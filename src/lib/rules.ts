@@ -12,14 +12,14 @@ export interface Rule {
   sources: EvidenceKey[];
 }
 
-const ALL: PersonId[] = ["mohammed", "bilal", "omar"];
+const ALL: PersonId[] = ["mohammed", "khalifa", "rashid"];
 
 export function buildRules(version: Version): Rule[] {
   const limit = version === 1 ? 10_000 : 25_000;
   return [
     {
       id: "R1",
-      label: "Any two of Mohammed, Bilal and Omar sign jointly",
+      label: "Any two of Mohammed, Khalifa and Rashid sign jointly",
       signers: ALL,
       count: 2,
       currency: "AED",
@@ -27,8 +27,8 @@ export function buildRules(version: Version): Rule[] {
     },
     {
       id: "R2",
-      label: `Bilal signs alone up to AED ${fmt(limit)}`,
-      signers: ["bilal"],
+      label: `Khalifa signs alone up to AED ${fmt(limit)}`,
+      signers: ["khalifa"],
       count: 1,
       currency: "AED",
       maxAmount: limit,
@@ -116,20 +116,20 @@ export function boundaryTests(rules: Rule[], held: PersonId[]): BoundaryTest[] {
   const cases: Omit<BoundaryTest, "actual" | "pass">[] = [
     {
       id: "at-limit",
-      label: `AED ${fmt(limit)} by Bilal alone`,
-      tx: { initiator: "bilal", approvers: [], amount: limit, currency: "AED" },
+      label: `AED ${fmt(limit)} by Khalifa alone`,
+      tx: { initiator: "khalifa", approvers: [], amount: limit, currency: "AED" },
       expected: "allowed",
     },
     {
       id: "over-limit",
-      label: `AED ${fmt(limit + 1)} by Bilal alone`,
-      tx: { initiator: "bilal", approvers: [], amount: limit + 1, currency: "AED" },
+      label: `AED ${fmt(limit + 1)} by Khalifa alone`,
+      tx: { initiator: "khalifa", approvers: [], amount: limit + 1, currency: "AED" },
       expected: "blocked",
     },
     {
       id: "over-limit-joint",
-      label: `AED ${fmt(limit + 1)} by Mohammed + Bilal`,
-      tx: { initiator: "mohammed", approvers: ["bilal"], amount: limit + 1, currency: "AED" },
+      label: `AED ${fmt(limit + 1)} by Mohammed + Khalifa`,
+      tx: { initiator: "mohammed", approvers: ["khalifa"], amount: limit + 1, currency: "AED" },
       expected: "allowed",
     },
     {
@@ -140,14 +140,14 @@ export function boundaryTests(rules: Rule[], held: PersonId[]): BoundaryTest[] {
     },
     {
       id: "held",
-      label: "Any amount by Omar",
-      tx: { initiator: "omar", approvers: ["bilal"], amount: 5_000, currency: "AED" },
+      label: "Any amount by Rashid",
+      tx: { initiator: "rashid", approvers: ["khalifa"], amount: 5_000, currency: "AED" },
       expected: "held",
     },
     {
       id: "usd",
-      label: "USD 1,000 by Bilal",
-      tx: { initiator: "bilal", approvers: [], amount: 1_000, currency: "USD" },
+      label: "USD 1,000 by Khalifa",
+      tx: { initiator: "khalifa", approvers: [], amount: 1_000, currency: "USD" },
       expected: "not_covered",
     },
   ];
@@ -246,8 +246,8 @@ export function buildStages(version: Version): Stage[] {
       items: people.map((p) => ({
         key: `role-${p.id}`,
         label: p.name,
-        value: p.id === "bilal" ? "Authorizer: joint and single" : "Authorizer: joint",
-        sources: p.id === "bilal" ? ["svs-man-c1", "svs-man-c2"] : ["svs-man-c1"],
+        value: p.id === "khalifa" ? "Authorizer: joint and single" : "Authorizer: joint",
+        sources: p.id === "khalifa" ? ["svs-man-c1", "svs-man-c2"] : ["svs-man-c1"],
       })),
     },
     {
@@ -269,13 +269,13 @@ export function buildStages(version: Version): Stage[] {
         {
           key: "wf-low",
           label: `AED 1 to ${fmt(limit)}`,
-          value: "Bilal approves alone, or any two approve",
+          value: "Khalifa approves alone, or any two approve",
           sources: r2Sources,
         },
         {
           key: "wf-high",
           label: `Above AED ${fmt(limit)}`,
-          value: "Any two of Mohammed, Bilal and Omar approve",
+          value: "Any two of Mohammed, Khalifa and Rashid approve",
           sources: ["svs-man-c1", ...r2Sources],
         },
         {
@@ -360,5 +360,5 @@ export function policyChecks(version: Version, held: PersonId[]): PolicyCheck[] 
   ];
 }
 
-export const heldIds = (omarRenewed: boolean): PersonId[] => (omarRenewed ? [] : ["omar"]);
+export const heldIds = (rashidRenewed: boolean): PersonId[] => (rashidRenewed ? [] : ["rashid"]);
 export const nameOf = (id: PersonId) => personById(id).name;

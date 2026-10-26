@@ -1,6 +1,7 @@
 "use client";
 
 import { Check } from "lucide-react";
+import { useEffect } from "react";
 import { business } from "@/data/seed";
 import { duration, lastTime, statusOf, stepStates } from "@/lib/derive";
 import { Tab, hasEvent, useStore } from "@/lib/store";
@@ -13,9 +14,11 @@ import { SimulatorView } from "./SimulatorView";
 import { ReviewView } from "./ReviewView";
 import { ReleaseView } from "./ReleaseView";
 import { AuditView } from "./AuditView";
+import { AutonomyView } from "./AutonomyView";
 
 const tabs: { id: Tab; label: string }[] = [
   { id: "run", label: "Agent run" },
+  { id: "autonomy", label: "Autonomy map" },
   { id: "evidence", label: "Evidence & identity" },
   { id: "plan", label: "Access plan" },
   { id: "simulator", label: "Simulator" },
@@ -28,10 +31,15 @@ export function CaseWorkspace() {
   const { state, tab, setTab, hydrated } = useStore();
   const st = statusOf[state.phase];
   const now = lastTime(state);
-  const firstLive = hasEvent(state, "rel-bilal-login");
+  const firstLive = hasEvent(state, "rel-khalifa-login");
   const rail = stepStates(state);
   const reviewDot = state.phase === "in_review" || state.phase === "re_review";
   const releaseDot = state.phase === "executed" || state.phase === "partially_live";
+  useEffect(() => {
+    if (!hydrated) return;
+    const want = new URLSearchParams(window.location.search).get("tab");
+    if (want && tabs.some((t) => t.id === want)) setTab(want as Tab);
+  }, [hydrated, setTab]);
   if (!hydrated) return null;
   return (
     <div className="flex h-full">
@@ -45,6 +53,9 @@ export function CaseWorkspace() {
               </div>
               <p className="mt-1 text-sm text-sub">
                 Joint signatories (3) · <span className="font-mono text-xs">{business.iban}</span> · {business.accountType}
+              </p>
+              <p className="mt-0.5 text-xs text-muted">
+                {business.address} · Trade licence {business.licence}
               </p>
             </div>
             <div className="text-right text-xs text-muted">
@@ -91,6 +102,7 @@ export function CaseWorkspace() {
         <div className="min-h-0 flex-1 overflow-y-auto px-8 py-6 pb-40">
           <div key={tab} className="animate-enter">
             {tab === "run" && <RunView />}
+            {tab === "autonomy" && <AutonomyView />}
             {tab === "evidence" && <EvidenceView />}
             {tab === "plan" && <PlanView />}
             {tab === "simulator" && <SimulatorView />}

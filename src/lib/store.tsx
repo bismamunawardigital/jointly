@@ -79,7 +79,7 @@ const approvalTimes: Record<number, string> = { 1: "Mon 10:04", 2: "Mon 10:05", 
 
 export const versionOf = (s: State): Version => (hasEvent(s, "rev-plan") ? 2 : 1);
 export const hasEvent = (s: State, id: string) => s.log.some((e) => e.kind === "agent" && e.id === id);
-export const omarRenewed = (s: State) => hasEvent(s, "ren-kyc");
+export const rashidRenewed = (s: State) => hasEvent(s, "ren-kyc");
 
 function human(id: string, time: string, text: string, by = checker.name): HumanEntry {
   return { id, kind: "human", time, by, text };
@@ -126,11 +126,11 @@ function reducer(s: State, a: Action): State {
     case "sendCleanup":
       return { ...s, cleanupTicket: "sent", log: [...s.log, human("cleanup", "Mon 09:40", "Sent Finacle Mode of Operation cleanup ticket to Data Quality")] };
     case "release": {
-      const log = [...s.log, human("release", "Mon 10:51", "Released Mohammed and Bilal. Omar stays held.")];
+      const log = [...s.log, human("release", "Mon 10:51", "Released Mohammed and Khalifa. Rashid stays held.")];
       return { ...s, log, phase: "releasing", queue: groupEvents("release"), queueGroup: "release" };
     }
     case "renew": {
-      const log = [...s.log, human("renew", "Wed 09:39", "Demo control: Omar renewed his EID", "Demo")];
+      const log = [...s.log, human("renew", "Wed 09:39", "Demo control: Rashid renewed his EID", "Demo")];
       return { ...s, log, phase: "renewing", queue: groupEvents("renew"), queueGroup: "renew" };
     }
     case "tour":
@@ -138,7 +138,7 @@ function reducer(s: State, a: Action): State {
   }
 }
 
-const KEY = "jointly-demo-v1";
+const KEY = "jointly-demo-v2";
 
 interface Ctx {
   state: State;
@@ -152,7 +152,7 @@ interface Ctx {
   setTab: (t: Tab) => void;
 }
 
-export type Tab = "run" | "evidence" | "plan" | "simulator" | "review" | "release" | "audit";
+export type Tab = "run" | "autonomy" | "evidence" | "plan" | "simulator" | "review" | "release" | "audit";
 
 const StoreContext = createContext<Ctx | null>(null);
 
@@ -182,7 +182,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
   const openEvidence = useCallback((k: EvidenceKey | null) => setEvidenceOpen(k), []);
   const version = versionOf(state);
-  const renewed = omarRenewed(state);
+  const renewed = rashidRenewed(state);
   const held = useMemo(() => heldIds(renewed), [renewed]);
 
   const value = useMemo(

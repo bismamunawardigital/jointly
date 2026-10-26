@@ -8,7 +8,7 @@ import { hasEvent, useStore } from "@/lib/store";
 import { useTourTarget } from "@/components/Tour";
 import { Button, Card, Empty, Pill, Sources, cn } from "@/components/ui";
 
-const defaultNote = "Bilal's single limit was raised in 2023. Please check SVS for the amendment letter.";
+const defaultNote = "Khalifa's single limit was raised in 2023. Please check SVS for the amendment letter.";
 
 export function ReviewView() {
   const { state, dispatch, version } = useStore();

@@ -67,10 +67,10 @@ export function EvidenceView() {
                         <div className="space-y-1">
                           <Pill tone="bad">EID expired</Pill>
                           <p className="text-xs text-muted">Expired {p.eidExpiry}</p>
-                          <SourceChip k="eid-omar" />
+                          <SourceChip k="eid-rashid" />
                         </div>
                       ) : (
-                        <Pill tone="ok">{p.id === "omar" ? "Renewed" : "Valid"}</Pill>
+                        <Pill tone="ok">{p.id === "rashid" ? "Renewed" : "Valid"}</Pill>
                       )}
                     </td>
                     <td className="px-4 py-3 text-xs">
@@ -92,7 +92,7 @@ export function EvidenceView() {
         </Card>
         {!renewed && (
           <p className="mt-3 text-xs text-sub">
-            EID update request started for Omar at {hasEvent(state, "kyc-request") ? "Mon 09:13" : "…"}. KYC is never waived, so he stays held until it clears.
+            EID update request started for Rashid at {hasEvent(state, "kyc-request") ? "Mon 09:13" : "…"}. KYC is never waived, so he stays held until it clears.
           </p>
         )}
       </section>
@@ -107,7 +107,7 @@ export function EvidenceView() {
                 <Pill tone="warn">Too coarse</Pill>
               </div>
               <p className="mt-3 font-mono text-sm">JOINTLY - ANY TWO</p>
-              <p className="mt-2 text-sm text-sub">No amount bands. No single-signing right for Bilal.</p>
+              <p className="mt-2 text-sm text-sub">No amount bands. No single-signing right for Khalifa.</p>
               <div className="mt-3">
                 <SourceChip k="finacle-mop" />
               </div>
@@ -129,7 +129,7 @@ export function EvidenceView() {
                   <span className="font-mono text-xs text-muted">cl.2</span>
                   <div className="flex-1">
                     <p>
-                      Bilal can sign alone up to{" "}
+                      Khalifa can sign alone up to{" "}
                       {searchedAll ? (
                         <>
                           <span className="text-muted line-through">AED 10,000</span> <span className="font-medium">AED 25,000</span>

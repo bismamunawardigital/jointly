@@ -17,7 +17,7 @@ const outcomeUi: Record<Outcome, { label: string; tone: Tone }> = {
 export function SimulatorView() {
   const { state, version, held } = useStore();
   const [v, setV] = useState<1 | 2 | null>(null);
-  const [initiator, setInitiator] = useState<PersonId>("bilal");
+  const [initiator, setInitiator] = useState<PersonId>("khalifa");
   const [approvers, setApprovers] = useState<PersonId[]>([]);
   const [amount, setAmount] = useState(10_001);
   const [currency, setCurrency] = useState("AED");

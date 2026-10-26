@@ -11,7 +11,7 @@ const groupTitle: Record<Group, string> = {
   revise: "Revision after Sara's return",
   execute: "Execution",
   release: "Release",
-  renew: "Omar added later",
+  renew: "Rashid added later",
 };
 
 const icon = {
@@ -62,7 +62,7 @@ export function RunView() {
       const passed = checks.filter((c) => c.pass).length;
       title = `${e.title}: ${passed} of ${checks.length} checks`;
       const limit = buildRules(e.dynamic === "policy-v1" ? 1 : 2)[1].maxAmount!.toLocaleString("en-US");
-      detail = `Boundary tests at AED ${limit} and one dirham above, KYC hold on Omar, USD not covered, every signatory has a user and role.`;
+      detail = `Boundary tests at AED ${limit} and one dirham above, KYC hold on Rashid, USD not covered, every signatory has a user and role.`;
     }
     rows.push(
       <li key={e.id} className="relative flex gap-4 pb-5 animate-enter">

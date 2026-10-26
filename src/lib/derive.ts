@@ -73,11 +73,11 @@ export function progressFor(s: State, id: PersonId): Track[] {
       { label: "Access", done: hasEvent(s, "rel-mohammed"), time: t("rel-mohammed"), note: "Reused, no new credentials" },
       { label: "First login", done: hasEvent(s, "rel-mohammed-login"), time: t("rel-mohammed-login") },
     ];
-  if (id === "bilal")
+  if (id === "khalifa")
     return [
       { label: "Configured", done: hasEvent(s, "ex-users"), time: t("ex-users") },
-      { label: "Credentials claimed", done: hasEvent(s, "rel-bilal-verified"), time: t("rel-bilal-verified"), note: hasEvent(s, "rel-bilal-link") ? "Link sent " + eventById("rel-bilal-link").time : undefined },
-      { label: "First login", done: hasEvent(s, "rel-bilal-login"), time: t("rel-bilal-login") },
+      { label: "Credentials claimed", done: hasEvent(s, "rel-khalifa-verified"), time: t("rel-khalifa-verified"), note: hasEvent(s, "rel-khalifa-link") ? "Link sent " + eventById("rel-khalifa-link").time : undefined },
+      { label: "First login", done: hasEvent(s, "rel-khalifa-login"), time: t("rel-khalifa-login") },
     ];
   return [
     { label: "Configured", done: hasEvent(s, "ren-enable"), time: t("ren-enable"), note: hasEvent(s, "ex-users") && !hasEvent(s, "ren-enable") ? "Created, switched off" : undefined },

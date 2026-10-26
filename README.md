@@ -20,5 +20,5 @@ npm run build    # static export to out/
 
 - `/` case study
 - `/demo/` command center
-- `/demo/case/` the Al Noor Trading case: agent run, evidence, plan, simulator, checker review, release, audit log
+- `/demo/case/` the Creekside General Trading case: agent run, evidence, plan, simulator, checker review, release, audit log
 - `DESIGN.md` design system in the Google design.md format

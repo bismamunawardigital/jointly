@@ -1,4 +1,4 @@
-export type PersonId = "mohammed" | "bilal" | "omar";
+export type PersonId = "mohammed" | "khalifa" | "rashid";
 
 export interface Person {
   id: PersonId;
@@ -17,10 +17,12 @@ export interface Person {
 }
 
 export const business = {
-  id: "al-noor",
-  name: "Al Noor Trading LLC",
+  id: "creekside",
+  name: "Creekside General Trading LLC",
   iban: "AE07 0331 2345 6789 0123 456",
   accountType: "AED current account",
+  address: "Office 1408, Dubai Creek Harbour, Dubai",
+  licence: "DED 1029384",
   finacleMop: "JOINTLY - ANY TWO",
   submittedAt: "Mon 09:12",
 };
@@ -42,13 +44,13 @@ export const people: Person[] = [
     digitalUser: { existing: true, userId: "DBU-77120" },
   },
   {
-    id: "bilal",
-    name: "Bilal Hassan",
-    initials: "BH",
+    id: "khalifa",
+    name: "Khalifa Saeed Al Falasi",
+    initials: "KF",
     tint: "#E9F5EA",
-    formName: "Bilal Hassan",
-    finacleName: "BILAL HASSAN",
-    svsName: "Bilal Hassan",
+    formName: "Khalifa Saeed Al Falasi",
+    finacleName: "KHALIFA S ALFALASI",
+    svsName: "Khalifa Al Falasi",
     rcif: "100587",
     eidLast4: "7714",
     eidExpiry: "19-Nov-2027",
@@ -57,13 +59,13 @@ export const people: Person[] = [
     digitalUser: { existing: false },
   },
   {
-    id: "omar",
-    name: "Omar Khalid",
-    initials: "OK",
+    id: "rashid",
+    name: "Rashid Omar Al Suwaidi",
+    initials: "RS",
     tint: "#FBEDE3",
-    formName: "Omar Khalid",
-    finacleName: "OMAR KHALID",
-    svsName: "Omar Khalid",
+    formName: "Rashid Omar Al Suwaidi",
+    finacleName: "RASHID O SUWAIDI",
+    svsName: "Rashid Al Suwaidi",
     rcif: "100912",
     eidLast4: "5082",
     eidExpiry: "14-Aug-2026",
@@ -78,9 +80,9 @@ export const firstName = (id: PersonId) => personById(id).name.split(" ")[0];
 
 export type EvidenceKey =
   | "form-mohammed"
-  | "form-bilal"
-  | "form-omar"
-  | "eid-omar"
+  | "form-khalifa"
+  | "form-rashid"
+  | "eid-rashid"
   | "finacle-cif"
   | "finacle-mop"
   | "svs-signatories"
@@ -101,48 +103,48 @@ export interface Evidence {
 }
 
 const mandateText =
-  "Any two of Mohammed Abdulla Al Mansoori, Bilal Hassan and Omar Khalid shall sign jointly. Notwithstanding the above, Bilal Hassan may sign singly for AED payments up to and including AED 10,000.";
+  "Any two of Mohammed Abdulla Al Mansoori, Khalifa Saeed Al Falasi and Rashid Omar Al Suwaidi shall sign jointly. Notwithstanding the above, Khalifa Saeed Al Falasi may sign singly for AED payments up to and including AED 10,000.";
 
 export const evidence: Record<EvidenceKey, Evidence> = {
   "form-mohammed": {
     key: "form-mohammed",
     title: "Signed registration form",
     system: "Document store",
-    ref: "FORM-AN-0001",
+    ref: "FORM-CG-0001",
     body: "Signatory: Mohammed Abdulla Al Mansoori. EID ending 3391. Signed 24-Oct-2026.",
     highlight: "Mohammed Abdulla Al Mansoori",
   },
-  "form-bilal": {
-    key: "form-bilal",
+  "form-khalifa": {
+    key: "form-khalifa",
     title: "Signed registration form",
     system: "Document store",
-    ref: "FORM-AN-0002",
-    body: "Signatory: Bilal Hassan. EID ending 7714. Signed 24-Oct-2026.",
-    highlight: "Bilal Hassan",
+    ref: "FORM-CG-0002",
+    body: "Signatory: Khalifa Saeed Al Falasi. EID ending 7714. Signed 24-Oct-2026.",
+    highlight: "Khalifa Saeed Al Falasi",
   },
-  "form-omar": {
-    key: "form-omar",
+  "form-rashid": {
+    key: "form-rashid",
     title: "Signed registration form",
     system: "Document store",
-    ref: "FORM-AN-0003",
-    body: "Signatory: Omar Khalid. EID ending 5082. Signed 24-Oct-2026.",
-    highlight: "Omar Khalid",
+    ref: "FORM-CG-0003",
+    body: "Signatory: Rashid Omar Al Suwaidi. EID ending 5082. Signed 24-Oct-2026.",
+    highlight: "Rashid Omar Al Suwaidi",
   },
-  "eid-omar": {
-    key: "eid-omar",
+  "eid-rashid": {
+    key: "eid-rashid",
     title: "Emirates ID status",
     system: "KYC service",
     ref: "EID ending 5082",
-    body: "Holder: Omar Khalid. Status: expired. Expiry date: 14-Aug-2026.",
+    body: "Holder: Rashid Omar Al Suwaidi. Status: expired. Expiry date: 14-Aug-2026.",
     highlight: "expired. Expiry date: 14-Aug-2026",
-    note: "KYC is never waived. Omar is held until a renewed EID is on file.",
+    note: "KYC is never waived. Rashid is held until a renewed EID is on file.",
   },
   "finacle-cif": {
     key: "finacle-cif",
     title: "Customer records (inquiryCIF)",
     system: "Finacle",
     ref: "RCIF 100234 · 100587 · 100912",
-    body: "100234 MOHD A MANSOURI, EID ending 3391. 100587 BILAL HASSAN, EID ending 7714. 100912 OMAR KHALID, EID ending 5082.",
+    body: "100234 MOHD A MANSOURI, EID ending 3391. 100587 KHALIFA S ALFALASI, EID ending 7714. 100912 RASHID O SUWAIDI, EID ending 5082.",
     highlight: "MOHD A MANSOURI",
   },
   "finacle-mop": {
@@ -159,7 +161,7 @@ export const evidence: Record<EvidenceKey, Evidence> = {
     title: "Signatory records",
     system: "SVS",
     ref: "Account AE07…0123 456",
-    body: "Mohammed Al Mansouri (RCIF 100234). Bilal Hassan (RCIF 100587). Omar Khalid (RCIF 100912).",
+    body: "Mohammed Al Mansouri (RCIF 100234). Khalifa Al Falasi (RCIF 100587). Rashid Al Suwaidi (RCIF 100912).",
     highlight: "Mohammed Al Mansouri (RCIF 100234)",
   },
   "svs-man": {
@@ -169,7 +171,7 @@ export const evidence: Record<EvidenceKey, Evidence> = {
     ref: "SVS-MAN-2019-0441",
     body: mandateText,
     highlight:
-      "Notwithstanding the above, Bilal Hassan may sign singly for AED payments up to and including AED 10,000.",
+      "Notwithstanding the above, Khalifa Saeed Al Falasi may sign singly for AED payments up to and including AED 10,000.",
   },
   "svs-man-c1": {
     key: "svs-man-c1",
@@ -177,7 +179,7 @@ export const evidence: Record<EvidenceKey, Evidence> = {
     system: "SVS",
     ref: "SVS-MAN-2019-0441",
     body: mandateText,
-    highlight: "Any two of Mohammed Abdulla Al Mansoori, Bilal Hassan and Omar Khalid shall sign jointly.",
+    highlight: "Any two of Mohammed Abdulla Al Mansoori, Khalifa Saeed Al Falasi and Rashid Omar Al Suwaidi shall sign jointly.",
   },
   "svs-man-c2": {
     key: "svs-man-c2",
@@ -186,14 +188,14 @@ export const evidence: Record<EvidenceKey, Evidence> = {
     ref: "SVS-MAN-2019-0441",
     body: mandateText,
     highlight:
-      "Notwithstanding the above, Bilal Hassan may sign singly for AED payments up to and including AED 10,000.",
+      "Notwithstanding the above, Khalifa Saeed Al Falasi may sign singly for AED payments up to and including AED 10,000.",
   },
   "svs-amd": {
     key: "svs-amd",
     title: "Amendment letter, 2023",
     system: "SVS",
     ref: "SVS-AMD-2023-0107",
-    body: "The single-signing limit of Bilal Hassan is revised to AED 25,000 with effect from 01-Mar-2023.",
+    body: "The single-signing limit of Khalifa Saeed Al Falasi is revised to AED 25,000 with effect from 01-Mar-2023.",
     highlight: "revised to AED 25,000",
     note: "Filed under document type Letter, not Mandate.",
   },

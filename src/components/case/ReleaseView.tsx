@@ -22,7 +22,7 @@ export function ReleaseView() {
   return (
     <div className="max-w-5xl space-y-8">
       <section {...tour3}>
-        <SectionTitle aside={<AssumptionChip>partial release, validate with bank</AssumptionChip>}>Can we go live without Omar?</SectionTitle>
+        <SectionTitle aside={<AssumptionChip>partial release, validate with bank</AssumptionChip>}>Can we go live without Rashid?</SectionTitle>
         <Card className="p-5">
           <div className="flex items-center gap-8">
             <div className="flex items-center gap-3">
@@ -44,13 +44,13 @@ export function ReleaseView() {
                 ))}
               </div>
               <p className="mt-3 text-sm font-medium">{elig.summary}</p>
-              <p className="mt-1 text-xs text-muted">Checked by the rules engine. If Bilal were also held, Mohammed alone couldn&apos;t sign anything, and release would be blocked.</p>
+              <p className="mt-1 text-xs text-muted">Checked by the rules engine. If Khalifa were also held, Mohammed alone couldn&apos;t sign anything, and release would be blocked.</p>
             </div>
           </div>
           {state.phase === "executed" && (
             <div className="mt-5 border-t border-line pt-4">
               <Button variant="primary" disabled={!elig.eligible} onClick={() => dispatch({ type: "release" })}>
-                Release Mohammed and Bilal
+                Release Mohammed and Khalifa
               </Button>
             </div>
           )}

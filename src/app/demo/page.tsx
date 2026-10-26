@@ -66,7 +66,7 @@ export default function CommandCenter() {
                 <td className="px-4 py-3">
                   <Pill tone={st.tone}>{st.label}</Pill>
                 </td>
-                <td className="px-4 py-3 text-sub">{st.label === "Needs you" ? "Sara M." : st.tone === "accent" ? "Agent" : state.phase === "partially_live" ? "Omar, EID renewal" : "None"}</td>
+                <td className="px-4 py-3 text-sub">{st.label === "Needs you" ? "Sara M." : st.tone === "accent" ? "Agent" : state.phase === "partially_live" ? "Rashid, EID renewal" : "None"}</td>
                 <td className="tnum px-4 py-3 text-right text-sub">Today</td>
               </tr>
               {otherCases.map((c) => (
@@ -84,7 +84,7 @@ export default function CommandCenter() {
             </tbody>
           </table>
         </Card>
-        <p className="mt-3 text-xs text-muted">Only Al Noor Trading is clickable in this demo.</p>
+        <p className="mt-3 text-xs text-muted">Only Creekside General Trading is clickable in this demo.</p>
       </div>
     </div>
   );
