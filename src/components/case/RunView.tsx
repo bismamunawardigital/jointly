@@ -1,0 +1,111 @@
+"use client";
+
+import { AlertTriangle, Ban, Check, Info, Loader2, UserRound } from "lucide-react";
+import { Group, eventById } from "@/lib/script";
+import { buildRules, policyChecks } from "@/lib/rules";
+import { useStore } from "@/lib/store";
+import { AssumptionChip, Empty, Sources, cn } from "@/components/ui";
+
+const groupTitle: Record<Group, string> = {
+  run: "First run",
+  revise: "Revision after Sara's return",
+  execute: "Execution",
+  release: "Release",
+  renew: "Omar added later",
+};
+
+const icon = {
+  ok: <Check className="h-3 w-3 text-ok" strokeWidth={3} />,
+  warn: <AlertTriangle className="h-3 w-3 text-warn" />,
+  block: <Ban className="h-3 w-3 text-bad" />,
+  info: <Info className="h-3 w-3 text-muted" />,
+};
+
+export function RunView() {
+  const { state, held } = useStore();
+  if (!state.log.length && !state.queue.length)
+    return <Empty icon={Loader2} title="The agent hasn't started" body="Press Start agent run on the right. Each step shows what it called, what it found and where it found it." />;
+
+  let lastGroup: Group | null = null;
+  const rows: React.ReactNode[] = [];
+  for (const entry of state.log) {
+    if (entry.kind === "human") {
+      rows.push(
+        <li key={entry.id} className="relative flex gap-4 pb-5 animate-enter">
+          <span className="tnum w-[72px] shrink-0 pt-0.5 text-xs text-muted">{entry.time}</span>
+          <span className="relative z-10 mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-ink bg-white">
+            <UserRound className="h-3 w-3" />
+          </span>
+          <div className="min-w-0 flex-1 rounded-lg border border-line bg-panel/60 px-3 py-2">
+            <p className="text-xs text-muted">{entry.by}</p>
+            <p className="text-sm font-medium">{entry.text}</p>
+          </div>
+        </li>,
+      );
+      continue;
+    }
+    const e = eventById(entry.id);
+    if (e.group !== lastGroup) {
+      lastGroup = e.group;
+      rows.push(
+        <li key={`g-${e.group}`} className="relative flex gap-4 pb-4 pt-2">
+          <span className="w-[72px] shrink-0" />
+          <span className="relative z-10 w-5 shrink-0" />
+          <p className="text-xs font-medium text-muted">{groupTitle[e.group]}</p>
+        </li>,
+      );
+    }
+    let title = e.title;
+    let detail = e.detail;
+    if (e.dynamic) {
+      const checks = policyChecks(e.dynamic === "policy-v1" ? 1 : 2, held);
+      const passed = checks.filter((c) => c.pass).length;
+      title = `${e.title}: ${passed} of ${checks.length} checks`;
+      const limit = buildRules(e.dynamic === "policy-v1" ? 1 : 2)[1].maxAmount!.toLocaleString("en-US");
+      detail = `Boundary tests at AED ${limit} and one dirham above, KYC hold on Omar, USD not covered, every signatory has a user and role.`;
+    }
+    rows.push(
+      <li key={e.id} className="relative flex gap-4 pb-5 animate-enter">
+        <span className="tnum w-[72px] shrink-0 pt-0.5 text-xs text-muted">{e.time}</span>
+        <span className={cn("relative z-10 mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border bg-white", e.status === "block" ? "border-bad/40" : e.status === "warn" ? "border-warn/40" : "border-line")}>
+          {icon[e.status]}
+        </span>
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs">
+            <span className={cn("font-medium", e.actor === "Rules engine" ? "text-ok-ink" : "text-accent-ink")}>{e.actor}</span>
+            <span className="font-mono text-[11px] text-muted">
+              {e.call} → {e.system}
+            </span>
+          </div>
+          <p className={cn("mt-0.5 text-sm font-medium", e.status === "block" && "text-bad-ink")}>{title}</p>
+          {detail && <p className="mt-0.5 max-w-2xl text-sm text-sub">{detail}</p>}
+          {(e.evidence || e.assumption) && (
+            <div className="mt-2 flex flex-wrap items-center gap-1">
+              <Sources keys={e.evidence} />
+              {e.assumption && <AssumptionChip>{e.assumption}</AssumptionChip>}
+            </div>
+          )}
+        </div>
+      </li>,
+    );
+  }
+  if (state.queue.length) {
+    const n = eventById(state.queue[0]);
+    rows.push(
+      <li key="working" className="relative flex gap-4 pb-5">
+        <span className="w-[72px] shrink-0" />
+        <span className="relative z-10 mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-accent/40 bg-white">
+          <Loader2 className="h-3 w-3 animate-spin text-accent" />
+        </span>
+        <p className="text-sm text-muted">
+          {n.actor} calling <span className="font-mono text-xs">{n.call}</span>
+        </p>
+      </li>,
+    );
+  }
+  return (
+    <ol className="relative max-w-3xl before:absolute before:bottom-6 before:left-[97.5px] before:top-2 before:w-px before:bg-line" aria-live="polite">
+      {rows}
+    </ol>
+  );
+}
