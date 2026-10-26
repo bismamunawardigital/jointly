@@ -184,7 +184,7 @@ export const script: AgentEvent[] = [
     id: "ex-readback", group: "execute", step: "execute", time: "Mon 10:46", actor: "Rules engine",
     call: "admin.readBack", system: "Digital Banking Admin", status: "ok",
     title: "Read-back check: configured = approved",
-    detail: "Compared all 4 stages field by field against approved plan v2. 0 differences.",
+    detail: "Compared all 4 stages field by field against the approved {plan}. 0 differences.",
   },
   {
     id: "ex-eligibility", group: "execute", step: "release", time: "Mon 10:47", actor: "Release Agent",

@@ -22,7 +22,7 @@ const icon = {
 };
 
 export function RunView() {
-  const { state, held } = useStore();
+  const { state, held, version } = useStore();
   if (!state.log.length && !state.queue.length)
     return <Empty icon={Loader2} title="The agent hasn't started" body="Press Start agent run on the right. Each step shows what it called, what it found and where it found it." />;
 
@@ -56,7 +56,7 @@ export function RunView() {
       );
     }
     let title = e.title;
-    let detail = e.detail;
+    let detail = e.detail?.replace("{plan}", `plan v${version}`);
     if (e.dynamic) {
       const checks = policyChecks(e.dynamic === "policy-v1" ? 1 : 2, held);
       const passed = checks.filter((c) => c.pass).length;
