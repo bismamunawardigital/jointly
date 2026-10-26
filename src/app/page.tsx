@@ -135,11 +135,12 @@ export default function CaseStudy() {
       </section>
 
       <section className="mx-auto max-w-5xl px-6 py-16">
-        <h2 className="text-2xl font-semibold tracking-tight">What I heard</h2>
+        <h2 className="text-2xl font-semibold tracking-tight">The problem isn&apos;t hard. It&apos;s slow.</h2>
         <p className="mt-2 max-w-2xl text-sub">
-          I mapped the single, joint and non-signatory flows and spoke with
-          people who run them. The work isn&apos;t hard. It&apos;s slow, manual
-          and easy to get slightly wrong.
+          I mapped the single, joint and non-signatory flows and spoke with the
+          people who run them. Nobody is confused. They&apos;re copying the
+          same names between 4 systems, waiting on each other, and one missed
+          letter can change who is allowed to sign.
         </p>
         <div className="mt-8 grid gap-px overflow-hidden rounded-xl border border-line bg-line sm:grid-cols-2 md:grid-cols-4">
           {findings.map((f) => (
@@ -153,7 +154,7 @@ export default function CaseStudy() {
 
       <section className="mx-auto max-w-5xl px-6 pb-16">
         <h2 className="text-2xl font-semibold tracking-tight">
-          Who decides what
+          Before any screen: who decides what
         </h2>
         <p className="mt-2 max-w-2xl text-sub">
           The first thing I designed wasn&apos;t a screen. It was this map.
@@ -198,7 +199,7 @@ export default function CaseStudy() {
       <section className="border-t border-line">
         <div className="mx-auto max-w-5xl px-6 py-16">
           <h2 className="text-2xl font-semibold tracking-tight">
-            Agent design patterns
+            6 patterns I&apos;d reuse on any agent
           </h2>
           <p className="mt-2 max-w-2xl text-sub">
             Six patterns I&apos;d bring to any agent that works inside old
@@ -228,7 +229,7 @@ export default function CaseStudy() {
       <section className="border-t border-line">
         <div className="mx-auto max-w-5xl px-6 py-16">
           <h2 className="text-2xl font-semibold tracking-tight">
-            The card Sara lives in
+            The one card Sara uses all day
           </h2>
           <p className="mt-2 max-w-2xl text-sub">
             The checker spends most of her day on this one card, so I sweated
@@ -262,7 +263,7 @@ export default function CaseStudy() {
       <section className="border-t border-line">
         <div className="mx-auto max-w-5xl px-6 py-16">
           <h2 className="text-2xl font-semibold tracking-tight">Grounded in research</h2>
-          <p className="mt-2 max-w-2xl text-sub">Each pattern comes from a study or guideline, not a hunch.</p>
+          <p className="mt-2 max-w-2xl text-sub">Where a decision came from a paper or a rule, here it is, so you can check me.</p>
           <ul className="mt-8 grid gap-3 text-sm md:grid-cols-2">
             {grounded.map((g) => (
               <li key={g.href} className="rounded-xl border border-line bg-surface p-4">
@@ -280,7 +281,7 @@ export default function CaseStudy() {
       <section className="border-t border-line bg-panel/50">
         <div className="mx-auto max-w-5xl px-6 py-16">
           <h2 className="text-2xl font-semibold tracking-tight">
-            What I&apos;d test next
+            What I don&apos;t know yet
           </h2>
           <ul className="mt-6 grid gap-3 text-sm text-sub md:grid-cols-2">
             <li className="rounded-xl border border-dashed border-warn/50 bg-surface p-4">
