@@ -86,7 +86,7 @@ export function CaseWorkspace() {
             {rail.map((s, i) => (
               <li key={s.id} className="flex min-w-0 flex-1 items-center gap-1">
                 <div className={cn("flex min-w-0 flex-1 items-center gap-1.5 rounded-md px-1.5 py-1 text-xs", s.state === "active" ? "bg-accent-soft text-accent-ink" : s.state === "done" ? "text-sub" : "text-muted")}>
-                  <span className={cn("flex h-4 w-4 shrink-0 items-center justify-center rounded-full border text-[9px]", s.state === "done" ? "border-ok bg-ok text-white" : s.state === "active" ? "border-accent text-accent" : "border-line")}>
+                  <span className={cn("flex h-4 w-4 shrink-0 items-center justify-center rounded-full border text-[9px]", s.state === "done" ? "border-ok bg-ok text-onaccent" : s.state === "active" ? "border-accent text-accent" : "border-line")}>
                     {s.state === "done" ? <Check className="h-2.5 w-2.5" strokeWidth={3} /> : i + 1}
                   </span>
                   <span className="leading-tight">{s.label}</span>

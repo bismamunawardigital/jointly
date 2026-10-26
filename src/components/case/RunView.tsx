@@ -30,7 +30,7 @@ export function RunView() {
   const rows: React.ReactNode[] = [];
   if (hasEvent(state, "submit"))
     rows.push(
-      <li key="summary" className="relative z-10 mb-6 ml-[96px] rounded-lg border border-line bg-white px-3 py-2.5">
+      <li key="summary" className="relative z-10 mb-6 ml-[96px] rounded-lg border border-line bg-surface px-3 py-2.5">
         <p className="text-xs text-muted">3 things worth knowing</p>
         <ul className="mt-1.5 flex flex-wrap gap-2 text-xs">
           <li className="rounded-md bg-bad-soft px-2 py-1 text-bad-ink">Rashid held: EID expired</li>
@@ -44,7 +44,7 @@ export function RunView() {
       rows.push(
         <li key={entry.id} className="relative flex gap-4 pb-5 animate-enter">
           <span className="tnum w-[72px] shrink-0 pt-0.5 text-xs text-muted">{entry.time}</span>
-          <span className="relative z-10 mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-ink bg-white">
+          <span className="relative z-10 mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-ink bg-surface">
             <UserRound className="h-3 w-3" />
           </span>
           <div className="min-w-0 flex-1 rounded-lg border border-line bg-panel/60 px-3 py-2">
@@ -78,7 +78,7 @@ export function RunView() {
     rows.push(
       <li key={e.id} className="relative flex gap-4 pb-5 animate-enter">
         <span className="tnum w-[72px] shrink-0 pt-0.5 text-xs text-muted">{e.time}</span>
-        <span className={cn("relative z-10 mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border bg-white", e.status === "block" ? "border-bad/40" : e.status === "warn" ? "border-warn/40" : "border-line")}>
+        <span className={cn("relative z-10 mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border bg-surface", e.status === "block" ? "border-bad/40" : e.status === "warn" ? "border-warn/40" : "border-line")}>
           {icon[e.status]}
         </span>
         <div className="min-w-0 flex-1">
@@ -105,7 +105,7 @@ export function RunView() {
     rows.push(
       <li key="working" className="relative flex gap-4 pb-5">
         <span className="w-[72px] shrink-0" />
-        <span className="relative z-10 mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-accent/40 bg-white">
+        <span className="relative z-10 mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-accent/40 bg-surface">
           <Loader2 className="h-3 w-3 animate-spin text-accent" />
         </span>
         <p className="text-sm text-muted">

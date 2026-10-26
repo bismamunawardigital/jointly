@@ -123,7 +123,7 @@ export function NeedsYou() {
             </div>
           </li>
         </ul>
-        <div className="mt-5 rounded-lg border border-line bg-white p-3">
+        <div className="mt-5 rounded-lg border border-line bg-surface p-3">
           <p className="text-xs font-medium text-ink">The agent never</p>
           <ul className="mt-1.5 space-y-1 text-xs text-sub">
             <li>Waives EFR</li>

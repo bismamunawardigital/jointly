@@ -1,7 +1,7 @@
 import { Check, FileText, Undo2 } from "lucide-react";
 
 const hatch = {
-  backgroundImage: "repeating-linear-gradient(45deg, rgba(30,91,216,0.16) 0 1px, transparent 1px 6px)",
+  backgroundImage: "repeating-linear-gradient(45deg, rgb(var(--accent) / 0.16) 0 1px, transparent 1px 6px)",
 };
 
 function Gap({ h, label, horizontal = false }: { h: number; label: string; horizontal?: boolean }) {
@@ -10,7 +10,7 @@ function Gap({ h, label, horizontal = false }: { h: number; label: string; horiz
       className="relative flex shrink-0 items-center justify-center"
       style={{ ...hatch, ...(horizontal ? { width: h } : { height: h }) }}
     >
-      <span className="absolute z-10 rounded bg-accent px-1 font-mono text-[9px] leading-[14px] text-white">{label}</span>
+      <span className="absolute z-10 rounded bg-accent px-1 font-mono text-[9px] leading-[14px] text-onaccent">{label}</span>
     </div>
   );
 }
@@ -27,7 +27,7 @@ const specs = [
   { k: "Row padding", v: "12 / 10" },
   { k: "Button gap", v: "8" },
   { k: "Corner radius", v: "12 card, 8 rows" },
-  { k: "Border", v: "1px #E6E7EA" },
+  { k: "Border", v: "1px line" },
   { k: "Type", v: "12 label, 16 title" },
 ];
 
@@ -39,8 +39,8 @@ export function SpecDrawing() {
           <span className="h-3 w-3 rounded-tl-[12px] border-l border-t border-accent" /> r 12
         </Tag>
         <Tag className="right-10 top-3">stage card · 560 max</Tag>
-        <div className="overflow-hidden rounded-xl border border-ink/30" style={hatch} aria-hidden>
-          <div className="m-5 flex flex-col bg-white">
+        <div className="overflow-hidden rounded-xl border border-line-strong" style={hatch} aria-hidden>
+          <div className="m-5 flex flex-col bg-surface">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-xs text-muted">Stage 3 of 4</p>
@@ -56,7 +56,7 @@ export function SpecDrawing() {
                 <Gap h={12} label="12" horizontal />
                 <div className="flex flex-1 flex-col">
                   <div className="h-2.5" />
-                  <div className="flex items-start justify-between gap-4 bg-white">
+                  <div className="flex items-start justify-between gap-4 bg-surface">
                     <div>
                       <p className="text-xs text-muted">R2</p>
                       <p className="text-sm">Khalifa signs alone up to AED 10,000</p>
@@ -72,7 +72,7 @@ export function SpecDrawing() {
             </div>
             <Gap h={16} label="16" />
             <div className="flex">
-              <span className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-accent px-3 text-sm font-medium text-white">
+              <span className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-accent px-3 text-sm font-medium text-onaccent">
                 <Check className="h-3.5 w-3.5" /> Approve stage 3
               </span>
               <Gap h={8} label="8" horizontal />

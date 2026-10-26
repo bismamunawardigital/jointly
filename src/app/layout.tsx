@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
+import { IBM_Plex_Sans, IBM_Plex_Sans_Arabic, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 import { StoreProvider } from "@/lib/store";
 
@@ -7,6 +7,11 @@ const sans = IBM_Plex_Sans({
   subsets: ["latin"],
   weight: ["400", "500", "600"],
   variable: "--font-sans",
+});
+const arabic = IBM_Plex_Sans_Arabic({
+  subsets: ["arabic"],
+  weight: ["400", "500", "600"],
+  variable: "--font-arabic",
 });
 const mono = IBM_Plex_Mono({
   subsets: ["latin"],
@@ -20,9 +25,14 @@ export const metadata: Metadata = {
     "An agentic operations workbench that gets joint-signatory businesses onto digital banking in hours, on top of Finacle and SVS. Portfolio demo by Bisma Munawar.",
 };
 
+const themeScript = `try{if(localStorage.getItem("jointly-theme")==="dark")document.documentElement.dataset.theme="dark"}catch(e){}`;
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${sans.variable} ${mono.variable}`}>
+    <html lang="en" className={`${sans.variable} ${arabic.variable} ${mono.variable}`} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body>
         <StoreProvider>{children}</StoreProvider>
       </body>

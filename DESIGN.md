@@ -2,21 +2,22 @@
 name: Jointly
 description: Agentic operations workbench for onboarding joint-signatory businesses to digital banking on top of Finacle and SVS.
 colors:
-  ink: "#17181C"
-  sub: "#4B4F58"
-  muted: "#6B6F78"
-  line: "#E6E7EA"
-  panel: "#F6F7F8"
+  ink: "#16171A"
+  sub: "#4A4C52"
+  muted: "#6E6F73"
+  line: "#E7E4DE"
+  panel: "#F4F2EE"
   surface: "#FFFFFF"
-  accent: "#1E5BD8"
-  accent-soft: "#EAF0FD"
-  accent-ink: "#16449F"
-  ok: "#17803D"
-  ok-soft: "#E8F5EC"
-  warn: "#B25A07"
-  warn-soft: "#FDF1E3"
-  bad: "#B42323"
-  bad-soft: "#FCEBEB"
+  canvas: "#FBFAF7"
+  accent: "#2449B4"
+  accent-soft: "#EEF3FC"
+  accent-ink: "#1C3A93"
+  ok: "#157A43"
+  ok-soft: "#E6F4EC"
+  warn: "#A65A0B"
+  warn-soft: "#FBF0E1"
+  bad: "#B3261E"
+  bad-soft: "#FBEAE8"
 typography:
   body:
     fontFamily: IBM Plex Sans
@@ -68,11 +69,13 @@ components:
 
 ## Overview
 
-Jointly is an Operate-mode tool. A Customer Fulfillment checker uses it all day to move cases forward, so scanability and trust beat expression. The interface should feel like a calm, precise instrument: white surfaces, hairline borders, one blue accent, and colour only where it carries meaning.
+Jointly is an Operate-mode tool. A Customer Fulfillment checker uses it all day to move cases forward, so scanability and trust beat expression. The interface should feel like a calm, precise instrument: a warm canvas with white surfaces, hairline borders, one blue accent, and colour only where it carries meaning.
 
 The product story is always visible in the UI: the agent proposes, rules verify, a human approves, the agent executes, the system verifies.
 
 ## Colors
+
+All colours are CSS variables in `src/app/globals.css`, with a dark set under `[data-theme="dark"]`. Light is the default, dark is a switch in the sidebar. The full brand guide lives at `public/brand/brand-guidelines.html`.
 
 - **Neutrals** (ink, sub, muted, line, panel) carry 90% of the screen.
 - **Accent blue** is for the primary action, focus, the active tour target and agent activity. Never decorative.

@@ -86,7 +86,7 @@ export function ReleaseView() {
               <ol className="mt-4 space-y-3">
                 {progressFor(state, p.id).map((t) => (
                   <li key={t.label} className="flex gap-2.5">
-                    <span className={cn("mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border", t.done ? "border-ok bg-ok text-white" : "border-line")}>
+                    <span className={cn("mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border", t.done ? "border-ok bg-ok text-onaccent" : "border-line")}>
                       {t.done && <Check className="h-2.5 w-2.5" strokeWidth={3} />}
                     </span>
                     <div className="text-sm">

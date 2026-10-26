@@ -68,12 +68,12 @@ export function Tour() {
   };
   if (min)
     return (
-      <button onClick={() => setMin(false)} className="fixed bottom-4 right-4 z-40 hidden animate-enter items-center gap-2 rounded-full border border-line bg-white px-3 py-1.5 text-xs font-medium text-accent-ink shadow-[0_4px_16px_rgba(23,24,28,0.08)] hover:bg-panel lg:flex">
+      <button onClick={() => setMin(false)} className="fixed bottom-4 right-4 z-40 hidden animate-enter items-center gap-2 rounded-full border border-line bg-surface px-3 py-1.5 text-xs font-medium text-accent-ink shadow-md hover:bg-panel lg:flex">
         <span className="h-1.5 w-1.5 rounded-full bg-accent" /> Moment {i + 1} of 4
       </button>
     );
   return (
-    <div className="fixed bottom-4 right-3 z-40 hidden w-[296px] animate-enter rounded-xl border border-line bg-white p-4 shadow-[0_8px_30px_rgba(23,24,28,0.08)] lg:block" role="dialog" aria-label="Guided tour">
+    <div className="fixed bottom-4 right-3 z-40 hidden w-[296px] animate-enter rounded-xl border border-line bg-surface p-4 shadow-lg lg:block" role="dialog" aria-label="Guided tour">
       <div className="flex items-center justify-between">
         <p className="text-xs font-medium text-accent-ink">Moment {i + 1} of 4</p>
         <div className="flex gap-0.5">

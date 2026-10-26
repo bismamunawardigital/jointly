@@ -1,23 +1,34 @@
 import type { Config } from "tailwindcss";
 
+const v = (name: string) => `rgb(var(--${name}) / <alpha-value>)`;
+
 const config: Config = {
   content: ["./src/**/*.{ts,tsx}"],
   theme: {
     extend: {
       fontFamily: {
-        sans: ["var(--font-sans)", "system-ui", "sans-serif"],
+        sans: ["var(--font-sans)", "var(--font-arabic)", "system-ui", "sans-serif"],
+        arabic: ["var(--font-arabic)", "var(--font-sans)", "sans-serif"],
         mono: ["var(--font-mono)", "ui-monospace", "monospace"],
       },
       colors: {
-        ink: "#17181C",
-        sub: "#4B4F58",
-        muted: "#6B6F78",
-        line: "#E6E7EA",
-        panel: "#F6F7F8",
-        accent: { DEFAULT: "#1E5BD8", soft: "#EAF0FD", ink: "#16449F" },
-        ok: { DEFAULT: "#17803D", soft: "#E8F5EC", ink: "#11612E" },
-        warn: { DEFAULT: "#B25A07", soft: "#FDF1E3", ink: "#8A4505" },
-        bad: { DEFAULT: "#B42323", soft: "#FCEBEB", ink: "#8D1A1A" },
+        canvas: v("canvas"),
+        surface: v("surface"),
+        panel: v("panel"),
+        line: { DEFAULT: v("line"), strong: v("line-strong") },
+        ink: v("ink"),
+        sub: v("sub"),
+        muted: v("muted"),
+        onaccent: v("onaccent"),
+        accent: { DEFAULT: v("accent"), hover: v("accent-hover"), soft: v("accent-soft"), ink: v("accent-ink") },
+        ok: { DEFAULT: v("ok"), soft: v("ok-soft"), ink: v("ok-ink") },
+        warn: { DEFAULT: v("warn"), soft: v("warn-soft"), ink: v("warn-ink") },
+        bad: { DEFAULT: v("bad"), soft: v("bad-soft"), ink: v("bad-ink") },
+      },
+      boxShadow: {
+        sm: "0 1px 2px rgb(var(--shadow) / 0.04)",
+        md: "0 1px 2px rgb(var(--shadow) / 0.04), 0 4px 12px rgb(var(--shadow) / 0.05)",
+        lg: "0 2px 4px rgb(var(--shadow) / 0.04), 0 12px 32px rgb(var(--shadow) / 0.10)",
       },
       transitionTimingFunction: {
         out: "cubic-bezier(0.23, 1, 0.32, 1)",

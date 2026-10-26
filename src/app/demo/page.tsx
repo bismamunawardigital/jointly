@@ -29,7 +29,7 @@ export default function CommandCenter() {
         <h1 className="mt-1 text-2xl font-semibold tracking-tight">Command center</h1>
         <div className="mt-8 grid grid-cols-4 gap-px overflow-hidden rounded-xl border border-line bg-line">
           {stats.map((s) => (
-            <div key={s.label} className="bg-white px-5 py-4">
+            <div key={s.label} className="bg-surface px-5 py-4">
               <p className="text-xs text-muted">{s.label}</p>
               <p className={`tnum mt-1 text-2xl font-semibold ${s.tone === "warn" && s.value !== "0" ? "text-warn-ink" : ""}`}>{s.value}</p>
               {s.note && <p className="mt-0.5 text-[11px] text-muted">{s.note}</p>}

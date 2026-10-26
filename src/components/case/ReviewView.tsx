@@ -60,7 +60,7 @@ export function ReviewView() {
         const canAct = reviewing && !valid && prevOk;
         const canReturn = canAct && version === 1 && s.id === 3;
         return (
-          <Card key={s.id} className={cn("p-5", canAct && "border-ink/30", valid && "bg-panel/30")}>
+          <Card key={s.id} className={cn("p-5", canAct && "border-line-strong", valid && "bg-panel/30")}>
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-xs text-muted">Stage {s.id} of 4</p>

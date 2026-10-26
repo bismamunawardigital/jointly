@@ -58,7 +58,7 @@ export function SimulatorView() {
                       setInitiator(p.id);
                       setApprovers((a) => a.filter((x) => x !== p.id));
                     }}
-                    className={cn("flex items-center gap-2 rounded-lg border px-2.5 py-1.5 text-sm transition-colors", initiator === p.id ? "border-ink bg-white" : "border-line text-sub hover:border-sub")}
+                    className={cn("flex items-center gap-2 rounded-lg border px-2.5 py-1.5 text-sm transition-colors", initiator === p.id ? "border-ink bg-surface" : "border-line text-sub hover:border-sub")}
                   >
                     <Avatar id={p.id} size={22} held={held.includes(p.id)} /> {firstName(p.id)}
                   </button>
@@ -72,7 +72,7 @@ export function SimulatorView() {
                   .filter((p) => p.id !== initiator)
                   .map((p) => (
                     <label key={p.id} className={cn("flex cursor-pointer items-center gap-2 rounded-lg border px-2.5 py-1.5 text-sm", approvers.includes(p.id) ? "border-ink" : "border-line text-sub")}>
-                      <input type="checkbox" className="accent-[#1E5BD8]" checked={approvers.includes(p.id)} onChange={() => toggle(p.id)} />
+                      <input type="checkbox" className="accent-accent" checked={approvers.includes(p.id)} onChange={() => toggle(p.id)} />
                       {firstName(p.id)}
                     </label>
                   ))}
@@ -91,7 +91,7 @@ export function SimulatorView() {
               </label>
               <label className="block">
                 <span className="mb-2 block text-xs text-muted">Currency</span>
-                <select value={currency} onChange={(e) => setCurrency(e.target.value)} className="h-9 rounded-lg border border-line bg-white px-2 text-sm outline-none focus:border-accent">
+                <select value={currency} onChange={(e) => setCurrency(e.target.value)} className="h-9 rounded-lg border border-line bg-surface px-2 text-sm outline-none focus:border-accent">
                   <option>AED</option>
                   <option>USD</option>
                 </select>

@@ -19,7 +19,7 @@ export function AutonomyMap({ done, onOpen }: { done?: (event: string) => boolea
       {autonomy.map((lane) => {
         const { icon: Icon, head, icon_ } = look[lane.id];
         return (
-          <div key={lane.id} className={cn("flex flex-col rounded-xl border border-line border-t-2 bg-white p-4", head)}>
+          <div key={lane.id} className={cn("flex flex-col rounded-xl border border-line border-t-2 bg-surface p-4", head)}>
             <div className="flex items-center gap-2">
               <Icon className={cn("h-4 w-4", icon_)} />
               <p className="text-sm font-semibold">{lane.title}</p>

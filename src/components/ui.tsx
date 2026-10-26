@@ -57,7 +57,7 @@ export function SourceChip({ k, className }: { k: EvidenceKey; className?: strin
       type="button"
       onClick={() => openEvidence(k)}
       className={cn(
-        "inline-flex max-w-full items-center gap-1 rounded-md border border-line bg-white px-1.5 py-0.5 font-mono text-[11px] text-sub transition-colors duration-150 ease-out hover:border-accent/40 hover:text-accent-ink active:scale-[0.97]",
+        "inline-flex max-w-full items-center gap-1 rounded-md border border-line bg-surface px-1.5 py-0.5 font-mono text-[11px] text-sub transition-colors duration-150 ease-out hover:border-accent/40 hover:text-accent-ink active:scale-[0.97]",
         className,
       )}
       title={`${evidence[k].title} · ${evidence[k].system}`}
@@ -81,7 +81,7 @@ export function Sources({ keys }: { keys?: EvidenceKey[] }) {
 
 export function AssumptionChip({ children }: { children: React.ReactNode }) {
   return (
-    <span className="inline-flex items-center gap-1 rounded-md border border-dashed border-warn/50 bg-white px-1.5 py-0.5 text-[11px] font-medium text-warn-ink">
+    <span className="inline-flex items-center gap-1 rounded-md border border-dashed border-warn/50 bg-surface px-1.5 py-0.5 text-[11px] font-medium text-warn-ink">
       <Info className="h-3 w-3" aria-hidden />
       Assumption: {children}
     </span>
@@ -90,10 +90,10 @@ export function AssumptionChip({ children }: { children: React.ReactNode }) {
 
 type BtnVariant = "primary" | "secondary" | "ghost" | "danger";
 const btn: Record<BtnVariant, string> = {
-  primary: "bg-accent text-white hover:bg-accent-ink disabled:bg-accent/40",
-  secondary: "border border-line bg-white text-ink hover:bg-panel disabled:text-muted",
+  primary: "bg-accent text-onaccent hover:bg-accent-hover disabled:bg-accent/40",
+  secondary: "border border-line bg-surface text-ink hover:bg-panel disabled:text-muted",
   ghost: "text-sub hover:bg-panel hover:text-ink disabled:text-muted",
-  danger: "border border-bad/30 bg-white text-bad-ink hover:bg-bad-soft disabled:opacity-50",
+  danger: "border border-bad/30 bg-surface text-bad-ink hover:bg-bad-soft disabled:opacity-50",
 };
 
 export function Button({
@@ -131,7 +131,7 @@ export function Avatar({ id, size = 28, held = false }: { id: PersonId; size?: n
 
 export function Card({ className, children, ...rest }: React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div {...rest} className={cn("rounded-xl border border-line bg-white", className)}>
+    <div {...rest} className={cn("rounded-xl border border-line bg-surface", className)}>
       {children}
     </div>
   );
