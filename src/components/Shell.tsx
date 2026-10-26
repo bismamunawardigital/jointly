@@ -8,7 +8,7 @@ import { useStore } from "@/lib/store";
 import { cn } from "./ui";
 import { EvidenceDrawer } from "./EvidenceDrawer";
 import { Tour } from "./Tour";
-import { ThemeSwitch } from "./ThemeToggle";
+import { DensitySwitch, ThemeSwitch } from "./ThemeToggle";
 
 export function Logo({ className }: { className?: string }) {
   return (
@@ -78,6 +78,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
               </button>
             </label>
             <ThemeSwitch />
+            <DensitySwitch />
             <button
               onClick={() => {
                 dispatch({ type: "reset" });

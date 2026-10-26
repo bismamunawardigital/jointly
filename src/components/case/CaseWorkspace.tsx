@@ -84,7 +84,7 @@ export function CaseWorkspace() {
                 <Pill tone={st.tone}>{st.label}</Pill>
               </div>
               <p className="mt-1 text-sm text-sub">
-                Joint signatories (3) · <span className="font-mono text-xs">{business.iban}</span> · {business.accountType}
+                Joint signatories (3) · <bdi dir="ltr" className="font-mono text-xs">{business.iban}</bdi> · {business.accountType}
               </p>
               <p className="mt-0.5 text-xs text-muted">
                 {business.address} · Trade licence {business.licence}
