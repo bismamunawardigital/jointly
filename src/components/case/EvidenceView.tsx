@@ -1,7 +1,7 @@
 "use client";
 
 import { Check, FileSearch, Search, X } from "lucide-react";
-import { evidence, people, svsDocTypes } from "@/data/seed";
+import { EvidenceKey, evidence, people, svsDocTypes } from "@/data/seed";
 import { useTourTarget } from "@/components/Tour";
 import { hasEvent, useStore } from "@/lib/store";
 import { Avatar, Button, Card, Empty, Pill, SectionTitle, SourceChip, cn } from "@/components/ui";
@@ -24,7 +24,9 @@ export function EvidenceView() {
             <thead>
               <tr className="border-b border-line bg-panel/60 text-left text-xs text-muted">
                 <th className="px-4 py-2.5 font-medium">Signatory</th>
-                <th className="px-4 py-2.5 font-medium">Name in each system</th>
+                <th className="px-4 py-2.5 font-medium">Form</th>
+                <th className="px-4 py-2.5 font-medium">Finacle</th>
+                <th className="px-4 py-2.5 font-medium">SVS</th>
                 <th className="px-4 py-2.5 font-medium">Matched on</th>
                 <th className="px-4 py-2.5 font-medium">EFR</th>
                 <th className="px-4 py-2.5 font-medium">Digital login</th>
@@ -41,15 +43,17 @@ export function EvidenceView() {
                         <span className="font-medium">{p.name.split(" ")[0]}</span>
                       </div>
                     </td>
-                    <td className="px-4 py-3">
-                      <dl className="grid grid-cols-[52px_1fr] gap-x-2 gap-y-0.5 text-xs">
-                        <dt className="text-muted">Form</dt>
-                        <dd className="text-sub">{p.formName}</dd>
-                        <dt className="text-muted">Finacle</dt>
-                        <dd className={"font-mono text-sub"}>{p.finacleName}</dd>
-                        <dt className="text-muted">SVS</dt>
-                        <dd className="text-sub">{p.svsName}</dd>
-                      </dl>
+                    <td className="px-4 py-3 text-xs">
+                      <p className="text-sub">{p.formName}</p>
+                      <SourceChip k={`form-${p.id}` as EvidenceKey} className="mt-1" />
+                    </td>
+                    <td className="px-4 py-3 text-xs">
+                      <p className="font-mono text-sub">{p.finacleName}</p>
+                      <SourceChip k={p.id === "mohammed" ? "finacle-cif" : (`cif-${p.id}` as EvidenceKey)} className="mt-1" />
+                    </td>
+                    <td className="px-4 py-3 text-xs">
+                      <p className="text-sub">{p.svsName}</p>
+                      <SourceChip k="svs-signatories" className="mt-1" />
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex flex-col gap-1 whitespace-nowrap text-xs">

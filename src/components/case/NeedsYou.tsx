@@ -18,8 +18,16 @@ export function NeedsYou() {
   if (working && next && state.handedOver) {
     body = (
       <div>
-        <p className="flex items-center gap-1.5 text-sm font-medium"><Hand className="h-4 w-4 text-warn" /> With a maker</p>
-        <p className="mt-1 text-sm text-sub">{done} steps done, {state.queue.length} left. Next: <span className="font-mono text-xs">{next.call}</span></p>
+        <p className="flex items-center gap-1.5 text-sm font-medium"><Hand className="h-4 w-4 text-warn" /> With Omar K., Ops maker</p>
+        <p className="mt-1 text-xs text-muted">Sent to the Business onboarding makers queue</p>
+        <dl className="mt-3 grid grid-cols-[52px_1fr] gap-y-1 text-xs">
+          <dt className="text-muted">Done</dt>
+          <dd className="text-sub">{done} agent steps, all saved</dd>
+          <dt className="text-muted">Left</dt>
+          <dd className="text-sub">{state.queue.length} steps, starting <span className="font-mono">{next.call}</span></dd>
+          <dt className="text-muted">Half-done</dt>
+          <dd className="text-sub">Nothing</dd>
+        </dl>
         <Button className="mt-4 w-full" onClick={() => dispatch({ type: "resume" })}>
           <Play className="h-3.5 w-3.5" /> Take it back, resume agent
         </Button>

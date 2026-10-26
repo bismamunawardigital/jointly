@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Check, Lock, MessageSquare, Rocket, ScanFace, Smartphone, Truck } from "lucide-react";
+import { Check, Lock, MessageSquare, Rocket, ScanFace, Smartphone, Truck, TriangleAlert } from "lucide-react";
 import { firstName, people } from "@/data/seed";
 import { releaseEligibility } from "@/lib/rules";
 import { customerMessages } from "@/lib/script";
@@ -56,7 +56,12 @@ export function ReleaseView() {
             <div className="mt-5 border-t border-line pt-4">
               {confirming ? (
                 <div className="space-y-3">
-                  <p className="text-sm text-sub">Texts Mohammed and Khalifa now. Can&apos;t be unsent.</p>
+                  <p className="flex items-center gap-2 text-sm text-sub">
+                    <span className="inline-flex items-center gap-1 rounded-md bg-bad-soft px-1.5 py-0.5 text-[11px] font-medium text-bad-ink">
+                      <TriangleAlert className="h-3 w-3" /> Can&apos;t be undone
+                    </span>
+                    Texts Mohammed and Khalifa now.
+                  </p>
                   <div className="flex gap-2">
                     <Button variant="primary" onClick={() => dispatch({ type: "release" })}>
                       Yes, release them

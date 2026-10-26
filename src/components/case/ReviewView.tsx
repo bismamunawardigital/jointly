@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { AlertTriangle, Check, FlaskConical, Repeat, ShieldCheck, Undo2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { AlertTriangle, Check, ChevronRight, FlaskConical, Lightbulb, Repeat, ShieldCheck, Undo2, X } from "lucide-react";
 import { EvidenceKey, isAgentRead } from "@/data/seed";
 import { approvalValid, buildStages, diffStage } from "@/lib/rules";
 import { hasEvent, useStore } from "@/lib/store";
@@ -77,6 +77,12 @@ export function ReviewView() {
   const [returning, setReturning] = useState(false);
   const [note, setNote] = useState("");
   const [checked, setChecked] = useState<Record<number, boolean>>({});
+  const [hint, setHint] = useState(false);
+  useEffect(() => {
+    try {
+      setHint(localStorage.getItem("jointly-hint") !== "off");
+    } catch {}
+  }, []);
   if (!hasEvent(state, "submit")) return <Empty icon={ShieldCheck} title="Nothing to review yet" body="The agent sends you all 4 stages at once, so you review in one sitting." />;
   const stages = buildStages(version);
   const v1 = buildStages(1);
@@ -92,6 +98,26 @@ export function ReviewView() {
         </div>
         <Pill tone="neutral">Plan v{version}</Pill>
       </div>
+      {hint && (
+        <div className="flex items-start gap-2.5 rounded-lg border border-accent/30 bg-accent-soft/40 px-3 py-2.5 text-sm">
+          <Lightbulb className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
+          <p className="flex-1 text-sub">
+            <span className="font-medium text-ink">Where I&apos;m reliable:</span> anything copied from Finacle, EFR or Admin. <span className="font-medium text-ink">Where to check me:</span> what I read from SVS documents, especially letters and amendments.
+          </p>
+          <button
+            aria-label="Dismiss"
+            className="rounded p-0.5 text-muted hover:text-ink"
+            onClick={() => {
+              setHint(false);
+              try {
+                localStorage.setItem("jointly-hint", "off");
+              } catch {}
+            }}
+          >
+            <X className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      )}
       {stages.map((s, i) => {
         const approval = state.approvals[s.id];
         const valid = approvalValid(approval, s);
@@ -103,6 +129,8 @@ export function ReviewView() {
         const canReturn = canAct && version === 1 && s.id === 3;
         const needsCheck = s.items.some((it) => it.sources.some(isAgentRead));
         const cov = coverage(s.id, version);
+        const readItems = s.items.filter((it) => it.sources.some(isAgentRead));
+        const exactItems = s.items.filter((it) => !it.sources.some(isAgentRead));
         return (
           <Card key={s.id} className={cn("p-5", canAct && "border-line-strong", valid && "bg-panel/30")}>
             <div className="flex items-start justify-between gap-4">
@@ -141,9 +169,28 @@ export function ReviewView() {
             ) : (
               !valid && (
                 <ul className="mt-4 divide-y divide-line rounded-lg border border-line">
-                  {s.items.map((it) => (
+                  {readItems.map((it) => (
                     <ClaimRow key={it.key} label={it.label} value={it.value} sources={it.sources} />
                   ))}
+                  {exactItems.length > 0 && (
+                    <li>
+                      <details className="group">
+                        <summary className="flex cursor-pointer list-none items-center gap-2 px-3 py-3 text-sm">
+                          <ChevronRight className="h-3.5 w-3.5 text-muted transition-transform group-open:rotate-90" />
+                          <span className="flex h-4 w-4 items-center justify-center rounded-full bg-ok text-onaccent">
+                            <Check className="h-2.5 w-2.5" strokeWidth={3} />
+                          </span>
+                          <span className="font-medium">{exactItems.length} line{exactItems.length === 1 ? "" : "s"} copied exactly from system records</span>
+                          <span className="text-xs text-muted">Nothing to interpret. Open to see them.</span>
+                        </summary>
+                        <ul className="divide-y divide-line border-t border-line">
+                          {exactItems.map((it) => (
+                            <ClaimRow key={it.key} label={it.label} value={it.value} sources={it.sources} />
+                          ))}
+                        </ul>
+                      </details>
+                    </li>
+                  )}
                 </ul>
               )
             )}
@@ -194,7 +241,7 @@ export function ReviewView() {
             {canAct && !returning && (
               <div className="mt-3 flex gap-2">
                 <Button variant="primary" disabled={needsCheck && !checked[s.id]} onClick={() => dispatch({ type: "approve", stageId: s.id })}>
-                  <Check className="h-3.5 w-3.5" /> Approve stage {s.id}
+                  <Check className="h-3.5 w-3.5" /> Approve stage {s.id} · {s.items.length} line{s.items.length === 1 ? "" : "s"}
                 </Button>
                 {s.id === 3 && (
                   <Button variant="ghost" onClick={() => setTab("simulator")}>
