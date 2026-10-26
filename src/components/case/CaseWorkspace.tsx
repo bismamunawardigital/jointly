@@ -78,10 +78,10 @@ export function CaseWorkspace() {
                   <span className={cn("flex h-4 w-4 shrink-0 items-center justify-center rounded-full border text-[9px]", s.state === "done" ? "border-ok bg-ok text-white" : s.state === "active" ? "border-accent text-accent" : "border-line")}>
                     {s.state === "done" ? <Check className="h-2.5 w-2.5" strokeWidth={3} /> : i + 1}
                   </span>
-                  <span className={cn("truncate", s.state !== "active" && "hidden 2xl:inline")} title={s.label}>{s.label}</span>
+                  <span className="leading-tight">{s.label}</span>
                   {s.flag && <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-warn" title="Has an exception" />}
                 </div>
-                {i < rail.length - 1 && <span className={cn("h-px w-3 shrink-0", s.state === "done" ? "bg-ok/40" : "bg-line")} />}
+                {i < rail.length - 1 && <span className={cn("h-px w-2 shrink-0", s.state === "done" ? "bg-ok/40" : "bg-line")} />}
               </li>
             ))}
           </ol>
