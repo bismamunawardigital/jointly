@@ -1,10 +1,13 @@
 "use client";
 
 import { AutonomyMap } from "@/components/AutonomyMap";
-import { hasEvent, useStore } from "@/lib/store";
+import { buildStages, approvalValid } from "@/lib/rules";
+import { useStore } from "@/lib/store";
 
 export function AutonomyView() {
-  const { state, setTab } = useStore();
+  const { state, setTab, version } = useStore();
+  const allApproved = buildStages(version).every((st) => approvalValid(state.approvals[st.id], st));
+  const done = (id: string) => (id === "all-approved" ? allApproved : state.log.some((e) => e.id === id));
   return (
     <div className="max-w-6xl">
       <h2 className="text-base font-semibold">Who decides what</h2>
@@ -12,7 +15,7 @@ export function AutonomyView() {
         The agent does the legwork. Code answers the yes or no questions. Sara signs off on anything that changes who can move money. A tick means it has happened in this case. Click any line to see it.
       </p>
       <div className="mt-6">
-        <AutonomyMap done={(e) => hasEvent(state, e)} onOpen={setTab} />
+        <AutonomyMap done={done} onOpen={setTab} />
       </div>
     </div>
   );

@@ -43,9 +43,9 @@ export const autonomy: AutonomyLane[] = [
     title: "A person approves",
     why: "It changes who can move money. A named person signs off.",
     items: [
-      { text: "Each of the 4 setup stages", tab: "review", event: "submit" },
-      { text: "Sending a stage back with a note", tab: "review", event: "rev-amendment" },
-      { text: "Letting customers in", tab: "release", event: "rel-mohammed" },
+      { text: "Each of the 4 setup stages", tab: "review", event: "all-approved" },
+      { text: "Sending a stage back with a note", tab: "review", event: "return-3" },
+      { text: "Letting customers in", tab: "release", event: "release" },
     ],
   },
   {

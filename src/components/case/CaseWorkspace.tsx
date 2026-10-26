@@ -1,11 +1,11 @@
 "use client";
 
-import { Check } from "lucide-react";
+import { Check, Play } from "lucide-react";
 import { useEffect } from "react";
 import { business } from "@/data/seed";
 import { duration, lastTime, statusOf, stepStates } from "@/lib/derive";
 import { Tab, hasEvent, useStore } from "@/lib/store";
-import { Pill, cn } from "@/components/ui";
+import { Button, Pill, cn } from "@/components/ui";
 import { NeedsYou } from "./NeedsYou";
 import { RunView } from "./RunView";
 import { EvidenceView } from "./EvidenceView";
@@ -28,7 +28,8 @@ const tabs: { id: Tab; label: string }[] = [
 ];
 
 export function CaseWorkspace() {
-  const { state, tab, setTab, hydrated } = useStore();
+  const { state, dispatch, tab, setTab, hydrated } = useStore();
+  const notStarted = state.phase === "new" && !["run", "autonomy", "audit"].includes(tab);
   const st = statusOf[state.phase];
   const now = lastTime(state);
   const firstLive = hasEvent(state, "rel-khalifa-login");
@@ -84,14 +85,14 @@ export function CaseWorkspace() {
               </li>
             ))}
           </ol>
-          <nav className="-mb-px mt-4 flex gap-5" role="tablist">
+          <nav className="-mb-px mt-4 flex gap-5 overflow-x-auto whitespace-nowrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" role="tablist">
             {tabs.map((t) => (
               <button
                 key={t.id}
                 role="tab"
                 aria-selected={tab === t.id}
                 onClick={() => setTab(t.id)}
-                className={cn("relative flex items-center gap-1.5 border-b-2 pb-2.5 text-sm transition-colors duration-150", tab === t.id ? "border-ink font-medium text-ink" : "border-transparent text-muted hover:text-ink")}
+                className={cn("relative flex shrink-0 items-center gap-1.5 border-b-2 pb-2.5 text-sm transition-colors duration-150", tab === t.id ? "border-ink font-medium text-ink" : "border-transparent text-muted hover:text-ink")}
               >
                 {t.label}
                 {((t.id === "review" && reviewDot) || (t.id === "release" && releaseDot)) && <span className="h-1.5 w-1.5 rounded-full bg-warn" />}
@@ -101,6 +102,16 @@ export function CaseWorkspace() {
         </header>
         <div className="min-h-0 flex-1 overflow-y-auto px-8 py-6 pb-40">
           <div key={tab} className="animate-enter">
+            {notStarted && (
+              <div className="mb-6 flex items-center justify-between gap-4 rounded-xl border border-accent/30 bg-accent-soft/40 px-4 py-3">
+                <p className="text-sm text-sub">
+                  <span className="font-medium text-ink">This part hasn&apos;t happened yet.</span> Start the agent run and the guided tour will walk you here.
+                </p>
+                <Button size="sm" variant="primary" onClick={() => dispatch({ type: "start", group: "run" })}>
+                  <Play className="h-3.5 w-3.5" /> Start agent run
+                </Button>
+              </div>
+            )}
             {tab === "run" && <RunView />}
             {tab === "autonomy" && <AutonomyView />}
             {tab === "evidence" && <EvidenceView />}
