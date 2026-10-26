@@ -84,6 +84,8 @@ export type EvidenceKey =
   | "form-rashid"
   | "eid-rashid"
   | "finacle-cif"
+  | "cif-khalifa"
+  | "cif-rashid"
   | "finacle-mop"
   | "svs-signatories"
   | "svs-man"
@@ -133,11 +135,11 @@ export const evidence: Record<EvidenceKey, Evidence> = {
   "eid-rashid": {
     key: "eid-rashid",
     title: "Emirates ID status",
-    system: "KYC service",
+    system: "EFR service",
     ref: "EID ending 5082",
     body: "Holder: Rashid Omar Al Suwaidi. Status: expired. Expiry date: 14-Aug-2026.",
     highlight: "expired. Expiry date: 14-Aug-2026",
-    note: "KYC is never waived. Rashid is held until a renewed EID is on file.",
+    note: "EFR is never waived. Rashid is held until a renewed EID is on file.",
   },
   "finacle-cif": {
     key: "finacle-cif",
@@ -146,6 +148,22 @@ export const evidence: Record<EvidenceKey, Evidence> = {
     ref: "RCIF 100234 · 100587 · 100912",
     body: "100234 MOHD A MANSOURI, EID ending 3391. 100587 KHALIFA S ALFALASI, EID ending 7714. 100912 RASHID O SUWAIDI, EID ending 5082.",
     highlight: "MOHD A MANSOURI",
+  },
+  "cif-khalifa": {
+    key: "cif-khalifa",
+    title: "Customer record (inquiryCIF)",
+    system: "Finacle",
+    ref: "RCIF 100587",
+    body: "100587 KHALIFA S ALFALASI, EID ending 7714.",
+    highlight: "EID ending 7714",
+  },
+  "cif-rashid": {
+    key: "cif-rashid",
+    title: "Customer record (inquiryCIF)",
+    system: "Finacle",
+    ref: "RCIF 100912",
+    body: "100912 RASHID O SUWAIDI, EID ending 5082.",
+    highlight: "EID ending 5082",
   },
   "finacle-mop": {
     key: "finacle-mop",

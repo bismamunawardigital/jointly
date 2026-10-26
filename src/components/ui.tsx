@@ -36,7 +36,7 @@ export function Pill({ tone = "neutral", children, className, dot = true }: { to
 
 const systemShort: Record<string, string> = {
   "Document store": "Form",
-  "KYC service": "KYC",
+  "EFR service": "EFR",
   Finacle: "Finacle",
   SVS: "SVS",
   "Digital Banking Admin": "Admin",

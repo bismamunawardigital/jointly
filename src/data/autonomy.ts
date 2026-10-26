@@ -21,7 +21,7 @@ export const autonomy: AutonomyLane[] = [
     title: "Agent does it alone",
     why: "Slow, checkable work. Every step is logged with its source.",
     items: [
-      { text: "Reads the forms, Finacle, SVS and KYC", tab: "run", event: "intake-forms" },
+      { text: "Reads the forms, Finacle, SVS and EFR", tab: "run", event: "intake-forms" },
       { text: "Matches people on EID and RCIF", tab: "evidence", event: "id-svs" },
       { text: "Drafts the plan, with a source on every line", tab: "plan", event: "plan-build" },
       { text: "Sets up users, roles and rules", tab: "release", event: "ex-rules" },
@@ -53,7 +53,7 @@ export const autonomy: AutonomyLane[] = [
     title: "Never allowed",
     why: "Hard limits, not settings. Nobody can switch them on.",
     items: [
-      { text: "Waive KYC" },
+      { text: "Waive EFR" },
       { text: "Match people on a similar name" },
       { text: "Approve its own work" },
       { text: "Release access the mandate can't support" },

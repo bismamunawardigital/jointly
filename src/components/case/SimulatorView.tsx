@@ -10,7 +10,7 @@ import { Avatar, Card, Empty, Pill, SectionTitle, Tone, cn } from "@/components/
 const outcomeUi: Record<Outcome, { label: string; tone: Tone }> = {
   allowed: { label: "Allowed", tone: "ok" },
   blocked: { label: "Blocked", tone: "bad" },
-  held: { label: "KYC pending", tone: "warn" },
+  held: { label: "EFR pending", tone: "warn" },
   not_covered: { label: "Not covered by mandate", tone: "neutral" },
 };
 

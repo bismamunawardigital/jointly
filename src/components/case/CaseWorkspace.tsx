@@ -1,11 +1,12 @@
 "use client";
 
-import { Check, Play } from "lucide-react";
+import { Check } from "lucide-react";
 import { useEffect } from "react";
 import { business } from "@/data/seed";
 import { duration, lastTime, statusOf, stepStates } from "@/lib/derive";
 import { Tab, hasEvent, useStore } from "@/lib/store";
-import { Button, Pill, cn } from "@/components/ui";
+import { Pill, cn } from "@/components/ui";
+import { eventById } from "@/lib/script";
 import { NeedsYou } from "./NeedsYou";
 import { RunView } from "./RunView";
 import { EvidenceView } from "./EvidenceView";
@@ -18,21 +19,23 @@ import { AutonomyView } from "./AutonomyView";
 
 const tabs: { id: Tab; label: string }[] = [
   { id: "run", label: "Agent run" },
-  { id: "autonomy", label: "Autonomy map" },
   { id: "evidence", label: "Evidence & identity" },
   { id: "plan", label: "Access plan" },
   { id: "simulator", label: "Simulator" },
   { id: "review", label: "Checker review" },
   { id: "release", label: "Release" },
   { id: "audit", label: "Audit log" },
+  { id: "autonomy", label: "Autonomy map" },
 ];
 
 export function CaseWorkspace() {
   const { state, dispatch, tab, setTab, hydrated } = useStore();
-  const notStarted = state.phase === "new" && !["run", "autonomy", "audit"].includes(tab);
+  const readyAt: Partial<Record<Tab, string>> = { evidence: "id-digital", plan: "plan-build", simulator: "plan-build", review: "submit", release: "ex-readback" };
+  const notStarted = !!readyAt[tab] && !hasEvent(state, readyAt[tab]!);
   const st = statusOf[state.phase];
   const now = lastTime(state);
-  const firstLive = hasEvent(state, "rel-khalifa-login");
+  const firstLogin = hasEvent(state, "rel-mohammed-login");
+  const bankDone = hasEvent(state, "ex-readback");
   const rail = stepStates(state);
   const reviewDot = state.phase === "in_review" || state.phase === "re_review";
   const releaseDot = state.phase === "executed" || state.phase === "partially_live";
@@ -41,6 +44,9 @@ export function CaseWorkspace() {
     const want = new URLSearchParams(window.location.search).get("tab");
     if (want && tabs.some((t) => t.id === want)) setTab(want as Tab);
   }, [hydrated, setTab]);
+  useEffect(() => {
+    if (hydrated && state.phase === "new" && !state.queue.length) dispatch({ type: "start", group: "run" });
+  }, [hydrated, state.phase, state.queue.length, dispatch]);
   if (!hydrated) return null;
   return (
     <div className="flex h-full">
@@ -65,8 +71,13 @@ export function CaseWorkspace() {
               </p>
               {now && (
                 <p className="mt-0.5">
-                  {firstLive ? "Form to first login " : "Elapsed "}
-                  <span className="tnum font-medium text-ink">{duration(business.submittedAt, firstLive ? "Mon 13:22" : now)}</span>
+                  {firstLogin ? "Form to first login " : "Elapsed "}
+                  <span className="tnum font-medium text-ink">{duration(business.submittedAt, firstLogin ? eventById("rel-mohammed-login").time : now)}</span>
+                </p>
+              )}
+              {bankDone && (
+                <p className="mt-0.5">
+                  Bank-side work <span className="tnum font-medium text-ink">{duration(business.submittedAt, eventById("ex-readback").time)}</span>
                 </p>
               )}
             </div>
@@ -103,13 +114,10 @@ export function CaseWorkspace() {
         <div className="min-h-0 flex-1 overflow-y-auto px-8 py-6 pb-40">
           <div key={tab} className="animate-enter">
             {notStarted && (
-              <div className="mb-6 flex items-center justify-between gap-4 rounded-xl border border-accent/30 bg-accent-soft/40 px-4 py-3">
+              <div className="mb-6 rounded-xl border border-accent/30 bg-accent-soft/40 px-4 py-3">
                 <p className="text-sm text-sub">
-                  <span className="font-medium text-ink">This part hasn&apos;t happened yet.</span> Start the agent run and the guided tour will walk you here.
+                  <span className="font-medium text-ink">This part of the case hasn&apos;t happened yet.</span> It fills in as the case moves, and the guided tour tells you when to come back.
                 </p>
-                <Button size="sm" variant="primary" className="shrink-0 whitespace-nowrap" onClick={() => dispatch({ type: "start", group: "run" })}>
-                  <Play className="h-3.5 w-3.5" /> Start agent run
-                </Button>
               </div>
             )}
             {tab === "run" && <RunView />}

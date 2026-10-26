@@ -76,7 +76,7 @@ export function evaluate(tx: Tx, rules: Rule[], held: PersonId[] = []): Evaluati
   if (heldSigner) {
     return {
       outcome: "held",
-      reason: `${firstName(heldSigner)} is held: KYC pending (EID expired). No signing until it clears.`,
+      reason: `${firstName(heldSigner)} is held: EFR pending (EID expired). No signing until it clears.`,
     };
   }
 
@@ -235,8 +235,8 @@ export function buildStages(version: Version): Stage[] {
           ? `Link existing user ${p.digitalUser.userId} (same RCIF ${p.rcif}). No new login.`
           : p.eidValid
             ? `New user on RCIF ${p.rcif}. Mobile ending ${p.mobileLast4}.`
-            : `New user on RCIF ${p.rcif}. Switched off until KYC clears.`,
-        sources: p.digitalUser.existing ? ["admin-user-mohammed"] : ["finacle-cif"],
+            : `New user on RCIF ${p.rcif}. Switched off so workflows can name him. No login or signing until EFR passes.`,
+        sources: p.digitalUser.existing ? ["admin-user-mohammed"] : [p.id === "khalifa" ? "cif-khalifa" : "cif-rashid"],
       })),
     },
     {

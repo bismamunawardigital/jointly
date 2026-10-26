@@ -26,14 +26,13 @@ export function EvidenceView() {
                 <th className="px-4 py-2.5 font-medium">Signatory</th>
                 <th className="px-4 py-2.5 font-medium">Name in each system</th>
                 <th className="px-4 py-2.5 font-medium">Matched on</th>
-                <th className="px-4 py-2.5 font-medium">KYC</th>
+                <th className="px-4 py-2.5 font-medium">EFR</th>
                 <th className="px-4 py-2.5 font-medium">Digital login</th>
               </tr>
             </thead>
             <tbody>
               {people.map((p) => {
                 const expired = !p.eidValid && !renewed;
-                const differs = p.finacleName.toLowerCase() !== p.formName.toLowerCase() || p.svsName !== p.formName;
                 return (
                   <tr key={p.id} className="border-b border-line align-top last:border-0">
                     <td className="px-4 py-3">
@@ -47,9 +46,9 @@ export function EvidenceView() {
                         <dt className="text-muted">Form</dt>
                         <dd className="text-sub">{p.formName}</dd>
                         <dt className="text-muted">Finacle</dt>
-                        <dd className={cn("font-mono", differs ? "text-warn-ink" : "text-sub")}>{p.finacleName}</dd>
+                        <dd className={"font-mono text-sub"}>{p.finacleName}</dd>
                         <dt className="text-muted">SVS</dt>
-                        <dd className={differs ? "text-warn-ink" : "text-sub"}>{p.svsName}</dd>
+                        <dd className="text-sub">{p.svsName}</dd>
                       </dl>
                     </td>
                     <td className="px-4 py-3">
@@ -92,7 +91,7 @@ export function EvidenceView() {
         </Card>
         {!renewed && (
           <p className="mt-3 text-xs text-sub">
-            EID update request started for Rashid at {hasEvent(state, "kyc-request") ? "Mon 09:13" : "…"}. KYC is never waived, so he stays held until it clears.
+            EID update request started for Rashid at {hasEvent(state, "kyc-request") ? "Mon 09:13" : "…"}. EFR is never waived, so he stays held until it clears.
           </p>
         )}
       </section>

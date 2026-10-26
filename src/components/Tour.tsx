@@ -23,18 +23,18 @@ export const moments: Moment[] = [
     body: "Three systems spell Mohammed three ways. The agent matches people on EID and RCIF only, and catches Rashid's expired EID before any setup starts.",
     tab: "evidence",
     readyWhen: after("in_review"),
-    notReady: "Press Start agent run on the right, then come back here.",
+    notReady: "The agent is still gathering evidence. Show me opens the live run.",
   },
   {
     title: "Pattern: approval is tied to the content",
-    body: "Sara knows about a 2023 letter the agent missed. She returns stage 3. The agent finds it, and only stages 3 and 4 come back as a diff. Her first two approvals stay.",
+    body: "Stage 3 says the agent didn't read one SVS letter. Sara returns it. The agent reads the letter, and only stages 3 and 4 come back as a diff. Her first two approvals stay.",
     tab: "review",
     readyWhen: after("in_review"),
     notReady: "This opens once the agent sends the plan for review.",
   },
   {
     title: "Pattern: release what's safe, hold the rest",
-    body: "Rashid is held for KYC. The rules engine proves Mohammed and Khalifa can still form \u201cany two\u201d, so Sara can release them now. Rashid joins later, for future payments only.",
+    body: "Rashid is held for EFR. The rules engine proves Mohammed and Khalifa can still form \u201cany two\u201d, so Sara can release them now. Rashid joins later, for future payments only.",
     tab: "release",
     readyWhen: after("executed"),
     notReady: "This opens after Sara approves all 4 stages and the agent sets them up.",
@@ -63,7 +63,7 @@ export function Tour() {
   const m = moments[i];
   const ready = m.readyWhen.includes(state.phase);
   const show = () => {
-    setTab(m.tab);
+    setTab(ready ? m.tab : "run");
     if (!path.startsWith("/demo/case")) router.push("/demo/case/");
   };
   if (min)
@@ -89,7 +89,7 @@ export function Tour() {
       <p className="mt-1 text-sm leading-relaxed text-sub">{m.body}</p>
       {!ready && <p className="mt-2 rounded-md bg-panel px-2.5 py-1.5 text-xs text-sub">{m.notReady}</p>}
       <div className="mt-3 flex items-center gap-2">
-        <Button size="sm" variant="primary" disabled={!ready} onClick={show}>
+        <Button size="sm" variant="primary" onClick={show}>
           Show me
         </Button>
         <div className="ml-auto flex gap-1">

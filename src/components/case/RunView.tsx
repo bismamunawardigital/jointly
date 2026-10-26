@@ -1,9 +1,9 @@
 "use client";
 
-import { AlertTriangle, Ban, Check, Info, Loader2, UserRound } from "lucide-react";
+import { AlertTriangle, Ban, Check, Inbox, Info, Loader2, UserRound } from "lucide-react";
 import { Group, eventById } from "@/lib/script";
 import { buildRules, policyChecks } from "@/lib/rules";
-import { useStore } from "@/lib/store";
+import { hasEvent, useStore } from "@/lib/store";
 import { AssumptionChip, Empty, Sources, cn } from "@/components/ui";
 
 const groupTitle: Record<Group, string> = {
@@ -24,10 +24,21 @@ const icon = {
 export function RunView() {
   const { state, held, version } = useStore();
   if (!state.log.length && !state.queue.length)
-    return <Empty icon={Loader2} title="The agent hasn't started" body="Press Start agent run on the right. Each step shows what it called, what it found and where it found it." />;
+    return <Empty icon={Inbox} title="Request received" body="The agent is starting. Each step shows what it called, what it found and where it found it." />;
 
   let lastGroup: Group | null = null;
   const rows: React.ReactNode[] = [];
+  if (hasEvent(state, "submit"))
+    rows.push(
+      <li key="summary" className="relative z-10 mb-6 ml-[96px] rounded-lg border border-line bg-white px-3 py-2.5">
+        <p className="text-xs text-muted">3 things worth knowing</p>
+        <ul className="mt-1.5 flex flex-wrap gap-2 text-xs">
+          <li className="rounded-md bg-bad-soft px-2 py-1 text-bad-ink">Rashid held: EID expired</li>
+          <li className="rounded-md bg-warn-soft px-2 py-1 text-warn-ink">Finacle and SVS disagree: SVS used</li>
+          <li className="rounded-md bg-ok-soft px-2 py-1 text-ok-ink">Mohammed&apos;s login reused</li>
+        </ul>
+      </li>,
+    );
   for (const entry of state.log) {
     if (entry.kind === "human") {
       rows.push(
@@ -62,7 +73,7 @@ export function RunView() {
       const passed = checks.filter((c) => c.pass).length;
       title = `${e.title}: ${passed} of ${checks.length} checks`;
       const limit = buildRules(e.dynamic === "policy-v1" ? 1 : 2)[1].maxAmount!.toLocaleString("en-US");
-      detail = `Boundary tests at AED ${limit} and one dirham above, KYC hold on Rashid, USD not covered, every signatory has a user and role.`;
+      detail = `Boundary tests at AED ${limit} and one dirham above, EFR hold on Rashid, USD not covered, every signatory has a user and role.`;
     }
     rows.push(
       <li key={e.id} className="relative flex gap-4 pb-5 animate-enter">

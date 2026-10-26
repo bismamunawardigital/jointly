@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Check, Lock, MessageSquare, Rocket, ScanFace, Smartphone, Truck } from "lucide-react";
 import { firstName, people } from "@/data/seed";
 import { releaseEligibility } from "@/lib/rules";
@@ -13,6 +14,7 @@ export function ReleaseView() {
   const { state, dispatch, version, held } = useStore();
   const tour3 = useTourTarget(2);
   const tour4 = useTourTarget(3);
+  const [confirming, setConfirming] = useState(false);
   if (!hasEvent(state, "ex-readback"))
     return <Empty icon={Rocket} title="Not set up yet" body="After Sara approves all 4 stages, the agent sets them up, reads them back and checks who can be released." />;
   const elig = releaseEligibility(rulesFor(version), held);
@@ -44,14 +46,28 @@ export function ReleaseView() {
                 ))}
               </div>
               <p className="mt-3 text-sm font-medium">{elig.summary}</p>
-              <p className="mt-1 text-xs text-muted">Checked by the rules engine. If Khalifa were also held, Mohammed alone couldn&apos;t sign anything, and release would be blocked.</p>
+              <p className="mt-1 text-xs text-muted">Checked by the rules engine. If Khalifa were also held, Mohammed alone couldn&apos;t sign anything. If the mandate needed Rashid to co-sign any payment, release would be blocked too, and everyone would wait for him.</p>
             </div>
           </div>
           {state.phase === "executed" && (
             <div className="mt-5 border-t border-line pt-4">
-              <Button variant="primary" disabled={!elig.eligible} onClick={() => dispatch({ type: "release" })}>
-                Release Mohammed and Khalifa
-              </Button>
+              {confirming ? (
+                <div className="space-y-3">
+                  <p className="text-sm text-sub">This texts Mohammed and Khalifa that they can start, and tells them Rashid joins later. Messages can&apos;t be unsent.</p>
+                  <div className="flex gap-2">
+                    <Button variant="primary" onClick={() => dispatch({ type: "release" })}>
+                      Yes, release them
+                    </Button>
+                    <Button variant="ghost" onClick={() => setConfirming(false)}>
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <Button variant="primary" disabled={!elig.eligible} onClick={() => setConfirming(true)}>
+                  Release Mohammed and Khalifa
+                </Button>
+              )}
             </div>
           )}
         </Card>

@@ -4,7 +4,7 @@ export type Group = "run" | "revise" | "execute" | "release" | "renew";
 export type EventStatus = "ok" | "warn" | "block" | "info";
 export type Actor =
   | "Intake Agent"
-  | "KYC Agent"
+  | "EFR Agent"
   | "Identity Agent"
   | "Mandate Agent"
   | "Planner Agent"
@@ -32,7 +32,7 @@ export interface AgentEvent {
 export type StepId = "intake" | "identity" | "mandate" | "plan" | "policy" | "review" | "execute" | "release";
 
 export const steps: { id: StepId; label: string }[] = [
-  { id: "intake", label: "Intake & KYC" },
+  { id: "intake", label: "Intake & EFR" },
   { id: "identity", label: "Identity" },
   { id: "mandate", label: "Mandate" },
   { id: "plan", label: "Plan" },
@@ -46,22 +46,22 @@ export const script: AgentEvent[] = [
   {
     id: "intake-forms", group: "run", step: "intake", time: "Mon 09:12", actor: "Intake Agent",
     call: "docs.readForms", system: "Document store", status: "ok",
-    title: "Read 3 signed registration forms",
+    title: "Read the access request and 3 signed forms",
     detail: "Creekside General Trading LLC, account AE07…0123 456. Three joint signatories named.",
     evidence: ["form-mohammed", "form-khalifa", "form-rashid"],
   },
   {
-    id: "kyc-check", group: "run", step: "intake", time: "Mon 09:13", actor: "KYC Agent",
-    call: "kyc.checkEID", system: "KYC service", status: "block",
+    id: "kyc-check", group: "run", step: "intake", time: "Mon 09:13", actor: "EFR Agent",
+    call: "efr.verifyEID", system: "EFR service", status: "block",
     title: "Rashid Omar Al Suwaidi's Emirates ID expired on 14-Aug-2026",
     detail: "Caught before any setup work. Rashid is held. The run carries on for Mohammed and Khalifa.",
     evidence: ["eid-rashid"],
   },
   {
-    id: "kyc-request", group: "run", step: "intake", time: "Mon 09:13", actor: "KYC Agent",
-    call: "kyc.requestEIDUpdate", system: "KYC service", status: "warn",
+    id: "kyc-request", group: "run", step: "intake", time: "Mon 09:13", actor: "EFR Agent",
+    call: "efr.requestEIDUpdate", system: "EFR service", status: "warn",
     title: "Started an EID update request for Rashid",
-    detail: "Sent Rashid an SMS with the renewal steps, using an approved template. I'll recheck KYC once it's renewed.",
+    detail: "Sent Rashid an SMS with the renewal steps, using an approved template. I'll recheck EFR once it's renewed.",
   },
   {
     id: "id-finacle", group: "run", step: "identity", time: "Mon 09:15", actor: "Identity Agent",
@@ -126,7 +126,7 @@ export const script: AgentEvent[] = [
     id: "rev-amendment", group: "revise", step: "mandate", time: "Mon 10:08", actor: "Mandate Agent",
     call: "svs.getDocuments(type=ALL)", system: "SVS", status: "warn",
     title: "Found amendment SVS-AMD-2023-0107",
-    detail: "It's filed as a Letter, so my first search missed it. I now search every document type on this account.",
+    detail: "Sara returned stage 3 because of the unread letter. It's filed as a Letter, so my first search missed it. I now search every document type on this account.",
     evidence: ["svs-amd"],
   },
   {
@@ -163,7 +163,7 @@ export const script: AgentEvent[] = [
     id: "ex-users", group: "execute", step: "execute", time: "Mon 10:42", actor: "Executor Agent",
     call: "admin.createUser", system: "Digital Banking Admin", status: "ok",
     title: "Created users for Khalifa and Rashid",
-    detail: "Rashid's user is switched off until KYC clears.",
+    detail: "Rashid's user is switched off until EFR clears.",
   },
   {
     id: "ex-roles", group: "execute", step: "execute", time: "Mon 10:43", actor: "Executor Agent",
@@ -176,9 +176,15 @@ export const script: AgentEvent[] = [
     title: "Set 2 authorization rules from the approved plan",
   },
   {
+    id: "ex-workflow-fail", group: "execute", step: "execute", time: "Mon 10:45", actor: "Executor Agent",
+    call: "admin.setWorkflow", system: "Digital Banking Admin", status: "warn",
+    title: "Digital Banking Admin timed out. Nothing half-written",
+    detail: "Stages 1 to 3 are saved. Stage 4 rolled back. I retry once on my own. If it fails again I stop and hand the case to a person with this exact state.",
+  },
+  {
     id: "ex-workflow", group: "execute", step: "execute", time: "Mon 10:45", actor: "Executor Agent",
-    call: "admin.setWorkflow", system: "Digital Banking Admin", status: "ok",
-    title: "Set 3 workflow bands",
+    call: "admin.setWorkflow (retry 1)", system: "Digital Banking Admin", status: "ok",
+    title: "Retry worked. Set 3 workflow bands",
   },
   {
     id: "ex-readback", group: "execute", step: "execute", time: "Mon 10:46", actor: "Rules engine",
@@ -223,8 +229,8 @@ export const script: AgentEvent[] = [
   },
 
   {
-    id: "ren-kyc", group: "renew", step: "intake", time: "Wed 09:40", actor: "KYC Agent",
-    call: "kyc.checkEID", system: "KYC service", status: "ok",
+    id: "ren-kyc", group: "renew", step: "intake", time: "Wed 09:40", actor: "EFR Agent",
+    call: "efr.verifyEID", system: "EFR service", status: "ok",
     title: "Rashid's EID is renewed and valid",
   },
   {
@@ -271,13 +277,13 @@ export const customerMessages: CustomerMessage[] = [
     afterEvent: "rel-mohammed",
     to: "Mohammed Al Mansoori · mobile ending 2207",
     channel: "SMS",
-    text: "Hi Mohammed, Creekside General Trading LLC is now on your existing digital banking login. No new password needed. Just log in as usual.",
+    text: "Hi Mohammed, Creekside General Trading LLC is now on your existing digital banking login. No new password needed. Rashid joins once his Emirates ID is renewed. Any two of you can approve payments, so you can start now.",
   },
   {
     afterEvent: "rel-khalifa-link",
     to: "Khalifa Saeed Al Falasi · mobile ending 4410",
     channel: "SMS",
-    text: "Hi Khalifa, your Creekside General Trading access is ready. Tap the secure link to verify your Emirates ID and set up your login. The link works for 24 hours.",
+    text: "Hi Khalifa, your Creekside General Trading access is ready. Tap the secure link to verify your Emirates ID and set up your login. The link works for 24 hours. Rashid joins once his Emirates ID is renewed. Any two of you can approve payments, so you can start now.",
   },
   {
     afterEvent: "ren-link",

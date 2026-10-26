@@ -1,20 +1,42 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowRight, Check, ShieldCheck, Undo2 } from "lucide-react";
+import { AlertTriangle, Check, FlaskConical, ShieldCheck, Undo2 } from "lucide-react";
 import { checker } from "@/data/seed";
 import { approvalValid, buildStages, diffStage } from "@/lib/rules";
 import { hasEvent, useStore } from "@/lib/store";
 import { useTourTarget } from "@/components/Tour";
 import { Button, Card, Empty, Pill, Sources, cn } from "@/components/ui";
 
-const defaultNote = "Khalifa's single limit was raised in 2023. Please check SVS for the amendment letter.";
+
+function wordDiff(a: string, b: string) {
+  const x = a.split(" "), y = b.split(" ");
+  let p = 0;
+  while (p < x.length && p < y.length && x[p] === y[p]) p++;
+  let q = 0;
+  while (q < x.length - p && q < y.length - p && x[x.length - 1 - q] === y[y.length - 1 - q]) q++;
+  return { pre: x.slice(0, p).join(" "), del: x.slice(p, x.length - q).join(" "), ins: y.slice(p, y.length - q).join(" "), post: x.slice(x.length - q).join(" ") };
+}
+
+function Changed({ before, after }: { before: string; after: string }) {
+  if (before === after) return <>{after}</>;
+  const d = wordDiff(before, after);
+  return (
+    <>
+      {d.pre && `${d.pre} `}
+      {d.del && <del className="rounded bg-bad-soft px-0.5 text-bad-ink">{d.del}</del>}
+      {d.del && d.ins && " "}
+      {d.ins && <ins className="rounded bg-ok-soft px-0.5 font-medium text-ok-ink no-underline">{d.ins}</ins>}
+      {d.post && ` ${d.post}`}
+    </>
+  );
+}
 
 export function ReviewView() {
-  const { state, dispatch, version } = useStore();
+  const { state, dispatch, version, setTab } = useStore();
   const tour = useTourTarget(1);
   const [returning, setReturning] = useState(false);
-  const [note, setNote] = useState(defaultNote);
+  const [note, setNote] = useState("");
   if (!hasEvent(state, "submit")) return <Empty icon={ShieldCheck} title="Nothing to review yet" body="The agent sends you all 4 stages at once, so you review in one sitting." />;
   const stages = buildStages(version);
   const v1 = buildStages(1);
@@ -66,11 +88,11 @@ export function ReviewView() {
               <ul className="mt-4 space-y-2">
                 {changes.map((c) => (
                   <li key={c.key} className="rounded-lg border border-accent/30 bg-accent-soft/40 px-3 py-2.5">
-                    <p className="text-xs text-muted">{c.afterLabel}</p>
+                    <p className="text-xs text-muted">
+                      <Changed before={c.beforeLabel} after={c.afterLabel} />
+                    </p>
                     <p className="mt-0.5 text-sm">
-                      <span className="text-muted line-through">{c.before}</span>
-                      <ArrowRight className="mx-1.5 inline h-3.5 w-3.5 text-accent" />
-                      <span className="font-medium">{c.after}</span>
+                      <Changed before={c.before} after={c.after} />
                     </p>
                     <div className="mt-1.5">
                       <Sources keys={c.sources} />
@@ -95,6 +117,21 @@ export function ReviewView() {
               )
             )}
 
+            {s.id === 3 && !valid && (
+              version === 1 ? (
+                <div className="mt-3 flex gap-2.5 rounded-lg border border-warn/30 bg-warn-soft px-3 py-2.5 text-sm text-warn-ink">
+                  <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+                  <p>
+                    <span className="font-medium">The agent didn&apos;t read everything.</span> It searched SVS for Mandates only. 1 Letter on this account, filed 01-Mar-2023, was not read, so these rules may be out of date.
+                  </p>
+                </div>
+              ) : (
+                <p className="mt-3 flex items-center gap-1.5 text-xs text-ok-ink">
+                  <Check className="h-3.5 w-3.5" strokeWidth={3} /> Read every SVS document on this account (2 of 2)
+                </p>
+              )
+            )}
+
             {wasReturned && (
               <p className="mt-3 text-xs text-sub">
                 <span className="font-medium text-ink">Sara&apos;s note:</span> {state.returned!.note}
@@ -106,6 +143,11 @@ export function ReviewView() {
                 <Button variant="primary" onClick={() => dispatch({ type: "approve", stageId: s.id })}>
                   <Check className="h-3.5 w-3.5" /> Approve stage {s.id}
                 </Button>
+                {s.id === 3 && (
+                  <Button variant="ghost" onClick={() => setTab("simulator")}>
+                    <FlaskConical className="h-3.5 w-3.5" /> Test a payment
+                  </Button>
+                )}
                 {canReturn && (
                   <Button variant="danger" onClick={() => setReturning(true)}>
                     <Undo2 className="h-3.5 w-3.5" /> Return to agent
@@ -118,7 +160,7 @@ export function ReviewView() {
                 <label className="block text-xs text-muted" htmlFor="return-note">
                   Note for the agent
                 </label>
-                <textarea id="return-note" value={note} onChange={(e) => setNote(e.target.value)} rows={2} className="w-full rounded-lg border border-line p-2.5 text-sm outline-none focus:border-accent" />
+                <textarea id="return-note" placeholder="Tell the agent what to check" value={note} onChange={(e) => setNote(e.target.value)} rows={2} className="w-full rounded-lg border border-line p-2.5 text-sm outline-none focus:border-accent" />
                 <div className="flex gap-2">
                   <Button
                     variant="danger"

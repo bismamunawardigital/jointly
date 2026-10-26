@@ -20,7 +20,7 @@ export default function CommandCenter() {
     { label: "Open cases", value: "4" },
     { label: "Need you", value: String(needsYou), tone: "warn" as const },
     { label: "Agent working", value: String(otherCases.filter((c) => c.status === "Agent working").length + (st.tone === "accent" ? 1 : 0)) },
-    { label: "Form to first login, median", value: "4h 10m", note: "Illustrative target" },
+    { label: "Target: form to set up", value: "Under 2h", note: "Illustrative, not measured" },
   ];
   return (
     <div className="h-full overflow-y-auto">
@@ -62,11 +62,11 @@ export default function CommandCenter() {
                   <p className="font-mono text-[11px] text-muted">{business.iban}</p>
                 </td>
                 <td className="px-4 py-3 text-sub">Joint signatories (3)</td>
-                <td className="px-4 py-3 text-sub">{state.phase === "live" ? "Done" : active?.label ?? "Intake & KYC"}</td>
+                <td className="px-4 py-3 text-sub">{state.phase === "live" ? "Done" : active?.label ?? "Intake & EFR"}</td>
                 <td className="px-4 py-3">
                   <Pill tone={st.tone}>{st.label}</Pill>
                 </td>
-                <td className="px-4 py-3 text-sub">{st.label === "Needs you" ? "Sara M." : st.tone === "accent" ? "Agent" : state.phase === "partially_live" ? "Rashid, EID renewal" : "None"}</td>
+                <td className="px-4 py-3 text-sub">{st.label === "Needs you" ? "Sara M." : st.tone === "accent" ? "Agent" : state.phase === "partially_live" ? "Rashid, EID renewal" : state.phase === "new" ? "Agent" : "None"}</td>
                 <td className="tnum px-4 py-3 text-right text-sub">Today</td>
               </tr>
               {otherCases.map((c) => (

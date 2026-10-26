@@ -15,7 +15,7 @@ const findings = [
 const patterns = [
   { title: "Match on IDs, never names", body: "Every system spells Mohammed differently. The agent only links people by EID and RCIF, so a similar name can never grant access.", tab: "evidence" },
   { title: "Every claim has a source", body: "Each line of the plan has a chip that opens the record it came from. If the agent can't cite it, it doesn't say it.", tab: "plan" },
-  { title: "Show what wasn't searched", body: "When the agent missed a letter, the checker could see exactly where it hadn't looked. An honest miss builds more trust than a hidden one.", tab: "evidence" },
+  { title: "Show what wasn't searched", body: "The approval card says which documents the agent didn't read. Sara catches the miss from the screen, not from memory.", tab: "review" },
   { title: "Approval is tied to the content", body: "Sara returns one stage, not the whole case. If a stage didn't change, her approval stays. If it did, she sees a diff.", tab: "review" },
   { title: "Rules live in code, not the model", body: "Who can sign at what amount is a yes or no question. A rules engine answers it, and you can test it yourself in the simulator.", tab: "simulator" },
   { title: "Release what's safe, hold the rest", body: "Rashid's ID expired. The rules prove the other two can still sign together, so they go live today and he joins later.", tab: "release" },
@@ -79,6 +79,21 @@ export default function CaseStudy() {
         <p className="mt-2 max-w-2xl text-sub">The first thing I designed wasn&apos;t a screen. It was this map. Every action the agent could take had to land in one of four lanes before I drew anything.</p>
         <div className="mt-8">
           <AutonomyMap />
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-5xl px-6 pb-16">
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="rounded-xl border border-line p-6">
+            <p className="text-xs text-muted">The skeptic&apos;s question</p>
+            <h3 className="mt-1 text-lg font-semibold">Why not just fix the data?</h3>
+            <p className="mt-2 text-sm text-sub">Even a perfectly structured mandate still has to become users, roles, amount bands and approval workflows in Digital Banking Admin, and it still has to match Finacle. That translation is the job. The agent does it. CF checks it with every source in front of her.</p>
+          </div>
+          <div className="rounded-xl border border-line p-6">
+            <p className="text-xs text-muted">Who starts it</p>
+            <h3 className="mt-1 text-lg font-semibold">The customer asks, the agent builds, CF approves</h3>
+            <p className="mt-2 text-sm text-sub">The signatories request access. The agent starts on its own, builds the setup and shows where every line came from. The agent is a system user that can make but never approve. Sara is the accountable person.</p>
+          </div>
         </div>
       </section>
 
