@@ -3,7 +3,8 @@
 import { useState } from "react";
 
 import { AlertTriangle, Ban, Check, Inbox, Info, Loader2, UserRound } from "lucide-react";
-import { Group, eventById } from "@/lib/script";
+import { Group, eventById, steps } from "@/lib/script";
+import { stepStates } from "@/lib/derive";
 import { buildRules, policyChecks } from "@/lib/rules";
 import { hasEvent, useStore } from "@/lib/store";
 import { AssumptionChip, Empty, Sources, cn } from "@/components/ui";
@@ -29,8 +30,21 @@ export function RunView() {
   if (!state.log.length && !state.queue.length)
     return <Empty icon={Inbox} title="Request received" body="The agent is starting. Each step shows what it called, what it found and where it found it." />;
 
+  const plan = stepStates(state);
+  const planList = (
+    <ol key="plan" className="mb-5 ml-[96px] flex max-w-3xl flex-wrap gap-x-4 gap-y-1.5 rounded-lg border border-line bg-surface px-3 py-2.5 text-xs" aria-label="Agent plan">
+      {plan.map((p) => (
+        <li key={p.id} className={cn("flex items-center gap-1.5", p.state === "done" ? "text-sub" : p.state === "active" ? "font-medium text-accent-ink" : "text-muted")}>
+          <span className={cn("flex h-3.5 w-3.5 items-center justify-center rounded-full border", p.state === "done" ? "border-ok bg-ok text-onaccent" : p.state === "active" ? "border-accent" : "border-line")}>
+            {p.state === "done" && <Check className="h-2.5 w-2.5" strokeWidth={3} />}
+          </span>
+          {steps.find((x) => x.id === p.id)?.label}
+        </li>
+      ))}
+    </ol>
+  );
   let lastGroup: Group | null = null;
-  const rows: React.ReactNode[] = [];
+  const rows: React.ReactNode[] = [planList];
   if (hasEvent(state, "submit"))
     rows.push(
       <li key="summary" className="relative z-10 mb-6 ml-[96px] rounded-lg border border-line bg-surface px-3 py-2.5">

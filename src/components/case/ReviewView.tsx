@@ -83,6 +83,21 @@ export function ReviewView() {
       setHint(localStorage.getItem("jointly-hint") !== "off");
     } catch {}
   }, []);
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const el = e.target as HTMLElement;
+      if (e.key.toLowerCase() !== "a" || e.ctrlKey || e.metaKey || ["INPUT", "TEXTAREA", "SELECT"].includes(el.tagName)) return;
+      if (state.phase !== "in_review" && state.phase !== "re_review") return;
+      const list = buildStages(version);
+      const next = list.find((st, n) => !approvalValid(state.approvals[st.id], st) && list.slice(0, n).every((p) => approvalValid(state.approvals[p.id], p)));
+      if (!next) return;
+      const needs = next.items.some((it) => it.sources.some(isAgentRead));
+      if (needs && !checked[next.id]) return;
+      dispatch({ type: "approve", stageId: next.id });
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [state, version, checked, dispatch]);
   if (!hasEvent(state, "submit")) return <Empty icon={ShieldCheck} title="Nothing to review yet" body="The agent sends you all 4 stages at once, so you review in one sitting." />;
   const stages = buildStages(version);
   const v1 = buildStages(1);
@@ -242,6 +257,7 @@ export function ReviewView() {
               <div className="mt-3 flex gap-2">
                 <Button variant="primary" disabled={needsCheck && !checked[s.id]} onClick={() => dispatch({ type: "approve", stageId: s.id })}>
                   <Check className="h-3.5 w-3.5" /> Approve stage {s.id} · {s.items.length} line{s.items.length === 1 ? "" : "s"}
+                  <kbd className="ml-1 rounded border border-onaccent/40 px-1 text-[10px] font-normal opacity-80">A</kbd>
                 </Button>
                 {s.id === 3 && (
                   <Button variant="ghost" onClick={() => setTab("simulator")}>
