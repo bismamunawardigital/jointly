@@ -200,7 +200,7 @@ ins.d { background: var(--ok-soft); color: var(--ok-ink); border-radius: 3px; pa
 .do b, .dont b { display: block; margin-bottom: 4px; }
 pre { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius-md); padding: 14px 16px; overflow-x: auto; font: 12px/1.6 var(--font-mono); }
 
-@media (max-width: 900px) { .layout { grid-template-columns: 1fr; } nav.side { display: none; } main { padding: 0 20px 64px; } .g3, .g4 { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 900px) { .layout { grid-template-columns: 1fr; } nav.side { position: static; height: auto; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; border-right: 0; border-bottom: 1px solid var(--line); padding: 12px 16px; } nav.side a, nav.side .ver { display: none; } nav.side .toggle { margin: 0 0 0 auto; } main { padding: 0 20px 64px; } .g3, .g4 { grid-template-columns: 1fr 1fr; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 1ms !important; transition-duration: 1ms !important; } }
 @media print {
   nav.side, .no-print { display: none !important; }
@@ -576,7 +576,7 @@ darkMode: ["class", '[data-theme="dark"]'],</pre>
 <div class="toast copied" id="copied">Copied</div>
 <script>
 const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
-const copy = (hex) => { navigator.clipboard?.writeText(hex); const c = document.getElementById("copied"); c.textContent = "Copied " + hex; c.classList.add("show"); setTimeout(() => c.classList.remove("show"), 1200); };
+const copy = async (hex) => { let ok = false; try { await navigator.clipboard.writeText(hex); ok = true; } catch (e) {} const c = document.getElementById("copied"); c.textContent = ok ? "Copied " + hex : hex + ", copy blocked here"; c.classList.add("show"); setTimeout(() => c.classList.remove("show"), 1200); };
 const scale = [50,100,200,300,400,500,600,700,800,900];
 const sc = document.getElementById("scale");
 scale.forEach((n) => { const b = document.createElement("button"); const hex = css("--blue-" + n); b.style.background = hex; b.style.color = n >= 500 ? "#fff" : "#13234F"; b.innerHTML = n + "<br>" + hex; b.onclick = () => copy(hex); sc.appendChild(b); });
