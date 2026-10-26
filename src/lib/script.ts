@@ -277,13 +277,13 @@ export const customerMessages: CustomerMessage[] = [
     afterEvent: "rel-mohammed",
     to: "Mohammed Al Mansoori · mobile ending 2207",
     channel: "SMS",
-    text: "Hi Mohammed, Creekside General Trading LLC is now on your existing digital banking login. No new password needed. Rashid joins once his Emirates ID is renewed. Any two of you can approve payments, so you can start now.",
+    text: "Hi Mohammed, Creekside General Trading LLC is now on your existing digital banking login. No new password needed. Rashid joins once his Emirates ID is renewed. Until then, any payment that needs two approvers needs both Mohammed and Khalifa.",
   },
   {
     afterEvent: "rel-khalifa-link",
     to: "Khalifa Saeed Al Falasi · mobile ending 4410",
     channel: "SMS",
-    text: "Hi Khalifa, your Creekside General Trading access is ready. Tap the secure link to verify your Emirates ID and set up your login. The link works for 24 hours. Rashid joins once his Emirates ID is renewed. Any two of you can approve payments, so you can start now.",
+    text: "Hi Khalifa, your Creekside General Trading access is ready. Tap the secure link to verify your Emirates ID and set up your login. The link works for 24 hours. Rashid joins once his Emirates ID is renewed. Until then, any payment that needs two approvers needs both Mohammed and Khalifa.",
   },
   {
     afterEvent: "ren-link",
