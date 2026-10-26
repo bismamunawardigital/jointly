@@ -49,6 +49,15 @@ const patterns = [
   },
 ];
 
+const grounded = [
+  { source: "Vasconcelos et al., CSCW 2023", href: "https://doi.org/10.1145/3579605", finding: "People over-trust AI less when checking is easier than trusting.", where: "the clause quote sits next to every line in review" },
+  { source: "Steyvers and Kumar, 2024", href: "https://journals.sagepub.com/doi/full/10.1177/17456916231181102", finding: "Showing how sure the AI is helps people rely on it the right amount.", where: "Exact match vs Agent read this tags" },
+  { source: "Buçinca et al., CSCW 2021", href: "https://doi.org/10.1145/3449287", finding: "A small forced check cuts rubber-stamping.", where: "approve unlocks after Sara compares the highlighted words" },
+  { source: "Amershi et al., CHI 2019", href: "https://doi.org/10.1145/3290605.3300233", finding: "Support quick correction, and let the AI learn from it.", where: "return one stage, then make the fix stick" },
+  { source: "EU AI Act, Article 14", href: "https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-14", finding: "Humans must be able to stop the system.", where: "Pause agent and Hand to a maker" },
+  { source: "Feng, McDonald and Zhang, 2025", href: "https://arxiv.org/html/2506.12469v1", finding: "Autonomy is a design choice, set by the user's role.", where: "the autonomy map: Sara is the approver" },
+];
+
 export default function CaseStudy() {
   return (
     <div className="min-h-screen bg-canvas">
@@ -207,6 +216,24 @@ export default function CaseStudy() {
           <div className="mt-8">
             <SpecDrawing />
           </div>
+        </div>
+      </section>
+
+      <section className="border-t border-line">
+        <div className="mx-auto max-w-5xl px-6 py-16">
+          <h2 className="text-2xl font-semibold tracking-tight">Grounded in research</h2>
+          <p className="mt-2 max-w-2xl text-sub">Each pattern comes from a study or guideline, not a hunch.</p>
+          <ul className="mt-8 grid gap-3 text-sm md:grid-cols-2">
+            {grounded.map((g) => (
+              <li key={g.href} className="rounded-xl border border-line bg-surface p-4">
+                <a href={g.href} target="_blank" rel="noreferrer" className="font-medium text-accent-ink underline-offset-2 hover:underline">
+                  {g.source}
+                </a>
+                <p className="mt-1 text-sub">{g.finding}</p>
+                <p className="mt-2 text-xs text-muted">In Jointly: {g.where}</p>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 

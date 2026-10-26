@@ -1,6 +1,6 @@
 "use client";
 
-import { Bot, Loader2, ShieldCheck, UserRound } from "lucide-react";
+import { Bot, Hand, Loader2, Pause, Play, ShieldCheck, UserRound } from "lucide-react";
 import { checker } from "@/data/seed";
 import { releaseEligibility } from "@/lib/rules";
 import { eventById } from "@/lib/script";
@@ -14,29 +14,60 @@ export function NeedsYou() {
   const elig = releaseEligibility(rulesFor(version), held);
 
   let body: React.ReactNode;
-  if (working && next) {
+  const done = state.log.filter((e) => e.kind === "agent").length;
+  if (working && next && state.handedOver) {
     body = (
-      <div className="flex items-start gap-2.5">
-        <Loader2 className="mt-0.5 h-4 w-4 animate-spin text-accent" />
-        <div>
-          <p className="text-sm font-medium">{next.actor} is working</p>
-          <p className="mt-0.5 font-mono text-[11px] text-muted">{next.call}</p>
-          <p className="mt-2 text-sm text-sub">Nothing needed from you right now.</p>
+      <div>
+        <p className="flex items-center gap-1.5 text-sm font-medium"><Hand className="h-4 w-4 text-warn" /> With a maker</p>
+        <p className="mt-1 text-sm text-sub">{done} steps done, {state.queue.length} left. Next: <span className="font-mono text-xs">{next.call}</span></p>
+        <Button className="mt-4 w-full" onClick={() => dispatch({ type: "resume" })}>
+          <Play className="h-3.5 w-3.5" /> Take it back, resume agent
+        </Button>
+      </div>
+    );
+  } else if (working && next && state.paused) {
+    body = (
+      <div>
+        <p className="flex items-center gap-1.5 text-sm font-medium"><Pause className="h-4 w-4 text-warn" /> Agent paused</p>
+        <p className="mt-1 text-sm text-sub">Stopped between steps. Nothing is half-written.</p>
+        <p className="mt-2 text-xs text-muted">{done} done · {state.queue.length} left · next <span className="font-mono">{next.call}</span></p>
+        <div className="mt-4 space-y-2">
+          <Button variant="primary" className="w-full" onClick={() => dispatch({ type: "resume" })}>
+            <Play className="h-3.5 w-3.5" /> Resume
+          </Button>
+          <Button className="w-full" onClick={() => dispatch({ type: "handover" })}>
+            <Hand className="h-3.5 w-3.5" /> Hand to a maker
+          </Button>
         </div>
+      </div>
+    );
+  } else if (working && next) {
+    body = (
+      <div>
+        <div className="flex items-start gap-2.5">
+          <Loader2 className="mt-0.5 h-4 w-4 animate-spin text-accent" />
+          <div>
+            <p className="text-sm font-medium">{next.actor} is working</p>
+            <p className="mt-0.5 font-mono text-[11px] text-muted">{next.call}</p>
+          </div>
+        </div>
+        <p className="mt-2 text-sm text-sub">Nothing needed from you.</p>
+        <Button size="sm" variant="ghost" className="mt-3" onClick={() => dispatch({ type: "pause" })}>
+          <Pause className="h-3.5 w-3.5" /> Pause agent
+        </Button>
       </div>
     );
   } else if (state.phase === "new") {
     body = (
       <>
-        <p className="text-sm text-sub">The signatories asked for digital banking access at 09:12. The agent is starting. It gathers evidence from Finacle, SVS and EFR, then drafts an access plan for you to check.</p>
+        <p className="text-sm text-sub">Access request in at 09:12. The agent is starting.</p>
       </>
     );
   } else if (state.phase === "in_review") {
     body = (
       <>
         <p className="text-sm font-medium">Review plan v1</p>
-        <p className="mt-1 text-sm text-sub">4 stages, all with sources. Approve each one, or return a stage with a note.</p>
-        <p className="mt-3 rounded-lg bg-warn-soft px-3 py-2 text-xs text-warn-ink">Stage 3 has a gap: the agent didn&apos;t read 1 SVS letter. Check it before you approve.</p>
+        <p className="mt-3 rounded-lg bg-warn-soft px-3 py-2 text-xs text-warn-ink">Stage 3: 1 SVS letter not read.</p>
         <Button variant="primary" className="mt-4 w-full" onClick={() => setTab("review")}>
           Open checker review
         </Button>
@@ -46,7 +77,7 @@ export function NeedsYou() {
     body = (
       <>
         <p className="text-sm font-medium">Review the changes in plan v2</p>
-        <p className="mt-1 text-sm text-sub">Only stages 3 and 4 changed. Your approvals on stages 1 and 2 still stand.</p>
+        <p className="mt-1 text-sm text-sub">Stages 3 and 4 changed. 1 and 2 keep your approval.</p>
         <Button variant="primary" className="mt-4 w-full" onClick={() => setTab("review")}>
           Review 2 changed stages
         </Button>
@@ -66,7 +97,7 @@ export function NeedsYou() {
     body = (
       <>
         <p className="text-sm font-medium">Live, 2 of 3</p>
-        <p className="mt-1 text-sm text-sub">Rashid is waiting on his EID renewal. The agent rechecks EFR and adds him when it clears.</p>
+        <p className="mt-1 text-sm text-sub">Rashid joins when his EID clears EFR.</p>
         <div className="mt-4 rounded-lg border border-dashed border-line p-3">
           <p className="text-xs text-muted">Demo control</p>
           <Button className="mt-2 w-full" onClick={() => dispatch({ type: "renew" })}>

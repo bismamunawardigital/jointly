@@ -5,7 +5,8 @@ import { Check, FlaskConical, X } from "lucide-react";
 import { PersonId, firstName, people } from "@/data/seed";
 import { Outcome, boundaryTests, evaluate } from "@/lib/rules";
 import { hasEvent, rulesFor, useStore } from "@/lib/store";
-import { Avatar, Card, Empty, Pill, SectionTitle, Tone, cn } from "@/components/ui";
+import { EvidenceKey } from "@/data/seed";
+import { Avatar, Card, Empty, Pill, SectionTitle, Sources, Tone, cn } from "@/components/ui";
 
 const outcomeUi: Record<Outcome, { label: string; tone: Tone }> = {
   allowed: { label: "Allowed", tone: "ok" },
@@ -26,6 +27,8 @@ export function SimulatorView() {
   const rules = rulesFor(ver);
   const result = evaluate({ initiator, approvers, amount, currency }, rules, held);
   const tests = boundaryTests(rules, held);
+  const why: EvidenceKey[] =
+    result.outcome === "held" ? ["eid-rashid"] : result.outcome === "not_covered" ? ["svs-man"] : result.ruleId ? rules.find((r) => r.id === result.ruleId)!.sources : rules.flatMap((r) => r.sources);
   const toggle = (id: PersonId) => setApprovers((a) => (a.includes(id) ? a.filter((x) => x !== id) : [...a, id]));
 
   return (
@@ -104,6 +107,9 @@ export function SimulatorView() {
               {outcomeUi[result.outcome].label}
             </Pill>
             <p className="mt-3 text-sm text-sub">{result.reason}</p>
+            <div className="mt-2">
+              <Sources keys={Array.from(new Set(why))} />
+            </div>
           </div>
         </Card>
       </section>

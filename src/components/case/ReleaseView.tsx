@@ -8,7 +8,7 @@ import { customerMessages } from "@/lib/script";
 import { progressFor } from "@/lib/derive";
 import { hasEvent, rulesFor, useStore } from "@/lib/store";
 import { useTourTarget } from "@/components/Tour";
-import { AssumptionChip, Avatar, Button, Card, Empty, Pill, SectionTitle, cn } from "@/components/ui";
+import { AssumptionChip, Avatar, Button, Card, Empty, Pill, SectionTitle, Sources, cn } from "@/components/ui";
 
 export function ReleaseView() {
   const { state, dispatch, version, held } = useStore();
@@ -46,14 +46,17 @@ export function ReleaseView() {
                 ))}
               </div>
               <p className="mt-3 text-sm font-medium">{elig.summary}</p>
-              <p className="mt-1 text-xs text-muted">Checked by the rules engine. If Khalifa were also held, Mohammed alone couldn&apos;t sign anything. If the mandate needed Rashid to co-sign any payment, release would be blocked too, and everyone would wait for him.</p>
+              <p className="mt-1 text-xs text-muted">Checked by the rules engine. If any payment needed Rashid, everyone would wait.</p>
+              <div className="mt-2">
+                <Sources keys={["svs-man-c1", "eid-rashid"]} />
+              </div>
             </div>
           </div>
           {state.phase === "executed" && (
             <div className="mt-5 border-t border-line pt-4">
               {confirming ? (
                 <div className="space-y-3">
-                  <p className="text-sm text-sub">This texts Mohammed and Khalifa that they can start, and tells them Rashid joins later. Messages can&apos;t be unsent.</p>
+                  <p className="text-sm text-sub">Texts Mohammed and Khalifa now. Can&apos;t be unsent.</p>
                   <div className="flex gap-2">
                     <Button variant="primary" onClick={() => dispatch({ type: "release" })}>
                       Yes, release them

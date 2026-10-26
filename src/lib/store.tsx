@@ -2,7 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useState } from "react";
 import { EvidenceKey, PersonId, checker } from "@/data/seed";
-import { Group, groupEvents } from "./script";
+import { Group, eventById, groupEvents } from "./script";
 import { Approval, Version, approvalValid, buildRules, buildStages, heldIds, stageHash } from "./rules";
 
 export type Phase =
@@ -41,6 +41,8 @@ export interface State {
   cleanupTicket: "draft" | "sent";
   tourOn: boolean;
   tourStep: number;
+  paused?: boolean;
+  handedOver?: boolean;
 }
 
 export const initialState: State = {
@@ -61,6 +63,10 @@ type Action =
   | { type: "sendCleanup" }
   | { type: "release" }
   | { type: "renew" }
+  | { type: "pause" }
+  | { type: "resume" }
+  | { type: "handover" }
+  | { type: "lesson" }
   | { type: "tour"; on?: boolean; step?: number }
   | { type: "reset" }
   | { type: "hydrate"; state: State };
@@ -83,6 +89,11 @@ export const rashidRenewed = (s: State) => hasEvent(s, "ren-kyc");
 
 function human(id: string, time: string, text: string, by = checker.name): HumanEntry {
   return { id, kind: "human", time, by, text };
+}
+
+function nowOf(s: State) {
+  const last = [...s.log].reverse().find((e) => e.kind === "agent");
+  return last ? eventById(last.id).time : "Mon 09:12";
 }
 
 function reducer(s: State, a: Action): State {
@@ -133,6 +144,14 @@ function reducer(s: State, a: Action): State {
       const log = [...s.log, human("renew", "Wed 09:39", "Demo control: Rashid renewed his EID", "Demo")];
       return { ...s, log, phase: "renewing", queue: groupEvents("renew"), queueGroup: "renew" };
     }
+    case "pause":
+      return s.queue.length ? { ...s, paused: true, log: [...s.log, human(`pause-${s.log.length}`, nowOf(s), "Paused the agent between steps")] } : s;
+    case "resume":
+      return { ...s, paused: false, handedOver: false, log: [...s.log, human(`resume-${s.log.length}`, nowOf(s), s.handedOver ? "Took the case back from the maker and resumed the agent" : "Resumed the agent")] };
+    case "handover":
+      return { ...s, handedOver: true, log: [...s.log, human(`handover-${s.log.length}`, nowOf(s), `Handed to a maker: ${s.queue.length} step${s.queue.length === 1 ? "" : "s"} left, nothing half-written`)] };
+    case "lesson":
+      return s.log.some((e) => e.id === "lesson") ? s : { ...s, log: [...s.log, human("lesson", "Mon 10:39", "Sent a lasting change to the supervisor: always read every SVS document type")] };
     case "tour":
       return { ...s, tourOn: a.on ?? s.tourOn, tourStep: a.step ?? s.tourStep };
   }
@@ -175,10 +194,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   }, [state, hydrated]);
 
   useEffect(() => {
-    if (!hydrated || !state.queue.length) return;
+    if (!hydrated || !state.queue.length || state.paused) return;
     const t = setTimeout(() => dispatch({ type: "reveal" }), 650);
     return () => clearTimeout(t);
-  }, [state.queue, hydrated]);
+  }, [state.queue, state.paused, hydrated]);
 
   const openEvidence = useCallback((k: EvidenceKey | null) => setEvidenceOpen(k), []);
   const version = versionOf(state);
