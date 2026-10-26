@@ -23,7 +23,6 @@ export function EvidenceView() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-line bg-panel/60 text-left text-xs text-muted">
-                <th className="px-4 py-2.5 font-medium">Signatory</th>
                 <th className="px-4 py-2.5 font-medium">Form</th>
                 <th className="px-4 py-2.5 font-medium">Finacle</th>
                 <th className="px-4 py-2.5 font-medium">SVS</th>
@@ -37,13 +36,11 @@ export function EvidenceView() {
                 const expired = !p.eidValid && !renewed;
                 return (
                   <tr key={p.id} className="border-b border-line align-top last:border-0">
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2.5">
-                        <Avatar id={p.id} held={expired} />
-                        <span className="font-medium">{p.name.split(" ")[0]}</span>
-                      </div>
-                    </td>
                     <td className="px-4 py-3 text-xs">
+                      <div className="mb-1 flex items-center gap-2">
+                        <Avatar id={p.id} size={22} held={expired} />
+                        <span className="text-sm font-medium text-ink">{p.name.split(" ")[0]}</span>
+                      </div>
                       <p className="text-sub">{p.formName}</p>
                       <SourceChip k={`form-${p.id}` as EvidenceKey} className="mt-1" />
                     </td>
@@ -53,7 +50,7 @@ export function EvidenceView() {
                     </td>
                     <td className="px-4 py-3 text-xs">
                       <p className="text-sub">{p.svsName}</p>
-                      <SourceChip k="svs-signatories" className="mt-1" />
+                      <SourceChip k="svs-signatories" className="mt-1 max-w-[150px]" />
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex flex-col gap-1 whitespace-nowrap text-xs">
