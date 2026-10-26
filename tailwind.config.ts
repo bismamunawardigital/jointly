@@ -1,16 +1,46 @@
 import type { Config } from "tailwindcss";
 
+const v = (name: string) => `rgb(var(--${name}) / <alpha-value>)`;
+
 const config: Config = {
-  content: [
-    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
-  ],
+  content: ["./src/**/*.{ts,tsx}"],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ["var(--font-sans)", "var(--font-arabic)", "system-ui", "sans-serif"],
+        arabic: ["var(--font-arabic)", "var(--font-sans)", "sans-serif"],
+        mono: ["var(--font-mono)", "ui-monospace", "monospace"],
+      },
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+        canvas: v("canvas"),
+        surface: v("surface"),
+        panel: v("panel"),
+        line: { DEFAULT: v("line"), strong: v("line-strong") },
+        ink: v("ink"),
+        sub: v("sub"),
+        muted: v("muted"),
+        onaccent: v("onaccent"),
+        accent: { DEFAULT: v("accent"), hover: v("accent-hover"), soft: v("accent-soft"), ink: v("accent-ink") },
+        ok: { DEFAULT: v("ok"), soft: v("ok-soft"), ink: v("ok-ink") },
+        warn: { DEFAULT: v("warn"), soft: v("warn-soft"), ink: v("warn-ink") },
+        bad: { DEFAULT: v("bad"), soft: v("bad-soft"), ink: v("bad-ink") },
+      },
+      boxShadow: {
+        sm: "0 1px 2px rgb(var(--shadow) / 0.04)",
+        md: "0 1px 2px rgb(var(--shadow) / 0.04), 0 4px 12px rgb(var(--shadow) / 0.05)",
+        lg: "0 2px 4px rgb(var(--shadow) / 0.04), 0 12px 32px rgb(var(--shadow) / 0.10)",
+      },
+      transitionTimingFunction: {
+        out: "cubic-bezier(0.23, 1, 0.32, 1)",
+      },
+      keyframes: {
+        enter: {
+          from: { opacity: "0", transform: "translateY(4px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
+        },
+      },
+      animation: {
+        enter: "enter 220ms cubic-bezier(0.23, 1, 0.32, 1) both",
       },
     },
   },
