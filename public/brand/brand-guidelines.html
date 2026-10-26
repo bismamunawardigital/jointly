@@ -1,0 +1,604 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Jointly brand and design system v1.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+:root {
+  --font-sans: "IBM Plex Sans", "IBM Plex Sans Arabic", system-ui, sans-serif;
+  --font-arabic: "IBM Plex Sans Arabic", "IBM Plex Sans", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  --blue-50: #EEF3FC; --blue-100: #DCE6F9; --blue-200: #B9CCF2; --blue-300: #8EAAE8; --blue-400: #5F84DB;
+  --blue-500: #3A63CC; --blue-600: #2449B4; --blue-700: #1C3A93; --blue-800: #182F75; --blue-900: #13234F;
+
+  --canvas: #FBFAF7; --surface: #FFFFFF; --panel: #F4F2EE; --line: #E7E4DE; --line-strong: #D6D2CA;
+  --ink: #16171A; --sub: #4A4C52; --muted: #6E6F73;
+  --accent: var(--blue-600); --accent-hover: var(--blue-700); --accent-soft: var(--blue-50); --accent-ink: var(--blue-700);
+  --ok: #157A43; --ok-soft: #E6F4EC; --ok-ink: #0F5C32;
+  --warn: #A65A0B; --warn-soft: #FBF0E1; --warn-ink: #7F4407;
+  --bad: #B3261E; --bad-soft: #FBEAE8; --bad-ink: #8A1C16;
+
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 20px; --space-6: 24px; --space-8: 32px; --space-10: 40px; --space-12: 48px; --space-16: 64px;
+  --radius-xs: 4px; --radius-sm: 6px; --radius-md: 8px; --radius-lg: 12px; --radius-xl: 16px; --radius-full: 9999px;
+  --shadow-sm: 0 1px 2px rgba(22, 23, 26, 0.04);
+  --shadow-md: 0 1px 2px rgba(22, 23, 26, 0.04), 0 4px 12px rgba(22, 23, 26, 0.05);
+  --shadow-lg: 0 2px 4px rgba(22, 23, 26, 0.04), 0 12px 32px rgba(22, 23, 26, 0.10);
+
+  --dur-fast: 120ms; --dur-base: 200ms; --dur-slow: 320ms;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1); --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  --track-display: -0.02em; --track-title: -0.01em; --track-body: 0; --track-label: 0.04em;
+}
+[data-theme="dark"] {
+  --canvas: #0F1115; --surface: #16191F; --panel: #1C2028; --line: #2A2F38; --line-strong: #3A404B;
+  --ink: #ECEDEF; --sub: #B4B8C0; --muted: #8B909A;
+  --accent: #7FA0F0; --accent-hover: #A3BCF5; --accent-soft: #1A2440; --accent-ink: #A3BCF5;
+  --ok: #4CC27E; --ok-soft: #12291D; --ok-ink: #7AD9A1;
+  --warn: #E9A54B; --warn-soft: #2E2112; --warn-ink: #F2C07E;
+  --bad: #F07A70; --bad-soft: #321716; --bad-ink: #F5A39B;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,.3); --shadow-md: 0 1px 2px rgba(0,0,0,.3), 0 4px 12px rgba(0,0,0,.3); --shadow-lg: 0 12px 32px rgba(0,0,0,.45);
+}
+* { box-sizing: border-box; }
+html { -webkit-font-smoothing: antialiased; scroll-behavior: smooth; }
+body { margin: 0; background: var(--canvas); color: var(--ink); font: 400 14px/1.5 var(--font-sans); transition: background var(--dur-base) var(--ease-out), color var(--dur-base) var(--ease-out); }
+.mono, code, .num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: var(--accent-hover); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+
+.layout { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+nav.side { position: sticky; top: 0; height: 100vh; overflow-y: auto; border-right: 1px solid var(--line); background: var(--surface); padding: 24px 16px; }
+nav.side .brand { display: flex; align-items: center; gap: 8px; font-weight: 600; letter-spacing: var(--track-title); padding: 0 8px 4px; }
+nav.side .ver { margin: 0 8px 20px; font-size: 12px; color: var(--muted); }
+nav.side a { display: block; padding: 6px 8px; border-radius: var(--radius-sm); color: var(--sub); font-size: 13px; }
+nav.side a:hover { background: var(--panel); color: var(--ink); }
+nav.side .toggle { margin: 20px 8px 0; }
+main { padding: 0 56px 96px; max-width: 1080px; }
+section { padding: 64px 0 8px; border-bottom: 1px solid var(--line); }
+section:last-child { border-bottom: 0; }
+.eyebrow { font-size: 12px; font-weight: 500; letter-spacing: var(--track-label); text-transform: uppercase; color: var(--muted); }
+h1 { font-size: 44px; line-height: 1.1; letter-spacing: var(--track-display); font-weight: 600; margin: 12px 0 16px; }
+h2 { font-size: 24px; line-height: 1.25; letter-spacing: var(--track-title); font-weight: 600; margin: 8px 0 8px; }
+h3 { font-size: 16px; line-height: 1.4; font-weight: 600; margin: 32px 0 12px; }
+p.lead { font-size: 16px; color: var(--sub); max-width: 640px; }
+p.note { color: var(--sub); max-width: 680px; }
+.grid { display: grid; gap: 16px; }
+.g2 { grid-template-columns: repeat(2, 1fr); } .g3 { grid-template-columns: repeat(3, 1fr); } .g4 { grid-template-columns: repeat(4, 1fr); }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 20px; box-shadow: var(--shadow-sm); }
+.card.flat { box-shadow: none; }
+.small { font-size: 12px; color: var(--muted); }
+.badge-ver { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); border-radius: var(--radius-full); padding: 2px 10px; font-size: 12px; color: var(--sub); background: var(--surface); }
+
+/* buttons */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 36px; padding: 0 14px; border-radius: var(--radius-md); font: 500 14px/1 var(--font-sans); border: 1px solid transparent; cursor: pointer; transition: background var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out); }
+.btn:active { transform: scale(0.97); }
+.btn-sm { height: 30px; padding: 0 10px; font-size: 13px; }
+.btn-primary { background: var(--accent); color: #fff; }
+[data-theme="dark"] .btn-primary { color: #0F1115; }
+.btn-primary:hover { background: var(--accent-hover); }
+.btn-secondary { background: var(--surface); color: var(--ink); border-color: var(--line-strong); }
+.btn-secondary:hover { background: var(--panel); }
+.btn-ghost { background: transparent; color: var(--sub); }
+.btn-ghost:hover { background: var(--panel); color: var(--ink); }
+.btn-danger { background: var(--surface); color: var(--bad-ink); border-color: color-mix(in srgb, var(--bad) 35%, transparent); }
+.btn-danger:hover { background: var(--bad-soft); }
+.btn[disabled] { opacity: .45; cursor: not-allowed; transform: none; }
+.btn.focus { outline: 2px solid var(--accent); outline-offset: 2px; }
+.row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+
+/* pills, chips */
+.pill { display: inline-flex; align-items: center; gap: 6px; border-radius: var(--radius-full); padding: 2px 9px; font-size: 12px; font-weight: 500; white-space: nowrap; }
+.pill::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: .9; }
+.pill.neutral { background: var(--panel); color: var(--sub); } .pill.accent { background: var(--accent-soft); color: var(--accent-ink); }
+.pill.ok { background: var(--ok-soft); color: var(--ok-ink); } .pill.warn { background: var(--warn-soft); color: var(--warn-ink); } .pill.bad { background: var(--bad-soft); color: var(--bad-ink); }
+.chip { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 2px 7px; font: 400 11px/1.6 var(--font-mono); color: var(--sub); background: var(--surface); cursor: pointer; }
+.chip:hover { border-color: var(--accent); color: var(--accent-ink); }
+.assume { display: inline-flex; gap: 6px; border: 1px dashed color-mix(in srgb, var(--warn) 50%, transparent); border-radius: var(--radius-sm); padding: 1px 7px; font-size: 11px; color: var(--warn-ink); }
+
+/* forms */
+label.f { display: block; font-size: 12px; font-weight: 500; color: var(--sub); margin-bottom: 6px; }
+.input, select.input, textarea.input { width: 100%; height: 36px; padding: 0 12px; border: 1px solid var(--line-strong); border-radius: var(--radius-md); background: var(--surface); color: var(--ink); font: 400 14px var(--font-sans); transition: border-color var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out); }
+textarea.input { height: 76px; padding: 8px 12px; resize: vertical; }
+.input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent); }
+.input.err { border-color: var(--bad); }
+.help { font-size: 12px; color: var(--muted); margin-top: 6px; } .help.err { color: var(--bad-ink); }
+.switch { position: relative; width: 34px; height: 20px; border-radius: 999px; background: var(--line-strong); border: 0; cursor: pointer; transition: background var(--dur-base) var(--ease-out); }
+.switch::after { content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: #fff; box-shadow: var(--shadow-sm); transition: transform var(--dur-base) var(--ease-out); }
+.switch[aria-checked="true"] { background: var(--accent); } .switch[aria-checked="true"]::after { transform: translateX(14px); }
+.check { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; }
+.check input { width: 16px; height: 16px; accent-color: var(--accent); }
+
+/* table */
+table.t { width: 100%; border-collapse: collapse; font-size: 13px; }
+.t th { text-align: left; font-weight: 500; font-size: 12px; color: var(--muted); padding: 10px 12px; border-bottom: 1px solid var(--line); background: var(--panel); }
+.t td { padding: 11px 12px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+.t tr:hover td { background: color-mix(in srgb, var(--panel) 60%, transparent); }
+.t td.n, .t th.n { text-align: right; font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.tablewrap { border: 1px solid var(--line); border-radius: var(--radius-lg); overflow: hidden; background: var(--surface); }
+.toolbar { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+
+/* alerts, toast, modal */
+.alert { display: flex; gap: 10px; border-radius: var(--radius-md); padding: 10px 12px; font-size: 13px; border: 1px solid; }
+.alert.warn { background: var(--warn-soft); color: var(--warn-ink); border-color: color-mix(in srgb, var(--warn) 25%, transparent); }
+.alert.bad { background: var(--bad-soft); color: var(--bad-ink); border-color: color-mix(in srgb, var(--bad) 25%, transparent); }
+.alert.ok { background: var(--ok-soft); color: var(--ok-ink); border-color: color-mix(in srgb, var(--ok) 25%, transparent); }
+.alert.info { background: var(--accent-soft); color: var(--accent-ink); border-color: color-mix(in srgb, var(--accent) 25%, transparent); }
+.toast { display: flex; align-items: center; gap: 12px; background: var(--ink); color: var(--canvas); border-radius: var(--radius-md); padding: 10px 14px; font-size: 13px; box-shadow: var(--shadow-lg); width: max-content; }
+.toast a { color: var(--blue-200); }
+.modal-stage { position: relative; background: color-mix(in srgb, var(--ink) 30%, transparent); border-radius: var(--radius-lg); padding: 32px; display: grid; place-items: center; }
+.modal { background: var(--surface); border-radius: var(--radius-xl); box-shadow: var(--shadow-lg); width: 420px; padding: 24px; }
+.menu { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-md); box-shadow: var(--shadow-md); padding: 4px; width: 220px; }
+.menu div { padding: 7px 10px; border-radius: var(--radius-sm); font-size: 13px; color: var(--sub); display: flex; justify-content: space-between; }
+.menu div:hover, .menu div.on { background: var(--panel); color: var(--ink); }
+.search { display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 12px; border: 1px solid var(--line-strong); border-radius: var(--radius-md); background: var(--surface); color: var(--muted); }
+.kbd { margin-left: auto; font: 11px var(--font-mono); border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; }
+.tabs { display: flex; gap: 20px; border-bottom: 1px solid var(--line); }
+.tabs span { padding: 10px 0; font-size: 14px; color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -1px; cursor: pointer; }
+.tabs span.on { color: var(--ink); border-color: var(--ink); font-weight: 500; }
+.sidenav { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 12px; width: 220px; }
+.sidenav div { padding: 7px 10px; border-radius: var(--radius-sm); font-size: 13px; color: var(--sub); }
+.sidenav div.on { background: var(--panel); color: var(--ink); font-weight: 500; box-shadow: inset 0 0 0 1px var(--line); }
+
+/* swatches */
+.sw { border: 1px solid var(--line); border-radius: var(--radius-md); overflow: hidden; background: var(--surface); cursor: pointer; text-align: left; padding: 0; font: inherit; color: inherit; }
+.sw .c { height: 56px; }
+.sw .m { padding: 8px 10px; font-size: 12px; }
+.sw .m b { display: block; font-weight: 500; }
+.sw .m span { font-family: var(--font-mono); color: var(--muted); font-size: 11px; }
+.scale { display: grid; grid-template-columns: repeat(10, 1fr); border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--line); }
+.scale button { border: 0; height: 72px; padding: 6px; display: flex; flex-direction: column; justify-content: flex-end; font: 10px var(--font-mono); cursor: pointer; text-align: left; }
+.copied { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px); opacity: 0; transition: all var(--dur-base) var(--ease-out); pointer-events: none; }
+.copied.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* type specimens */
+.spec { display: grid; grid-template-columns: 160px 1fr; gap: 16px; align-items: baseline; padding: 14px 0; border-bottom: 1px solid var(--line); }
+.spec:last-child { border-bottom: 0; }
+.spec .k { font: 11px/1.5 var(--font-mono); color: var(--muted); }
+.ar { font-family: var(--font-arabic); direction: rtl; text-align: right; }
+.ar .num, .ar .chip { direction: ltr; unicode-bidi: isolate; }
+
+/* spacing */
+.bar { height: 12px; background: var(--accent); border-radius: 2px; opacity: .85; }
+.sprow { display: grid; grid-template-columns: 80px 64px 1fr; gap: 12px; align-items: center; font-size: 12px; padding: 4px 0; }
+.radius-demo { height: 64px; border: 1.5px solid var(--ink); background: var(--panel); }
+.shadow-demo { height: 80px; border-radius: var(--radius-lg); background: var(--surface); display: grid; place-items: center; font-size: 12px; color: var(--muted); }
+
+/* motion */
+.track { position: relative; height: 32px; background: var(--panel); border-radius: var(--radius-sm); overflow: hidden; }
+.dot { position: absolute; top: 8px; left: 8px; width: 16px; height: 16px; border-radius: 50%; background: var(--accent); }
+.motion-go .dot { transform: translateX(calc(100% * 0 + 340px)); }
+
+/* product mocks */
+.approval { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 20px; box-shadow: var(--shadow-sm); }
+.approval .head { display: flex; justify-content: space-between; align-items: flex-start; }
+.approval .rows { margin-top: 14px; border: 1px solid var(--line); border-radius: var(--radius-md); }
+.approval .r { display: flex; justify-content: space-between; gap: 12px; align-items: center; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+.approval .r:last-child { border-bottom: 0; }
+del.d { background: var(--bad-soft); color: var(--bad-ink); border-radius: 3px; padding: 0 2px; }
+ins.d { background: var(--ok-soft); color: var(--ok-ink); border-radius: 3px; padding: 0 2px; text-decoration: none; font-weight: 500; }
+.timeline { border-left: 1px solid var(--line); margin-left: 8px; padding-left: 18px; }
+.ev { position: relative; padding: 8px 0; }
+.ev::before { content: ""; position: absolute; left: -23px; top: 14px; width: 9px; height: 9px; border-radius: 50%; background: var(--surface); border: 2px solid var(--ok); }
+.ev.warn::before { border-color: var(--warn); } .ev.bad::before { border-color: var(--bad); }
+.ev .call { font: 11px var(--font-mono); color: var(--muted); }
+.empty { text-align: center; padding: 40px 24px; border: 1px dashed var(--line-strong); border-radius: var(--radius-lg); }
+.skel { height: 12px; border-radius: 4px; background: linear-gradient(90deg, var(--panel), var(--line), var(--panel)); background-size: 200% 100%; animation: sh 1.4s var(--ease-in-out) infinite; }
+@keyframes sh { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+.chart { display: flex; align-items: flex-end; gap: 10px; height: 160px; padding: 0 0 0 40px; border-bottom: 1px solid var(--line-strong); position: relative; }
+.chart .col { flex: 1; display: flex; flex-direction: column-reverse; border-radius: 3px 3px 0 0; overflow: hidden; }
+.chart .grid-l { position: absolute; left: 40px; right: 0; border-top: 1px dashed var(--line); font: 10px var(--font-mono); color: var(--muted); }
+.chart .grid-l span { position: absolute; left: -36px; top: -7px; }
+.tip { background: var(--ink); color: var(--canvas); border-radius: var(--radius-sm); padding: 6px 9px; font-size: 12px; box-shadow: var(--shadow-md); width: max-content; }
+.dd { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.do, .dont { border-radius: var(--radius-md); padding: 14px 16px; font-size: 13px; }
+.do { background: var(--ok-soft); color: var(--ok-ink); } .dont { background: var(--bad-soft); color: var(--bad-ink); }
+.do b, .dont b { display: block; margin-bottom: 4px; }
+pre { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius-md); padding: 14px 16px; overflow-x: auto; font: 12px/1.6 var(--font-mono); }
+
+@media (max-width: 900px) { .layout { grid-template-columns: 1fr; } nav.side { display: none; } main { padding: 0 20px 64px; } .g3, .g4 { grid-template-columns: 1fr 1fr; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 1ms !important; transition-duration: 1ms !important; } }
+@media print {
+  nav.side, .no-print { display: none !important; }
+  .layout { display: block; } main { padding: 0; max-width: none; }
+  section { break-inside: avoid-page; padding-top: 24px; }
+  .card, .approval { box-shadow: none; }
+  body { background: #fff; }
+}
+</style>
+</head>
+<body>
+<div class="layout">
+<nav class="side" aria-label="Sections">
+  <div class="brand">
+    <svg width="22" height="14" viewBox="0 0 22 14" aria-hidden="true"><circle cx="7" cy="7" r="6" fill="none" stroke="var(--accent)" stroke-width="2"/><circle cx="15" cy="7" r="6" fill="none" stroke="var(--ink)" stroke-width="2"/></svg>
+    Jointly
+  </div>
+  <div class="ver">Brand and design system · v1.0</div>
+  <a href="#cover">Cover</a><a href="#personality">Personality</a><a href="#logo">Logo</a><a href="#color">Colour</a><a href="#type">Typography</a><a href="#space">Spacing and layout</a><a href="#motion">Motion</a><a href="#components">Components</a><a href="#patterns">Patterns</a><a href="#data">Data visualisation</a><a href="#voice">Voice and content</a><a href="#arabic">Arabic and RTL</a><a href="#dos">Do's and don'ts</a><a href="#tokens">Token reference</a><a href="#dev">Developer setup</a>
+  <div class="toggle row"><button class="switch" id="theme" role="switch" aria-checked="false" aria-label="Dark mode"></button><span class="small">Dark mode</span></div>
+</nav>
+<main>
+
+<section id="cover">
+  <span class="badge-ver"><span class="pill accent" style="padding:0 6px">v1.0</span> October 2026</span>
+  <h1>Jointly</h1>
+  <p class="lead" style="font-size:20px;color:var(--ink);margin-top:-4px">Joint signatories live in hours, with every step on the record.</p>
+  <p class="lead">Jointly is an agent workbench for bank operations teams. The agent reads Finacle, SVS and EFR, builds the digital banking setup for a joint-signatory business, and a checker approves it with every source in view. This guide is how Jointly looks, moves and talks, so anyone can build a new screen without asking.</p>
+  <div class="grid g3" style="margin-top:32px">
+    <div class="card flat"><div class="eyebrow">Who uses it</div><p style="margin:6px 0 0">Customer Fulfillment checkers at UAE banks, on work laptops, all day.</p></div>
+    <div class="card flat"><div class="eyebrow">What it feels like</div><p style="margin:6px 0 0">A calm, exact instrument that knows your legacy-system day.</p></div>
+    <div class="card flat"><div class="eyebrow">Languages</div><p style="margin:6px 0 0">English and Arabic, with full right-to-left layouts.</p></div>
+  </div>
+</section>
+
+<section id="personality">
+  <div class="eyebrow">01</div><h2>Personality</h2>
+  <p class="note">Sara opens Finacle in one window, SVS in another, and a scanned mandate in a third. Jointly is the first tool in her day that doesn't make her hold things in her head. That's the feeling we design for.</p>
+  <div class="grid g4" style="margin-top:20px">
+    <div class="card"><b>Calm</b><p class="small" style="margin:6px 0 0">Quiet surfaces. Colour shows up only when something needs her.</p></div>
+    <div class="card"><b>Exact</b><p class="small" style="margin:6px 0 0">Real IDs, real amounts, real sources. Never "some records".</p></div>
+    <div class="card"><b>Accountable</b><p class="small" style="margin:6px 0 0">Every claim links to where it came from. Every action has a name on it.</p></div>
+    <div class="card"><b>Warm</b><p class="small" style="margin:6px 0 0">We know the legacy-system grind, and we say so like a good colleague would.</p></div>
+  </div>
+  <h3>We are / we are not</h3>
+  <div class="tablewrap"><table class="t">
+    <tr><th>We are</th><th>We are not</th><th>Inspired by</th></tr>
+    <tr><td>Plain and step by step</td><td>Jargon heavy</td><td>Wise: copy that explains money simply</td></tr>
+    <tr><td>Hospitable and dignified in Arabic</td><td>Gold, luxe or ornamental</td><td>Emirates: Arabic type and service tone</td></tr>
+    <tr><td>Locally warm, a bit human</td><td>Cute or jokey</td><td>du: personal, local voice</td></tr>
+    <tr><td>One clear next step per screen</td><td>Pushy, promo-style nudges</td><td>Not Careem</td></tr>
+    <tr><td>Dense where it helps, quiet elsewhere</td><td>A wall of choices</td><td>Not Talabat</td></tr>
+  </table></div>
+  <h3>Voice in practice</h3>
+  <div class="grid g3">
+    <div class="card flat"><div class="small">Agent finds a gap</div><p style="margin:6px 0 0">"I didn't read 1 Letter from 2023. These rules may be out of date."</p></div>
+    <div class="card flat"><div class="small">Nothing to do</div><p style="margin:6px 0 0">"Nothing needs you right now. The agent will call you when it does."</p></div>
+    <div class="card flat"><div class="small">Something broke</div><p style="margin:6px 0 0">"Digital Banking Admin timed out. Nothing was half-written. Retrying once."</p></div>
+  </div>
+</section>
+
+<section id="logo">
+  <div class="eyebrow">02</div><h2>Logo</h2>
+  <p class="note">Two rings that overlap: two signatories, one decision. Blue is the agent, ink is the person. The overlap is where Jointly lives.</p>
+  <div class="grid g3" style="margin-top:20px">
+    <div class="card" style="display:grid;place-items:center;height:160px">
+      <span style="display:inline-flex;align-items:center;gap:12px;font-size:32px;font-weight:600;letter-spacing:var(--track-display)"><svg width="50" height="32" viewBox="0 0 22 14"><circle cx="7" cy="7" r="6" fill="none" stroke="var(--accent)" stroke-width="2"/><circle cx="15" cy="7" r="6" fill="none" stroke="var(--ink)" stroke-width="2"/></svg>Jointly</span>
+    </div>
+    <div class="card" style="display:grid;place-items:center;height:160px;background:var(--blue-900);border-color:var(--blue-900)">
+      <span style="display:inline-flex;align-items:center;gap:12px;font-size:32px;font-weight:600;color:#fff;letter-spacing:var(--track-display)"><svg width="50" height="32" viewBox="0 0 22 14"><circle cx="7" cy="7" r="6" fill="none" stroke="#8EAAE8" stroke-width="2"/><circle cx="15" cy="7" r="6" fill="none" stroke="#fff" stroke-width="2"/></svg>Jointly</span>
+    </div>
+    <div class="card" style="display:grid;place-items:center;height:160px">
+      <span class="ar" style="display:inline-flex;align-items:center;gap:12px;font-size:30px;font-weight:600">جوينتلي<svg width="50" height="32" viewBox="0 0 22 14"><circle cx="7" cy="7" r="6" fill="none" stroke="var(--accent)" stroke-width="2"/><circle cx="15" cy="7" r="6" fill="none" stroke="var(--ink)" stroke-width="2"/></svg></span>
+    </div>
+  </div>
+  <div class="grid g4" style="margin-top:16px">
+    <div class="card flat"><b>Clear space</b><p class="small" style="margin:6px 0 0">One ring's height on every side. Nothing enters it.</p></div>
+    <div class="card flat"><b>Minimum size</b><p class="small" style="margin:6px 0 0">Mark 16px wide. Full lockup 72px wide.</p></div>
+    <div class="card flat"><b>In Arabic</b><p class="small" style="margin:6px 0 0">The mark sits on the right, the wordmark on its left. The rings don't flip.</p></div>
+    <div class="card flat"><b>Don't</b><p class="small" style="margin:6px 0 0">Fill the rings, add a gradient, rotate, recolour the ink ring or add a tagline inside the lockup.</p></div>
+  </div>
+</section>
+
+<section id="color">
+  <div class="eyebrow">03</div><h2>Colour</h2>
+  <p class="note">Neutrals carry about 90% of every screen. Blue means "you can act here". Green, amber and red mean data: verified, needs a person, blocked. A hue never does another hue's job. Click any swatch to copy its hex.</p>
+  <h3>Creek blue, primary scale</h3>
+  <div class="scale" id="scale"></div>
+  <p class="small">600 is the accent. 700 is hover and pressed. 50 is selected rows and the agent's soft tint. 900 is the only dark brand surface.</p>
+  <h3>Warm neutrals</h3>
+  <div class="grid g4" id="neutrals"></div>
+  <h3>Semantic colour</h3>
+  <div class="grid g4" id="semantic"></div>
+  <h3>Colour rules</h3>
+  <div class="tablewrap"><table class="t">
+    <tr><th>Role</th><th>Colour</th><th>Used for</th><th>Never used for</th></tr>
+    <tr><td>Interactive</td><td><span class="pill accent">Blue</span></td><td>Primary buttons, links, focus, active tour target, agent working</td><td>Status, decoration, charts of outcomes</td></tr>
+    <tr><td>Verified</td><td><span class="pill ok">Green</span></td><td>Rules passed, read-back matched, approved, live</td><td>Success toasts for trivial actions</td></tr>
+    <tr><td>Needs a person</td><td><span class="pill warn">Amber</span></td><td>A human decision is waiting, an exception, an assumption</td><td>Things that are fine but different (name spellings)</td></tr>
+    <tr><td>Blocked</td><td><span class="pill bad">Red</span></td><td>Rule failed, EFR failed, destructive action</td><td>Validation hints before the user tried anything</td></tr>
+  </table></div>
+  <p class="small" style="margin-top:12px">Known collision: the agent's blue and the primary button share a hue. We accept it because the agent's tint is always the soft 50 and the button is always solid 600. Text contrast: every ink on its soft background passes WCAG AA (4.5:1) in light and dark.</p>
+</section>
+
+<section id="type">
+  <div class="eyebrow">04</div><h2>Typography</h2>
+  <p class="note">IBM Plex Sans for words, IBM Plex Mono for anything a person might compare across systems: amounts, IDs, IBANs, times, API calls. IBM Plex Sans Arabic for Arabic, so both scripts share the same skeleton.</p>
+  <div class="card" style="margin-top:20px">
+    <div class="spec"><div class="k">display · 44/48 · 600 · -0.02em</div><div style="font-size:44px;line-height:1.1;font-weight:600;letter-spacing:-0.02em">Live in hours</div></div>
+    <div class="spec"><div class="k">h1 · 32/40 · 600 · -0.02em</div><div style="font-size:32px;line-height:1.25;font-weight:600;letter-spacing:-0.02em">Creekside General Trading LLC</div></div>
+    <div class="spec"><div class="k">h2 · 24/30 · 600 · -0.01em</div><div style="font-size:24px;font-weight:600;letter-spacing:-0.01em">Can we go live without Rashid?</div></div>
+    <div class="spec"><div class="k">h3 · 20/28 · 600 · -0.01em</div><div style="font-size:20px;font-weight:600;letter-spacing:-0.01em">Authorization rules</div></div>
+    <div class="spec"><div class="k">title · 16/24 · 600</div><div style="font-size:16px;font-weight:600">Stage 3 of 4</div></div>
+    <div class="spec"><div class="k">body · 14/21 · 400</div><div>Khalifa signs alone up to AED <span class="num">25,000</span>. Above that, any two approve.</div></div>
+    <div class="spec"><div class="k">small · 13/20 · 400</div><div style="font-size:13px;color:var(--sub)">Checked by the rules engine, not the AI model.</div></div>
+    <div class="spec"><div class="k">label · 12/16 · 500 · 0.04em caps</div><div class="eyebrow">Needs you</div></div>
+    <div class="spec"><div class="k">mono · 12/18 · 400 · tnum</div><div class="mono" style="font-size:12px">AE07 0331 2345 6789 0123 456 · RCIF 100587 · svs.getDocuments(type=ALL)</div></div>
+    <div class="spec"><div class="k">arabic body · 15/26 · 400</div><div class="ar" style="font-size:15px;line-height:1.75">خليفة يوقّع منفرداً حتى <span class="num">25,000</span> درهم. وما زاد عن ذلك يتطلب موافقة اثنين.</div></div>
+  </div>
+  <p class="small" style="margin-top:12px">Weights: 400 body, 500 labels and buttons, 600 headings. Nothing heavier. Arabic runs one size up (15 on 14) and with more line height (1.75), because Arabic letters sit smaller on the line at the same size.</p>
+</section>
+
+<section id="space">
+  <div class="eyebrow">05</div><h2>Spacing and layout</h2>
+  <p class="note">A 4px base. Most gaps are 8, 12, 16 or 24. Cards breathe at 20. Sections breathe at 48 or 64.</p>
+  <div class="grid g2" style="margin-top:20px">
+    <div class="card" id="spacing"></div>
+    <div class="card">
+      <b>App frame at 1440 x 900</b>
+      <div style="display:grid;grid-template-columns:56px 1fr 72px;gap:6px;height:180px;margin-top:12px">
+        <div style="background:var(--panel);border-radius:6px;display:grid;place-items:center" class="small">Nav<br>232</div>
+        <div style="border:1px dashed var(--line-strong);border-radius:6px;display:grid;place-items:center" class="small">Work area, fluid, 32 padding</div>
+        <div style="background:var(--warn-soft);border-radius:6px;display:grid;place-items:center;color:var(--warn-ink)" class="small">Needs you<br>320</div>
+      </div>
+      <p class="small">Desktop only, 1280px minimum. Below that we show a short "open on a laptop" screen.</p>
+    </div>
+  </div>
+  <h3>Radius</h3>
+  <div class="grid g4">
+    <div><div class="radius-demo" style="border-radius:4px"></div><p class="small">xs 4 · kbd, diff marks</p></div>
+    <div><div class="radius-demo" style="border-radius:6px"></div><p class="small">sm 6 · chips, menu items</p></div>
+    <div><div class="radius-demo" style="border-radius:8px"></div><p class="small">md 8 · buttons, inputs</p></div>
+    <div><div class="radius-demo" style="border-radius:12px"></div><p class="small">lg 12 · cards · xl 16 modals</p></div>
+  </div>
+  <h3>Elevation</h3>
+  <div class="grid g4">
+    <div class="shadow-demo" style="border:1px solid var(--line)">none · flat panels</div>
+    <div class="shadow-demo" style="border:1px solid var(--line);box-shadow:var(--shadow-sm)">sm · cards</div>
+    <div class="shadow-demo" style="border:1px solid var(--line);box-shadow:var(--shadow-md)">md · menus</div>
+    <div class="shadow-demo" style="box-shadow:var(--shadow-lg)">lg · drawers, modals</div>
+  </div>
+</section>
+
+<section id="motion">
+  <div class="eyebrow">06</div><h2>Motion</h2>
+  <p class="note">Motion tells Sara what just changed. It never decorates. Everything eases out, because things should arrive fast and settle slowly. Reduced motion turns it all off.</p>
+  <div class="grid g3" style="margin-top:20px">
+    <div class="card"><b>fast · 120ms</b><p class="small">Hover, press, focus ring</p><div class="track"><div class="dot" data-d="120"></div></div></div>
+    <div class="card"><b>base · 200ms</b><p class="small">Tab change, pill change, toggle</p><div class="track"><div class="dot" data-d="200"></div></div></div>
+    <div class="card"><b>slow · 320ms</b><p class="small">Drawer, modal, new agent step</p><div class="track"><div class="dot" data-d="320"></div></div></div>
+  </div>
+  <div class="row no-print" style="margin-top:12px"><button class="btn btn-secondary btn-sm" id="play">Play</button><span class="small">ease-out cubic-bezier(0.23, 1, 0.32, 1). ease-in-out cubic-bezier(0.65, 0, 0.35, 1), only for looping skeletons.</span></div>
+  <div class="grid g3" style="margin-top:16px">
+    <div class="card flat"><b>Enter</b><p class="small" style="margin:6px 0 0">Fade in and move up 4px. Agent steps appear one by one, 200ms each.</p></div>
+    <div class="card flat"><b>Press</b><p class="small" style="margin:6px 0 0">Buttons scale to 0.97. Feels physical, no bounce.</p></div>
+    <div class="card flat"><b>Never</b><p class="small" style="margin:6px 0 0">Spinners for things that aren't running. Parallax. Confetti on approval.</p></div>
+  </div>
+</section>
+
+<section id="components">
+  <div class="eyebrow">07</div><h2>Components</h2>
+  <h3>Buttons</h3>
+  <div class="card">
+    <div class="row"><button class="btn btn-primary">Approve stage 3</button><button class="btn btn-secondary">Test a payment</button><button class="btn btn-ghost">Cancel</button><button class="btn btn-danger">Return to agent</button></div>
+    <div class="row" style="margin-top:12px"><button class="btn btn-primary btn-sm">Small</button><button class="btn btn-primary focus">Focused</button><button class="btn btn-primary" disabled>Disabled</button><button class="btn btn-secondary" disabled>Approve stage 2 first</button></div>
+    <p class="small" style="margin:12px 0 0">One primary per area. Labels say what happens, with the object: "Approve stage 3", not "Submit". Destructive or irreversible actions ask once, in place, before they run.</p>
+  </div>
+  <h3>Form controls</h3>
+  <div class="card grid g2">
+    <div><label class="f" for="n1">Return note</label><textarea class="input" id="n1" placeholder="Tell the agent what to check"></textarea><div class="help">The agent reads this and replies in the timeline.</div></div>
+    <div><label class="f" for="n2">Amount (AED)</label><input class="input mono" id="n2" value="18,000" /><div class="help">Use digits. Commas are fine.</div>
+      <label class="f" for="n3" style="margin-top:12px">Initiator</label><select class="input" id="n3"><option>Khalifa Saeed Al Falasi</option><option>Mohammed Abdulla Al Mansoori</option></select></div>
+    <div><label class="f" for="n4">Search cases</label><input class="input err" id="n4" value="AE07 0331" /><div class="help err">No case with that IBAN. Check the last 4 digits.</div></div>
+    <div><label class="f">Options</label><label class="check"><input type="checkbox" checked /> Show only cases that need me</label><div class="row" style="margin-top:12px"><button class="switch" role="switch" aria-checked="true" aria-label="Guided tour" onclick="this.setAttribute('aria-checked', this.getAttribute('aria-checked')!=='true')"></button><span>Guided tour</span></div></div>
+  </div>
+  <h3>Badges, chips, alerts</h3>
+  <div class="card">
+    <div class="row"><span class="pill neutral">New</span><span class="pill accent">Agent working</span><span class="pill warn">Needs you</span><span class="pill ok">Live</span><span class="pill bad">Blocked</span></div>
+    <div class="row" style="margin-top:12px"><span class="chip">SVS MAN-2019-0441 cl.2</span><span class="chip">Finacle RCIF 100587</span><span class="chip">EFR EID ending 5082</span><span class="assume">Assumption: validate with bank</span></div>
+    <div class="grid g2" style="margin-top:16px">
+      <div class="alert warn"><b>!</b><div><b>The agent didn't read everything.</b> 1 Letter from 2023 was not read, so these rules may be out of date.</div></div>
+      <div class="alert bad"><b>×</b><div><b>Rashid can't go live.</b> His Emirates ID expired on 14 Aug, so EFR can't pass.</div></div>
+      <div class="alert ok"><b>✓</b><div>Read every SVS document on this account (2 of 2).</div></div>
+      <div class="alert info"><b>i</b><div>Checked by the rules engine, not the AI model.</div></div>
+    </div>
+  </div>
+  <h3>Cards and tables</h3>
+  <div class="tablewrap">
+    <div class="toolbar"><div class="search" style="width:260px"><span>Search cases</span><span class="kbd">/</span></div><span class="pill neutral" style="cursor:pointer">Status: all</span><span class="pill warn" style="cursor:pointer">Needs you · 1</span><span class="small" style="margin-left:auto">4 cases</span></div>
+    <table class="t">
+      <tr><th>Business</th><th>Status</th><th>Waiting on</th><th class="n">Signatories</th><th class="n">Received</th></tr>
+      <tr><td><b>Creekside General Trading LLC</b><div class="small mono">AE07 0331 ··· 3456</div></td><td><span class="pill warn">Needs you</span></td><td>Sara M.</td><td class="n">3</td><td class="n">Mon 09:12</td></tr>
+      <tr><td><b>Al Seef Marine Services</b><div class="small mono">AE21 0331 ··· 8812</div></td><td><span class="pill accent">Agent working</span></td><td>Agent</td><td class="n">2</td><td class="n">Mon 08:40</td></tr>
+      <tr><td><b>Jumeirah Bay Interiors</b><div class="small mono">AE55 0331 ··· 0217</div></td><td><span class="pill ok">Live</span></td><td>None</td><td class="n">4</td><td class="n">Fri 14:05</td></tr>
+    </table>
+  </div>
+  <h3>Overlays</h3>
+  <div class="grid g2">
+    <div class="modal-stage"><div class="modal"><b style="font-size:16px">Release Mohammed and Khalifa?</b><p style="color:var(--sub);margin:8px 0 20px">This texts them that they can start, and tells them Rashid joins later. Messages can't be unsent.</p><div class="row" style="justify-content:flex-end"><button class="btn btn-ghost">Cancel</button><button class="btn btn-primary">Yes, release them</button></div></div></div>
+    <div style="display:grid;gap:16px;align-content:start">
+      <div class="menu"><div class="on">Open evidence <span class="kbd">E</span></div><div>Copy reference</div><div>Open in SVS</div></div>
+      <div class="toast">Stage 2 approved. <a href="#">Undo</a></div>
+      <div class="tip">Rule R2 · SVS-AMD-2023-0107</div>
+    </div>
+  </div>
+  <h3>Navigation and tabs</h3>
+  <div class="grid g2">
+    <div class="sidenav"><div class="on">Command center</div><div>Creekside General Trading</div><div>Case study</div></div>
+    <div class="card"><div class="tabs"><span>Agent run</span><span>Evidence</span><span class="on">Checker review</span><span>Release</span><span>Audit log</span></div><p class="small" style="margin:12px 0 0">Active tab: ink text, 2px ink underline. A small amber dot means that tab needs you.</p></div>
+  </div>
+</section>
+
+<section id="patterns">
+  <div class="eyebrow">08</div><h2>Patterns</h2>
+  <h3>The approval card, where Sara spends her day</h3>
+  <div class="approval">
+    <div class="head"><div><div class="small">Stage 3 of 4</div><b style="font-size:16px">Authorization rules</b></div><span class="pill accent">Changed, review the diff</span></div>
+    <div class="rows">
+      <div class="r"><div><div class="small">R2</div>Khalifa signs alone up to AED <del class="d num">10,000</del> <ins class="d num">25,000</ins></div><div class="row"><span class="chip">SVS MAN-2019-0441 cl.2</span><span class="chip">SVS AMD-2023-0107</span></div></div>
+    </div>
+    <div class="alert ok" style="margin-top:12px">Read every SVS document on this account (2 of 2).</div>
+    <div class="row" style="margin-top:14px"><button class="btn btn-primary">Approve stage 3</button><button class="btn btn-ghost">Test a payment</button></div>
+  </div>
+  <p class="small">Rules: state first, then content with a source on every line, then coverage, then actions. Diffs mark only the words that changed.</p>
+  <div class="grid g2">
+    <div>
+      <h3>Agent timeline</h3>
+      <div class="card"><div class="timeline">
+        <div class="ev"><div class="call">svs.getDocuments(type=MANDATE) · 09:20</div>Found mandate SVS-MAN-2019-0441</div>
+        <div class="ev warn"><div class="call">finacle.inquiryMOP · 09:24</div>Finacle says "any two". SVS adds a single limit. SVS used.</div>
+        <div class="ev bad"><div class="call">efr.verifyEID · 09:26</div>Rashid's Emirates ID expired. Held.</div>
+      </div></div>
+    </div>
+    <div>
+      <h3>Empty and loading</h3>
+      <div class="empty"><b>Nothing needs you right now</b><p class="small" style="margin:6px 0 0">The agent will flag the next case when it's ready for you.</p></div>
+      <div class="card" style="margin-top:12px;display:grid;gap:8px"><div class="skel" style="width:60%"></div><div class="skel"></div><div class="skel" style="width:80%"></div><p class="small" style="margin:0">Skeletons only for content we're loading. Agent work shows real steps, not a spinner.</p></div>
+    </div>
+  </div>
+  <h3>Page header</h3>
+  <div class="card"><div style="display:flex;justify-content:space-between"><div><div class="row"><b style="font-size:20px;letter-spacing:-0.01em">Creekside General Trading LLC</b><span class="pill warn">Needs you</span></div><div class="small mono" style="margin-top:4px">AE07 0331 2345 6789 0123 456 · AED current account</div></div><div class="small" style="text-align:right">Form received <span class="num">Mon 09:12</span><br>Bank-side work <b class="num" style="color:var(--ink)">1h 34m</b></div></div></div>
+</section>
+
+<section id="data">
+  <div class="eyebrow">09</div><h2>Data visualisation</h2>
+  <p class="note">Charts are rare in Jointly. When they appear, they use the semantic colours for outcomes and neutral greys for everything else. No rainbow palettes.</p>
+  <div class="card" style="margin-top:20px">
+    <b>Cases by day, this week</b><p class="small">Live · Needs you · Agent working</p>
+    <div class="chart" id="chart"><div class="grid-l" style="bottom:50%"><span>4</span></div><div class="grid-l" style="bottom:100%"><span>8</span></div></div>
+    <div class="row" style="padding-left:40px;justify-content:space-around;margin-top:6px" id="chartx"></div>
+    <div class="row" style="margin-top:12px"><div class="tip">Wed · 3 live · 1 needs you</div><span class="small">Tooltip: ink on light, values in mono, no chart junk.</span></div>
+  </div>
+  <p class="small">Order in stacks: verified at the base, then amber, then blue. Axis labels in mono 10px muted. Gridlines dashed, line colour. One gridline every 4 units at most.</p>
+</section>
+
+<section id="voice">
+  <div class="eyebrow">10</div><h2>Voice and content</h2>
+  <div class="tablewrap" style="margin-top:20px"><table class="t">
+    <tr><th>Thing</th><th>Rule</th><th>Example</th></tr>
+    <tr><td>Money</td><td>Currency code first, space, grouped digits, no decimals unless the amount has fils</td><td class="mono">AED 25,000 · AED 1,250.50</td></tr>
+    <tr><td>Dates</td><td>DD-Mon-YYYY in records, "14 Aug" in sentences</td><td class="mono">14-Aug-2026 · Mon 09:12</td></tr>
+    <tr><td>Durations</td><td>Hours and minutes, no seconds</td><td class="mono">1h 34m</td></tr>
+    <tr><td>IDs</td><td>Always mono, show the system name</td><td class="mono">RCIF 100587 · SVS-AMD-2023-0107</td></tr>
+    <tr><td>Partial IDs</td><td>"ending" plus last 4</td><td class="mono">EID ending 5082</td></tr>
+    <tr><td>Buttons</td><td>Verb plus object. Sentence case</td><td>Approve stage 3 · Return to agent</td></tr>
+    <tr><td>Errors</td><td>What happened, what's safe, what happens next</td><td>"Admin timed out. Nothing was half-written. Retrying once."</td></tr>
+    <tr><td>Agent</td><td>First person, plain, honest about gaps</td><td>"I didn't read 1 Letter."</td></tr>
+    <tr><td>Punctuation</td><td>No em dashes. Short sentences. Full stops in body copy, none in labels</td><td>Needs you</td></tr>
+  </table></div>
+</section>
+
+<section id="arabic">
+  <div class="eyebrow">11</div><h2>Arabic and right to left</h2>
+  <p class="note">Two Arabic voices, each where it fits. Modern Standard Arabic for the interface, rules and anything legal, because it reads as official and every colleague understands it. Emirati Khaleeji for warm moments: SMS to customers, empty states, small nudges. Arabic copy here is a starting point and needs a native Emirati review before it ships.</p>
+  <div class="grid g2" style="margin-top:20px">
+    <div class="approval ar" dir="rtl">
+      <div class="head"><div><div class="small">المرحلة 3 من 4</div><b style="font-size:17px">قواعد التفويض</b></div><span class="pill warn">بانتظار موافقتك</span></div>
+      <div class="rows"><div class="r"><div>خليفة يوقّع منفرداً حتى <span class="num">25,000</span> درهم</div><span class="chip" dir="ltr">SVS AMD-2023-0107</span></div></div>
+      <div class="row" style="margin-top:14px"><button class="btn btn-primary">اعتماد المرحلة 3</button><button class="btn btn-danger">إرجاع إلى الوكيل</button></div>
+      <p class="small" style="margin:10px 0 0">فصحى · واجهة النظام</p>
+    </div>
+    <div class="card ar" dir="rtl">
+      <div class="small">رسالة نصية إلى راشد</div>
+      <p style="font-size:15px;line-height:1.8;margin:8px 0">هلا راشد، هويتك الإماراتية منتهية من 14 أغسطس. جددها، وأول ما تتجدد بنضيفك على الحساب على طول. ما يحتاج تعبي الاستمارة مرة ثانية.</p>
+      <div class="empty" style="padding:20px"><b>ما في شي يحتاجك الحين</b><p class="small" style="margin:6px 0 0">بنعلمك أول ما توصل الحالة الجاية.</p></div>
+      <p class="small" style="margin:10px 0 0">إماراتي · لحظات ودّية</p>
+    </div>
+  </div>
+  <div class="tablewrap" style="margin-top:16px"><table class="t">
+    <tr><th>RTL rule</th><th>Why</th></tr>
+    <tr><td>Mirror layout: nav on the right, Needs you on the left, timeline line on the right</td><td>Reading starts on the right</td></tr>
+    <tr><td>Keep digits as 0 to 9 in both languages</td><td>Finacle, SVS and IBANs use them. Sara compares numbers across systems</td></tr>
+    <tr><td>IDs, IBANs, API calls and source chips stay left to right inside RTL text</td><td>They're codes, not words</td></tr>
+    <tr><td>Don't mirror: the logo, checkmarks, play icons, charts' time axis</td><td>They carry meaning, not direction</td></tr>
+    <tr><td>Mirror: arrows, chevrons, progress, back and next</td><td>They point in the reading direction</td></tr>
+    <tr><td>Use logical CSS (margin-inline-start, padding-inline-end)</td><td>One stylesheet for both directions</td></tr>
+  </table></div>
+</section>
+
+<section id="dos">
+  <div class="eyebrow">12</div><h2>Do's and don'ts</h2>
+  <div class="dd" style="margin-top:20px">
+    <div class="do"><b>Do</b>Put the source next to every claim the agent makes.</div><div class="dont"><b>Don't</b>Ask Sara to remember something the system could show her.</div>
+    <div class="do"><b>Do</b>Show what the agent didn't search, on the screen where she decides.</div><div class="dont"><b>Don't</b>Hide gaps in a separate tab.</div>
+    <div class="do"><b>Do</b>Use amber only when a person has to decide.</div><div class="dont"><b>Don't</b>Colour harmless differences, like name spellings, as warnings.</div>
+    <div class="do"><b>Do</b>Use mono and tabular digits for anything compared across systems.</div><div class="dont"><b>Don't</b>Use gradients, glows, glass or gold.</div>
+    <div class="do"><b>Do</b>Give one clear next step per screen.</div><div class="dont"><b>Don't</b>Show the same button twice on one screen.</div>
+    <div class="do"><b>Do</b>Confirm once before anything reaches a customer.</div><div class="dont"><b>Don't</b>Show a spinner when nothing is running.</div>
+  </div>
+</section>
+
+<section id="tokens">
+  <div class="eyebrow">13</div><h2>Token reference</h2>
+  <div class="tablewrap" style="margin-top:20px"><table class="t" id="tok"><tr><th>Token</th><th>Light</th><th>Dark</th><th>Use</th></tr></table></div>
+  <h3>Scale tokens</h3>
+  <div class="tablewrap"><table class="t">
+    <tr><th>Token</th><th>Value</th><th>Use</th></tr>
+    <tr><td class="mono">space-1 … space-16</td><td class="mono">4 8 12 16 20 24 32 40 48 64</td><td>All gaps and padding</td></tr>
+    <tr><td class="mono">radius-xs / sm / md / lg / xl</td><td class="mono">4 6 8 12 16</td><td>Marks, chips, controls, cards, modals</td></tr>
+    <tr><td class="mono">shadow-sm / md / lg</td><td class="mono">see :root</td><td>Cards, menus, drawers and modals</td></tr>
+    <tr><td class="mono">dur-fast / base / slow</td><td class="mono">120 200 320ms</td><td>Press, change, arrive</td></tr>
+    <tr><td class="mono">ease-out</td><td class="mono">cubic-bezier(0.23, 1, 0.32, 1)</td><td>All transitions</td></tr>
+    <tr><td class="mono">ease-in-out</td><td class="mono">cubic-bezier(0.65, 0, 0.35, 1)</td><td>Looping skeletons only</td></tr>
+    <tr><td class="mono">track-display / title / label</td><td class="mono">-0.02em -0.01em 0.04em</td><td>Big type, headings, caps labels</td></tr>
+  </table></div>
+</section>
+
+<section id="dev">
+  <div class="eyebrow">14</div><h2>Developer setup</h2>
+  <p class="note">Next.js 14, Tailwind CSS 3, custom components in <code>src/components/ui.tsx</code>. No component library. Tokens live as CSS variables so dark mode is one attribute.</p>
+<pre>npm install
+npm run dev        # http://localhost:3000
+npm run typecheck && npm run lint && npm test</pre>
+<pre>// src/app/layout.tsx
+import { IBM_Plex_Sans, IBM_Plex_Sans_Arabic, IBM_Plex_Mono } from "next/font/google";
+const sans = IBM_Plex_Sans({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--font-sans" });
+const arabic = IBM_Plex_Sans_Arabic({ subsets: ["arabic"], weight: ["400", "500", "600"], variable: "--font-arabic" });
+const mono = IBM_Plex_Mono({ subsets: ["latin"], weight: ["400", "500"], variable: "--font-mono" });</pre>
+<pre>// tailwind.config.ts (excerpt)
+colors: {
+  canvas: "var(--canvas)", surface: "var(--surface)", panel: "var(--panel)",
+  line: { DEFAULT: "var(--line)", strong: "var(--line-strong)" },
+  ink: "var(--ink)", sub: "var(--sub)", muted: "var(--muted)",
+  accent: { DEFAULT: "var(--accent)", hover: "var(--accent-hover)", soft: "var(--accent-soft)", ink: "var(--accent-ink)" },
+  ok:   { DEFAULT: "var(--ok)",   soft: "var(--ok-soft)",   ink: "var(--ok-ink)" },
+  warn: { DEFAULT: "var(--warn)", soft: "var(--warn-soft)", ink: "var(--warn-ink)" },
+  bad:  { DEFAULT: "var(--bad)",  soft: "var(--bad-soft)",  ink: "var(--bad-ink)" },
+},
+darkMode: ["class", '[data-theme="dark"]'],</pre>
+  <div class="tablewrap"><table class="t">
+    <tr><th>Component</th><th>Code</th></tr>
+    <tr><td>Button (primary, secondary, ghost, danger)</td><td class="mono">ui.tsx · Button</td></tr>
+    <tr><td>Status pill</td><td class="mono">ui.tsx · Pill</td></tr>
+    <tr><td>Source chip</td><td class="mono">ui.tsx · SourceChip, Sources</td></tr>
+    <tr><td>Assumption chip</td><td class="mono">ui.tsx · AssumptionChip</td></tr>
+    <tr><td>Approval card</td><td class="mono">case/ReviewView.tsx</td></tr>
+    <tr><td>Evidence drawer</td><td class="mono">EvidenceDrawer.tsx</td></tr>
+    <tr><td>Agent timeline</td><td class="mono">case/RunView.tsx</td></tr>
+  </table></div>
+</section>
+</main>
+</div>
+<div class="toast copied" id="copied">Copied</div>
+<script>
+const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const copy = (hex) => { navigator.clipboard?.writeText(hex); const c = document.getElementById("copied"); c.textContent = "Copied " + hex; c.classList.add("show"); setTimeout(() => c.classList.remove("show"), 1200); };
+const scale = [50,100,200,300,400,500,600,700,800,900];
+const sc = document.getElementById("scale");
+scale.forEach((n) => { const b = document.createElement("button"); const hex = css("--blue-" + n); b.style.background = hex; b.style.color = n >= 500 ? "#fff" : "#13234F"; b.innerHTML = n + "<br>" + hex; b.onclick = () => copy(hex); sc.appendChild(b); });
+const swatch = (host, list) => { const el = document.getElementById(host); el.innerHTML = ""; list.forEach(([name, v, use]) => { const hex = css(v); const b = document.createElement("button"); b.className = "sw"; b.innerHTML = `<div class="c" style="background:${hex}"></div><div class="m"><b>${name}</b><span>${hex}</span><div class="small">${use}</div></div>`; b.onclick = () => copy(hex); el.appendChild(b); }); };
+const neutrals = [["canvas","--canvas","App background"],["surface","--surface","Cards, inputs"],["panel","--panel","Table heads, hover"],["line","--line","Hairlines"],["line-strong","--line-strong","Input borders"],["ink","--ink","Primary text"],["sub","--sub","Secondary text"],["muted","--muted","Labels, meta"]];
+const semantic = [["ok","--ok","Verified, live"],["ok-soft","--ok-soft","Verified tint"],["warn","--warn","Needs a person"],["warn-soft","--warn-soft","Decision tint"],["bad","--bad","Blocked"],["bad-soft","--bad-soft","Blocked tint"],["accent","--accent","Act here"],["accent-soft","--accent-soft","Agent tint"]];
+const render = () => { swatch("neutrals", neutrals); swatch("semantic", semantic); };
+render();
+const light = {}, dark = {};
+const all = [...neutrals, ...semantic, ["accent-hover","--accent-hover","Hover and pressed"],["accent-ink","--accent-ink","Blue text on tint"],["ok-ink","--ok-ink","Green text on tint"],["warn-ink","--warn-ink","Amber text on tint"],["bad-ink","--bad-ink","Red text on tint"]];
+all.forEach(([, v]) => (light[v] = css(v)));
+document.documentElement.dataset.theme = "dark"; all.forEach(([, v]) => (dark[v] = css(v))); delete document.documentElement.dataset.theme;
+const tok = document.getElementById("tok");
+all.forEach(([n, v, use]) => { const r = tok.insertRow(); r.innerHTML = `<td class="mono">${v}</td><td class="mono"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${light[v]};border:1px solid #0002;margin-right:6px"></span>${light[v]}</td><td class="mono"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${dark[v]};border:1px solid #0002;margin-right:6px"></span>${dark[v]}</td><td>${use}</td>`; });
+const sp = document.getElementById("spacing"); sp.innerHTML = "<b>Spacing scale</b>";
+[[1,4],[2,8],[3,12],[4,16],[5,20],[6,24],[8,32],[10,40],[12,48],[16,64]].forEach(([k, px]) => { sp.insertAdjacentHTML("beforeend", `<div class="sprow"><span class="mono">space-${k}</span><span class="mono small">${px}px</span><div class="bar" style="width:${px * 3}px"></div></div>`); });
+const days = [["Mon",[3,1,2]],["Tue",[4,0,1]],["Wed",[3,1,1]],["Thu",[5,0,2]],["Fri",[2,1,0]]];
+const ch = document.getElementById("chart"), cx = document.getElementById("chartx");
+days.forEach(([d, [l, n, a]]) => { const c = document.createElement("div"); c.className = "col"; c.style.height = ((l + n + a) / 8) * 100 + "%"; [[l,"--ok"],[n,"--warn"],[a,"--accent"]].forEach(([v, col]) => { const s = document.createElement("div"); s.style.flex = v; s.style.background = `var(${col})`; c.appendChild(s); }); ch.appendChild(c); cx.insertAdjacentHTML("beforeend", `<span class="small mono">${d}</span>`); });
+const t = document.getElementById("theme");
+t.onclick = () => { const on = t.getAttribute("aria-checked") !== "true"; t.setAttribute("aria-checked", on); if (on) document.documentElement.dataset.theme = "dark"; else delete document.documentElement.dataset.theme; render(); };
+document.getElementById("play").onclick = () => { document.querySelectorAll(".dot").forEach((d) => { const ms = d.dataset.d; d.style.transition = "none"; d.style.transform = "translateX(0)"; requestAnimationFrame(() => requestAnimationFrame(() => { d.style.transition = `transform ${ms}ms var(--ease-out)`; d.style.transform = `translateX(${d.parentElement.clientWidth - 32}px)`; })); }); };
+</script>
+</body>
+</html>
