@@ -70,6 +70,9 @@ export default function CaseStudy() {
       <header className="mx-auto flex max-w-5xl items-center justify-between px-6 py-6">
         <Logo />
         <div className="flex items-center gap-2">
+          <Link href="/ar/" lang="ar" className="inline-flex h-9 items-center rounded-lg border border-line px-3 font-arabic text-sm text-sub hover:text-ink">
+            العربية
+          </Link>
           <ThemeButton />
           <Link
             href="/demo/"
