@@ -160,7 +160,7 @@ export default function CaseStudyAr() {
   return (
     <div lang="ar" dir="rtl" className="alt min-h-screen bg-canvas font-arabic">
       <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
-        <Logo />
+        <Logo href="/ar/" />
         <div className="flex items-center gap-2">
           <LangSwitch href="/" lang="en" label="English" className="inline-flex h-9 items-center rounded-lg border border-line px-3 font-sans text-sm text-sub hover:text-ink" />
           <ThemeButton />

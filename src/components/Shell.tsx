@@ -9,15 +9,15 @@ import { cn } from "./ui";
 import { EvidenceDrawer } from "./EvidenceDrawer";
 import { DensitySwitch, ThemeSwitch } from "./ThemeToggle";
 
-export function Logo({ className }: { className?: string }) {
+export function Logo({ className, href = "/" }: { className?: string; href?: string }) {
   return (
-    <span className={cn("inline-flex items-center gap-2 font-semibold tracking-tight text-ink", className)}>
+    <Link href={href} aria-label="Jointly home" className={cn("inline-flex items-center gap-2 font-semibold tracking-tight text-ink", className)}>
       <svg width="20" height="14" viewBox="0 0 20 14" aria-hidden>
         <circle cx="7" cy="7" r="6" fill="none" stroke="rgb(var(--brand))" strokeWidth="2" />
         <circle cx="13" cy="7" r="6" fill="none" stroke="currentColor" strokeWidth="2" />
       </svg>
       Jointly
-    </span>
+    </Link>
   );
 }
 
