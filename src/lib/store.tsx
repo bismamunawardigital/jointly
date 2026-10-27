@@ -58,11 +58,13 @@ const blankState: State = {
   tourStep: 0,
 };
 
-export const initialState: State = {
+const approvalTimes: Record<number, string> = { 1: "Mon 10:04", 2: "Mon 10:05", 3: "Mon 10:38", 4: "Mon 10:40" };
+
+export const initialState: State = autoVerify({
   ...blankState,
   phase: "in_review",
   log: groupEvents("run").map((id) => ({ id, kind: "agent" as const })),
-};
+});
 
 type Action =
   | { type: "start"; group: Group }
@@ -81,6 +83,7 @@ type Action =
   | { type: "tour"; on?: boolean; step?: number }
   | { type: "reset" }
   | { type: "watchRun" }
+  | { type: "signoff" }
   | { type: "hydrate"; state: State };
 
 const groupPhase: Record<Group, { running: Phase; done: Phase }> = {
@@ -94,10 +97,13 @@ const groupPhase: Record<Group, { running: Phase; done: Phase }> = {
 
 const tourStepFor: Partial<Record<Phase, number>> = { re_review: 1, executed: 2, partially_live: 3 };
 
-const approvalTimes: Record<number, string> = { 1: "Mon 10:04", 2: "Mon 10:05", 3: "Mon 10:38", 4: "Mon 10:40" };
 
-export const versionOf = (s: State): Version => (hasEvent(s, "rev-plan") ? 2 : 1);
-export const hasEvent = (s: State, id: string) => s.log.some((e) => e.kind === "agent" && e.id === id);
+export function versionOf(s: State): Version {
+  return hasEvent(s, "rev-plan") ? 2 : 1;
+}
+export function hasEvent(s: State, id: string) {
+  return s.log.some((e) => e.kind === "agent" && e.id === id);
+}
 export const rashidRenewed = (s: State) => hasEvent(s, "ren-kyc");
 
 function human(id: string, time: string, text: string, by = checker.name): HumanEntry {
@@ -108,6 +114,24 @@ function nowOf(s: State) {
   const last = [...s.log].reverse().find((e) => e.kind === "agent");
   return last ? eventById(last.id).time : "Mon 09:12";
 }
+
+function autoVerify(s: State): State {
+  if (s.phase !== "in_review" && s.phase !== "re_review") return s;
+  const version = versionOf(s);
+  const approvals = { ...s.approvals };
+  const log = [...s.log];
+  for (const st of buildStages(version)) {
+    if (approvalValid(approvals[st.id], st)) continue;
+    const bySara = st.id === 3;
+    if (bySara && !(version === 2 && s.confirmed !== undefined)) break;
+    const by = bySara ? checker.name : "Rules";
+    approvals[st.id] = { stageId: st.id, by, at: approvalTimes[st.id], hash: stageHash(st) };
+    log.push(human(`verify-${st.id}-v${version}`, approvalTimes[st.id], bySara ? "Approved stage 3 by confirming the 2023 letter value" : `Verified by rule: stage ${st.id}, ${st.title}`, by));
+  }
+  return { ...s, approvals, log };
+}
+
+export const allApproved = (s: State) => buildStages(versionOf(s)).every((st) => approvalValid(s.approvals[st.id], st));
 
 function reducer(s: State, a: Action): State {
   switch (a.type) {
@@ -128,7 +152,7 @@ function reducer(s: State, a: Action): State {
       if (rest.length) return { ...s, log, queue: rest };
       const done = groupPhase[s.queueGroup!].done;
       const tourStep = Math.max(s.tourStep, tourStepFor[done] ?? 0);
-      return { ...s, log, queue: [], queueGroup: undefined, phase: done, tourStep };
+      return autoVerify({ ...s, log, queue: [], queueGroup: undefined, phase: done, tourStep });
     }
     case "approve": {
       if (s.phase !== "in_review" && s.phase !== "re_review") return s;
@@ -138,12 +162,12 @@ function reducer(s: State, a: Action): State {
         [a.stageId]: { stageId: a.stageId, by: checker.name, at: approvalTimes[a.stageId], hash: stageHash(stage) },
       };
       const log = [...s.log, human(`approve-${a.stageId}`, approvalTimes[a.stageId], `Approved stage ${a.stageId}: ${stage.title}`)];
-      const next = { ...s, approvals, log };
-      const stages = buildStages(versionOf(s));
-      if (stages.every((st) => approvalValid(approvals[st.id], st))) {
-        return { ...next, phase: "executing", queue: groupEvents("execute"), queueGroup: "execute" };
-      }
-      return next;
+      return autoVerify({ ...s, approvals, log });
+    }
+    case "signoff": {
+      if ((s.phase !== "in_review" && s.phase !== "re_review") || !allApproved(s)) return s;
+      const log = [...s.log, human("signoff", "Mon 10:40", `Signed off plan v${versionOf(s)} · 4 stages`)];
+      return { ...s, log, phase: "executing", queue: groupEvents("execute"), queueGroup: "execute" };
     }
     case "return": {
       const log = [...s.log, human("return-3", "Mon 10:07", `Returned stage 3: ${a.note}`)];
@@ -181,7 +205,7 @@ function reducer(s: State, a: Action): State {
   }
 }
 
-const KEY = "jointly-demo-v4";
+const KEY = "jointly-demo-v5";
 
 interface Ctx {
   state: State;

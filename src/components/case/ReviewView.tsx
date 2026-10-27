@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { AlertTriangle, Check, ChevronRight, Repeat, ShieldCheck, Undo2 } from "lucide-react";
 import { EvidenceKey, isAgentRead } from "@/data/seed";
 import { approvalValid, buildStages, diffStage, fmt, policyChecks } from "@/lib/rules";
-import { hasEvent, useStore } from "@/lib/store";
+import { allApproved, hasEvent, useStore } from "@/lib/store";
 import { useTourTarget } from "@/components/Tour";
 import { Avatar, BasisTag, Button, Card, Empty, Pill, Proof, Tween, cn } from "@/components/ui";
 
@@ -231,6 +231,10 @@ export function ReviewView() {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const el = e.target as HTMLElement;
+      if (e.key.toLowerCase() === "s" && !e.ctrlKey && !e.metaKey && !["INPUT", "TEXTAREA", "SELECT"].includes(el.tagName) && !failing.length) {
+        dispatch({ type: "signoff" });
+        return;
+      }
       if (e.key.toLowerCase() !== "a" || e.ctrlKey || e.metaKey || ["INPUT", "TEXTAREA", "SELECT"].includes(el.tagName)) return;
       if (state.phase !== "in_review" && state.phase !== "re_review") return;
       const list = buildStages(version);
@@ -259,6 +263,19 @@ export function ReviewView() {
     <div className="max-w-4xl space-y-4" {...tour}>
       <h2 className="font-display text-2xl">{headline}</h2>
       {failing.length > 0 && <FailBanner n={failing.length} />}
+      {reviewing && allApproved(state) && (
+        <Card className="flex flex-wrap items-center gap-4 border-line-strong p-4">
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-medium">
+              {stages.filter((s) => state.approvals[s.id]?.by === "Rules").length} stages verified by rule, {stages.filter((s) => state.approvals[s.id] && state.approvals[s.id]!.by !== "Rules").length} by you. {failing.length ? `${failing.length} failing check${failing.length === 1 ? "" : "s"}.` : "All checks pass."}
+            </p>
+            <p className="mt-0.5 text-xs text-sub">2 decisions in this case: the letter value, then this sign-off.</p>
+          </div>
+          <Button variant="primary" disabled={failing.length > 0} onClick={() => dispatch({ type: "signoff" })}>
+            Sign off plan v{version} · 4 stages <kbd className="ml-1 rounded border border-white/40 px-1 text-[11px]">S</kbd>
+          </Button>
+        </Card>
+      )}
       <div className="grid grid-cols-4 gap-2">
         {stages.map((s, i) => (
           <a key={s.id} href={`#stage-${s.id}`} className="flex items-center gap-2.5 rounded-card border border-line bg-surface px-3 py-2.5 hover:border-line-strong">
@@ -314,7 +331,7 @@ export function ReviewView() {
               <div className="flex flex-col items-end gap-1">
                 {valid ? (
                   <Pill tone="ok">
-                    {state.returned && s.id < 3 ? "Approval kept" : "Approved"} · {approval!.by} {approval!.at}
+                    {approval!.by === "Rules" ? "Verified by rule" : state.returned && s.id < 3 ? "Approval kept" : "Approved"} · {approval!.by === "Rules" ? "exact copy" : approval!.by} {approval!.at}
                   </Pill>
                 ) : changes.length ? (
                   <Pill tone="accent">Changed, review the diff</Pill>
