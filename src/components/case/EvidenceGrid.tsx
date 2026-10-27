@@ -52,7 +52,11 @@ export function EvidenceGrid() {
         p.id === "khalifa"
           ? v2
             ? { tone: "ok", text: "Solo to 25,000", src: "svs-amd", changed: true }
-            : { tone: "warn", text: "25,000? Unclear scan", src: "svs-amd", why: "The amount on the 2023 letter is smudged. Type what you read in stage 3." }
+            : state.mine
+              ? { tone: "ok", text: `Sara read ${fmt(state.confirmed ?? 10000)}`, src: "svs-amd", why: "Sara read the scan differently from the agent and used her own value, so the agent's reading is not used." }
+              : state.copy === "requested"
+                ? { tone: "held", text: "Waiting for a clean copy", src: "svs-amd", why: "Sara disagreed with the agent's reading, so the case waits for a clean copy from the branch." }
+                : { tone: "warn", text: "25,000? Unclear scan", src: "svs-amd", why: "The amount on the 2023 letter is smudged. Type what you read in stage 3." }
           : na,
         isHeld
           ? { tone: "held", text: "Created, switched off", why: "Set up now, switched on only after EFR passes and Sara releases him." }

@@ -57,7 +57,11 @@ export function ProgressView() {
     mandate: [
       ...(has("mandate-conflict") ? [{ tone: "ok" as Tone, lead: "Mandate understood", text: "the SVS mandate is more detailed than Finacle, so we used SVS.", who: "agent" as const, docs: ["svs-man"] as EvidenceKey[] }] : []),
       ...(has("mandate-letter")
-        ? [has("rev-amendment")
+        ? [state.mine
+            ? { tone: "ok" as Tone, lead: "2023 letter: Sara's value", text: `Sara read AED ${(state.confirmed ?? 10000).toLocaleString("en-US")} and the agent wasn't sure, so the plan keeps Sara's value.`, who: "sara" as const, people: ["khalifa"] as PersonId[], docs: ["svs-amd"] as EvidenceKey[] }
+            : state.copy === "requested"
+              ? { tone: "warn" as Tone, lead: "Waiting for a clean copy", text: "Sara disagreed with the agent's reading, so the case waits for the branch.", who: "sara" as const, people: ["khalifa"] as PersonId[], docs: ["svs-amd"] as EvidenceKey[] }
+              : has("rev-amendment")
             ? { tone: "ok" as Tone, lead: "2023 letter confirmed", text: "Sara checked the scan. Khalifa can sign alone up to AED 25,000.", who: "sara" as const, people: ["khalifa"] as PersonId[], docs: ["svs-amd"] as EvidenceKey[] }
             : { tone: "warn" as Tone, lead: "A 2023 letter is unclear", text: "it may raise Khalifa's limit to AED 25,000. Sara checks the scan.", who: "agent" as const, people: ["khalifa"] as PersonId[], docs: ["svs-amd"] as EvidenceKey[] }]
         : []),

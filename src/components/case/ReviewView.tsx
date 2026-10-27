@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { AlertTriangle, Check, ChevronRight, Repeat, ShieldCheck, Undo2 } from "lucide-react";
 import { EvidenceKey, isAgentRead } from "@/data/seed";
 import { approvalValid, buildStages, diffStage, fmt, policyChecks } from "@/lib/rules";
-import { allApproved, hasEvent, useStore } from "@/lib/store";
+import { allApproved, hasEvent, useStore, letterLabel } from "@/lib/store";
 import { useTourTarget } from "@/components/Tour";
 import { Avatar, BasisTag, Button, Card, Empty, Pill, Proof, Tween, cn } from "@/components/ui";
 
@@ -137,7 +137,19 @@ function ScanLens({ src, alt }: { src: string; alt: string }) {
   );
 }
 
-function ScanCheck({ canAct, onConfirm, onReturn }: { canAct: boolean; onConfirm: (v: number) => void; onReturn: (v: number) => void }) {
+function CleanLetter() {
+  return (
+    <div className="rounded-lg border border-line bg-surface p-5 text-[13px] leading-relaxed text-ink" style={{ fontFamily: "Georgia, serif" }}>
+      <p className="font-semibold">Subject: Amendment to signing mandate</p>
+      <p className="mt-2">The single-signing limit of Khalifa Saeed Al Falasi is revised to AED 25,000 with effect from 01-Mar-2023. All other terms of the 2019 mandate remain unchanged.</p>
+    </div>
+  );
+}
+
+function ScanCheck({ canAct, onConfirm }: { canAct: boolean; onConfirm: (v: number) => void }) {
+  const { state, dispatch } = useStore();
+  const clean = state.copy === "received";
+  const waiting = state.copy === "requested";
   const [value, setValue] = useState("");
   const [checked, setChecked] = useState<number | null>(null);
   const n = Number(value.replace(/[^0-9.]/g, ""));
@@ -149,64 +161,84 @@ function ScanCheck({ canAct, onConfirm, onReturn }: { canAct: boolean; onConfirm
   return (
     <div className="mt-4 rounded-lg border border-warn/40 bg-surface p-4">
       <p className="flex items-center gap-1.5 text-sm font-medium text-warn-ink">
-        <AlertTriangle className="h-4 w-4 shrink-0" /> A 2023 letter may change Khalifa&apos;s limit. The scan is unclear.
+        <AlertTriangle className="h-4 w-4 shrink-0" /> {clean ? "The branch sent a clean copy of the 2023 letter." : "A 2023 letter may change Khalifa's limit. The scan is unclear."}
       </p>
       <div className="mt-3 flex flex-wrap items-start gap-5">
         <figure className="w-[520px] max-w-full">
-          <ScanLens src="/scans/svs-amd-2023.png" alt="Scan of the 2023 amendment letter. The last digits of the amount are smudged." />
-          <figcaption className="mt-1 text-[11px] text-muted">2023 amendment letter · scan from SVS · click to zoom</figcaption>
+          {clean ? <CleanLetter /> : <ScanLens src="/scans/svs-amd-2023.png" alt="Scan of the 2023 amendment letter. The last digits of the amount are smudged." />}
+          <figcaption className="mt-1 text-[11px] text-muted">{clean ? "Clean copy from the branch" : "2023 amendment letter · scan from SVS · click to zoom"}</figcaption>
         </figure>
         <div className="min-w-[220px] flex-1 space-y-3 text-sm">
-          {canAct && checked === null && (
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                if (n > 0) check(n);
-              }}
-            >
-              <label htmlFor="scan-value" className="text-xs text-muted">
-                The letter says Khalifa&apos;s limit is
-              </label>
-              <div className="mt-1 flex items-center gap-2">
-                <span className="text-xs text-muted">AED</span>
-                <input id="scan-value" inputMode="numeric" autoComplete="off" value={value} onChange={(e) => setValue(e.target.value)} className="tnum h-9 w-32 rounded-lg border border-line bg-surface px-2.5 text-sm outline-none focus:border-accent" />
-              </div>
-              <p className="mt-1 text-xs text-sub">Type what you read. You&apos;ll see the agent&apos;s reading after.</p>
-              <Button type="submit" variant="primary" className="mt-2" disabled={!(n > 0)}>
-                Check
-              </Button>
-            </form>
-          )}
-          {(checked !== null || !canAct) && (
-            <div>
-              <p className="text-xs text-muted">The agent read</p>
-              <p className="tnum mt-0.5 font-medium">
-                AED 25,000 <span className="text-xs font-normal text-warn-ink">not certain</span>
-              </p>
+          {waiting ? (
+            <div className="rounded-lg border border-line bg-panel p-3">
+              <p className="font-medium">Waiting for a clean copy · requested 10:07</p>
+              <p className="mt-1 text-xs text-sub">You asked the branch for a clean copy at 10:07, and the case is waiting for it.</p>
             </div>
-          )}
-          {canAct && checked !== null && (
-            <div className={cn("rounded-lg border p-3", match ? "border-ok/40 bg-ok-soft" : "border-warn/40 bg-surface")}>
-              {match ? (
-                <p className="flex items-center gap-1.5 font-medium text-ok-ink">
-                  <Check className="h-4 w-4" /> You and the agent both read 25,000
-                </p>
-              ) : (
-                <p className="text-warn-ink">
-                  You read <span className="tnum font-medium">AED {fmt(checked)}</span>. The agent read AED 25,000.
-                </p>
+          ) : (
+            <>
+              {canAct && checked === null && (
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    if (n > 0) check(n);
+                  }}
+                >
+                  <label htmlFor="scan-value" className="text-xs text-muted">
+                    The letter says Khalifa&apos;s limit is
+                  </label>
+                  <div className="mt-1 flex items-center gap-2">
+                    <span className="text-xs text-muted">AED</span>
+                    <input id="scan-value" inputMode="numeric" autoComplete="off" value={value} onChange={(e) => setValue(e.target.value)} className="tnum h-9 w-32 rounded-lg border border-line bg-surface px-2.5 text-sm outline-none focus:border-accent" />
+                  </div>
+                  <p className="mt-1 text-xs text-sub">Type what you read. You&apos;ll see the agent&apos;s reading after.</p>
+                  <Button type="submit" variant="primary" className="mt-2" disabled={!(n > 0)}>
+                    Check
+                  </Button>
+                </form>
               )}
-              <div className="mt-2 flex flex-wrap gap-2">
-                <Button variant="primary" data-confirm-scan onClick={() => (match ? onConfirm(checked) : onReturn(checked))}>
-                  {match ? "Confirm and update the plan" : "Send back with my value"}
-                </Button>
-                <Button variant="ghost" onClick={() => check(null)}>
-                  Change my reading
-                </Button>
-              </div>
-            </div>
+              {(checked !== null || !canAct) && (
+                <div>
+                  <p className="text-xs text-muted">The agent read</p>
+                  <p className="tnum mt-0.5 font-medium">
+                    AED 25,000 {!clean && <span className="text-xs font-normal text-warn-ink">not certain</span>}
+                  </p>
+                </div>
+              )}
+              {canAct && checked !== null && (
+                <div className={cn("rounded-lg border p-3", match ? "border-ok/40 bg-ok-soft" : "border-warn/40 bg-surface")}>
+                  {match ? (
+                    <p className="flex items-center gap-1.5 font-medium text-ok-ink">
+                      <Check className="h-4 w-4" /> You and the agent both read 25,000
+                    </p>
+                  ) : (
+                    <p className="text-warn-ink">
+                      You read <span className="tnum font-medium">AED {fmt(checked)}</span>, but the agent read AED 25,000 and wasn&apos;t sure.
+                    </p>
+                  )}
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {match ? (
+                      <Button variant="primary" data-confirm-scan onClick={() => onConfirm(checked)}>
+                        Confirm and update the plan
+                      </Button>
+                    ) : (
+                      <>
+                        <Button variant="primary" data-ask-copy onClick={() => dispatch({ type: "askCopy", value: checked })}>
+                          Ask the branch for a clean copy
+                        </Button>
+                        <Button data-use-mine onClick={() => dispatch({ type: "useMine", value: checked })}>
+                          Use my value (AED {fmt(checked)})
+                        </Button>
+                      </>
+                    )}
+                    <Button variant="ghost" onClick={() => check(null)}>
+                      Change my reading
+                    </Button>
+                  </div>
+                </div>
+              )}
+              {!canAct && <p className="text-xs text-sub">Plan v1 keeps AED 10,000 until Sara confirms.</p>}
+            </>
           )}
-          {!canAct && <p className="text-xs text-sub">Plan v1 keeps AED 10,000 until Sara confirms.</p>}
         </div>
       </div>
     </div>
@@ -378,8 +410,10 @@ export function ReviewView() {
               <div className="flex flex-col items-end gap-1">
                 {valid ? (
                   <Pill tone="ok">
-                    {approval!.by === "Rules" ? "Verified by rule" : state.returned && s.id < 3 ? "Approval kept" : signedOff ? "Approved" : "Confirmed by you"} · {approval!.by === "Rules" ? "exact copy" : approval!.by} {approval!.at}
+                    {approval!.by === "Rules" ? "Verified by rule" : state.returned && s.id < 3 ? "Approval kept" : s.id === 3 ? letterLabel(state) : signedOff ? "Approved" : "Confirmed by you"} · {approval!.by === "Rules" ? "exact copy" : approval!.by} {approval!.at}
                   </Pill>
+                ) : s.id === 3 && state.copy === "requested" ? (
+                  <Pill tone="neutral">Waiting for a clean copy · requested 10:07</Pill>
                 ) : changes.length ? (
                   <Pill tone="accent">Changed, review the diff</Pill>
                 ) : wasReturned && version === 1 ? (
@@ -441,19 +475,20 @@ export function ReviewView() {
               )
             )}
 
-            {s.id === 3 && !valid && (
-              version === 1 ? (
-                <ScanCheck canAct={canAct && !returning} onConfirm={(v) => dispatch({ type: "confirm", value: v })} onReturn={(v) => dispatch({ type: "return", note: `Sara reads AED ${fmt(v)} on the scan, not AED 25,000. Get a clean copy from the branch.` })} />
-              ) : (
-                <>
-                  <p className="mt-3 flex items-center gap-1.5 text-xs text-ok-ink">
-                    <Check className="h-3.5 w-3.5" strokeWidth={3} /> 2023 letter checked by you: AED 25,000
-                  </p>
+            {s.id === 3 && !valid && state.confirmed === undefined && (
+              <ScanCheck key={state.copy ?? "none"} canAct={canAct && !returning} onConfirm={(v) => dispatch({ type: "confirm", value: v })} />
+            )}
+            {s.id === 3 && state.confirmed !== undefined && (
+              <>
+                <p className="mt-3 flex items-center gap-1.5 text-xs text-ok-ink">
+                  <Check className="h-3.5 w-3.5" strokeWidth={3} /> 2023 letter: AED {fmt(state.confirmed)} · {letterLabel(state)}
+                </p>
+                {state.copy === "received" && !state.mine && (
                   <div className="mt-3 flex items-start gap-2.5 rounded-lg border border-line bg-panel/60 px-3 py-2.5">
                     <Repeat className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-medium">Make this fix stick?</p>
-                      <p className="mt-0.5 text-xs text-sub">The agent proposes: when a scan is unclear, ask the branch for a clean copy before building the plan. A supervisor has to approve it.</p>
+                      <p className="mt-0.5 text-xs text-sub">This case only moved once the branch sent a clean copy. The agent proposes asking the branch for a clean copy whenever a scan is unclear, before it builds the plan, and a supervisor has to approve that change.</p>
                     </div>
                     {state.log.some((e) => e.id === "lesson") ? (
                       <Pill tone="neutral">Sent to supervisor</Pill>
@@ -463,8 +498,8 @@ export function ReviewView() {
                       </Button>
                     )}
                   </div>
-                </>
-              )
+                )}
+              </>
             )}
 
             {wasReturned && (

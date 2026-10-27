@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { policyChecks, releaseEligibility } from "@/lib/rules";
 import { eventById } from "@/lib/script";
 import { headlineOf } from "@/lib/derive";
-import { Tab, rulesFor, useStore } from "@/lib/store";
+import { Tab, rulesFor, useStore, allApproved, versionOf } from "@/lib/store";
 import { Button, cn } from "@/components/ui";
 
 const doingMap: Record<string, string> = {
@@ -118,7 +118,13 @@ export function NeedsYou() {
     );
   } else if (state.phase === "new") {
     sub = "Access request in at 09:12. The agent is starting.";
-  } else if (state.phase === "in_review") {
+  } else if ((state.phase === "in_review" || state.phase === "re_review") && state.copy === "requested") {
+    title = "Waiting for a clean copy from the branch";
+    sub = "You disagreed with the agent's reading, so the case waits and the agent's value isn't used.";
+    actions = (
+      <Button variant="primary" onClick={() => { dispatch({ type: "cleanCopy" }); setTimeout(() => go("review", "stage-3", "#scan-value"), 50); }}>Skip ahead: the branch sends a clean copy</Button>
+    );
+  } else if (state.phase === "in_review" && !allApproved(state)) {
     sub = "Stages 1 and 2 passed by rule. Stage 3: check a value on a blurry 2023 letter.";
     if (scanOk) {
       title = "Your reading matches the agent's";
@@ -134,13 +140,13 @@ export function NeedsYou() {
         )}
       </>
     );
-  } else if (state.phase === "re_review") {
-    sub = failing ? `${failing} check failed. Sign-off is blocked.` : "Your letter value is in. Stages 1, 2 and 4 passed by rule.";
+  } else if (state.phase === "re_review" || state.phase === "in_review") {
+    sub = failing ? `${failing} check failed. Sign-off is blocked.` : state.mine ? "You used your own value, so the plan keeps AED 10,000. Stages 1, 2 and 4 passed by rule." : "Your letter value is in. Stages 1, 2 and 4 passed by rule.";
     actions = (
       <>
         {handBtn}
         <Button variant="primary" disabled={failing > 0} onClick={() => dispatch({ type: "signoff" })}>
-          Sign off plan v2 · 4 stages <Key k="S" />
+          Sign off plan v{versionOf(state)} · 4 stages <Key k="S" />
         </Button>
       </>
     );

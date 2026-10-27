@@ -3,7 +3,7 @@
 import { FileCheck2, Printer } from "lucide-react";
 import { business, checker } from "@/data/seed";
 import { approvalValid, buildRules, buildStages, releaseEligibility } from "@/lib/rules";
-import { hasEvent, useStore } from "@/lib/store";
+import { hasEvent, letterLabel, useStore } from "@/lib/store";
 import { BasisTag, Button, Card, Empty, Quote, SourceChip } from "@/components/ui";
 
 export function DecisionView() {
@@ -35,10 +35,16 @@ export function DecisionView() {
           <p className="mt-1 text-xs text-sub">Reason on screen: the 2023 letter scan was unclear. Fixed in plan v2.</p>
         </Card>
       )}
-      {state.confirmed && (
+      {state.confirmed !== undefined && (
         <Card className="p-4">
-          <p className="text-xs text-muted">Mon 10:07 · {checker.name} checked the 2023 letter scan</p>
-          <p className="mt-1 text-sm">Typed AED {state.confirmed.toLocaleString("en-US")} from the image. It matched the agent&apos;s reading, so plan v2 uses it.</p>
+          <p className="text-xs text-muted">Mon 10:07 · {checker.name} checked the 2023 letter · {letterLabel(state)}</p>
+          <p className="mt-1 text-sm">
+            {state.mine
+              ? `Sara read AED ${state.confirmed.toLocaleString("en-US")} on the scan, while the agent read AED 25,000 and wasn't sure. Sara chose her own value, so the plan uses AED ${state.confirmed.toLocaleString("en-US")}.`
+              : state.copy === "received"
+                ? `Sara's first reading of the blurry scan was AED ${(state.disagreed ?? 0).toLocaleString("en-US")}, so she asked the branch for a clean copy. She read AED ${state.confirmed.toLocaleString("en-US")} on the clean copy, so the plan uses it.`
+                : `Sara typed AED ${state.confirmed.toLocaleString("en-US")} from the image, which matched the agent's reading, so plan v2 uses it.`}
+          </p>
           <div className="mt-1.5 flex gap-1">
             <SourceChip k="svs-amd" />
           </div>
