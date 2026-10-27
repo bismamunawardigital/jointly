@@ -253,3 +253,10 @@ svg.lucide {
 [data-anim] svg { animation: tick-in 200ms ease-out both; animation-delay: calc(var(--c) * 30ms); }
 [data-anim="warn"], [data-anim="bad"] { animation: glow-once 900ms ease-out 400ms 1 both; }
 @media (prefers-reduced-motion: reduce) { [data-anim] svg, [data-anim="warn"], [data-anim="bad"] { animation: none !important; } }
+
+@view-transition { navigation: auto; }
+.vt-hero { view-transition-name: hero-frame; }
+::view-transition-group(hero-frame) { animation-duration: 400ms; animation-timing-function: ease-out; }
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
+}

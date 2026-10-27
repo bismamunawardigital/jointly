@@ -204,9 +204,9 @@ const primary = "inline-flex h-11 items-center gap-1.5 rounded-lg bg-accent px-5
 const card = "rounded-card border border-line bg-surface";
 const wrap = "mx-auto max-w-6xl px-6 py-12";
 const Sara = () => (
-  <Link href="/demo/case/" data-track="cta" className={primary}>
+  <a href="/demo/case/" data-track="cta" className={primary}>
     Check it as Sara (5 min) <ArrowRight className="h-4 w-4" />
-  </Link>
+  </a>
 );
 
 export default function CaseStudy() {

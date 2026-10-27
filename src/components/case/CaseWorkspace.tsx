@@ -202,7 +202,7 @@ export function CaseWorkspace() {
               <div className="max-w-[1280px] space-y-10 pt-6">
                 <LegacyBeat />
                 {agentWorking && <ProgressView />}
-                {hasEvent(state, "submit") ? <ReviewView /> : !agentWorking && <NotYet />}
+                <div className="vt-hero">{hasEvent(state, "submit") ? <ReviewView /> : !agentWorking && <NotYet />}</div>
                 {hasEvent(state, "ex-readback") && (
                   <section id="sec-release" aria-label="Release" className="scroll-mt-6">
                     <ReleaseView />

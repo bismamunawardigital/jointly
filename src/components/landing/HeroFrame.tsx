@@ -58,7 +58,7 @@ export function HeroFrame({ callouts, url = "jointly · Creekside · Review" }: 
         : [t < 2 ? "Reading mandate…" : "Read mandate", t < 2 ? "Reading Finacle, SVS and EFR…" : "Read Finacle, SVS and EFR."];
   return (
     <figure className="min-w-0">
-      <div dir="ltr" className="relative rounded-card bg-panel p-4 md:p-6 md:pb-40">
+      <div dir="ltr" className="vt-hero relative rounded-card bg-panel p-4 md:p-6 md:pb-40">
       <div
         dir="ltr"
         onMouseEnter={() => setPaused(true)}

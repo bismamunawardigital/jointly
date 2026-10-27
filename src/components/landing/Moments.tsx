@@ -85,7 +85,7 @@ export function Moments({ titles, see = "See it live", v = en, extras }: { title
     <div className="grid gap-10 md:grid-cols-2 [&>*]:min-w-0">
       <div className="hidden md:block">
         <div aria-hidden className="sticky top-24 flex h-[280px] items-center justify-center rounded-card border border-line bg-surface p-8 shadow-sm">
-          <div key={active} className="flex w-full animate-enter justify-center">
+          <div key={active} className="flex w-full fade-in justify-center">
             <V v={v} />
           </div>
         </div>

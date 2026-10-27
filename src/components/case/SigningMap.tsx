@@ -91,7 +91,7 @@ export function SigningMap({ compact = false, part = "all" }: { compact?: boolea
             <Avatar id={id} size={32} held={held.includes(id)} />
           </span>
         ))}
-        {c.ids.length === 1 && <span className="ml-1.5 pr-1 text-xs text-sub">alone</span>}
+        {c.ids.length === 1 && <span key={c.ids.join()} className="tick-in ml-1.5 pr-1 text-xs text-sub">alone</span>}
       </button>
     );
   };
