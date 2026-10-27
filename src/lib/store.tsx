@@ -84,6 +84,7 @@ type Action =
   | { type: "reset" }
   | { type: "watchRun" }
   | { type: "signoff" }
+  | { type: "sendBack" }
   | { type: "hydrate"; state: State };
 
 const groupPhase: Record<Group, { running: Phase; done: Phase }> = {
@@ -196,8 +197,16 @@ function reducer(s: State, a: Action): State {
       return s.queue.length ? { ...s, paused: true, log: [...s.log, human(`pause-${s.log.length}`, nowOf(s), "Paused the agent between steps")] } : s;
     case "resume":
       return { ...s, paused: false, handedOver: false, log: [...s.log, human(`resume-${s.log.length}`, nowOf(s), s.handedOver ? "Took the case back from the maker and resumed the agent" : "Resumed the agent")] };
-    case "handover":
-      return { ...s, handedOver: true, log: [...s.log, human(`handover-${s.log.length}`, nowOf(s), `Handed to a maker: ${s.queue.length} step${s.queue.length === 1 ? "" : "s"} left, nothing half-written`)] };
+    case "handover": {
+      const reviewing = s.phase === "in_review" || s.phase === "re_review";
+      if (s.handedOver || (!s.queue.length && !reviewing)) return s;
+      const text = s.queue.length
+        ? `Handed to Omar K., CF Maker: ${s.queue.length} step${s.queue.length === 1 ? "" : "s"} left, nothing half-written`
+        : "Handed to Omar K., CF Maker. Note: please check the 2023 letter against the branch copy";
+      return { ...s, paused: s.queue.length ? true : s.paused, handedOver: true, log: [...s.log, human(`handover-${s.log.length}`, nowOf(s), text)] };
+    }
+    case "sendBack":
+      return s.handedOver ? { ...s, handedOver: false, log: [...s.log, human(`sendback-${s.log.length}`, nowOf(s), "Sent it back: the branch copy is just as blurry. The value needs the checker.", "Omar K.")] } : s;
     case "lesson":
       return s.log.some((e) => e.id === "lesson") ? s : { ...s, log: [...s.log, human("lesson", "Mon 10:39", "Sent a lasting change to the supervisor: ask the branch for a clean copy when a scan is unclear")] };
     case "tour":
@@ -227,7 +236,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [hydrated, setHydrated] = useState(false);
   const [evidenceOpen, setEvidenceOpen] = useState<EvidenceKey | null>(null);
-  const [tab, setTab] = useState<Tab>("run");
+  const [tab, setTab] = useState<Tab>("review");
 
   useEffect(() => {
     try {

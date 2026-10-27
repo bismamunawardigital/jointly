@@ -3,7 +3,7 @@
 import { Ban, Bot, Scale, UserCheck, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { business } from "@/data/seed";
-import { duration, headlineOf, lastTime, statusOf } from "@/lib/derive";
+import { duration, lastTime, statusOf } from "@/lib/derive";
 import { Tab, hasEvent, useStore } from "@/lib/store";
 import { Pill, cn } from "@/components/ui";
 import { eventById } from "@/lib/script";
@@ -22,9 +22,9 @@ import { CommandPalette } from "@/components/CommandPalette";
 
 type Group = { id: "review" | "setup" | "history"; label: string; sections: { id: Tab; label: string }[] };
 const groups: Group[] = [
-  { id: "review", label: "Review", sections: [{ id: "review", label: "Checker review" }, { id: "release", label: "Release" }] },
+  { id: "review", label: "Review", sections: [{ id: "review", label: "Checker review" }, { id: "release", label: "Release" }, { id: "run", label: "Agent progress" }] },
   { id: "setup", label: "Setup", sections: [{ id: "map", label: "Signing map" }, { id: "evidence", label: "Identity" }, { id: "plan", label: "Users and roles" }, { id: "simulator", label: "Simulator" }] },
-  { id: "history", label: "History", sections: [{ id: "run", label: "Progress" }, { id: "audit", label: "Timeline" }, { id: "decisions", label: "Decision record" }] },
+  { id: "history", label: "History", sections: [{ id: "audit", label: "Timeline" }, { id: "decisions", label: "Decision record" }] },
 ];
 const groupOf = (t: Tab) => groups.find((g) => g.sections.some((x) => x.id === t)) ?? groups[2];
 const how = [
@@ -33,13 +33,46 @@ const how = [
   { icon: UserCheck, title: "Sara approves", line: "Anything that changes who can move money." },
   { icon: Ban, title: "Never allowed", line: "Waiving EFR, approving its own work, seeing a password." },
 ];
-const paletteTabs = groups.map((g) => ({ id: g.sections[0].id, label: g.label }));
+const paletteTabs = groups.flatMap((g) => g.sections.map((x) => ({ id: x.id, label: `${g.label} › ${x.label}` })));
+const firstOf = (t: Tab) => groups.some((g) => g.sections[0].id === t);
+
+function NotYet() {
+  return <p className="rounded-xl border border-dashed border-line px-4 py-3 text-sm text-muted">This part fills in as the case moves.</p>;
+}
 
 export function CaseWorkspace() {
   const { state, dispatch, tab, setTab, hydrated } = useStore();
+  const [progressOpen, setProgressOpen] = useState(false);
+  const agentWorking = state.queue.length > 0 && !state.paused;
+  const reviewing = state.phase === "in_review" || state.phase === "re_review";
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const el = e.target as HTMLElement;
+      if (e.ctrlKey || e.metaKey || e.altKey || ["INPUT", "TEXTAREA", "SELECT"].includes(el.tagName)) return;
+      const k = e.key.toLowerCase();
+      if (k === "p") {
+        if (state.paused || state.handedOver) dispatch({ type: "resume" });
+        else if (state.queue.length) dispatch({ type: "pause" });
+      } else if (k === "h" && !state.handedOver && (reviewing || state.queue.length)) {
+        dispatch({ type: "handover" });
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [state.paused, state.handedOver, state.queue.length, reviewing, dispatch]);
+  useEffect(() => {
+    if (!hydrated) return;
+    if (tab === "run") {
+      setProgressOpen(true);
+      return;
+    }
+    if (firstOf(tab)) return;
+    const t = setTimeout(() => document.getElementById(`sec-${tab}`)?.scrollIntoView({ behavior: "smooth", block: "start" }), 60);
+    return () => clearTimeout(t);
+  }, [tab, hydrated]);
   const readyAt: Partial<Record<Tab, string>> = { map: "plan-build", evidence: "id-digital", plan: "plan-build", simulator: "plan-build", review: "submit", release: "ex-readback" };
-  const notStarted = !!readyAt[tab] && !hasEvent(state, readyAt[tab]!);
-  const st = state.paused && state.queue.length ? { label: state.handedOver ? "With a maker" : "Paused", tone: "warn" as const } : statusOf[state.phase];
+  const notYet = (t: Tab) => !!readyAt[t] && !hasEvent(state, readyAt[t]!);
+  const st = state.handedOver ? { label: "With a maker", tone: "warn" as const } : state.paused && state.queue.length ? { label: "Paused", tone: "warn" as const } : statusOf[state.phase];
   const now = lastTime(state);
   const firstLogin = hasEvent(state, "rel-mohammed-login");
   const bankDone = hasEvent(state, "ex-readback");
@@ -70,48 +103,27 @@ export function CaseWorkspace() {
   return (
     <div className="flex h-full">
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="border-b border-line px-8 pb-0 pt-6">
-          <div className="flex items-start justify-between gap-6">
-            <div>
-              <div className="flex items-center gap-2.5">
-                <p className="text-xs font-medium text-muted">{business.name}</p>
-                <Pill tone={st.tone}>{st.label}</Pill>
-              </div>
-              <h1 className="mt-1 font-display text-[28px] leading-tight text-ink">{headlineOf[state.phase]}</h1>
-              <p className="mt-1 text-sm text-sub">
-                Joint signatories (3) · <bdi dir="ltr" className="font-mono text-xs">{business.iban}</bdi> · {business.accountType}
-              </p>
-              <p className="mt-0.5 text-xs text-muted">
-                {business.address} · Trade licence {business.licence}
-              </p>
-            </div>
-            <div className="text-right text-xs text-muted">
-              <p>
-                Form received <span className="tnum text-sub">{business.submittedAt}</span>
-              </p>
+        <header className="border-b border-line px-8 pb-0 pt-4">
+          <div className="flex items-center gap-3 text-xs">
+            <h1 className="truncate font-display text-lg leading-tight text-ink">{business.name}</h1>
+            <Pill tone={st.tone}>{st.label}</Pill>
+            <bdi dir="ltr" className="hidden font-mono text-muted xl:inline">{business.iban}</bdi>
+            <span className="ml-auto flex items-center gap-4 text-muted">
               {now && (
-                <p className="mt-0.5">
+                <span>
                   {firstLogin ? "Form to first login " : "Elapsed "}
                   <span className="tnum font-medium text-ink">{duration(business.submittedAt, firstLogin ? eventById("rel-mohammed-login").time : now)}</span>
-                </p>
+                  {bankDone && !firstLogin && <span className="tnum"> · bank-side {duration(business.submittedAt, eventById("ex-readback").time)}</span>}
+                </span>
               )}
-              {bankDone && (
-                <p className="mt-0.5">
-                  Bank-side work <span className="tnum font-medium text-ink">{duration(business.submittedAt, eventById("ex-readback").time)}</span>
-                </p>
-              )}
-            </div>
+              <button type="button" onClick={() => setProgressOpen(true)} className="hover:text-ink hover:underline">Agent progress</button>
+              <button type="button" onClick={() => setHowOpen(true)} className="hover:text-ink hover:underline">How it works</button>
+              <button type="button" onClick={() => window.dispatchEvent(new Event("jointly:palette"))} className="hover:text-ink">
+                <kbd className="rounded border border-line px-1">{mac ? "⌘K" : "Ctrl K"}</kbd>
+              </button>
+            </span>
           </div>
-          <button type="button" onClick={() => window.dispatchEvent(new Event("jointly:palette"))} className="mt-2 text-[11px] text-muted hover:text-ink">
-            <kbd className="rounded border border-line px-1">{mac ? "⌘K" : "Ctrl K"}</kbd> to jump anywhere
-          </button>
-          <button type="button" onClick={() => setHowOpen(true)} className="ml-4 mt-2 text-[11px] text-muted underline-offset-2 hover:text-ink hover:underline">
-            How this agent works
-          </button>
-          <button type="button" onClick={() => dispatch({ type: "watchRun" })} className="ml-4 mt-2 text-[11px] text-muted underline-offset-2 hover:text-ink hover:underline">
-            Watch the agent run from the start
-          </button>
-          <nav aria-label="Case steps" className="-mb-px mt-5 flex gap-5 overflow-x-auto whitespace-nowrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" role="tablist">
+          <nav aria-label="Case steps" className="-mb-px mt-3 flex gap-5 overflow-x-auto whitespace-nowrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" role="tablist">
             {groups.map((g) => (
               <button
                 key={g.id}
@@ -126,52 +138,79 @@ export function CaseWorkspace() {
             ))}
           </nav>
         </header>
-        <div className="min-h-0 flex-1 overflow-y-auto px-8 py-6 pb-40">
-          <div role="tablist" aria-label={`${group.label} sections`} className="mb-6 inline-flex gap-1 rounded-full border border-line bg-surface p-1">
-            {group.sections.map((x) => (
-              <button
-                key={x.id}
-                role="tab"
-                aria-selected={tab === x.id}
-                onClick={() => setTab(x.id)}
-                className={cn("rounded-full px-3 py-1 text-xs font-medium transition-colors duration-150", tab === x.id ? "bg-ink text-canvas" : "text-sub hover:text-ink")}
-              >
-                {x.label}
-              </button>
-            ))}
-          </div>
-          <div key={tab} className="animate-enter">
-            {notStarted && (
-              <div className="mb-6 rounded-xl border border-accent/30 bg-accent-soft/40 px-4 py-3">
-                <p className="text-sm text-sub">
-                  <span className="font-medium text-ink">This part of the case hasn&apos;t happened yet.</span> It fills in as the case moves.
-                </p>
-              </div>
-            )}
-            {tab === "run" && <ProgressView />}
-            {tab === "map" && (
-              <div className="max-w-4xl space-y-8">
-                <SigningMap />
-                {hasEvent(state, "plan-build") && (
-                  <div>
-                    <h3 className="mb-3 text-sm font-semibold">How a payment gets approved</h3>
-                    <PaymentWorkflow />
-                  </div>
+        <div className="min-h-0 flex-1 overflow-y-auto px-8 pb-12">
+          <div key={group.id} className="animate-enter">
+            {group.id === "review" && (
+              <div className="max-w-4xl space-y-10 pt-6">
+                {agentWorking && <ProgressView />}
+                {hasEvent(state, "submit") ? <ReviewView /> : !agentWorking && <NotYet />}
+                {hasEvent(state, "ex-readback") && (
+                  <section id="sec-release" aria-label="Release" className="scroll-mt-6">
+                    <ReleaseView />
+                  </section>
                 )}
               </div>
             )}
-            {tab === "evidence" && <EvidenceView />}
-            {tab === "plan" && <PlanView />}
-            {tab === "simulator" && <SimulatorView />}
-            {tab === "review" && <ReviewView />}
-            {tab === "release" && <ReleaseView />}
-            {tab === "decisions" && <DecisionView />}
-            {tab === "audit" && <AuditView />}
+            {group.id === "setup" && (
+              <>
+                <nav aria-label="Setup sections" className="sticky top-0 z-10 -mx-8 mb-6 flex gap-4 border-b border-line bg-canvas/95 px-8 py-2.5 text-xs backdrop-blur">
+                  {groups[1].sections.map((x) => (
+                    <a key={x.id} href={`#sec-${x.id}`} className="text-sub hover:text-ink">{x.label}</a>
+                  ))}
+                </nav>
+                <div className="max-w-4xl space-y-12">
+              <section id="sec-map" aria-label="Signing map" className="scroll-mt-14">
+                <h2 className="mb-3 text-sm font-semibold text-sub">Signing map</h2>
+                {notYet("map") ? <NotYet /> : (
+                    <div className="space-y-8">
+                      <SigningMap />
+                      <div>
+                        <h3 className="mb-3 text-sm font-semibold">How a payment gets approved</h3>
+                        <PaymentWorkflow />
+                      </div>
+                    </div>
+                  )}
+              </section>
+              <section id="sec-evidence" aria-label="Identity" className="scroll-mt-14">
+                <h2 className="mb-3 text-sm font-semibold text-sub">Identity</h2>
+                {notYet("evidence") ? <NotYet /> : <EvidenceView />}
+              </section>
+              <section id="sec-plan" aria-label="Users and roles" className="scroll-mt-14">
+                <h2 className="mb-3 text-sm font-semibold text-sub">Users and roles</h2>
+                {notYet("plan") ? <NotYet /> : <PlanView />}
+              </section>
+              <section id="sec-simulator" aria-label="Simulator" className="scroll-mt-14">
+                <h2 className="mb-3 text-sm font-semibold text-sub">Simulator</h2>
+                {notYet("simulator") ? <NotYet /> : <SimulatorView />}
+              </section>
+                </div>
+              </>
+            )}
+            {group.id === "history" && (
+              <div className="max-w-4xl space-y-12 pt-6">
+                <section id="sec-audit" aria-label="Timeline"><AuditView /></section>
+                <section id="sec-decisions" aria-label="Decision record" className="scroll-mt-6"><DecisionView /></section>
+              </div>
+            )}
           </div>
         </div>
+        <NeedsYou />
       </div>
-      <NeedsYou />
       <CommandPalette tabs={paletteTabs} />
+      {progressOpen && (
+        <div className="fixed inset-0 z-50 flex justify-end" role="dialog" aria-modal="true" aria-label="Agent progress">
+          <button aria-label="Close" className="absolute inset-0 bg-ink/30" onClick={() => { setProgressOpen(false); if (tab === "run") setTab("review"); }} />
+          <div className="relative h-full w-[560px] max-w-full animate-enter overflow-y-auto border-l border-line bg-surface p-6 shadow-lg">
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="font-display text-xl">Agent progress</h2>
+              <button aria-label="Close agent progress" onClick={() => { setProgressOpen(false); if (tab === "run") setTab("review"); }} className="rounded p-1 text-muted hover:bg-panel hover:text-ink">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <ProgressView />
+          </div>
+        </div>
+      )}
       {howOpen && (
         <div className="fixed inset-0 z-50 flex justify-end" role="dialog" aria-modal="true" aria-label="How this agent works">
           <button aria-label="Close" className="absolute inset-0 bg-ink/30" onClick={() => setHowOpen(false)} />

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { AlertTriangle, BookOpen, Check, ChevronRight, FileText, ListChecks, Loader2, Radio, ShieldCheck, UserCheck, Users } from "lucide-react";
+import { AlertTriangle, BookOpen, Check, ChevronRight, FileText, ListChecks, Radio, ShieldCheck, UserCheck, Users } from "lucide-react";
 import { StepId, eventById } from "@/lib/script";
 import { policyChecks } from "@/lib/rules";
 import { hasEvent, useStore } from "@/lib/store";
@@ -151,7 +151,7 @@ export function ProgressView() {
         )}
         {working && (
           <li className="flex items-center gap-3 px-4 py-2 text-sm text-muted">
-            <Loader2 className="h-4 w-4 animate-spin text-brand" /> Working on {checkpoints.find((c) => c.steps.includes(working))?.label.toLowerCase() ?? "the next step"}
+            <span className="h-2 w-2 animate-pulse rounded-full bg-brand" /> Working on {checkpoints.find((c) => c.steps.includes(working))?.label.toLowerCase() ?? "the next step"}
           </li>
         )}
       </ul>

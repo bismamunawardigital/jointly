@@ -231,6 +231,19 @@ export function ReviewView() {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const el = e.target as HTMLElement;
+      const typing = ["INPUT", "TEXTAREA", "SELECT"].includes(el.tagName);
+      if (!typing && !e.ctrlKey && !e.metaKey && ["j", "k"].includes(e.key.toLowerCase())) {
+        const cards = Array.from(document.querySelectorAll<HTMLElement>("[data-stage-card]"));
+        const at = cards.findIndex((c) => c.contains(document.activeElement));
+        const to = cards[Math.max(0, Math.min(cards.length - 1, at + (e.key.toLowerCase() === "j" ? 1 : -1)))];
+        to?.focus();
+        to?.scrollIntoView({ behavior: "smooth", block: "center" });
+        return;
+      }
+      if (!typing && e.key === "Enter" && el.dataset.stageCard !== undefined) {
+        el.querySelector<HTMLElement>("input, button:not([disabled])")?.focus();
+        return;
+      }
       if (e.key.toLowerCase() === "s" && !e.ctrlKey && !e.metaKey && !["INPUT", "TEXTAREA", "SELECT"].includes(el.tagName) && !failing.length) {
         dispatch({ type: "signoff" });
         return;
@@ -319,7 +332,7 @@ export function ReviewView() {
         const readItems = s.items.filter((it) => it.sources.some(isAgentRead));
         const exactItems = s.items.filter((it) => !it.sources.some(isAgentRead));
         return (
-          <Card key={s.id} id={`stage-${s.id}`} className={cn("p-5", canAct && "border-line-strong", valid && "bg-panel/30")}>
+          <Card key={s.id} id={`stage-${s.id}`} data-stage-card="" tabIndex={-1} className={cn("p-5 outline-none focus-visible:ring-2 focus-visible:ring-brand", canAct && "border-line-strong", valid && "bg-panel/30")}>
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-xs text-muted">Stage {s.id} of 4</p>
