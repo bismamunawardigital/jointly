@@ -1,5 +1,6 @@
 "use client";
 
+import { FocusSources, SourceIcons, SourceTrail } from "@/components/case/SourcePeek";
 import { EvidenceGrid } from "./EvidenceGrid";
 import { PaymentWorkflow } from "./PaymentWorkflow";
 import { SigningMap } from "./SigningMap";
@@ -165,6 +166,7 @@ function ScanCheck({ canAct, onConfirm }: { canAct: boolean; onConfirm: (v: numb
       </p>
       <div className="mt-3 flex flex-wrap items-start gap-5">
         <figure className="w-[520px] max-w-full">
+          {!clean && <SourceTrail />}
           {clean ? <CleanLetter /> : <ScanLens src="/scans/svs-amd-2023.png" alt="Scan of the 2023 amendment letter. The last digits of the amount are smudged." />}
           <figcaption className="mt-1 text-xs text-muted">{clean ? "Clean copy from the branch" : "2023 amendment letter · scan from SVS · click to zoom"}</figcaption>
         </figure>
@@ -362,10 +364,11 @@ export function ReviewView() {
           <Button variant="ghost" onClick={() => setExpand(true)}>Show evidence and stages</Button>
         </Card>
       )}
+      {!expand && reviewing && <FocusSources />}
       {!expand && needsLetter && <ScanCheck key={state.copy ?? "none"} canAct={!failing.length} onConfirm={(v) => dispatch({ type: "confirm", value: v })} />}
       {!expand && reviewing && allApproved(state) && (
         <Card className="p-4 text-sm">
-          <p className="font-medium">When you sign off, Mohammed and Khalifa go live today, and Rashid&apos;s user is created but stays switched off until his ID is renewed.</p>
+          <p className="font-medium">When you sign off, Mohammed and Khalifa go live today, and Rashid&apos;s user is created but stays switched off until his ID is renewed.<SourceIcons sys={["finacle", "efr", "svs"]} /></p>
           <p className="mt-1 text-sub">The agent makes 5 changes in Digital Banking Admin and then reads them back, and no payments are made. You can still change anything before you sign off.</p>
         </Card>
       )}

@@ -232,6 +232,7 @@ export default function CaseStudy() {
             <Gloss term="Joint signatories" def="These are 2 or more people who have to approve a company's payments together." />
             <Gloss term="Operations team" def="This is the bank team that sets up a company's online banking by hand. Some banks call it Customer Fulfillment, or CF." />
             <Gloss term="Mixed mandate" def="Different rules for different people or amounts, for example one person alone up to 10,000, any two above that." />
+            {["RCIF", "Finacle", "SVS", "EFR", "Mandate", "Maker-checker", "Digital Banking Admin"].map((t) => <Gloss key={t} term={t} />)}
           </p>
           <dl className="mt-6 grid grid-cols-3 gap-4 md:gap-6">
             {stats.map((s) => (

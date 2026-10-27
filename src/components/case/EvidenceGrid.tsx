@@ -1,5 +1,6 @@
 "use client";
 
+import { NameMatch, PeekMock } from "@/components/case/SourcePeek";
 import { useState } from "react";
 import { AlertTriangle, Check, X } from "lucide-react";
 import { EvidenceKey, evidence, people } from "@/data/seed";
@@ -81,7 +82,9 @@ export function EvidenceGrid() {
 
   const all = rows.flatMap((r) => r.cells);
   const count = (t: Tone) => new Set(all.filter((c) => c.tone === t).map((c, i) => (t === "warn" ? c.src : i))).size;
-  const act = (c: CellData) => {
+  const [peek, setPeek] = useState<string | null>(null);
+  const act = () => (document.activeElement as HTMLElement | null)?.click();
+  const goLetter = (c: CellData) => {
     if (c.tone === "warn") {
       setTab("review");
       setTimeout(() => document.getElementById("stage-3")?.scrollIntoView({ behavior: "smooth", block: "center" }), 50);
@@ -96,7 +99,7 @@ export function EvidenceGrid() {
     const m = move[e.key];
     if (e.key === "Enter") {
       e.preventDefault();
-      act(rows[r].cells[c]);
+      act();
       return;
     }
     if (!m) return;
@@ -134,7 +137,10 @@ export function EvidenceGrid() {
           <tbody>
             {rows.map((row, r) => (
               <tr key={row.id} data-row={row.id} className="border-b border-line last:border-0">
-                <th scope="row" className="whitespace-nowrap px-3 py-2.5 text-left text-sm font-medium">{row.label}</th>
+                <th scope="row" className="group relative whitespace-nowrap px-3 py-2.5 text-left text-sm font-medium">
+                  {row.name.startsWith("Mohammed") ? <span tabIndex={0} className="cursor-help underline decoration-dotted underline-offset-4">{row.label}</span> : row.label}
+                  {row.name.startsWith("Mohammed") && <div className="absolute start-0 top-full z-40 mt-1 hidden rounded-lg border border-line bg-surface p-3 font-normal shadow-lg group-focus-within:block group-hover:block"><NameMatch /></div>}
+                </th>
                 {row.cells.map((cell, c) => {
                   const key = `${r}-${c}`;
                   const tip = cell.why ?? (cell.src ? evidence[cell.src].body : undefined);
@@ -147,7 +153,8 @@ export function EvidenceGrid() {
                         tabIndex={r === 0 && c === 0 ? 0 : -1}
                         aria-label={`${row.name}, ${cols[c]}: ${toneWord[cell.tone]}, ${cell.text}`}
                         title="View source"
-                        onClick={() => act(cell)}
+                        onClick={() => setPeek(peek === key ? null : key)}
+                        onKeyDown={(e) => e.key === "Escape" && setPeek(null)}
                         onMouseEnter={() => setActive(key)}
                         onMouseLeave={() => setActive(null)}
                         onFocus={() => setActive(key)}
@@ -165,6 +172,15 @@ export function EvidenceGrid() {
                         {glyph[cell.tone]}
                         <span className={/^(EID|RCIF) /.test(cell.text) ? "min-w-0 whitespace-nowrap tnum text-xs" : "min-w-0"}>{cell.text}</span>
                       </button>
+                      {peek === key && (
+                        <div className="absolute start-0 top-full z-40 mt-1 w-80 rounded-lg border border-line bg-surface p-3 text-start shadow-lg">
+                          <PeekMock col={c} person={row.name.split(" ")[0].toLowerCase()} />
+                          <div className="mt-2 flex justify-between text-xs">
+                            {cell.tone === "warn" ? <button type="button" className="font-medium text-accent-ink hover:underline" onClick={() => goLetter(cell)}>Check this value</button> : cell.src ? <button type="button" className="text-accent-ink hover:underline" onClick={() => goLetter(cell)}>Open the full source</button> : <span />}
+                            <button type="button" className="text-sub hover:text-ink" onClick={() => setPeek(null)}>Close</button>
+                          </div>
+                        </div>
+                      )}
                       {active === key && tip && (
                         <div role="tooltip" className="absolute left-2 top-full z-20 mt-1 w-64 rounded-lg border border-line bg-surface p-3 text-xs text-sub shadow-lg">
                           {cell.src && <p className="mb-1 tnum text-xs text-muted">{evidence[cell.src].ref}</p>}

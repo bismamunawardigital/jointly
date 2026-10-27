@@ -1,5 +1,6 @@
 "use client";
 
+import { ChecksBlock } from "@/components/case/SourcePeek";
 import { useState } from "react";
 import { AlertTriangle, BookOpen, Check, ChevronRight, FileText, ListChecks, Radio, ShieldCheck, UserCheck, Users } from "lucide-react";
 import { StepId, eventById } from "@/lib/script";
@@ -88,6 +89,7 @@ export function ProgressView() {
 
   return (
     <div className="max-w-4xl">
+      <ChecksBlock />
       <h2 className="font-display text-2xl">{headline}</h2>
       <ol className="mt-6 grid grid-cols-6 gap-2" aria-label="Checkpoints">
         {checkpoints.map((c, i) => {
