@@ -4,7 +4,7 @@ import type { LucideIcon } from "lucide-react";
 import { Logo } from "@/components/Shell";
 import { ThemeButton } from "@/components/ThemeToggle";
 import { AgentMark, Avatar } from "@/components/ui";
-import { HeroFrame } from "@/components/landing/HeroFrame";
+import { HeroStage } from "@/components/landing/HeroStage";
 import { Gloss } from "@/components/landing/Gloss";
 import { DaysSwimlane } from "@/components/landing/DaysSwimlane";
 import { LiveGrid, MandateToggle } from "@/components/landing/LivePreview";
@@ -210,8 +210,8 @@ export default function CaseStudy() {
         </div>
       </header>
 
-      <section id="hero" className="mx-auto grid max-w-6xl items-start gap-10 px-6 pb-12 pt-2 md:grid-cols-[1fr_1.05fr] md:pt-4">
-        <div>
+      <section id="hero" className="mx-auto grid max-w-6xl items-start gap-10 px-6 pb-12 pt-2 md:pt-4">
+        <div className="md:max-w-[519px]">
           <p className="text-[13px] text-muted">Case study · Agentic AI for bank operations · Bisma Munawar, Product Designer</p>
           <h1 className="mt-3 font-display text-[36px] leading-[1.05] tracking-tight md:text-[50px]">A company with 3 signatories usually waits 5 days to get online banking, and Jointly gets them live before lunch.</h1>
           <p className="mt-4 max-w-xl text-base text-sub md:text-lg">Jointly is an AI agent that prepares the setup from the bank&apos;s old systems, and a person approves every step.</p>
@@ -234,7 +234,9 @@ export default function CaseStudy() {
           </div>
           <p className="mt-3 text-[11px] text-muted">Synthetic case. Not measured in a real bank.</p>
         </div>
-        <HeroFrame callouts={["Every record from Finacle, SVS and EFR", "Green is exact, amber was read", "Sara decides the amber one"]} />
+        <div className="min-w-0">
+          <HeroStage />
+        </div>
       </section>
 
       <section id="in30" aria-label="In 30 seconds" className="border-y border-line">

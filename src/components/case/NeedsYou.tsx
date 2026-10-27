@@ -1,12 +1,12 @@
 "use client";
 
-import { Hand, Pause, Play, Sparkles } from "lucide-react";
+import { Hand, Pause, Play } from "lucide-react";
 import { useEffect, useState } from "react";
 import { policyChecks, releaseEligibility } from "@/lib/rules";
 import { eventById } from "@/lib/script";
 import { headlineOf } from "@/lib/derive";
 import { Tab, rulesFor, useStore } from "@/lib/store";
-import { Button, cn } from "@/components/ui";
+import { Button, cn, AgentIcon } from "@/components/ui";
 
 const doingMap: Record<string, string> = {
   intake: "reading the forms",
@@ -160,7 +160,7 @@ export function NeedsYou() {
   return (
     <div role="region" aria-label="Decision bar" className={cn("flex h-16 shrink-0 items-center gap-4 border-t px-8", needs ? "border-warn/40 bg-warn-soft/40" : "border-line bg-surface")}>
       <span className={cn("inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full", needs ? "bg-warn text-white" : "bg-panel text-sub")}>
-        {working && !state.paused ? <span className="h-2 w-2 animate-pulse rounded-full bg-brand" /> : <Sparkles className="h-3.5 w-3.5" aria-hidden />}
+        {working && !state.paused ? <span className="h-2 w-2 animate-pulse rounded-full bg-brand" /> : <AgentIcon className="h-3.5 w-3.5" />}
       </span>
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-medium">{needs && <span className="sr-only">Needs you: </span>}{title}</p>

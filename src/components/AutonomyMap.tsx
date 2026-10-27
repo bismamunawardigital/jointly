@@ -1,13 +1,14 @@
 import Link from "next/link";
-import { ArrowUpRight, Ban, Bot, Check, ShieldCheck, UserRound } from "lucide-react";
+import { ArrowUpRight, Ban, Check, ShieldCheck, UserRound } from "lucide-react";
+import { AgentIcon } from "./ui";
 import type { Tab } from "@/lib/store";
 import { Lane, autonomy } from "@/data/autonomy";
 import { clsx } from "clsx";
 
 const cn = clsx;
 
-const look: Record<Lane, { icon: typeof Bot; head: string; icon_: string }> = {
-  agent: { icon: Bot, head: "border-t-accent", icon_: "text-accent" },
+const look: Record<Lane, { icon: React.ComponentType<{ className?: string }>; head: string; icon_: string }> = {
+  agent: { icon: AgentIcon, head: "border-t-accent", icon_: "text-accent" },
   rules: { icon: ShieldCheck, head: "border-t-ok", icon_: "text-ok" },
   human: { icon: UserRound, head: "border-t-warn", icon_: "text-warn" },
   never: { icon: Ban, head: "border-t-bad", icon_: "text-bad" },
