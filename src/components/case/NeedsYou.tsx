@@ -6,6 +6,18 @@ import { eventById } from "@/lib/script";
 import { rulesFor, useStore } from "@/lib/store";
 import { Button, Pill } from "@/components/ui";
 
+const doingMap: Record<string, string> = {
+  intake: "reading the forms",
+  identity: "confirming the people",
+  mandate: "reading the mandate",
+  plan: "building the plan",
+  policy: "testing the plan",
+  review: "sending the plan to you",
+  execute: "setting it up in Digital Banking Admin",
+  release: "switching people on",
+};
+const doing = (step: string) => doingMap[step] ?? "working";
+
 export function NeedsYou() {
   const { state, dispatch, setTab, version, held } = useStore();
   const working = state.queue.length > 0;
@@ -23,7 +35,7 @@ export function NeedsYou() {
           <dt className="text-muted">Done</dt>
           <dd className="text-sub">{done} agent steps, all saved</dd>
           <dt className="text-muted">Left</dt>
-          <dd className="text-sub">{state.queue.length} steps, starting <span className="font-mono">{next.call}</span></dd>
+          <dd className="text-sub">{state.queue.length} steps, starting with {doing(next.step)}</dd>
           <dt className="text-muted">Half-done</dt>
           <dd className="text-sub">Nothing</dd>
         </dl>
@@ -37,7 +49,7 @@ export function NeedsYou() {
       <div>
         <p className="flex items-center gap-1.5 text-sm font-medium"><Pause className="h-4 w-4 text-warn" /> Agent paused</p>
         <p className="mt-1 text-sm text-sub">Stopped between steps. Nothing is half-written.</p>
-        <p className="mt-2 text-xs text-muted">{done} done · {state.queue.length} left · next <span className="font-mono">{next.call}</span></p>
+        <p className="mt-2 text-xs text-muted">{done} done · {state.queue.length} left · next: {doing(next.step)}</p>
         <div className="mt-4 space-y-2">
           <Button variant="primary" className="w-full" onClick={() => dispatch({ type: "resume" })}>
             <Play className="h-3.5 w-3.5" /> Resume
@@ -54,8 +66,7 @@ export function NeedsYou() {
         <div className="flex items-start gap-2.5">
           <Loader2 className="mt-0.5 h-4 w-4 animate-spin text-accent" />
           <div>
-            <p className="text-sm font-medium">{next.actor} is working</p>
-            <p className="mt-0.5 font-mono text-[11px] text-muted">{next.call}</p>
+            <p className="text-sm font-medium">Agent is {doing(next.step)}</p>
           </div>
         </div>
         <p className="mt-2 text-sm text-sub">Nothing needed from you.</p>
