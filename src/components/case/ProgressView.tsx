@@ -6,7 +6,7 @@ import { StepId, eventById } from "@/lib/script";
 import { policyChecks } from "@/lib/rules";
 import { hasEvent, useStore } from "@/lib/store";
 import { EvidenceKey, PersonId, evidence } from "@/data/seed";
-import { AgentMark, Avatar, cn } from "@/components/ui";
+import { AgentMark, Avatar, Sources, cn } from "@/components/ui";
 
 type Tone = "ok" | "warn" | "wait";
 interface Line {
@@ -38,6 +38,7 @@ export function ProgressView() {
   const { state, held, version } = useStore();
   const [open, setOpen] = useState<string | null>(null);
   const [tech, setTech] = useState<Record<string, boolean>>({});
+  const [refs, setRefs] = useState(false);
   const has = (id: string) => hasEvent(state, id);
   const rashidHeld = held.includes("rashid");
   const partLive = has("rel-khalifa-login");
@@ -77,6 +78,12 @@ export function ProgressView() {
           : [],
   };
 
+  const ran = state.log.filter((e) => e.kind === "agent").map((e) => eventById(e.id));
+  const spans = new Map<string, number[]>();
+  ran.forEach((ev) => spans.set(ev.group, [...(spans.get(ev.group) ?? []), toMin(ev.time)]));
+  const mins = Array.from(spans.values()).reduce((n, t) => n + Math.max(...t) - Math.min(...t) + 1, 0);
+  const read = Array.from(new Set(ran.flatMap((ev) => ev.evidence ?? []))).filter((k) => evidence[k]);
+
   const reached = checkpoints.map((c) => has(c.done));
   const activeIdx = state.phase === "new" ? -1 : reached.findIndex((r) => !r);
   const headline = state.phase === "live" ? "All 3 live" : partLive ? "2 of 3 live" : ["in_review", "re_review"].includes(state.phase) ? "Plan ready for your review" : state.phase === "executed" ? "Set up. Granting access is your call" : "Setting up Creekside General Trading";
@@ -85,6 +92,18 @@ export function ProgressView() {
   return (
     <div className="max-w-4xl">
       <h2 className="font-display text-2xl">{headline}</h2>
+      {mins > 0 && (
+        <div className="mt-2 text-sm text-muted">
+          <button type="button" onClick={() => setRefs((r) => !r)} aria-expanded={refs} className="inline-flex items-center gap-1.5 hover:text-ink">
+            <AgentMark size={16} className="text-person-agent" />
+            Worked for <span className="tnum font-medium text-ink">{mins} min</span>
+            <span aria-hidden>·</span>
+            Read <span className="tnum font-medium text-ink">{read.length} sources</span>
+            <ChevronRight className={cn("h-3.5 w-3.5 transition-transform duration-150", refs && "rotate-90")} />
+          </button>
+          {refs && <div className="mt-2"><Sources keys={read} /></div>}
+        </div>
+      )}
       <ol className="mt-6 grid grid-cols-6 gap-2" aria-label="Checkpoints">
         {checkpoints.map((c, i) => {
           const done = reached[i] || (c.id === "live" && partLive);
@@ -187,4 +206,11 @@ function DocThumb({ k }: { k: EvidenceKey }) {
       <p className="text-[11px] text-muted">{e.system}</p>
     </figure>
   );
+}
+
+const days = ["Mon", "Tue", "Wed", "Thu", "Fri"];
+function toMin(t: string) {
+  const [d, hm] = t.split(" ");
+  const [h, m] = hm.split(":").map(Number);
+  return days.indexOf(d) * 1440 + h * 60 + m;
 }
