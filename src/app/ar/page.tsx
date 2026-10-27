@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { AlertTriangle, ArrowLeft, Ban, Check, FileText, Printer, Search, ShieldCheck, Truck, Undo2, UserRound } from "lucide-react";
+import { ArrowLeft, Ban, Check, FileText, Printer, Search, ShieldCheck, Truck, Undo2, UserRound } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { Logo } from "@/components/Shell";
 import { ThemeButton } from "@/components/ThemeToggle";
@@ -12,6 +12,8 @@ import { HeroFrame } from "@/components/landing/HeroFrame";
 import { DaysSwimlane } from "@/components/landing/DaysSwimlane";
 import { LiveGrid, MandateToggle } from "@/components/landing/LivePreview";
 import { statsAr } from "@/content/stats";
+import { glossaryAr } from "@/content/glossary";
+import { PORTFOLIO_URL } from "@/content/portfolio";
 
 const B = ({ children }: { children: React.ReactNode }) => <bdi>{children}</bdi>;
 
@@ -37,7 +39,7 @@ const swim = {
 const inbox: { who: ("mohammed" | "khalifa" | "rashid")[]; line: React.ReactNode; time: string }[] = [
   { who: ["khalifa"], line: <>تأكيد قيمة في خطاب غير واضح · <B>Creekside</B></>, time: "2 د" },
   { who: ["mohammed", "khalifa"], line: <>اعتماد مُدخِل مدفوعات جديد · <B>Saffron Bay</B></>, time: "1 د" },
-  { who: ["rashid"], line: <>تفعيل راشد بعد تجديد هويته · <B>Creekside</B></>, time: "30 ث" },
+  { who: ["rashid"], line: <>منح راشد الوصول بعد تجديد هويته · <B>Creekside</B></>, time: "30 ث" },
 ];
 
 const days: { day: string; label: string; icons: LucideIcon[] }[] = [
@@ -49,9 +51,50 @@ const days: { day: string; label: string; icons: LucideIcon[] }[] = [
 ];
 
 const why: [React.ReactNode, string][] = [
-  [<>التفويض نص حر. عبارة &laquo;خليفة منفردًا حتى <B>10,000</B>&raquo; موجودة في خطاب ممسوح ضوئيًا، لا في حقل.</>, "الوكيل يقرأها ويقتبس السطر."],
-  [<>الأنظمة لا تتفق. <B>Finacle</B> يقول &laquo;أي اثنين&raquo;، والتفاصيل في <B>SVS</B>.</>, "القواعد تختار المصدر الأحدث والأدق، وتوضح السبب."],
+  [<><Gloss term="التفويض" def={glossaryAr.Mandate} /> نص حر. عبارة &laquo;خليفة منفردًا حتى <B>10,000</B>&raquo; موجودة في خطاب ممسوح ضوئيًا، لا في حقل.</>, "الوكيل يقرأها ويقتبس السطر."],
+  [<>الأنظمة لا تتفق. <Gloss term="Finacle" def={glossaryAr.Finacle} /> يقول &laquo;أي اثنين&raquo;، والتفاصيل في <Gloss term="SVS" def={glossaryAr.SVS} />.</>, "القواعد تختار المصدر الأحدث والأدق، وتوضح السبب."],
   [<>لا توجد واجهة برمجية للكتابة. <B>Digital Banking Admin</B> شاشة تنتهي مهلتها.</>, "الوكيل يكتب خطوة بخطوة، ثم يقرأ ما كتبه، ويعيد المحاولة بأمان."],
+];
+
+const impact: [string, React.ReactNode, string][] = [
+  ["1 من 5", <>أكثر من دولار من كل <B>5</B> دولارات يكسبها البنك يأتي من الشركات الصغيرة والمتوسطة.</>, "https://www.mckinsey.com/featured-insights/week-in-charts/the-digital-edge-in-small-business-banking"],
+  ["41 يومًا", <>في استطلاع في أمريكا وبريطانيا، احتاجت الشركة <B>41</B> يومًا في المتوسط لتفتح حسابًا بنكيًا.</>, "https://fintech.global/?p=33634"],
+  ["87%", <><B>87%</B> من مديري الخزينة في الشركات يقولون إنهم تركوا طلبًا بنكيًا قبل أن يكملوه.</>, "https://www.retailbankerinternational.com/news/87-percent-of-corporate-treasurers-abandon-banking-applications"],
+];
+
+const fixes: [React.ReactNode, string][] = [
+  ["تطبيقات التسجيل الجديدة", "تسرّع الواجهة، لكن المكتب الخلفي ما زال يعيد كتابة كل شيء."],
+  ["روبوتات العمليات", "تعمل مع الحقول الثابتة، لكنها تتعطل عند النص الحر."],
+  ["استبدال النظام الأساسي", "يحل المشكلة، لكنه يستغرق سنوات."],
+  ["توظيف موظفين أكثر", "ينفع إلى أن يكبر حجم العمل."],
+  [<B key="j">Jointly</B>, "يضع وكيلًا فوق الأنظمة الموجودة في البنك أصلًا."],
+];
+
+const costLines = [
+  "الوكيل يقرأ كل نظام مرة واحدة في كل حالة، ويعيد استخدام ما قرأه.",
+  "يستخدم نموذج الذكاء الاصطناعي للخطابات الممسوحة فقط، والقواعد تتولى الباقي، وهذا أقل تكلفة ويعطي الجواب نفسه كل مرة.",
+  "لكل نظام قديم موصّل صغير خاص به، فلا تعطّل شاشة إدارة بطيئة بقية الأنظمة، ولا تكتب إعادة المحاولة مرتين.",
+];
+
+const compare: [React.ReactNode, React.ReactNode][] = [
+  [<>يعتمد الناس كل خطوة، وتشير دراسات إلى أنهم يوافقون على <B>93</B> إلى <B>97%</B> من الطلبات.</>, <>القواعد تمرّر النسخ المطابقة، فيتخذ الشخص قرارين فقط.</>],
+  ["درجة ثقة.", "حالات واضحة: مطابق، أو غير مطابق، أو تعذّرت القراءة."],
+  ["رابط إلى المستند كله.", "الجزء الدقيق من المسح، والقاعدة التي فحصته."],
+  ["إعادة المحاولة والأمل.", "إعادة المحاولة، ثم قراءة كل شيء من جديد."],
+];
+
+const phases: [React.ReactNode, string, string][] = [
+  [<><B>4</B> أسابيع</>, "نتفق على القواعد", "نكتب قواعد التفويض مع العمليات والامتثال ومخاطر العمليات، بصلاحية قراءة فقط."],
+  [<><B>8</B> أسابيع</>, "وضع المراقبة", "الوكيل يخطط بينما الفريق ما زال يقوم بالعمل، ونقارن بين الاثنين."],
+  [<><B>8</B> أسابيع</>, "الوكيل يُحضّر، والناس يعتمدون", "الوكيل يُعدّ النسخ المطابقة، ومشرف يعيد فحص اعتماد واحد من كل 20."],
+  ["مستمر", "التوسّع", "بعدها التفويضات المختلطة وتعديلات التفويض."],
+];
+
+const learnt: React.ReactNode[] = [
+  <>كان عليّ أن أفهم الأنظمة الحالية أولًا، فلم أستطع تصميم الوكيل قبل أن أعرف كيف تنتقل الحالة بين <B>Finacle</B> و <B>SVS</B> و <B>EFR</B> و <B>Admin</B>.</>,
+  <>البنوك تريد الوكلاء، لكنها مضطرة لتدقيق كل قرار، لذلك يُحفظ كل قرار في <B>Jointly</B> في سجل يستطيع المدقق قراءته.</>,
+  "الأنظمة القديمة بطيئة ومكلفة عند كل استدعاء، لذلك يقرأ الوكيل كل نظام مرة واحدة ويعيد استخدام ما قرأه.",
+  <>معظم الانتظار يحدث بين الأشخاص، لذلك يزيل <B>Jointly</B> التسليمات بينهم ويبقي كل فحص.</>,
 ];
 
 const systems: { name: string; tag: string; k: "r" | "w" | "c"; d: string }[] = [
@@ -67,29 +110,21 @@ const adminRun: [string, React.ReactNode, "warn" | "plain" | "ok"][] = [
   ["10:46", <>قراءة النتيجة: <B>0</B> اختلافات عن الخطة المعتمدة.</>, "ok"],
 ];
 
-const learned: React.ReactNode[] = [<>مراجعة خطابات <B>SVS</B></>, "إعادة استخدام حسابات الدخول الحالية", <>إعادة فحص <B>EFR</B> قبل التفعيل</>];
+const learned: React.ReactNode[] = [<>مراجعة خطابات <B>SVS</B></>, "إعادة استخدام حسابات الدخول الحالية", <>إعادة فحص <B>EFR</B> قبل منح الوصول</>];
 
 const lanes: { icon: React.ReactNode; title: string; items: string[]; never?: boolean }[] = [
   { icon: <AgentMark size={40} className="text-person-agent" />, title: "الوكيل يقوم بـ", items: ["قراءة كل السجلات", "بناء الخطة", "التنفيذ بعد الاعتماد"] },
   { icon: <ShieldCheck className="h-10 w-10 text-accent" />, title: "القواعد تحدد", items: ["من يوقّع", "حتى أي مبلغ", "من يُفعَّل"] },
-  { icon: <UserRound className="h-10 w-10 text-ink" />, title: "سارة تعتمد", items: ["القيم غير الواضحة", "اعتماد الخطة", "كل تفعيل"] },
+  { icon: <UserRound className="h-10 w-10 text-ink" />, title: "سارة تعتمد", items: ["القيم غير الواضحة", "اعتماد الخطة", "كل منح للوصول"] },
   { icon: <Ban className="h-10 w-10 text-bad" />, title: "ممنوع دائمًا", items: ["اعتماد عمله بنفسه", "إرسال كلمات المرور", "مطابقة الأشخاص بالاسم"], never: true },
 ];
 
-const patterns: { I: LucideIcon; title: string; why: React.ReactNode }[] = [
-  { I: Search, title: "طابِق بالمعرّف، لا بالاسم", why: <>الاسم يُكتب بـ <B>3</B> طرق في الأنظمة. المعرّف لا يتغيّر.</> },
-  { I: FileText, title: "لكل ادعاء مصدر", why: "سارة تراجع المصدر، لا كلام الوكيل." },
-  { I: AlertTriangle, title: "أظهِر ما لست متأكدًا منه", why: "انتباه سارة يذهب إلى القيمة الوحيدة التي تحتاجه." },
-  { I: Check, title: "الاعتماد يبقى مع المحتوى", why: "إذا تغيّرت الخطة، لا ينتقل الاعتماد القديم إليها." },
-  { I: ShieldCheck, title: "القواعد مكتوبة في الكود", why: "المُدخلات نفسها تعطي النتيجة نفسها، والتدقيق يستطيع إعادتها." },
-  { I: UserRound, title: "فعّل الآمن، وأوقف الباقي", why: <>شخصان يُفعَّلان اليوم، بدل أن ينتظر <B>3</B> بسبب هوية واحدة.</> },
-];
 
 const gaveUp: { d: React.ReactNode; why: string }[] = [
   { d: <>أبقيت <B>4</B> اعتمادات، كإجراء واحد</>, why: "ضوابط البنك تتطلب ذلك. نقرات أقل، والسجل نفسه." },
   { d: "بدون درجات ثقة", why: "الجهات الرقابية تسأل أي قاعدة طُبّقت، لا مدى ثقة النموذج." },
   { d: "لسطح المكتب فقط", why: "فريق خدمة العملاء يعمل على أجهزة البنك. الجوال منتج مختلف." },
-  { d: "التفعيل الجزئي فرضية", why: "لا يوجد دليل منشور بعد. أول ما يجب اختباره مع بنك." },
+  { d: "منح الوصول لشريكين من ثلاثة فرضية", why: "لا يوجد دليل منشور بعد. أول ما يجب اختباره مع بنك." },
 ];
 
 // Real quotes stay in their original English so nothing is put in someone's mouth.
@@ -117,7 +152,7 @@ const measures: React.ReactNode[] = [
 
 const unknowns: React.ReactNode[] = [
   "هل يبني إظهار ما لم يبحث عنه الوكيل الثقة؟",
-  <>هل سيسمح البنك بتفعيل <B>2</B> من <B>3</B> مفوّضين؟</>,
+  <>هل سيسمح البنك بمنح الوصول لاثنين من ثلاثة مفوّضين؟</>,
   "هل سيقبل فريق الأمن التفعيل الذاتي؟",
   "هل يمكن لمستخدم نظام أن يكون المُدخِل؟",
 ];
@@ -207,6 +242,18 @@ export default function CaseStudyAr() {
               </div>
             ))}
           </dl>
+          <ul className="mt-6 grid gap-6 border-t border-line pt-6 md:grid-cols-3">
+            {impact.map(([n, t, href]) => (
+              <li key={href} className="flex items-start gap-4">
+                <bdi className="tnum shrink-0 text-2xl font-semibold text-ink">{n}</bdi>
+                <p className="text-sm text-sub">
+                  {t}{" "}
+                  <a href={href} target="_blank" rel="noreferrer" className="text-xs underline underline-offset-2 hover:text-ink">المصدر</a>
+                </p>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-4 text-xs text-muted">أرقام من القطاع، وليست من بنك بعينه.</p>
         </div>
       </section>
 
@@ -283,6 +330,15 @@ export default function CaseStudyAr() {
             ))}
           </ul>
           <p className="mt-6 max-w-3xl text-sub">روبوت القواعد وحده يتعطل عند أول سطر بنص حر. والنموذج وحده لا يُؤتمن على المال. لذلك النموذج يقرأ، والقواعد تقرر.</p>
+          <p className="mt-10 text-sm font-semibold text-ink">كيف تحاول البنوك حل المشكلة</p>
+          <ul className="mt-3 divide-y divide-line overflow-hidden rounded-card border border-line bg-surface">
+            {fixes.map(([k, v], i) => (
+              <li key={i} className={`flex items-center gap-3 px-5 py-3 text-sm ${i === fixes.length - 1 ? "bg-ok-soft text-ok-ink" : "text-sub"}`}>
+                {i === fixes.length - 1 ? <Check aria-hidden className="h-4 w-4 shrink-0" /> : <Ban aria-hidden className="h-4 w-4 shrink-0 text-muted" />}
+                <span><span className="font-semibold text-ink">{k}</span> {v}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
@@ -293,7 +349,7 @@ export default function CaseStudyAr() {
             {systems.map((x) => (
               <li key={x.name} className="rounded-card border border-line bg-surface p-5">
                 <div className="flex items-center justify-between gap-2">
-                  <p lang="en" dir="ltr" className="font-sans font-semibold">{x.name}</p>
+                  <p lang="en" dir="ltr" className="font-sans font-semibold">{x.name === "EFR" ? <Gloss term="EFR" def={glossaryAr.EFR} /> : x.name}</p>
                   <span className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${x.k === "w" ? "bg-accent-soft text-accent-ink" : x.k === "c" ? "bg-ok-soft text-ok-ink" : "bg-panel text-sub"}`}>{x.tag}</span>
                 </div>
                 <p className="mt-2 text-sm text-sub">{x.d}</p>
@@ -310,6 +366,12 @@ export default function CaseStudyAr() {
               </li>
             ))}
           </ol>
+          <ul className="mt-8 grid gap-4 md:grid-cols-3">
+            {costLines.map((t) => (
+              <li key={t} className="flex gap-2 text-sm text-sub"><Check aria-hidden className="mt-0.5 h-4 w-4 shrink-0 text-ok" />{t}</li>
+            ))}
+          </ul>
+          <p className="mt-4 text-xs text-muted">أهداف تصميم من حالة مكتوبة مسبقًا، وليست قياسات.</p>
           <p className="mt-4 text-xs text-muted">أنظمة وبيانات افتراضية، مبنية على إعدادات مصرفية أساسية شائعة.</p>
         </div>
       </section>
@@ -374,6 +436,22 @@ export default function CaseStudyAr() {
               </div>
             ))}
           </div>
+          <div className="mt-8 overflow-hidden rounded-card border border-line bg-surface">
+            <table className="w-full text-start text-sm">
+              <thead className="bg-panel text-xs text-muted">
+                <tr><th scope="col" className="px-5 py-3 text-start font-medium">الشائع اليوم</th><th scope="col" className="px-5 py-3 text-start font-medium">ما يفعله <B>Jointly</B></th></tr>
+              </thead>
+              <tbody className="divide-y divide-line">
+                {compare.map(([a, b], i) => (
+                  <tr key={i}>
+                    <td className="px-5 py-3 text-sub">{a}</td>
+                    <td className="px-5 py-3 font-medium text-ink"><span className="flex gap-2"><Check aria-hidden className="mt-0.5 h-4 w-4 shrink-0 text-ok" />{b}</span></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="mt-3 text-xs text-muted">مقارنة لخيارات التصميم مع أكثر من <B>40</B> منتجًا ودراسة عن الوكلاء. <B>Jointly</B> نموذج أولي، لذلك لا توجد بيانات أداء بعد.</p>
           <p className="mt-8 text-sm text-sub">
             تنتهي كل حالة بسجل قرار يستطيع المدقق قراءته: القاعدة، والاقتباس، والمعتمِد، والوقت.{" "}
             <Link href="/demo/case/?view=record" className="text-accent-ink underline underline-offset-2">شاهد سجل <B>Creekside</B></Link>
@@ -417,18 +495,28 @@ export default function CaseStudyAr() {
         </div>
       </section>
 
-      <section id="patterns" className="border-t border-line">
+      <section id="about" className="border-t border-line">
         <div className="mx-auto max-w-6xl px-6 py-20">
-          <h2 className={h2}><B>6</B> أنماط أعيد استخدامها</h2>
-          <div className="mt-10 grid gap-4 sm:grid-cols-2 md:grid-cols-3">
-            {patterns.map(({ I, title, why: w }) => (
-              <div key={title} className="rounded-card border border-line bg-surface p-6">
-                <I aria-hidden className="h-6 w-6 text-accent" />
-                <p className="mt-4 font-semibold">{title}</p>
-                <p className="mt-1 text-sm text-sub">{w}</p>
-              </div>
-            ))}
+          <h2 className={h2}>عنّي</h2>
+          <div className="mt-8 grid gap-10 md:grid-cols-2">
+            <p className="text-sub">
+              أنا بسمة، مصممة منتجات في أبوظبي. تعلّمت تصميم الخدمات في بنك إماراتي، حين رسمت كيف تُسجَّل الشركات عبر الأشخاص والأنظمة القديمة، وصمّمت الإعداد الرقمي للمفوّضين بالتوقيع المشترك في تطبيق الأعمال الجديد للبنك. <B>Jointly</B> هو كيف كنت سأفعلها بطريقة مختلفة، بوكيل يتولى القراءة، فيملأ العملاء أقل، ويتلقى فريق العمليات طلبات أقل.
+            </p>
+            <div>
+              <p className="text-sm font-semibold text-ink">ما تعلّمته</p>
+              <ol className="mt-3 space-y-3">
+                {learnt.map((t, i) => (
+                  <li key={i} className="flex gap-3 text-sm text-sub">
+                    <span className="tnum shrink-0 font-semibold text-accent-ink"><B>{i + 1}</B></span>
+                    <span>{t}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
           </div>
+          <p className="mt-10 text-sm text-sub">
+            <span className="font-medium text-ink">من فعل ماذا:</span> قمت بالبحث وتصميم الخدمة وتصميم المنتج، وكتب <B>Devin</B> الكود من مواصفاتي.
+          </p>
         </div>
       </section>
 
@@ -448,15 +536,25 @@ export default function CaseStudyAr() {
 
       <section id="measure" className="border-t border-line">
         <div className="mx-auto max-w-6xl px-6 py-20">
-          <h2 className={h2}>كيف سأعرف أنه ينجح</h2>
-          <ul className="mt-8 grid gap-3 sm:grid-cols-2 md:grid-cols-4">
-            {measures.map((m, i) => (
-              <li key={i} className="rounded-card border border-line bg-surface p-5">
-                <span className={tag}>خطة، لا نتائج</span>
-                <p className="mt-3 text-sm font-medium">{m}</p>
+          <h2 className={h2}>لو بنيت هذا في بنك حقيقي، لبدأت بوضع المراقبة.</h2>
+          <p className="mt-3 max-w-3xl text-sm text-sub">البنوك حذرة مع الوكلاء بسبب التدقيق، ومخاطر النماذج، والوصول إلى الأنظمة القديمة، والمساءلة، لذلك تجيب كل مرحلة عن واحد منها.</p>
+          <ol className="mt-10 grid gap-6 md:grid-cols-4">
+            {phases.map(([when, title, d], i) => (
+              <li key={title}>
+                <div className="flex items-center gap-3">
+                  <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-accent-soft text-sm font-semibold text-accent-ink"><B>{i + 1}</B></span>
+                  {i < phases.length - 1 && <span aria-hidden className="h-px flex-1 bg-line" />}
+                </div>
+                <p className="mt-4 text-xs text-muted">{when}</p>
+                <p className="mt-1 font-semibold">{title}</p>
+                <p className="mt-2 text-sm text-sub">{d}</p>
               </li>
             ))}
-          </ul>
+          </ol>
+          <p className="mt-10 text-sm text-muted">
+            ما سأقيسه، خطة لا نتائج:{" "}
+            <span className="text-sub">{measures.map((m, i) => <span key={i}>{i > 0 && " · "}{m}</span>)}</span>
+          </p>
         </div>
       </section>
 
@@ -498,6 +596,7 @@ export default function CaseStudyAr() {
             <p className="mt-3 text-sm text-sub">
               تصميم بسمة منور ·{" "}
               <a href="mailto:bismamunawardigital@gmail.com" className="underline-offset-2 hover:underline">البريد</a>
+              {PORTFOLIO_URL && <>{" · "}<a href={PORTFOLIO_URL} className="underline-offset-2 hover:underline">العودة إلى أعمال بسمة</a></>}
             </p>
             <p className="mt-1 text-xs text-muted">كل الأشخاص والحسابات والأنظمة البنكية افتراضية.</p>
             <p className="mt-3 inline-flex items-center gap-2 rounded-full bg-warn-soft px-3 py-1 text-xs font-medium text-warn-ink">
