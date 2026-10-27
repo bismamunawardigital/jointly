@@ -191,7 +191,7 @@ function ScanCheck({ canAct, onConfirm, onReturn }: { canAct: boolean; onConfirm
                 <span className="text-xs text-muted">AED</span>
                 <input id="scan-value" inputMode="numeric" autoComplete="off" value={value} onChange={(e) => setValue(e.target.value)} className="tnum h-9 w-32 rounded-lg border border-line bg-surface px-2.5 text-sm outline-none focus:border-accent" />
               </div>
-              <p className="mt-1 text-xs text-sub">Type what you read. You&apos;ll see the agent&apos;s reading after.</p>
+              <p className="mt-1 text-xs text-sub">{clean ? "Type what the clean copy says." : <>Type what you read. You&apos;ll see the agent&apos;s reading after.</>}</p>
               <Button type="submit" variant="primary" className="mt-2" disabled={!(n > 0)}>
                 Check
               </Button>
