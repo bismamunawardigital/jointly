@@ -176,7 +176,14 @@ export default function CaseStudyAr() {
           </p>
           <p className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm">
             <Gloss term="المفوّضون بالتوقيع المشترك" def="شخصان أو أكثر يجب أن يعتمدوا مدفوعات الشركة معًا." />
-            <Gloss term="خدمة العملاء (CF)" def="فريق البنك الذي يُعدّ الخدمات المصرفية الرقمية للشركات يدويًا." />
+            <Gloss term="فريق العمليات" def="فريق البنك الذي يُعدّ الخدمات المصرفية الرقمية للشركات يدويًا. بعض البنوك تسميه CF." />
+            <Gloss term="RCIF" def="رقم العميل الفريد في النظام المصرفي الأساسي، فلكل شخص رقم واحد مهما اختلفت كتابة اسمه." />
+            <Gloss term="Finacle" def="النظام المصرفي الأساسي للبنك، وفيه بيانات العملاء والحسابات." />
+            <Gloss term="SVS" def="نظام التحقق من التوقيع، ويحفظ التفويضات والخطابات الموقّعة، وغالبًا تكون صورًا ممسوحة." />
+            <Gloss term="EFR" def="التحقق من الهوية الإماراتية بالوجه، ويتأكد أن الهوية سارية وأن الوجه يطابقها." />
+            <Gloss term="التفويض" def="القاعدة المكتوبة للشركة التي تحدد من يعتمد المدفوعات وحتى أي مبلغ." />
+            <Gloss term="المنشئ والمدقق" def="شخص يُعدّ التغيير وشخص ثانٍ يراجعه، والبنوك تطبق هذا على كل تغيير." />
+            <Gloss term="Digital Banking Admin" def="الشاشة الخلفية التي يُعدّ فيها مستخدمو الخدمات المصرفية الرقمية وأدوارهم وقواعد الاعتماد." />
           </p>
           <dl className="mt-6 grid grid-cols-3 gap-4 md:gap-6">
             {statsAr.map((s) => (
@@ -363,6 +370,9 @@ export default function CaseStudyAr() {
       <section id="roles" className="border-t border-line">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className={h2}>من يقرر ماذا</h2>
+          <p className="mt-3 text-lg font-medium">الوكيل منشئ، ولا يمكن أبدًا أن يكون مدقق عمله.</p>
+          <p className="mt-1 text-sub">إذا وصلت الحالة إلى 3 استثناءات في القواعد، تنتقل إلى مدقق أقدم.</p>
+          <p className="mt-1 text-xs text-muted">مبني على <a className="underline" href="https://artificialintelligenceact.eu/article/14/" target="_blank" rel="noreferrer">المادة 14 من قانون الذكاء الاصطناعي الأوروبي</a> و<a className="underline" href="https://www.wam.ae/en/article/byvw3l2-cbuae-issues-guidance-note-protect-consumers-and" target="_blank" rel="noreferrer">إرشادات مصرف الإمارات المركزي لعام 2026</a>. هذه قراءتي، وليست رأيًا قانونيًا.</p>
           <div className="mt-10 grid gap-4 sm:grid-cols-2 md:grid-cols-4">
             {lanes.map((l) => (
               <div key={l.title} className="rounded-card border border-line bg-surface p-6">
