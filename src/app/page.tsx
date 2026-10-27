@@ -15,11 +15,11 @@ import { statsEn } from "@/content/stats";
 const stats = statsEn;
 
 const in30: [string, string][] = [
-  ["Problem", "4 to 5 days of manual setup and courier PINs"],
-  ["User", "Sara, a checker in a UAE bank's accounts operations team"],
-  ["What I built", "An agent that prepares, rules that check, a screen Sara approves on"],
-  ["Outcome", "Under 2 hours, 2 setup decisions (synthetic case, not measured)"],
-  ["My role", "Research, service design, product design, prototype built with Devin"],
+  ["Problem", "5 days of manual setup"],
+  ["User", "Sara, a checker"],
+  ["What I built", "An agent, rules and a review screen"],
+  ["Outcome", "Under 2 hours (synthetic case, not measured)"],
+  ["My role", "Research, design, prototype"],
 ];
 
 const swim = {
@@ -158,16 +158,16 @@ const sources = [
 ];
 
 const why: [string, string][] = [
-  ["The mandate is free text. 'Khalifa alone up to 10,000' lives in a scanned letter, not a field.", "The agent reads it and quotes the line."],
-  ["The systems disagree. Finacle says 'any two'. SVS has the detail.", "Rules pick the newer, more specific source and show why."],
-  ["There's no API to write to. Digital Banking Admin is a screen that times out.", "The agent writes step by step, reads it back and retries safely."],
+  ["The mandate is free text in a scanned letter.", "The agent reads it and quotes the line."],
+  ["Finacle and SVS disagree.", "Rules pick the newer source."],
+  ["Digital Banking Admin has no API.", "The agent writes, reads back and retries."],
 ];
 
 const systems: { name: string; tag: "Read" | "Write" | "Check"; d: string }[] = [
-  { name: "Finacle", tag: "Read", d: "Customer records and the short mandate code" },
-  { name: "SVS", tag: "Read", d: "Signed mandates and letters, often scanned" },
-  { name: "EFR", tag: "Check", d: "Is the Emirates ID valid today?" },
-  { name: "Digital Banking Admin", tag: "Write", d: "Users, roles, rules, workflows. Assumed: no write API." },
+  { name: "Finacle", tag: "Read", d: "Customer records" },
+  { name: "SVS", tag: "Read", d: "Signed mandates and letters" },
+  { name: "EFR", tag: "Check", d: "Emirates ID check" },
+  { name: "Digital Banking Admin", tag: "Write", d: "Users, roles and rules" },
 ];
 
 const adminRun: [string, string, "warn" | "plain" | "ok"][] = [
@@ -177,10 +177,10 @@ const adminRun: [string, string, "warn" | "plain" | "ok"][] = [
 ];
 
 const measures = [
-  "Shadow agreement: how often the agent's plan matches the maker's",
-  "Override rate: how often Sara changes what the agent read",
-  "Form to first login, per case",
-  "Unapproved writes: must stay at 0",
+  "Shadow agreement with the maker",
+  "How often Sara changes a reading",
+  "Form to first login",
+  "Unapproved writes, always 0",
 ];
 
 const elsewhere: [string, string][] = [
@@ -190,8 +190,8 @@ const elsewhere: [string, string][] = [
 ];
 
 const unknowns = [
-  "Does showing what the agent didn't search build trust?",
-  "Will a bank allow 2 of 3 signatories to go live?",
+  "Does showing what it didn't search build trust?",
+  "Will a bank let 2 of 3 go live?",
   "Will security accept self-service activation?",
   "Can a system user be the maker?",
 ];
@@ -213,8 +213,8 @@ export default function CaseStudy() {
       <section id="hero" className="mx-auto grid max-w-6xl items-start gap-10 px-6 pb-12 pt-2 md:grid-cols-[1fr_1.05fr] md:pt-4">
         <div>
           <p className="text-[13px] text-muted">Case study · Agentic AI for bank operations · Bisma Munawar, Product Designer</p>
-          <h1 className="mt-3 font-display text-[36px] leading-[1.05] tracking-tight md:text-[50px]">Sara sets up 3 signatories before lunch. The agent can&apos;t sign anything.</h1>
-          <p className="mt-4 max-w-xl text-base text-sub md:text-lg">An AI agent does a bank&apos;s back-office setup across 4 legacy systems. A person still approves every decision that moves money.</p>
+          <h1 className="mt-3 font-display text-[36px] leading-[1.05] tracking-tight md:text-[50px]">A company with 3 signatories usually waits 5 days to get online banking, and Jointly gets them live before lunch.</h1>
+          <p className="mt-4 max-w-xl text-base text-sub md:text-lg">Jointly is an AI agent that prepares the setup from the bank&apos;s old systems, and a person approves every step.</p>
           <p className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm">
             <Gloss term="Joint signatories" def="2 or more people who must approve a company's payments together." />
             <Gloss term="Accounts operations team" def="The bank team that sets up their online banking by hand." />
@@ -234,7 +234,7 @@ export default function CaseStudy() {
           </div>
           <p className="mt-3 text-[11px] text-muted">Synthetic case. Not measured in a real bank.</p>
         </div>
-        <HeroFrame callouts={["The agent pulled every record from Finacle, SVS and EFR", "Green = copied exactly. Amber = the agent had to read a document", "Sara only decides the amber one. Then she signs off."]} />
+        <HeroFrame callouts={["Every record from Finacle, SVS and EFR", "Green is exact, amber was read", "Sara decides the amber one"]} />
       </section>
 
       <section id="in30" aria-label="In 30 seconds" className="border-y border-line">
@@ -272,7 +272,6 @@ export default function CaseStudy() {
             </ul>
           </div>
         </div>
-        <p className="mt-4 text-sm text-sub">A typical morning across several cases. The demo opens one of them.</p>
       </section>
 
       <section id="slow" className="border-y border-line">
@@ -329,7 +328,6 @@ export default function CaseStudy() {
               </li>
             ))}
           </ul>
-          <p className="mt-6 max-w-3xl text-sub">A rules-only bot breaks on the first free-text line. A model alone can&apos;t be trusted with money. So the model reads and the rules decide.</p>
         </div>
       </section>
 
@@ -364,7 +362,7 @@ export default function CaseStudy() {
       <section id="shadow" className="border-t border-line">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className={h2}>It watched before it acted</h2>
-          <p className="mt-2 max-w-2xl text-sub">Before it acts, the agent runs in shadow mode. It watches the accounts operations team&apos;s makers and compares its plan with theirs.</p>
+          <p className="mt-2 max-w-2xl text-sub">First the agent watches the accounts operations team&apos;s makers and compares its plan with theirs.</p>
           <div className="mt-8 flex flex-col gap-4 md:flex-row md:items-center">
             <p className="rounded-card border border-line bg-surface px-5 py-4"><span className="tnum font-display text-3xl">12</span> <span className="text-sm text-sub">maker cases observed</span></p>
             <ArrowRight className="h-5 w-5 rotate-90 text-accent md:rotate-0" />
@@ -383,7 +381,6 @@ export default function CaseStudy() {
         <div className="mt-8">
           <LiveGrid />
         </div>
-        <p className="mt-4 text-sm text-sub">17 cells match bank records. Sara checks the 1 value the agent had to read.</p>
       </section>
 
       <section id="mandate" className="border-t border-line mx-auto max-w-6xl px-6 py-20">
@@ -422,7 +419,7 @@ export default function CaseStudy() {
             ))}
           </div>
           <p className="mt-8 text-sm text-sub">
-            Every case ends with a decision record an examiner can read: rule, quote, approver, time.{" "}
+            Every case ends with a decision record an examiner can read.{" "}
             <Link href="/demo/case/?view=record" className="text-accent-ink underline underline-offset-2">See Creekside&apos;s</Link>
           </p>
         </div>
@@ -433,7 +430,7 @@ export default function CaseStudy() {
           <h2 className={h2}>What I heard, what I changed</h2>
           <div className="mt-10 max-w-2xl rounded-card border border-line bg-surface p-6">
             <span className="rounded-full border border-line px-2.5 py-0.5 text-xs text-muted">Paraphrased</span>
-            <p className="mt-3 font-display text-lg leading-snug">Setting up one joint-signatory business takes 4 to 5 days. Most of it is reading customer documents and free-text instructions in SVS, then setting it up by hand.</p>
+            <p className="mt-3 font-display text-lg leading-snug">Setting up one joint-signatory business takes 4 to 5 days.</p>
             <p className="mt-2 text-xs text-muted">Accounts operations team member, paraphrased from an interview</p>
             <ArrowRight className="my-4 h-4 w-4 rotate-90 text-accent" />
             <p className="text-sm font-medium">So the agent reads, and Sara only checks what it read.</p>
@@ -475,7 +472,6 @@ export default function CaseStudy() {
               <div key={p.title} className="rounded-card border border-line bg-surface p-6">
                 <div aria-hidden className="flex h-12 items-center">{p.mini}</div>
                 <p className="mt-4 font-semibold">{p.title}</p>
-                <p className="mt-1 text-sm text-sub">{p.why}</p>
               </div>
             ))}
           </div>
@@ -489,7 +485,6 @@ export default function CaseStudy() {
             {gaveUp.map((g) => (
               <li key={g.d} className="rounded-card border border-line bg-surface p-6">
                 <p className="font-medium">{g.d}</p>
-                <p className="mt-1 text-sm text-sub">{g.why}</p>
               </li>
             ))}
           </ul>
@@ -527,13 +522,12 @@ export default function CaseStudy() {
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className={h2}>Where I&apos;d use this pattern next</h2>
           <ul className="mt-8 grid gap-3 md:grid-cols-3">
-            {elsewhere.map(([k, v]) => (
+            {elsewhere.map(([k]) => (
               <li key={k} className="rounded-card border border-line bg-surface p-5">
                 <div className="flex items-center justify-between">
                   <p className="font-semibold">{k}</p>
                   <span className="rounded-full border border-line px-2 py-0.5 text-[11px] text-muted">Illustrative</span>
                 </div>
-                <p className="mt-2 text-sm text-sub">{v}</p>
               </li>
             ))}
           </ul>
