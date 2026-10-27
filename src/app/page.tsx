@@ -12,6 +12,7 @@ import { LangSwitch } from "@/components/landing/LangSwitch";
 import { SectionNav } from "@/components/landing/SectionNav";
 import { Tabs } from "@/components/landing/Tabs";
 import { statsEn } from "@/content/stats";
+import { CountUp, hm } from "@/components/CountUp";
 import { PORTFOLIO_URL } from "@/content/links";
 
 const stats = statsEn;
@@ -237,7 +238,7 @@ export default function CaseStudy() {
           <dl className="mt-6 grid grid-cols-3 gap-4 md:gap-6">
             {stats.map((s) => (
               <div key={s.k}>
-                <dd className="tnum whitespace-nowrap font-display text-2xl md:text-3xl">{s.v}</dd>
+                <dd className="tnum whitespace-nowrap font-display text-2xl md:text-3xl"><CountUp to={s.n} format={s.n === 114 ? hm : undefined} /></dd>
                 <dt className="mt-1 text-xs text-muted">{s.k}</dt>
               </div>
             ))}
@@ -251,7 +252,7 @@ export default function CaseStudy() {
           <div className="mt-5 flex items-center gap-2 text-sub" aria-hidden>
             <FileText className="h-4 w-4" /><ArrowRight className="h-3 w-3 text-muted" /><ShieldCheck className="h-4 w-4" /><ArrowRight className="h-3 w-3 text-muted" /><UserRound className="h-4 w-4" />
           </div>
-          <p className="mt-1.5 text-sm text-sub">The agent reads the records, the bank&apos;s rules check its work, and Sara approves what goes live.</p>
+          <p className="mt-1.5 text-sm text-sub"><span className="light-step">The agent reads the records</span>, <span className="light-step [animation-delay:300ms]">the bank&apos;s rules check its work</span>, and <span className="light-step [animation-delay:600ms]">Sara approves what goes live</span>.</p>
         </div>
         <HeroFrame callouts={["The agent pulled every record from Finacle, SVS and EFR", "Amber means the agent had to read a document", "Sara decides that one value, then signs off"]} />
       </section>

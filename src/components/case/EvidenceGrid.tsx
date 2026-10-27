@@ -1,7 +1,7 @@
 "use client";
 
 import { NameMatch, PeekMock } from "@/components/case/SourcePeek";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AlertTriangle, Check, X } from "lucide-react";
 import { EvidenceKey, evidence, people } from "@/data/seed";
 import { buildRules, fmt, singleLimit } from "@/lib/rules";
@@ -83,6 +83,12 @@ export function EvidenceGrid() {
   const all = rows.flatMap((r) => r.cells);
   const count = (t: Tone) => new Set(all.filter((c) => c.tone === t).map((c, i) => (t === "warn" ? c.src : i))).size;
   const [peek, setPeek] = useState<string | null>(null);
+  const [first, setFirst] = useState(false);
+  useEffect(() => {
+    if (sessionStorage.getItem("jointly-ticked")) return;
+    sessionStorage.setItem("jointly-ticked", "1");
+    setFirst(true);
+  }, []);
   const act = () => (document.activeElement as HTMLElement | null)?.click();
   const goLetter = (c: CellData) => {
     if (c.tone === "warn") {
@@ -153,6 +159,8 @@ export function EvidenceGrid() {
                         tabIndex={r === 0 && c === 0 ? 0 : -1}
                         aria-label={`${row.name}, ${cols[c]}: ${toneWord[cell.tone]}, ${cell.text}`}
                         title="View source"
+                        data-anim={first ? cell.tone : undefined}
+                        style={{ ["--c" as string]: c } as React.CSSProperties}
                         onClick={() => setPeek(peek === key ? null : key)}
                         onKeyDown={(e) => e.key === "Escape" && setPeek(null)}
                         onMouseEnter={() => setActive(key)}
@@ -173,7 +181,7 @@ export function EvidenceGrid() {
                         <span className={/^(EID|RCIF) /.test(cell.text) ? "min-w-0 whitespace-nowrap tnum text-xs" : "min-w-0"}>{cell.text}</span>
                       </button>
                       {peek === key && (
-                        <div className="absolute start-0 top-full z-40 mt-1 w-80 rounded-lg border border-line bg-surface p-3 text-start shadow-lg">
+                        <div className="peek-grow absolute start-0 top-full z-40 mt-1 w-80 rounded-lg border border-line bg-surface p-3 text-start shadow-lg">
                           <PeekMock col={c} person={row.name.split(" ")[0].toLowerCase()} />
                           <div className="mt-2 flex justify-between text-xs">
                             {cell.tone === "warn" ? <button type="button" className="font-medium text-accent-ink hover:underline" onClick={() => goLetter(cell)}>Check this value</button> : cell.src ? <button type="button" className="text-accent-ink hover:underline" onClick={() => goLetter(cell)}>Open the full source</button> : <span />}

@@ -82,7 +82,7 @@ export function GuideRail() {
           return (
             <li key={t.label}>
               <button type="button" onClick={() => emit("jointly:spot-go")} className={cn("flex w-full gap-2 text-left", i === cur ? "font-semibold text-ink" : "text-sub")}>
-                <span className={cn("mt-0.5 flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full", ok ? "bg-ok text-onaccent" : i === cur ? "bg-brand" : "border border-line")}>{ok && <Check className="h-2.5 w-2.5" strokeWidth={3} />}</span>
+                <span className={cn("mt-0.5 flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full", ok ? "tick-in bg-ok text-onaccent" : i === cur ? "slide-in-end bg-brand" : "border border-line")}>{ok && <Check className="h-2.5 w-2.5" strokeWidth={3} />}</span>
                 {t.label}
               </button>
             </li>

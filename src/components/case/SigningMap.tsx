@@ -174,7 +174,7 @@ export function SigningMap({ compact = false, part = "all" }: { compact?: boolea
           ))}
         </div>
         {!compact && (
-          <span className="pointer-events-none absolute -inset-y-1 z-10 w-0.5 rounded bg-ink transition-[left] duration-150" style={{ left: pos(amount) }} aria-hidden />
+          <span className="pointer-events-none absolute -inset-y-1 z-10 w-0.5 rounded bg-ink transition-[left] duration-300 ease-out" style={{ left: pos(amount) }} aria-hidden />
         )}
         <button
           type="button"
