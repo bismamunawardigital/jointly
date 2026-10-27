@@ -137,7 +137,19 @@ function ScanLens({ src, alt }: { src: string; alt: string }) {
   );
 }
 
+function CleanLetter() {
+  return (
+    <div className="rounded-lg border border-line bg-white p-5 font-serif text-[15px] leading-relaxed text-[#1b1b1b]">
+      <p className="font-semibold">Subject: Amendment to signing mandate</p>
+      <p className="mt-2">The single-signing limit of Khalifa Saeed Al Falasi is revised to AED 25,000 with effect from 01-Mar-2023. All other terms of the 2019 mandate remain unchanged.</p>
+    </div>
+  );
+}
+
 function ScanCheck({ canAct, onConfirm, onReturn }: { canAct: boolean; onConfirm: (v: number) => void; onReturn: (v: number) => void }) {
+  const { state, dispatch } = useStore();
+  const clean = state.copy === "received";
+  const waiting = state.copy === "requested";
   const [value, setValue] = useState("");
   const [checked, setChecked] = useState<number | null>(null);
   const n = Number(value.replace(/[^0-9.]/g, ""));
@@ -149,15 +161,23 @@ function ScanCheck({ canAct, onConfirm, onReturn }: { canAct: boolean; onConfirm
   return (
     <div className="mt-4 rounded-lg border border-warn/40 bg-surface p-4">
       <p className="flex items-center gap-1.5 text-sm font-medium text-warn-ink">
-        <AlertTriangle className="h-4 w-4 shrink-0" /> A 2023 letter may change Khalifa&apos;s limit. The scan is unclear.
+        <AlertTriangle className="h-4 w-4 shrink-0" /> {clean ? "The branch sent a clean copy of the 2023 letter. Check it again." : "A 2023 letter may change Khalifa's limit. The scan is unclear."}
       </p>
       <div className="mt-3 flex flex-wrap items-start gap-5">
         <figure className="w-[520px] max-w-full">
-          <ScanLens src="/scans/svs-amd-2023.png" alt="Scan of the 2023 amendment letter. The last digits of the amount are smudged." />
-          <figcaption className="mt-1 text-[11px] text-muted">2023 amendment letter · scan from SVS · click to zoom</figcaption>
+          {clean ? <CleanLetter /> : <ScanLens src="/scans/svs-amd-2023.png" alt="Scan of the 2023 amendment letter. The last digits of the amount are smudged." />}
+          <figcaption className="mt-1 text-[11px] text-muted">{clean ? "2023 amendment letter · clean copy from the branch" : "2023 amendment letter · scan from SVS · click to zoom"}</figcaption>
         </figure>
         <div className="min-w-[220px] flex-1 space-y-3 text-sm">
-          {canAct && checked === null && (
+          {waiting && (
+            <div className="space-y-3">
+              <p className="text-warn-ink">You read <span className="tnum font-medium">AED {fmt(state.disagreed ?? 0)}</span>, so the agent asked the branch for a clean copy. The case waits, and the agent&apos;s reading isn&apos;t used.</p>
+              <Button variant="ghost" className="border border-dashed border-line" onClick={() => dispatch({ type: "cleanCopy" })}>
+                Skip ahead: the branch sends a clean copy
+              </Button>
+            </div>
+          )}
+          {!waiting && canAct && checked === null && (
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -177,7 +197,7 @@ function ScanCheck({ canAct, onConfirm, onReturn }: { canAct: boolean; onConfirm
               </Button>
             </form>
           )}
-          {(checked !== null || !canAct) && (
+          {!waiting && !clean && (checked !== null || !canAct) && (
             <div>
               <p className="text-xs text-muted">The agent read</p>
               <p className="tnum mt-0.5 font-medium">
@@ -185,15 +205,15 @@ function ScanCheck({ canAct, onConfirm, onReturn }: { canAct: boolean; onConfirm
               </p>
             </div>
           )}
-          {canAct && checked !== null && (
+          {!waiting && canAct && checked !== null && (
             <div className={cn("rounded-lg border p-3", match ? "border-ok/40 bg-ok-soft" : "border-warn/40 bg-surface")}>
               {match ? (
                 <p className="flex items-center gap-1.5 font-medium text-ok-ink">
-                  <Check className="h-4 w-4" /> You and the agent both read 25,000
+                  <Check className="h-4 w-4" /> {clean ? "You read 25,000, the same as the clean copy" : "You and the agent both read 25,000"}
                 </p>
               ) : (
                 <p className="text-warn-ink">
-                  You read <span className="tnum font-medium">AED {fmt(checked)}</span>. The agent read AED 25,000.
+                  You read <span className="tnum font-medium">AED {fmt(checked)}</span>. {clean ? "The clean copy shows AED 25,000." : "The agent read AED 25,000."}
                 </p>
               )}
               <div className="mt-2 flex flex-wrap gap-2">
@@ -443,7 +463,7 @@ export function ReviewView() {
 
             {s.id === 3 && !valid && (
               version === 1 ? (
-                <ScanCheck canAct={canAct && !returning} onConfirm={(v) => dispatch({ type: "confirm", value: v })} onReturn={(v) => dispatch({ type: "return", note: `Sara reads AED ${fmt(v)} on the scan, not AED 25,000. Get a clean copy from the branch.` })} />
+                <ScanCheck key={state.copy ?? "none"} canAct={canAct && !returning} onConfirm={(v) => dispatch({ type: "confirm", value: v })} onReturn={(v) => dispatch({ type: "disagree", value: v })} />
               ) : (
                 <>
                   <p className="mt-3 flex items-center gap-1.5 text-xs text-ok-ink">

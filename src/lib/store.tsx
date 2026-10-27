@@ -41,6 +41,8 @@ export interface State {
   approvals: Partial<Record<1 | 2 | 3 | 4, Approval>>;
   returned?: { stageId: 3; note: string };
   confirmed?: number;
+  disagreed?: number;
+  copy?: "requested" | "received";
   cleanupTicket: "draft" | "sent";
   tourOn: boolean;
   tourStep: number;
@@ -69,6 +71,8 @@ export const initialState: State = autoVerify({
 type Action =
   | { type: "start"; group: Group }
   | { type: "reveal" }
+  | { type: "disagree"; value: number }
+  | { type: "cleanCopy" }
   | { type: "approve"; stageId: 1 | 2 | 3 | 4 }
   | { type: "return"; note: string }
   | { type: "confirm"; value: number }
@@ -170,11 +174,22 @@ function reducer(s: State, a: Action): State {
       const log = [...s.log, human("signoff", "Mon 10:40", `Signed off plan v${versionOf(s)} · 4 stages`)];
       return { ...s, log, phase: "executing", queue: groupEvents("execute"), queueGroup: "execute" };
     }
+    case "disagree": {
+      const log = [...s.log, human(`disagree-${s.log.length}`, "Mon 10:07", `Read AED ${a.value.toLocaleString("en-US")} on the scan, not the agent's AED 25,000. Asked the branch for a clean copy, and the case waits.`)];
+      return { ...s, log, disagreed: a.value, copy: "requested" };
+    }
+    case "cleanCopy": {
+      if (s.copy !== "requested") return s;
+      const log = [...s.log, human("clean-copy", "Mon 10:31", "Demo control: the branch sent a clean copy of the 2023 letter", "Demo")];
+      return { ...s, log, copy: "received" };
+    }
     case "return": {
       const log = [...s.log, human("return-3", "Mon 10:07", `Returned stage 3: ${a.note}`)];
+      if (s.confirmed === undefined) return { ...s, log: [...log, human(`wait-${s.log.length}`, "Mon 10:07", "Asked the branch for a clean copy of the 2023 letter, and the case waits", "Agent")], returned: { stageId: 3, note: a.note }, copy: "requested" };
       return { ...s, log, returned: { stageId: 3, note: a.note }, phase: "revising", queue: groupEvents("revise"), queueGroup: "revise" };
     }
     case "confirm": {
+      if (s.copy === "requested") return s;
       const log = [...s.log, human("confirm-3", "Mon 10:07", `Checked the 2023 letter scan: AED ${a.value.toLocaleString("en-US")}`)];
       return { ...s, log, confirmed: a.value, phase: "revising", queue: groupEvents("revise"), queueGroup: "revise" };
     }
