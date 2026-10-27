@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Gloss } from "@/components/landing/Gloss";
+import { EidCard } from "@/components/case/EidCard";
 import { glossary } from "@/content/glossary";
 import { AlertTriangle, Check, X } from "lucide-react";
 import { EvidenceKey, evidence, people } from "@/data/seed";
@@ -45,25 +46,17 @@ function Outlined({ text, needle }: { text: string; needle?: string }) {
 
 function FinacleCrop({ id }: { id: string }) {
   const p = people.find((x) => x.id === id)!;
-  const cifName = evidence[`cif-${id}` as EvidenceKey].body.split(",")[0].replace(/^\d+ /, "");
   const svsName = new RegExp(`([^.]*) \\(RCIF ${p.rcif}\\)`).exec(evidence["svs-signatories"].body)?.[1].trim() ?? p.name;
-  const f = (k: string, v: string, mark?: boolean) => (
-    <div className="grid grid-cols-[92px_1fr] items-center gap-2">
-      <span className="text-[10px] font-semibold text-[#1f2d3d]">{k}</span>
-      <span className={cn("border border-[#9aa7b4] bg-white px-1.5 py-0.5 font-mono text-[10px] text-black", mark && "outline outline-2 outline-offset-1 outline-accent")}>{v}</span>
-    </div>
-  );
   return (
     <div className="space-y-2">
-      <div className="overflow-hidden rounded border border-[#9aa7b4] bg-[#eef1f5]">
-        <div className="bg-gradient-to-b from-[#5a7184] to-[#3e5568] px-2 py-1 text-[10px] font-semibold text-white">Inquire on Customer</div>
-        <div className="space-y-1 p-2">
-          {f("CIF ID", p.rcif)}
-          {f("Customer Name", cifName)}
-          {f("Emirates ID", `•••• ${p.eidLast4}`, true)}
-          {f("Mobile", `•••• ${p.mobileLast4 ?? ""}`)}
+      <figure>
+        <div className="relative overflow-hidden rounded border border-[#9aa7b4]">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/sources/finacle-cif.png" alt="Finacle Inquire on Signatures screen, with the CIF ID field outlined" className="block w-full" />
+          <span className="absolute flex items-center bg-white px-1 font-mono text-[9px] leading-none text-black outline outline-2 outline-offset-1 outline-accent" style={{ left: "39.1%", top: "47.9%", width: "28.8%", height: "6.1%" }}>{p.rcif}</span>
         </div>
-      </div>
+        <figcaption className="mt-1 text-[11px] text-muted">The Finacle screen the agent reads. The CIF ID is filled in for this demo.</figcaption>
+      </figure>
       <p className="text-ink">
         The SVS mandate says <q>{svsName}</q> and the form says <q>{p.name}</q>. The agent matched them by Emirates ID and <Gloss term="RCIF" def={glossary.RCIF} />, so it doesn&apos;t matter how the name is written.
       </p>
@@ -240,13 +233,14 @@ export function EvidenceGrid() {
                         <span className={/^(EID|RCIF) /.test(cell.text) ? "min-w-0 whitespace-nowrap font-mono text-[11px]" : "min-w-0"}>{cell.text}</span>
                       </button>
                       {pinned === key && (
-                        <div role="dialog" aria-label={`Source for ${row.name}, ${cols[c]}`} style={rect ? { left: Math.min(rect.left + 8, window.innerWidth - 336), ...(rect.bottom + 360 > window.innerHeight ? { bottom: window.innerHeight - rect.top + 4 } : { top: rect.bottom + 4 }) } : undefined}
-                          className="fixed z-50 w-80 rounded-lg border border-line bg-surface p-3 text-xs text-sub shadow-lg">
+                        <div role="dialog" aria-label={`Source for ${row.name}, ${cols[c]}`} style={rect ? { left: Math.min(rect.left + 8, window.innerWidth - (c === 1 ? 432 : 336)), ...(rect.bottom + (c === 1 || c === 2 ? 520 : 360) > window.innerHeight ? { bottom: window.innerHeight - rect.top + 4 } : { top: rect.bottom + 4 }) } : undefined}
+                          className={cn("fixed z-50 rounded-lg border border-line bg-surface p-3 text-xs text-sub shadow-lg", c === 1 ? "w-[26rem]" : "w-80")}>
                           <div className="mb-2 flex items-center justify-between gap-2">
                             <span className="font-medium text-ink">{cell.src ? evidence[cell.src].system : cols[c]}</span>
                             <button type="button" aria-label="Close" onClick={() => setPinned(null)} className="rounded p-0.5 text-muted hover:text-ink"><X className="h-3.5 w-3.5" /></button>
                           </div>
                           {cell.src && <p className="mb-1 font-mono text-[11px] text-muted">{evidence[cell.src].ref} · {evidence[cell.src].title}</p>}
+                          {c === 2 && row.id !== "mandate" && <EidCard id={row.id} expired={cell.tone === "bad"} />}
                           {c === 1 && row.id !== "mandate" ? <FinacleCrop id={row.id} /> : (
                           <p className="rounded-md bg-panel p-2 leading-relaxed text-ink">
                             {cell.src ? (
@@ -261,7 +255,7 @@ export function EvidenceGrid() {
                           )}
                           <p className="mt-2">{checkedBy[c]}</p>
                           <div className="mt-2 flex items-center justify-between gap-2 text-[11px] text-muted">
-                            <span>Synthetic record</span>
+                            <span>{c === 1 ? "Real Finacle screen, demo data" : c === 2 ? "Illustrated ID, demo data" : "Synthetic record"}</span>
                             {cell.tone === "warn" ? (
                               <button type="button" onClick={toLetter} className="font-medium text-accent-ink hover:underline">Go to the letter check</button>
                             ) : cell.src ? (

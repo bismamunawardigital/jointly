@@ -36,7 +36,11 @@ function Ids() {
   return (
     <span className="flex gap-1">
       {["MA", "KF", "RS"].map((x) => (
-        <span key={x} className={cn("grid h-7 w-10 place-items-center rounded-sm border text-[10px] font-medium", x === "RS" ? "border-warn bg-warn-soft text-warn-ink" : "border-line bg-surface text-ink")}>{x}</span>
+        <span key={x} className="relative">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/sources/emirates-id-sm.png" alt="" className={cn("h-7 w-auto rounded-[3px]", x === "RS" ? "ring-2 ring-warn" : "ring-1 ring-line")} />
+          <span className={cn("absolute -bottom-1 -right-1 rounded-full px-1 text-[8px] font-semibold leading-3", x === "RS" ? "bg-warn-soft text-warn-ink" : "bg-surface text-ink ring-1 ring-line")}>{x}</span>
+        </span>
       ))}
     </span>
   );
