@@ -194,7 +194,7 @@ export default function CaseStudyAr() {
             ))}
           </dl>
           <div className="mt-6">
-            <Link href="/demo/case/" className={primary}>
+            <Link href="/demo/case/?lang=ar" className={primary}>
               افتح العرض التجريبي (<B>5</B> دقائق) <ArrowLeft className="h-4 w-4" />
             </Link>
           </div>
@@ -386,7 +386,7 @@ export default function CaseStudyAr() {
           </div>
           <p className="mt-8 text-sm text-sub">
             تنتهي كل حالة بسجل قرار يستطيع المدقق قراءته: القاعدة، والاقتباس، والمعتمِد، والوقت.{" "}
-            <Link href="/demo/case/?view=record" className="text-accent-ink underline underline-offset-2">شاهد سجل <B>Creekside</B></Link>
+            <Link href="/demo/case/?view=record&lang=ar" className="text-accent-ink underline underline-offset-2">شاهد سجل <B>Creekside</B></Link>
           </p>
         </div>
       </section>
@@ -514,7 +514,7 @@ export default function CaseStudyAr() {
               المراجعة اللغوية من متحدث أصلي قيد الانتظار · <span lang="en" className="font-sans">Native review pending</span>
             </p>
           </div>
-          <Link href="/demo/case/" className={primary}>
+          <Link href="/demo/case/?lang=ar" className={primary}>
             افتح العرض التجريبي <ArrowLeft className="h-4 w-4" />
           </Link>
         </div>
