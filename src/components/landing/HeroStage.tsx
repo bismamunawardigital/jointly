@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import "./hero-stage.css";
-import { AGENT_PATH } from "@/components/ui";
+import { AgentMark } from "@/components/ui";
 
 const CHECK = <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5" /></svg>;
 const PAUSE = '<rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/>';
@@ -163,7 +163,7 @@ export function HeroStage() {
           </div>
           <div className="abs node" id="jh-agent" style={{ left: "37.6%", top: "42.1%", width: "24.8%", height: "12.9%" }}>
             <span className="ring" />
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d={AGENT_PATH} /></svg>AI agent
+            <AgentMark />AI agent
           </div>
           <div className="abs bubble" id="jh-bubble" style={{ left: "58%", top: "31%", width: "21%" }}>Can you check one value on this letter?</div>
           <div className="abs node" id="jh-approve" style={{ left: "41%", top: "63.6%", width: "18%", height: "9.3%", fontSize: "1.4cqw" }}>

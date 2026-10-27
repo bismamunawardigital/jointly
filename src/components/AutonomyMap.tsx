@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ArrowUpRight, Ban, Check, ShieldCheck, UserRound } from "lucide-react";
-import { AgentIcon } from "./ui";
+import { AgentMark } from "./ui";
 import type { Tab } from "@/lib/store";
 import { Lane, autonomy } from "@/data/autonomy";
 import { clsx } from "clsx";
@@ -8,7 +8,7 @@ import { clsx } from "clsx";
 const cn = clsx;
 
 const look: Record<Lane, { icon: React.ComponentType<{ className?: string }>; head: string; icon_: string }> = {
-  agent: { icon: AgentIcon, head: "border-t-accent", icon_: "text-accent" },
+  agent: { icon: AgentMark, head: "border-t-accent", icon_: "text-accent" },
   rules: { icon: ShieldCheck, head: "border-t-ok", icon_: "text-ok" },
   human: { icon: UserRound, head: "border-t-warn", icon_: "text-warn" },
   never: { icon: Ban, head: "border-t-bad", icon_: "text-bad" },

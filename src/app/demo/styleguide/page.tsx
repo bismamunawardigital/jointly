@@ -72,7 +72,7 @@ function Board({ theme }: { theme: "light" | "dark" }) {
             <span className="text-sm">Sara · ink</span>
           </div>
           <div className="flex items-center gap-2">
-            <AgentMark size={36} />
+            <AgentMark size={36} className="text-person-agent" />
             <span className="text-sm">Agent · graphite</span>
           </div>
         </div>

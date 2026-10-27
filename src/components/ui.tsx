@@ -213,25 +213,17 @@ export function Avatar({ id, size = 28, held = false }: { id: PersonId; size?: n
   );
 }
 
-export const AGENT_PATH = "M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z";
-
-export function AgentIcon({ className, style }: { className?: string; style?: React.CSSProperties }) {
+export function AgentMark({ size = 24, className, style, title }: { size?: number; className?: string; style?: React.CSSProperties; title?: string }) {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} style={style} aria-hidden="true">
-      <path d={AGENT_PATH} />
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={cn("shrink-0", className)} style={style} role={title ? "img" : undefined} aria-label={title} aria-hidden={title ? undefined : true}>
+      <line x1="5" y1="6" x2="12" y2="12" stroke="currentColor" strokeWidth="1.5" />
+      <line x1="5" y1="18" x2="12" y2="12" stroke="currentColor" strokeWidth="1.5" />
+      <line x1="12" y1="12" x2="20" y2="12" stroke="currentColor" strokeWidth="1.5" />
+      <circle cx="5" cy="6" r="2.5" fill="currentColor" />
+      <circle cx="5" cy="18" r="2.5" fill="currentColor" />
+      <circle cx="12" cy="12" r="3" fill="currentColor" />
+      <circle cx="20" cy="12" r="2.5" stroke="currentColor" strokeWidth="1.5" />
     </svg>
-  );
-}
-
-export function AgentMark({ size = 28 }: { size?: number }) {
-  return (
-    <span
-      className="inline-flex shrink-0 items-center justify-center rounded-full border border-person-agent/40 bg-person-agent/10 text-person-agent"
-      style={{ width: size, height: size }}
-      title="Agent"
-    >
-      <AgentIcon style={{ width: size * 0.5, height: size * 0.5 }} />
-    </span>
   );
 }
 

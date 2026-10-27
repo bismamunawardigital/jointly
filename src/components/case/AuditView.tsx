@@ -13,7 +13,7 @@ const lanes: { id: Lane; label: string; filter: string }[] = [
   { id: "rules", label: "Rules", filter: "Rules" },
 ];
 const mark: Record<Lane, React.ReactNode> = {
-  agent: <AgentMark size={20} />,
+  agent: <AgentMark size={20} className="text-person-agent" />,
   rules: <span className="flex h-5 w-5 items-center justify-center rounded-full bg-ok-soft text-ok-ink"><ShieldCheck className="h-3 w-3" /></span>,
   person: <span className="flex h-5 w-5 items-center justify-center rounded-full border border-ink"><UserRound className="h-3 w-3" /></span>,
 };

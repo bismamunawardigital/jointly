@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { business } from "@/data/seed";
 import { duration, lastTime, statusOf } from "@/lib/derive";
 import { Tab, hasEvent, useStore, jumpState, initialState, allApproved, State } from "@/lib/store";
-import { Pill, cn, AgentIcon } from "@/components/ui";
+import { Pill, cn, AgentMark } from "@/components/ui";
 import { eventById } from "@/lib/script";
 import { LegacyBeat, NeedsYou } from "./NeedsYou";
 import { ReplayRun } from "./ReplayRun";
@@ -29,7 +29,7 @@ const groups: Group[] = [
 ];
 const groupOf = (t: Tab) => groups.find((g) => g.sections.some((x) => x.id === t)) ?? groups[2];
 const how = [
-  { icon: AgentIcon, title: "The agent does it alone", line: "Reads, matches and drafts. Every step is logged with its source." },
+  { icon: AgentMark, title: "The agent does it alone", line: "Reads, matches and drafts. Every step is logged with its source." },
   { icon: Scale, title: "Rules decide", line: "Who can sign and up to what amount. Code, not a model." },
   { icon: UserCheck, title: "Sara approves", line: "Anything that changes who can move money." },
   { icon: Ban, title: "Never allowed", line: "Waiving EFR, approving its own work, seeing a password." },

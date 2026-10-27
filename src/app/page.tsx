@@ -57,7 +57,7 @@ const days: { day: string; label: string; icons: LucideIcon[] }[] = [
 ];
 
 const lanes: { icon: React.ReactNode; title: string; items: string[]; never?: boolean }[] = [
-  { icon: <AgentMark size={40} />, title: "Agent does", items: ["Reads every record", "Builds the plan", "Sets it up after approval"] },
+  { icon: <AgentMark size={40} className="text-person-agent" />, title: "Agent does", items: ["Reads every record", "Builds the plan", "Sets it up after approval"] },
   { icon: <ShieldCheck className="h-10 w-10 text-accent" />, title: "Rules decide", items: ["Who can sign", "Up to what amount", "Who can go live"] },
   { icon: <UserRound className="h-10 w-10 text-ink" />, title: "Sara approves", items: ["Unclear values", "The plan sign-off", "Every release"] },
   { icon: <Ban className="h-10 w-10 text-bad" />, title: "Never allowed", items: ["Approve its own work", "Send passwords", "Match people by name"], never: true },
