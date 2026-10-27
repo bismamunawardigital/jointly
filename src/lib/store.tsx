@@ -289,9 +289,9 @@ export function StoreProvider({ children, frozen = false, initial }: { children:
   useEffect(() => {
     if (frozen || !hydrated || !state.queue.length || state.paused) return;
     const hold: Record<string, number> = { "ex-workflow": 2000, "ex-readback": 1000, "ex-eligibility": 2000 };
-    const t = setTimeout(() => dispatch({ type: "reveal" }), hold[state.queue[0]] ?? 650);
+    const t = setTimeout(() => dispatch({ type: "reveal" }), hold[state.queue[0]] ?? (state.queueGroup === "run" ? 1100 : 650));
     return () => clearTimeout(t);
-  }, [state.queue, state.paused, hydrated, frozen]);
+  }, [state.queue, state.queueGroup, state.paused, hydrated, frozen]);
 
   const openEvidence = useCallback((k: EvidenceKey | null) => setEvidenceOpen(k), []);
   const version = versionOf(state);

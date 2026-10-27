@@ -45,6 +45,26 @@ export function CaseWorkspace() {
   const { state, dispatch, tab, setTab, hydrated } = useStore();
   const [progressOpen, setProgressOpen] = useState(false);
   const agentWorking = state.queue.length > 0 && !state.paused;
+  const letterAsk = !agentWorking && hasEvent(state, "submit") && state.phase === "in_review" && state.confirmed === undefined && !state.copy;
+  const wasRun = useRef(false);
+  useEffect(() => {
+    if (!hydrated || sessionStorage.getItem("jointly-opened")) return;
+    sessionStorage.setItem("jointly-opened", "1");
+    if (window.location.search.includes("moment") || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (state.phase !== "in_review" || state.confirmed !== undefined || state.copy) return;
+    dispatch({ type: "watchRun" });
+    dispatch({ type: "start", group: "run" });
+  }, [hydrated]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (state.queueGroup === "run") wasRun.current = true;
+    else if (wasRun.current && !state.queue.length) {
+      wasRun.current = false;
+      setTimeout(() => {
+        document.getElementById("stage-3")?.scrollIntoView({ behavior: "smooth", block: "center" });
+        document.getElementById("scan-value")?.focus({ preventScroll: true });
+      }, 300);
+    }
+  }, [state.queueGroup, state.queue.length]);
   const reviewing = state.phase === "in_review" || state.phase === "re_review";
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -198,15 +218,26 @@ export function CaseWorkspace() {
         <div className="min-h-0 flex-1 overflow-y-auto px-8 pb-12">
           <div key={group.id}>
             {group.id === "review" && (
-              <div className="max-w-[1280px] space-y-10 pt-6">
+              <div className="grid gap-8 pt-6 xl:grid-cols-[minmax(0,1fr)_380px]">
+              <div className="min-w-0 max-w-[1280px] space-y-10">
                 <LegacyBeat />
-                {agentWorking && <ProgressView />}
                 {hasEvent(state, "submit") ? <ReviewView /> : !agentWorking && <NotYet />}
                 {hasEvent(state, "ex-readback") && (
                   <section id="sec-release" aria-label="Release" className="scroll-mt-6">
                     <ReleaseView />
                   </section>
                 )}
+              </div>
+              <aside aria-label="Agent progress" className="space-y-4 xl:sticky xl:top-6 xl:max-h-[calc(100vh-200px)] xl:self-start xl:overflow-y-auto">
+                <div className="flex items-center justify-between">
+                  <h2 className="font-display text-lg">Agent progress</h2>
+                  {agentWorking && state.queueGroup === "run" && (
+                    <button type="button" onClick={() => dispatch({ type: "hydrate", state: { ...initialState, tourOn: state.tourOn } })} className="text-sm font-medium text-accent-ink hover:underline">Skip</button>
+                  )}
+                </div>
+                {letterAsk && <p role="status" className="rounded-lg border border-warn/40 bg-warn-soft p-3 text-sm text-warn-ink">I couldn&apos;t read the last digits of the limit on this 2023 letter, so please check it against the scan.</p>}
+                <ProgressView />
+              </aside>
               </div>
             )}
             {group.id === "setup" && (
