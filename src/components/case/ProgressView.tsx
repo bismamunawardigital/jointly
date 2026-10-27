@@ -16,6 +16,7 @@ interface Line {
   who: "agent" | "rules" | "sara";
   people?: PersonId[];
   docs?: EvidenceKey[];
+  trace?: { t: string; who: "agent" | "rules" | "sara" }[];
 }
 interface Checkpoint {
   id: string;
@@ -32,6 +33,19 @@ const checkpoints: Checkpoint[] = [
   { id: "plan", label: "Plan built & tested", icon: ListChecks, steps: ["plan", "policy"], done: "policy-check" },
   { id: "review", label: "Your review", icon: UserCheck, steps: ["review", "execute"], done: "ex-readback" },
   { id: "live", label: "Live", icon: Radio, steps: ["release"], done: "ren-login" },
+];
+
+const rashidTrace: Line["trace"] = [
+  { t: "Read Rashid's Emirates ID from his signed form", who: "agent" },
+  { t: "EFR said it expired on 14 Aug 2026", who: "agent" },
+  { t: "No access while an ID is expired, so Rashid waits", who: "rules" },
+  { t: "Texted Rashid to renew. Mohammed and Khalifa carry on", who: "agent" },
+];
+const letterTrace: Line["trace"] = [
+  { t: "Found a 2023 letter in SVS", who: "agent" },
+  { t: "Read AED 25,000, but the last digits are blurry", who: "agent" },
+  { t: "Anything the agent isn't sure of goes to a person", who: "rules" },
+  { t: "Kept the 2019 limit of AED 10,000 until Sara checks", who: "agent" },
 ];
 
 export function ProgressView() {
@@ -51,7 +65,7 @@ export function ProgressView() {
       ...(has("kyc-check")
         ? [has("ren-kyc")
             ? { tone: "ok" as Tone, lead: "Rashid renewed", text: "his Emirates ID is valid again.", who: "agent" as const, people: ["rashid"] as PersonId[] }
-            : { tone: "warn" as Tone, lead: "Rashid is on hold", text: "his Emirates ID expired 14 Aug. We asked him to renew. The others continue.", who: "agent" as const, people: ["rashid"] as PersonId[] }]
+            : { tone: "warn" as Tone, lead: "Rashid is on hold", text: "his Emirates ID expired 14 Aug. We asked him to renew. The others continue.", who: "agent" as const, people: ["rashid"] as PersonId[], trace: rashidTrace }]
         : []),
       ...(has("id-digital") ? [{ tone: "ok" as Tone, lead: "People confirmed", text: "matched by Emirates ID, not by name. Mohammed already has a login, so we reuse it.", who: "agent" as const, people: ["mohammed", "khalifa", "rashid"] as PersonId[] }] : []),
     ],
@@ -60,7 +74,7 @@ export function ProgressView() {
       ...(has("mandate-letter")
         ? [has("rev-amendment")
             ? { tone: "ok" as Tone, lead: "2023 letter confirmed", text: "Sara checked the scan. Khalifa can sign alone up to AED 25,000.", who: "sara" as const, people: ["khalifa"] as PersonId[], docs: ["svs-amd"] as EvidenceKey[] }
-            : { tone: "warn" as Tone, lead: "A 2023 letter is unclear", text: "it may raise Khalifa's limit to AED 25,000. Sara checks the scan.", who: "agent" as const, people: ["khalifa"] as PersonId[], docs: ["svs-amd"] as EvidenceKey[] }]
+            : { tone: "warn" as Tone, lead: "A 2023 letter is unclear", text: "it may raise Khalifa's limit to AED 25,000. Sara checks the scan.", who: "agent" as const, people: ["khalifa"] as PersonId[], docs: ["svs-amd"] as EvidenceKey[], trace: letterTrace }]
         : []),
     ],
     plan: has("policy-check") ? [{ tone: "ok", lead: "Plan built & tested", text: `${passed} of ${checks.length} checks passed on plan v${version}.`, who: "rules" }] : [],
@@ -146,6 +160,18 @@ export function ProgressView() {
                 </button>
                 {isOpen && (
                   <div className="border-t border-line px-4 py-3">
+                    {l.trace && (
+                      <ol aria-label="How the agent got here" className="mb-4">
+                        {l.trace.map((t, n) => (
+                          <li key={n} className="relative flex items-center gap-3 pb-3 last:pb-0">
+                            {n < l.trace!.length - 1 && <span className="absolute left-[9px] top-5 h-full w-px bg-line" aria-hidden />}
+                            <span className="tnum relative z-10 flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full border border-line bg-surface text-[10px] font-semibold text-sub">{n + 1}</span>
+                            <span className="flex-1 text-sm text-ink">{t.t}</span>
+                            <Who who={t.who} />
+                          </li>
+                        ))}
+                      </ol>
+                    )}
                     {l.docs && (
                       <div className="flex flex-wrap gap-3">
                         {l.docs.filter((k) => evidence[k]).map((k) => <DocThumb key={k} k={k} />)}
