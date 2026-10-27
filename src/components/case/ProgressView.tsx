@@ -169,17 +169,17 @@ function DocThumb({ k }: { k: EvidenceKey }) {
   const e = evidence[k];
   return (
     <figure className="w-44">
-      <div className="relative h-24 overflow-hidden rounded-lg border border-line bg-[#f4efe4] shadow-sm">
+      <div className="relative h-24 overflow-hidden rounded-lg border border-line bg-panel shadow-sm">
         {e.image ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={e.image} alt={e.title} className="h-full w-full object-cover" />
         ) : (
           <div className="space-y-1.5 p-3" aria-hidden>
-            <div className="h-1.5 w-16 rounded bg-[#d9d0bf]" />
-            <div className="h-1 w-full rounded bg-[#e6dfd1]" />
-            <div className="h-1 w-5/6 rounded bg-[#e6dfd1]" />
-            <div className="h-1 w-4/6 rounded bg-[#e6dfd1]" />
-            <div className="mt-3 h-4 w-12 rounded-sm border border-[#cfc5b2]" />
+            <div className="h-1.5 w-16 rounded bg-line-strong" />
+            <div className="h-1 w-full rounded bg-line" />
+            <div className="h-1 w-5/6 rounded bg-line" />
+            <div className="h-1 w-4/6 rounded bg-line" />
+            <div className="mt-3 h-4 w-12 rounded-sm border border-[rgb(var(--line-strong))]" />
           </div>
         )}
       </div>

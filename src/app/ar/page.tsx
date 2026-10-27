@@ -77,7 +77,7 @@ export const metadata = { title: "Jointly · دراسة حالة" };
 
 export default function CaseStudyAr() {
   return (
-    <div lang="ar" dir="rtl" className="min-h-screen bg-canvas font-arabic">
+    <div lang="ar" dir="rtl" className="alt min-h-screen bg-canvas font-arabic">
       <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
         <Logo />
         <div className="flex items-center gap-2">
@@ -133,7 +133,7 @@ export default function CaseStudyAr() {
         <p className="mt-4 text-sm text-sub">الوكيل يعمل في الخلفية. سارة لا ترى إلا القرارات.</p>
       </section>
 
-      <section id="slow" className="border-y border-line bg-panel/50">
+      <section id="slow" className="border-y border-line">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className={h2}>العمل ليس صعبًا. إنه بطيء.</h2>
           <p className="mt-2 text-sub"><B>4</B> أنظمة، <B>4</B> تسليمات، ومندوب توصيل واحد.</p>
@@ -162,7 +162,7 @@ export default function CaseStudyAr() {
       </section>
 
 
-      <section id="shadow" className="border-t border-line bg-panel/50">
+      <section id="shadow" className="border-t border-line">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className={h2}>راقب قبل أن يتصرف</h2>
           <div className="mt-8 flex flex-col gap-4 md:flex-row md:items-center">
@@ -212,7 +212,7 @@ export default function CaseStudyAr() {
         </div>
       </section>
 
-      <section id="roles" className="border-t border-line bg-panel/50">
+      <section id="roles" className="border-t border-line">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className={h2}>من يقرر ماذا</h2>
           <div className="mt-10 grid gap-4 sm:grid-cols-2 md:grid-cols-4">
@@ -261,7 +261,7 @@ export default function CaseStudyAr() {
         </div>
       </section>
 
-      <section id="heard" className="border-t border-line bg-panel/50">
+      <section id="heard" className="border-t border-line">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className={h2}>ماذا سمعت، وماذا غيّرت</h2>
           <ul className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">

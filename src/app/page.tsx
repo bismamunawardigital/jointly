@@ -141,7 +141,7 @@ const primary = "inline-flex h-11 items-center gap-1.5 rounded-lg bg-accent px-5
 
 export default function CaseStudy() {
   return (
-    <div className="min-h-screen bg-canvas">
+    <div className="alt min-h-screen bg-canvas">
       <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
         <Logo />
         <div className="flex items-center gap-2">
@@ -196,7 +196,7 @@ export default function CaseStudy() {
         <p className="mt-4 text-sm text-sub">The agent works in the background. Sara only sees decisions.</p>
       </section>
 
-      <section id="slow" className="border-y border-line bg-panel/50">
+      <section id="slow" className="border-y border-line">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className={h2}>The work isn&apos;t hard. It&apos;s slow.</h2>
           <p className="mt-2 text-sub">4 systems, 4 handoffs, 1 courier.</p>
@@ -227,7 +227,7 @@ export default function CaseStudy() {
       </section>
 
 
-      <section id="shadow" className="border-t border-line bg-panel/50">
+      <section id="shadow" className="border-t border-line">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className={h2}>It watched before it acted</h2>
           <div className="mt-8 flex flex-col gap-4 md:flex-row md:items-center">
@@ -282,7 +282,7 @@ export default function CaseStudy() {
         </div>
       </section>
 
-      <section id="roles" className="border-t border-line bg-panel/50">
+      <section id="roles" className="border-t border-line">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className={h2}>Who decides what</h2>
           <div className="mt-10 grid gap-4 sm:grid-cols-2 md:grid-cols-4">
@@ -335,7 +335,7 @@ export default function CaseStudy() {
         </div>
       </section>
 
-      <section id="heard" className="border-t border-line bg-panel/50">
+      <section id="heard" className="border-t border-line">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className={h2}>What I heard, what I changed</h2>
           <ul className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">

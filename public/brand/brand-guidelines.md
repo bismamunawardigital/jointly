@@ -41,11 +41,11 @@ Neutrals carry about 90% of a screen. Blue means interactive. Green, amber and r
 
 | Token | Light | Dark | Use |
 |---|---|---|---|
-| canvas | #FBFAF7 | #0F1115 | App background |
+| canvas | #F6F7F9 | #0F1115 | App background |
 | surface | #FFFFFF | #16191F | Cards, inputs |
-| panel | #F4F2EE | #1C2028 | Table heads, hover |
-| line | #E7E4DE | #2A2F38 | Hairlines |
-| line-strong | #D6D2CA | #3A404B | Input borders |
+| panel | #EEF1F5 | #1C2028 | Table heads, hover |
+| line | #E3E7ED | #2A2F38 | Hairlines |
+| line-strong | #CBD2DC | #3A404B | Input borders |
 | ink | #16171A | #ECEDEF | Primary text |
 | sub | #4A4C52 | #B4B8C0 | Secondary text |
 | muted | #6E6F73 | #8B909A | Labels, meta |

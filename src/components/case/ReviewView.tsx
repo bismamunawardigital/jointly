@@ -147,7 +147,7 @@ function ScanCheck({ canAct, onConfirm, onReturn }: { canAct: boolean; onConfirm
     window.dispatchEvent(new CustomEvent("jointly:scan", { detail: x === 25000 }));
   };
   return (
-    <div className="mt-4 rounded-lg border border-warn/30 bg-warn-soft/40 p-4">
+    <div className="mt-4 rounded-lg border border-warn/40 bg-surface p-4">
       <p className="flex items-center gap-1.5 text-sm font-medium text-warn-ink">
         <AlertTriangle className="h-4 w-4 shrink-0" /> A 2023 letter may change Khalifa&apos;s limit. The scan is unclear.
       </p>
