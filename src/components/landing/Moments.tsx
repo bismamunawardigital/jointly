@@ -105,7 +105,7 @@ export function Moments() {
               refs.current[i] = el;
             }}
             data-i={i}
-            className="flex flex-col justify-center md:min-h-[60vh]"
+            className="flex flex-col justify-center md:min-h-[34vh]"
           >
             <p className={cn("tnum text-sm", i === active ? "text-accent-ink" : "text-muted")}>0{i + 1}</p>
             <p className={cn("mt-2 font-display text-2xl leading-snug md:text-3xl", i !== active && "md:text-muted")}>{s.title}</p>

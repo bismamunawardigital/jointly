@@ -149,19 +149,19 @@ h1, h2, h3 {
 .hs-forms { opacity: 0; animation-name: hs-forms; }
 @keyframes hs-forms { 0%, 6% { opacity: 0; transform: translateY(-12px); } 10%, 24% { opacity: 1; transform: none; } 30%, 100% { opacity: 0; transform: scale(0.7); } }
 .hs-people { animation-name: hs-people; }
-@keyframes hs-people { 0%, 8% { opacity: 1; transform: none; } 12%, 24% { opacity: 0.25; transform: scale(0.85); } 30%, 100% { opacity: 1; transform: none; } }
+@keyframes hs-people { 0%, 8% { opacity: 1; transform: none; } 12%, 24% { opacity: 0.6; transform: scale(0.92); } 30%, 100% { opacity: 1; transform: none; } }
 .hs-ladder { transform-origin: left; animation-name: hs-ladder; }
-@keyframes hs-ladder { 0%, 8% { opacity: 1; transform: scaleX(1); } 12%, 34% { opacity: 0; transform: scaleX(0); } 36% { opacity: 1; } 46%, 100% { opacity: 1; transform: scaleX(1); } }
+@keyframes hs-ladder { 0%, 8% { opacity: 1; transform: scaleX(1); } 12%, 34% { opacity: 0.4; transform: scaleX(0.4); } 46%, 100% { opacity: 1; transform: scaleX(1); } }
 .hs-r-on { opacity: 0; animation-name: hs-r-on; }
 @keyframes hs-r-on { 0%, 24% { opacity: 0; transform: scale(0.85); } 30%, 54% { opacity: 1; transform: none; } 62%, 100% { opacity: 0; } }
 .hs-r-held { animation-name: hs-r-held; }
 @keyframes hs-r-held { 0%, 8% { opacity: 1; } 12%, 24% { opacity: 0.25; } 28%, 54% { opacity: 0; } 62%, 100% { opacity: 1; } }
 .hs-link-l { animation-name: hs-link-l; }
-@keyframes hs-link-l { 0%, 8% { opacity: 1; transform: none; } 12%, 62% { opacity: 0; transform: translateX(-28px); } 66% { opacity: 1; transform: translateX(-28px); } 74%, 100% { opacity: 1; transform: none; } }
+@keyframes hs-link-l { 0%, 8% { opacity: 1; transform: none; } 12%, 62% { opacity: 0.35; transform: translateX(-28px); } 66% { opacity: 1; transform: translateX(-28px); } 74%, 100% { opacity: 1; transform: none; } }
 .hs-link-r { animation-name: hs-link-r; }
-@keyframes hs-link-r { 0%, 8% { opacity: 1; transform: none; } 12%, 62% { opacity: 0; transform: translateX(28px); } 66% { opacity: 1; transform: translateX(28px); } 74%, 100% { opacity: 1; transform: none; } }
+@keyframes hs-link-r { 0%, 8% { opacity: 1; transform: none; } 12%, 62% { opacity: 0.35; transform: translateX(28px); } 66% { opacity: 1; transform: translateX(28px); } 74%, 100% { opacity: 1; transform: none; } }
 .hs-live { animation-name: hs-live; }
-@keyframes hs-live { 0%, 8% { opacity: 1; transform: none; } 12%, 78% { opacity: 0; transform: scale(0.8); } 84%, 100% { opacity: 1; transform: none; } }
+@keyframes hs-live { 0%, 8% { opacity: 1; transform: none; } 12%, 78% { opacity: 0.3; transform: scale(0.9); } 84%, 100% { opacity: 1; transform: none; } }
 .crawl { transform-origin: left; animation: crawl 10s linear infinite; }
 @keyframes crawl { 0% { transform: scaleX(0); } 85%, 100% { transform: scaleX(1); } }
 .crawl-fast { transform-origin: left; animation: crawl-fast 10s ease-out infinite; }

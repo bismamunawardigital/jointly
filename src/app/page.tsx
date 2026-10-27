@@ -8,9 +8,25 @@ import { HeroScene } from "@/components/landing/HeroScene";
 import { Moments } from "@/components/landing/Moments";
 
 const stats = [
-  { v: "1h 54m", k: "was 4–5 days" },
+  { v: "1h 54m", k: "form to first login (was 4–5 days)" },
+  { v: "2", k: "decisions by Sara, not 4 review rounds" },
   { v: "0", k: "approvals by the agent" },
-  { v: "2 of 4", k: "stages re-checked, not all" },
+];
+
+const inbox: { who: ("mohammed" | "khalifa" | "rashid")[]; line: string; time: string }[] = [
+  { who: ["khalifa"], line: "Confirm a value on a blurry letter · Creekside", time: "2 min" },
+  { who: ["mohammed", "khalifa"], line: "Approve a new payments maker · Saffron Bay", time: "1 min" },
+  { who: ["rashid"], line: "Release Rashid, his ID is renewed · Creekside", time: "30 s" },
+];
+
+const callouts = ["4 maker-checker rounds", "Free-text mandate in SVS", "Courier PINs"];
+const learned = ["Check SVS letters", "Reuse existing logins", "Re-check EFR before release"];
+
+const gaveUp: { d: string; why: string }[] = [
+  { d: "Kept 4 sign-offs, as one action", why: "Bank controls require it. Fewer clicks, same record." },
+  { d: "No confidence scores", why: "Regulators ask which rule fired, not how sure the model was." },
+  { d: "Desktop only", why: "CF works on bank laptops. Mobile would be a different product." },
+  { d: "Partial release is a hypothesis", why: "No public evidence yet. First thing to test with a bank." },
 ];
 
 const days: { day: string; icons: { I: LucideIcon; label: string }[] }[] = [
@@ -24,7 +40,7 @@ const days: { day: string; icons: { I: LucideIcon; label: string }[] }[] = [
 const lanes: { icon: React.ReactNode; title: string; items: string[]; never?: boolean }[] = [
   { icon: <AgentMark size={40} />, title: "Agent does", items: ["Reads every record", "Builds the plan", "Sets it up after approval"] },
   { icon: <ShieldCheck className="h-10 w-10 text-accent" />, title: "Rules decide", items: ["Who can sign", "Up to what amount", "Who can go live"] },
-  { icon: <UserRound className="h-10 w-10 text-ink" />, title: "Sara approves", items: ["Each stage", "Unclear values", "Every release"] },
+  { icon: <UserRound className="h-10 w-10 text-ink" />, title: "Sara approves", items: ["Unclear values", "The plan sign-off", "Every release"] },
   { icon: <Ban className="h-10 w-10 text-bad" />, title: "Never allowed", items: ["Approve its own work", "Send passwords", "Match people by name"], never: true },
 ];
 
@@ -141,9 +157,9 @@ export default function CaseStudy() {
 
       <section className="mx-auto grid max-w-6xl items-center gap-10 px-6 pb-20 pt-4 md:grid-cols-2 md:pt-8">
         <div>
-          <h1 className="font-display text-[40px] leading-[1.05] tracking-tight md:text-[64px]">4 days to under 2 hours. A person still signs.</h1>
-          <p className="mt-5 max-w-xl text-lg text-sub">An AI agent that onboards joint-signatory businesses across legacy banking systems, and knows when to stop and ask.</p>
-          <dl className="mt-8 grid grid-cols-3 gap-4">
+          <h1 className="font-display text-[40px] leading-[1.05] tracking-tight md:text-[64px]">Sara sets up 3 signatories before lunch. The agent can&apos;t sign anything.</h1>
+          <p className="mt-5 max-w-xl text-lg text-sub">An agent for bank operations that works across Finacle, SVS and EFR, and stops when it isn&apos;t sure.</p>
+          <dl className="mt-8 grid grid-cols-3 gap-4 md:gap-6">
             {stats.map((s) => (
               <div key={s.k}>
                 <dd className="tnum whitespace-nowrap font-display text-2xl md:text-4xl">{s.v}</dd>
@@ -153,15 +169,36 @@ export default function CaseStudy() {
           </dl>
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <Link href="/demo/case/" className={primary}>
-              Try the demo (5 min) <ArrowRight className="h-4 w-4" />
+              Open the demo (5 min) <ArrowRight className="h-4 w-4" />
             </Link>
-            <span aria-disabled className="inline-flex h-11 cursor-not-allowed items-center gap-2 rounded-lg px-4 text-sm text-muted">
-              Watch 2-min walkthrough <span className="rounded-full bg-panel px-2 py-0.5 text-[11px]">soon</span>
-            </span>
           </div>
-          <p className="mt-3 text-[11px] text-muted">Demo numbers from a synthetic case.</p>
+          <p className="mt-3 text-[11px] text-muted">Synthetic case. Not measured in a real bank.</p>
         </div>
         <HeroScene />
+      </section>
+
+      <section className="mx-auto max-w-6xl px-6 pb-20">
+        <div className="flex items-center gap-3">
+          <h2 className={h2}>Where Sara starts her day</h2>
+          <span className="rounded-full border border-line px-2.5 py-0.5 text-xs text-muted">Concept</span>
+        </div>
+        <div className="mt-8 max-w-3xl">
+          <div className="overflow-hidden rounded-card border border-line bg-surface shadow-lg">
+            <div className="flex items-center gap-1.5 border-b border-line bg-panel/60 px-4 py-2.5">
+              <span className="h-2.5 w-2.5 rounded-full bg-line-strong" /><span className="h-2.5 w-2.5 rounded-full bg-line-strong" /><span className="h-2.5 w-2.5 rounded-full bg-line-strong" />
+            </div>
+            <ul className="divide-y divide-line">
+              {inbox.map((d) => (
+                <li key={d.line} className="flex items-center gap-4 px-5 py-4">
+                  <span className="flex -space-x-2">{d.who.map((w) => <Avatar key={w} id={w} size={32} />)}</span>
+                  <span className="min-w-0 flex-1 text-sm font-medium md:text-base">{d.line}</span>
+                  <span className="tnum text-xs text-muted">{d.time}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+        <p className="mt-4 text-sm text-sub">The agent works in the background. Sara only sees decisions.</p>
       </section>
 
       <section className="border-y border-line bg-panel/50">
@@ -195,6 +232,57 @@ export default function CaseStudy() {
       </section>
 
       <section className="mx-auto max-w-6xl px-6 py-20">
+        <h2 className={h2}>The real before and after</h2>
+        <div className="mt-8 grid gap-4 md:grid-cols-2">
+          {["Current state", "Future state"].map((t) => (
+            <div key={t} className="flex aspect-[4/3] flex-col items-center justify-center rounded-card border-2 border-dashed border-line bg-surface p-6 text-center">
+              <p className="text-sm font-medium">{t} map</p>
+              <p className="mt-1 text-xs text-muted">Coming soon. Real service map, bank names removed.</p>
+            </div>
+          ))}
+        </div>
+        <ol className="mt-6 flex flex-wrap gap-3">
+          {callouts.map((c, i) => (
+            <li key={c} className="flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1.5 text-sm">
+              <span className="tnum inline-flex h-5 w-5 items-center justify-center rounded-full bg-brand text-[11px] font-semibold text-white">{i + 1}</span>
+              {c}
+            </li>
+          ))}
+        </ol>
+        <p className="mt-4 text-sm text-sub">Mapped from interviews with the CF team and 3 journeys: single, joint and non-signatory.</p>
+      </section>
+
+      <section className="border-t border-line bg-panel/50">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <h2 className={h2}>It watched before it acted</h2>
+          <div className="mt-8 flex flex-col gap-4 md:flex-row md:items-center">
+            <p className="rounded-card border border-line bg-surface px-5 py-4"><span className="tnum font-display text-3xl">12</span> <span className="text-sm text-sub">maker cases observed</span></p>
+            <ArrowRight className="h-5 w-5 rotate-90 text-accent md:rotate-0" />
+            <p className="rounded-card border border-line bg-surface px-5 py-4"><span className="tnum font-display text-3xl">3</span> <span className="text-sm text-sub">steps missing from the SOP</span></p>
+            <ArrowRight className="h-5 w-5 rotate-90 text-accent md:rotate-0" />
+            <ul className="flex flex-wrap gap-2">
+              {learned.map((l) => <li key={l} className="rounded-full bg-accent-soft px-3 py-1.5 text-sm text-accent-ink">{l}</li>)}
+            </ul>
+          </div>
+          <p className="mt-4 text-xs text-muted">Illustrative. How the agent learns the unwritten work first.</p>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-6 py-20">
+        <h2 className={h2}>Every source in one grid</h2>
+        <div className="mt-8">
+          <div className="overflow-hidden rounded-card border border-line bg-surface shadow-lg">
+            <div className="flex items-center gap-1.5 border-b border-line bg-panel/60 px-4 py-2.5">
+              <span className="h-2.5 w-2.5 rounded-full bg-line-strong" /><span className="h-2.5 w-2.5 rounded-full bg-line-strong" /><span className="h-2.5 w-2.5 rounded-full bg-line-strong" />
+            </div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/landing/evidence-grid.png" alt="The evidence grid. Rows for Mohammed, Khalifa, Rashid and the mandate. One amber cell on the 2023 letter." className="w-full object-cover object-left max-md:h-56" />
+          </div>
+        </div>
+        <p className="mt-4 text-sm text-sub">17 cells match bank records. Sara checks the 1 value the agent had to read.</p>
+      </section>
+
+      <section className="border-t border-line mx-auto max-w-6xl px-6 py-20">
         <h2 className={h2}>A free-text mandate becomes a picture.</h2>
         <figure className="mt-8">
           <Link href="/demo/case/?tab=map" className="block overflow-hidden rounded-card border border-line bg-surface shadow-sm">
@@ -237,6 +325,10 @@ export default function CaseStudy() {
               </div>
             ))}
           </div>
+          <p className="mt-8 text-sm text-sub">
+            Every case ends with a decision record an examiner can read: rule, quote, approver, time.{" "}
+            <Link href="/demo/case/?tab=decisions" className="text-accent-ink underline underline-offset-2">See Creekside&apos;s</Link>
+          </p>
         </div>
       </section>
 
@@ -254,10 +346,24 @@ export default function CaseStudy() {
         </div>
       </section>
 
+      <section className="border-t border-line">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <h2 className={h2}>What I gave up</h2>
+          <ul className="mt-8 grid gap-4 md:grid-cols-2">
+            {gaveUp.map((g) => (
+              <li key={g.d} className="rounded-card border border-line bg-surface p-6">
+                <p className="font-medium">{g.d}</p>
+                <p className="mt-1 text-sm text-sub">{g.why}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
       <section className="border-t border-line bg-panel/50">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className={h2}>What I heard, what I changed</h2>
-          <ul className="mt-10 grid gap-4 md:grid-cols-3">
+          <ul className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {heard.map((h) => (
               <li key={h.href} className="flex flex-col rounded-card border border-line bg-surface p-6">
                 <p className="font-display text-lg leading-snug">&ldquo;{h.q}&rdquo;</p>
@@ -268,6 +374,12 @@ export default function CaseStudy() {
                 <p className="text-sm font-medium">{h.d}</p>
               </li>
             ))}
+            {/* TODO(Bisma): replace with a real quote from your own CF interviews. */}
+            <li className="flex flex-col rounded-card border-2 border-dashed border-warn/50 bg-surface p-6">
+              <span className="w-fit rounded-full bg-warn-soft px-2 py-0.5 text-[11px] font-medium text-warn-ink">TODO</span>
+              <p className="mt-3 font-display text-lg leading-snug text-muted">[Quote from CF interview]</p>
+              <p className="mt-2 text-xs text-muted">CF team interview</p>
+            </li>
           </ul>
           <details className="mt-6 text-sm">
             <summary className="cursor-pointer text-sub">Sources</summary>
@@ -315,7 +427,7 @@ export default function CaseStudy() {
             <p className="mt-1 text-xs text-muted">All people, accounts and bank systems are synthetic.</p>
           </div>
           <Link href="/demo/case/" className={primary}>
-            Try the demo <ArrowRight className="h-4 w-4" />
+            Open the demo <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
       </footer>
