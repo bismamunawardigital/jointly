@@ -84,7 +84,7 @@ export function Moments({ titles, see = "See it live", v = en, extras }: { title
   return (
     <div className="grid gap-10 md:grid-cols-2 [&>*]:min-w-0">
       <div className="hidden md:block">
-        <div aria-hidden className="sticky top-24 flex h-[320px] items-center justify-center rounded-card border border-line bg-surface p-8 shadow-sm">
+        <div aria-hidden className="sticky top-24 flex h-[280px] items-center justify-center rounded-card border border-line bg-surface p-8 shadow-sm">
           <div key={active} className="flex w-full animate-enter justify-center">
             <V v={v} />
           </div>
@@ -98,11 +98,16 @@ export function Moments({ titles, see = "See it live", v = en, extras }: { title
               refs.current[i] = el;
             }}
             data-i={i}
-            className="flex flex-col justify-center md:min-h-[16vh]"
+            className="flex flex-col justify-center md:min-h-[12vh]"
           >
             <p className={cn("tnum text-sm", i === active ? "text-accent-ink" : "text-muted")}>0{i + 1}</p>
             <p className={cn("mt-2 font-display text-2xl leading-snug md:text-3xl", i !== active && "md:text-muted")}>{titles?.[i] ?? s.title}</p>
-            {extras?.[i] && <div className="mt-6 min-w-0 overflow-x-auto">{extras[i]}</div>}
+            {extras?.[i] && (
+              <details className="mt-4 min-w-0">
+                <summary className="cursor-pointer text-sm font-medium text-accent-ink hover:underline">Open the signing map</summary>
+                <div className="mt-4 overflow-x-auto">{extras[i]}</div>
+              </details>
+            )}
             <div aria-hidden className="mt-4 flex justify-center rounded-card border border-line bg-surface p-6 md:hidden">
               <s.V v={v} />
             </div>

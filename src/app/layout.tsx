@@ -1,3 +1,4 @@
+import { Analytics } from "@vercel/analytics/react";
 import type { Metadata } from "next";
 import { IBM_Plex_Sans, IBM_Plex_Sans_Arabic, IBM_Plex_Mono, Instrument_Sans } from "next/font/google";
 import "./globals.css";
@@ -45,6 +46,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <StoreProvider>{children}</StoreProvider>
+        <Analytics />
       </body>
     </html>
   );

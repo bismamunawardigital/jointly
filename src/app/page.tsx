@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowRight, Ban, Check, FileText, ShieldCheck, UserRound } from "lucide-react";
 import { Logo } from "@/components/Shell";
 import { ThemeButton } from "@/components/ThemeToggle";
-import { AgentMark, Avatar } from "@/components/ui";
+import { AgentMark } from "@/components/ui";
 import { HeroFrame } from "@/components/landing/HeroFrame";
 import { Gloss } from "@/components/landing/Gloss";
 import { DaysSwimlane } from "@/components/landing/DaysSwimlane";
@@ -17,15 +17,20 @@ import { PORTFOLIO_URL } from "@/content/links";
 const stats = statsEn;
 
 const nav: [string, string][] = [
-  ["matters", "Why it matters"],
   ["problem", "Problem"],
-  ["system", "The system"],
+  ["system", "Before"],
   ["why", "Why an agent"],
   ["case", "The case"],
-  ["compare", "Compare"],
   ["roles", "Who decides"],
+  ["heard", "What I heard"],
   ["bank", "At a bank"],
-  ["about", "About"],
+  ["lessons", "Lessons"],
+];
+
+const wrongs = [
+  "When a scan is blurry, the agent can't read it reliably, so it asks Sara.",
+  "When a name is spelled 3 different ways, it would mismatch people, so it matches on the Emirates ID instead.",
+  "When an old system times out, a change could be left half-done, so it retries and then reads back everything it wrote.",
 ];
 
 const in30: [string, string][] = [
@@ -95,85 +100,6 @@ const lanes: { icon: React.ReactNode; title: string; items: string[]; never?: bo
 ];
 
 const chip = "rounded-full border border-line bg-canvas px-2 py-0.5 text-[11px]";
-const principles: { title: string; why: string; mini: React.ReactNode }[] = [
-  {
-    title: "Match on IDs, never names",
-    why: "Names are spelled 3 ways across systems. IDs aren't.",
-    mini: (
-      <div className="flex items-center gap-2">
-        <span className={`${chip} text-muted line-through`}>Mohd</span>
-        <ArrowRight className="h-3 w-3 text-muted" />
-        <span className={`${chip} font-medium`}>EID 3391</span>
-      </div>
-    ),
-  },
-  {
-    title: "Every claim has a source",
-    why: "Sara checks the source, not the agent's word.",
-    mini: (
-      <div className="flex items-center gap-2">
-        <span className="h-2 w-24 rounded bg-ink/20" />
-        <span className="flex h-8 w-6 items-center justify-center rounded border border-line bg-canvas">
-          <FileText className="h-3 w-3 text-muted" />
-        </span>
-      </div>
-    ),
-  },
-  {
-    title: "Show what it isn't sure about",
-    why: "Sara's attention goes to the 1 value that needs it.",
-    mini: (
-      <div className="flex items-center gap-2">
-        <span className="h-8 w-16 rounded bg-ink/15 blur-[2px]" />
-        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-warn-soft text-xs font-semibold text-warn-ink">?</span>
-      </div>
-    ),
-  },
-  {
-    title: "Approval stays with the content",
-    why: "If the plan changes, the old approval doesn't carry over.",
-    mini: (
-      <div className="flex gap-1.5">
-        {[1, 2].map((n) => (
-          <span key={n} className="flex h-6 w-6 items-center justify-center rounded-full bg-ok text-onaccent">
-            <Check className="h-3 w-3" strokeWidth={3} />
-          </span>
-        ))}
-        {[3, 4].map((n) => (
-          <span key={n} className="h-6 w-6 rounded-full border-2 border-accent" />
-        ))}
-      </div>
-    ),
-  },
-  {
-    title: "Rules live in code",
-    why: "The same input gives the same answer, and audit can replay it.",
-    mini: (
-      <div className="flex items-center gap-2">
-        <ShieldCheck className="h-6 w-6 text-accent" />
-        <span className={`${chip} text-ok-ink`}>yes</span>
-        <span className={`${chip} text-bad-ink`}>no</span>
-      </div>
-    ),
-  },
-  {
-    title: "Release what's safe",
-    why: "2 people go live today, instead of 3 waiting on 1 ID.",
-    mini: (
-      <div className="flex items-center gap-3">
-        <span className="flex">
-          <Avatar id="mohammed" size={28} />
-          <span className="-ml-2">
-            <Avatar id="khalifa" size={28} />
-          </span>
-        </span>
-        <Avatar id="rashid" size={28} held />
-      </div>
-    ),
-  },
-];
-
-
 const heard = [
   { q: "you start clicking Approve on autopilot and stop reading the diffs.", who: "Agent user, Hacker News", href: "https://news.ycombinator.com/item?id=48830674", d: "Exact copies fold away." },
   { q: "The bank showed them a confidence score. The regulator shut it down.", who: "Banking AI lead, LinkedIn", href: "https://www.linkedin.com/posts/johnforrester_a-regulator-asked-a-bank-to-explain-its-ai-activity-7438239662009114624-WaU0", d: "Rules, not scores." },
@@ -271,12 +197,13 @@ const compareSources = [
   "https://linear.app/developers/aig",
 ];
 
+const eyebrow = "text-xs font-medium uppercase tracking-wide text-muted";
 const h2 = "font-display text-3xl tracking-tight md:text-4xl";
 const primary = "inline-flex h-11 items-center gap-1.5 rounded-lg bg-accent px-5 text-sm font-medium text-onaccent transition-colors hover:bg-accent-hover";
 const card = "rounded-card border border-line bg-surface";
-const wrap = "mx-auto max-w-6xl px-6 py-14";
+const wrap = "mx-auto max-w-6xl px-6 py-12";
 const Sara = () => (
-  <Link href="/demo/case/" className={primary}>
+  <Link href="/demo/case/" data-track="cta" className={primary}>
     Check it as Sara (5 min) <ArrowRight className="h-4 w-4" />
   </Link>
 );
@@ -286,7 +213,10 @@ export default function CaseStudy() {
     <div className="alt min-h-screen bg-canvas">
       <SectionNav items={nav} />
       <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
-        <Logo />
+        <div className="flex items-center gap-5">
+          <Logo />
+          <a href={PORTFOLIO_URL} data-track="portfolio" className="hidden text-sm text-sub hover:text-ink sm:inline">← Bisma&apos;s portfolio</a>
+        </div>
         <div className="flex items-center gap-2">
           <LangSwitch href="/ar/" lang="ar" label="العربية" className="inline-flex h-9 items-center rounded-lg border border-line px-3 font-arabic text-sm text-sub hover:text-ink" />
           <ThemeButton />
@@ -314,8 +244,9 @@ export default function CaseStudy() {
           <p className="mt-2 text-[11px] text-muted">These numbers come from a scripted demo case, not from a real bank.</p>
           <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3">
             <Sara />
-            <a href="#in30" className="text-sm text-accent-ink hover:underline">Or read the case study in 3 minutes ↓</a>
+            <a href="#problem" className="text-sm text-accent-ink hover:underline">Or read the case study in 3 minutes ↓</a>
           </div>
+          <p className="mt-2 text-xs text-muted">3 min read · 5 min demo</p>
           <div className="mt-5 flex items-center gap-2 text-sub" aria-hidden>
             <FileText className="h-4 w-4" /><ArrowRight className="h-3 w-3 text-muted" /><ShieldCheck className="h-4 w-4" /><ArrowRight className="h-3 w-3 text-muted" /><UserRound className="h-4 w-4" />
           </div>
@@ -339,13 +270,14 @@ export default function CaseStudy() {
         </div>
       </section>
 
-      <section id="matters">
+      <section id="problem" className="bg-panel">
         <div className={wrap}>
-          <h2 className={h2}>Business customers bring banks a lot of revenue, yet they wait the longest to get set up.</h2>
-          <ul className="mt-10 grid gap-4 md:grid-cols-3">
+          <p className={eyebrow}>01 · Problem</p>
+          <h2 className={`mt-2 ${h2}`}>Business customers bring banks a lot of revenue, yet they wait the longest to get set up.</h2>
+          <ul className="mt-8 grid gap-3 md:grid-cols-3">
             {tiles.map((t) => (
-              <li key={t.n} className={`${card} p-6`}>
-                <p className="tnum font-display text-4xl">{t.n}</p>
+              <li key={t.n} className={`${card} p-5`}>
+                <p className="tnum font-display text-3xl">{t.n}</p>
                 <p className="mt-3 text-sm text-sub">{t.t}</p>
                 <a href={t.href} target="_blank" rel="noreferrer" className="mt-3 inline-block text-xs text-accent-ink hover:underline">Source: {t.src}</a>
               </li>
@@ -353,12 +285,7 @@ export default function CaseStudy() {
           </ul>
           <p className="mt-6 max-w-3xl text-sub">In my research, the slowest cases were existing customers with joint or mixed mandates on old accounts, and many of them still have no online approval workflow.</p>
           <p className="mt-2 text-xs text-muted">These are industry figures, not numbers from any one bank.</p>
-        </div>
-      </section>
-
-      <section id="problem" className="bg-panel">
-        <div className={wrap}>
-          <h2 className={h2}>For most of those 5 days, the case is simply waiting for the next person to pick it up.</h2>
+          <h3 className="mt-14 font-display text-2xl tracking-tight">For most of those 5 days, the case is simply waiting for the next person to pick it up.</h3>
           <p className="mt-2 text-sub">I mapped every hand-off in the process, and this is a simplified version of it.</p>
           <div className="mt-8 grid max-w-xl gap-2 text-sm">
             <div className="flex items-center gap-3"><span className="w-24 text-muted">Today</span><span className="h-2 flex-1 rounded-full bg-warn" /><span className="tnum w-16 font-medium">5 days</span></div>
@@ -372,7 +299,7 @@ export default function CaseStudy() {
 
       <section id="system">
         <div className={wrap}>
-          <p className="text-xs font-medium uppercase tracking-wide text-muted">Before the agent</p>
+          <p className={eyebrow}>02 · Before</p>
           <h2 className={`mt-2 ${h2}`}>I learnt how the bank&apos;s systems work before I designed anything.</h2>
           <p className="mt-3 max-w-3xl text-sub">At a UAE bank, I mapped how one onboarding case moves between the customer, the operations team, 4 old systems and a courier. That map decided what the agent should do, and just as clearly, what it should never touch.</p>
           <p className="mt-8 text-sm font-semibold">What the map showed me</p>
@@ -405,7 +332,8 @@ export default function CaseStudy() {
 
       <section id="why" className="band-dark">
         <div className={wrap}>
-          <h2 className={h2}>Rules can&apos;t read a scanned letter, which is why this needs an agent.</h2>
+          <p className={eyebrow}>03 · Why an agent</p>
+          <h2 className={`mt-2 ${h2}`}>Rules can&apos;t read a scanned letter, which is why this needs an agent.</h2>
           <p className="mt-8 text-xs font-medium uppercase tracking-wide text-muted">What banks try today</p>
           <ul className="mt-3 grid gap-3 md:grid-cols-5">
             {today.map(([k, v]) => (
@@ -415,7 +343,7 @@ export default function CaseStudy() {
               </li>
             ))}
           </ul>
-          <ul className="mt-10 space-y-3">
+          <ul className="mt-8 space-y-3">
             {why.map(([mess, fix]) => (
               <li key={mess} className="grid items-center gap-3 md:grid-cols-[1fr_auto_1fr]">
                 <p className={`${card} px-5 py-4 text-sm text-sub`}>{mess}</p>
@@ -425,7 +353,11 @@ export default function CaseStudy() {
             ))}
           </ul>
           <p className="mt-6 font-medium">So the model does the reading, and the rules make the decisions.</p>
-          <ul className="mt-10 grid grid-cols-2 gap-3 md:grid-cols-4">
+          <div className="mt-10">
+            <Tabs labels={["The 4 old systems", "Cost"]}>
+              {[
+                <div key="s">
+          <ul className="grid grid-cols-2 gap-3 md:grid-cols-4">
             {systems.map((x) => (
               <li key={x.name} className={`${card} p-5`}>
                 <div className="flex items-center justify-between gap-2">
@@ -446,7 +378,9 @@ export default function CaseStudy() {
               </li>
             ))}
           </ol>
-          <div className="mt-12 grid gap-6 md:grid-cols-2">
+                </div>,
+                <div key="c">
+          <div className="grid gap-6 md:grid-cols-2">
             <div>
               <p className="text-sm font-semibold">It&apos;s cheap to run and easy on the bank&apos;s old systems</p>
               <ul className="mt-3 space-y-2">
@@ -465,12 +399,17 @@ export default function CaseStudy() {
             </table>
           </div>
           <p className="mt-3 text-xs text-muted">This is a scripted case, so these call counts are design targets rather than measurements.</p>
+                </div>,
+              ]}
+            </Tabs>
+          </div>
         </div>
       </section>
 
-      <section id="case" className="bg-panel">
+      <section id="case">
         <div className={wrap}>
-          <h2 className={h2}>The agent checked every record and only asked Sara about one value.</h2>
+          <p className={eyebrow}>04 · The case</p>
+          <h2 className={`mt-2 ${h2}`}>The agent checked every record and only asked Sara about one value.</h2>
           <div className="mt-10">
             <Moments
               titles={moments}
@@ -489,11 +428,32 @@ export default function CaseStudy() {
         </div>
       </section>
 
-      <section id="compare">
+      <section id="roles" className="bg-panel">
         <div className={wrap}>
-          <h2 className={h2}>I compared Jointly&apos;s design with more than 40 agent products and studies.</h2>
-          <p className="mt-2 text-xs text-muted">This compares design choices, and since Jointly is a prototype, there&apos;s no performance data yet.</p>
-          <div className="mt-8">
+          <p className={eyebrow}>05 · Who decides</p>
+          <h2 className={`mt-2 ${h2}`}>Sara makes the decisions, and the agent can&apos;t approve anything.</h2>
+          <p className="mt-2 text-sub">The agent prepares the work, but it can never be the one who checks it.</p>
+          <div className="mt-10 grid gap-4 sm:grid-cols-2 md:grid-cols-4">
+            {lanes.map((l) => (
+              <div key={l.title} className={`${card} p-6`}>
+                {l.icon}
+                <p className="mt-4 font-semibold">{l.title}</p>
+                <ul className="mt-3 space-y-1.5 text-sm">
+                  {l.items.map((it) => (
+                    <li key={it} className={l.never ? "text-bad-ink" : "text-sub"}>{it}</li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+          <p className="mt-6 text-sm text-sub">Simple mandates need one checker, while complex mandates or a signature mismatch go to a second checker as well.</p>
+          <p className="mt-2 text-sm text-sub">
+            Every case ends with a record that an auditor can read, showing which rule was used, which source it came from, who approved it and when.{" "}
+            <Link href="/demo/case/?view=record" className="text-accent-ink underline underline-offset-2">See Creekside&apos;s record</Link>
+          </p>
+          <p className="mt-10 font-semibold">I compared Jointly&apos;s design with more than 40 agent products and studies.</p>
+          <p className="mt-1 text-xs text-muted">This compares design choices, and since Jointly is a prototype, there&apos;s no performance data yet.</p>
+          <div className="mt-4">
             <Tabs labels={["How it compares", "Oversight rules"]}>
               {[
                 <div key="c" className="overflow-x-auto">
@@ -544,34 +504,10 @@ export default function CaseStudy() {
         </div>
       </section>
 
-      <section id="roles" className="bg-panel">
-        <div className={wrap}>
-          <h2 className={h2}>Sara makes the decisions, and the agent can&apos;t approve anything.</h2>
-          <p className="mt-2 text-sub">The agent prepares the work, but it can never be the one who checks it.</p>
-          <div className="mt-10 grid gap-4 sm:grid-cols-2 md:grid-cols-4">
-            {lanes.map((l) => (
-              <div key={l.title} className={`${card} p-6`}>
-                {l.icon}
-                <p className="mt-4 font-semibold">{l.title}</p>
-                <ul className="mt-3 space-y-1.5 text-sm">
-                  {l.items.map((it) => (
-                    <li key={it} className={l.never ? "text-bad-ink" : "text-sub"}>{it}</li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-          <p className="mt-6 text-sm text-sub">Simple mandates need one checker, while complex mandates or a signature mismatch go to a second checker as well.</p>
-          <p className="mt-2 text-sm text-sub">
-            Every case ends with a record that an auditor can read, showing which rule was used, which source it came from, who approved it and when.{" "}
-            <Link href="/demo/case/?view=record" className="text-accent-ink underline underline-offset-2">See Creekside&apos;s record</Link>
-          </p>
-        </div>
-      </section>
-
       <section id="heard">
         <div className={wrap}>
-          <h2 className={h2}>Here&apos;s what the operations team told me, and what I changed because of it.</h2>
+          <p className={eyebrow}>06 · What I heard</p>
+          <h2 className={`mt-2 ${h2}`}>Here&apos;s what the operations team told me, and what I changed because of it.</h2>
           <div className={`mt-10 max-w-2xl ${card} p-6`}>
             <span className="rounded-full border border-line px-2.5 py-0.5 text-xs text-muted">Paraphrased</span>
             <p className="mt-3 font-display text-lg leading-snug">Setting up one joint-signatory business takes 4 to 5 days. Most of that time goes on reading customer documents and free-text instructions in SVS, and then setting it all up by hand.</p>
@@ -594,7 +530,8 @@ export default function CaseStudy() {
 
       <section id="bank" className="bg-panel">
         <div className={wrap}>
-          <h2 className={h2}>If I built this at a real bank, I would start in shadow mode.</h2>
+          <p className={eyebrow}>07 · At a bank</p>
+          <h2 className={`mt-2 ${h2}`}>If I built this at a real bank, I would start in shadow mode.</h2>
           <p className="mt-2 max-w-3xl text-sub">Banks are careful with agents for good reasons, including audit, model risk, access to old systems and accountability, so each phase is designed to answer one of these concerns.</p>
           <ol className="mt-10 grid gap-4 md:grid-cols-4">
             {phases.map((ph) => (
@@ -630,30 +567,32 @@ export default function CaseStudy() {
         </div>
       </section>
 
-      <section id="tradeoffs">
+      <section id="lessons">
         <div className={wrap}>
-          <h2 className={h2}>What I gave up, and where the agent still gets things wrong</h2>
+          <p className={eyebrow}>08 · Lessons</p>
+          <h2 className={`mt-2 ${h2}`}>What I gave up, and where the agent still gets things wrong</h2>
           <div className="mt-8">
-            <Tabs labels={["What I gave up", "6 patterns I'd reuse"]}>
+            <Tabs labels={["What I gave up", "Where it gets it wrong", "What I learnt"]}>
               {[
-                <ul key="g" className="grid gap-4 md:grid-cols-2">
+                <ul key="g" className="grid gap-3 md:grid-cols-2">
                   {gaveUp.map((g) => (
                     <li key={g} className={`${card} p-5 text-sm text-sub`}>{g}</li>
                   ))}
                 </ul>,
-                <div key="p" className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
-                  {principles.map((p) => (
-                    <div key={p.title} className={`${card} p-6`}>
-                      <div aria-hidden className="flex h-12 items-center">{p.mini}</div>
-                      <p className="mt-4 font-semibold">{p.title}</p>
-                      <p className="mt-1 text-sm text-sub">{p.why}</p>
-                    </div>
+                <ul key="w" className="grid gap-3 md:grid-cols-3">
+                  {wrongs.map((g) => (
+                    <li key={g} className={`${card} p-5 text-sm text-sub`}>{g}</li>
                   ))}
-                </div>,
+                </ul>,
+                <ul key="l" className="grid gap-3 md:grid-cols-2">
+                  {learnt.map((l) => (
+                    <li key={l} className={`${card} flex gap-2.5 p-5 text-sm text-sub`}><Check aria-hidden className="mt-0.5 h-4 w-4 shrink-0 text-ok" />{l}</li>
+                  ))}
+                </ul>,
               ]}
             </Tabs>
           </div>
-          <div className="mt-10 flex flex-wrap items-center gap-2 text-sm text-sub">
+          <div className="mt-8 flex flex-wrap items-center gap-2 text-sm text-sub">
             <span className={`${chip} text-muted`}>Illustrative</span>
             The same pattern would work for renewing a trade licence across government registries, for insurance pre-approvals built on referral letters, and for mandate changes on existing bank accounts.
           </div>
@@ -664,14 +603,6 @@ export default function CaseStudy() {
         <div className={wrap}>
           <h2 className={h2}>About me</h2>
           <p className="mt-4 max-w-3xl text-sub">I&apos;m Bisma, a product designer based in Abu Dhabi. I learnt service design at a UAE bank by mapping how business customers get onboarded across people and old systems, and I designed the digital setup for joint signatories in the bank&apos;s new business app. Jointly is how I would do it differently, with an agent doing the reading so that customers fill in less and the operations team gets fewer tickets.</p>
-          <p className="mt-8 text-xs font-medium uppercase tracking-wide text-muted">What I learnt</p>
-          <ul className="mt-3 grid gap-4 md:grid-cols-4">
-            {learnt.map((l) => (
-              <li key={l} className={`${card} p-5 text-sm text-sub`}>
-                <Check aria-hidden className="mb-2 h-4 w-4 text-ok" /> {l}
-              </li>
-            ))}
-          </ul>
           <p className="mt-6 text-sm text-sub"><span className="font-semibold text-ink">Who did what: </span>I did the research, the service design and the product design, and Devin wrote the code from my specs.</p>
           <div className="mt-6 grid gap-2 md:grid-cols-2">
             {faq.map(([q, a]) => (
@@ -696,7 +627,7 @@ export default function CaseStudy() {
           </div>
           <div className="flex flex-wrap items-center gap-4">
             <Sara />
-            <a href={PORTFOLIO_URL} className="text-sm text-accent-ink hover:underline">Back to Bisma&apos;s portfolio</a>
+            <a href={PORTFOLIO_URL} data-track="portfolio" className="text-sm text-accent-ink hover:underline">Back to Bisma&apos;s portfolio</a>
           </div>
         </div>
       </footer>

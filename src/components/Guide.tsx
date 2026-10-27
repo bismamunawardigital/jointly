@@ -1,5 +1,6 @@
 "use client";
 
+import { track } from "@/lib/track";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Check, RotateCcw, Sparkles } from "lucide-react";
@@ -51,6 +52,10 @@ export function GuideRail() {
   const [list, setList] = useState<string[]>([]);
   const [phoneSeen, setPhoneSeen] = useState(false);
   const { done, step } = useGuide();
+  useEffect(() => {
+    document.title = step < 4 ? `Step ${step + 1} of 4 · Jointly` : "Done · Jointly";
+    if (step > 0) track(step === 4 ? "finale" : "guide_task", { step });
+  }, [step]);
   const { dispatch, setTab } = useStore();
   useEffect(() => {
     const m = (e: Event) => setMode((e as CustomEvent<Mode>).detail);
@@ -130,8 +135,10 @@ export function Guide() {
   useEffect(() => {
     if (!hydrated || !onCase) return;
     const deep = /[?&](moment|view|tab)=/.test(window.location.search);
+    const fromHero = sessionStorage.getItem("jointly-from-hero");
+    sessionStorage.removeItem("jointly-from-hero");
     if (deep) localStorage.setItem(KEY, "seen");
-    else if (!localStorage.getItem(KEY)) setMode("intro");
+    else if (fromHero || !localStorage.getItem(KEY)) setMode("intro");
   }, [hydrated, onCase, setMode]);
   useEffect(() => {
     const m = (e: Event) => setModeRaw((e as CustomEvent<Mode>).detail);
@@ -302,7 +309,7 @@ function Intro({ onStart, onAuto, onExplore }: { onStart: () => void; onAuto: ()
         </div>
         <div className="intro-beat mt-6 flex flex-wrap items-center gap-2" style={{ animationDelay: "5s" }}>
           <Button variant="primary" onClick={onStart}>Start the guided demo (3 min)</Button>
-          <Button onClick={onAuto}>Watch it play (90 s)</Button>
+          <Button onClick={() => { track("watch_play"); onAuto(); }}>Watch it play (90 s)</Button>
           <Button variant="ghost" onClick={onExplore}>Explore on my own</Button>
         </div>
       </div>
@@ -325,9 +332,9 @@ function Finale({ onBonus }: { onBonus: () => void }) {
           ))}
         </dl>
         <div className="mt-6 flex flex-wrap items-center gap-3">
-          <Link href="/" className="inline-flex h-10 items-center rounded-lg bg-accent px-4 text-sm font-medium text-onaccent hover:bg-accent-hover">Read the case study</Link>
+          <Link href="/?back=1#roles" onClick={() => track("case_study_from_finale")} className="inline-flex h-10 items-center rounded-lg bg-accent px-4 text-sm font-medium text-onaccent hover:bg-accent-hover">Read the case study</Link>
           <Button onClick={onBonus}><RotateCcw className="h-3.5 w-3.5" /> Try disagreeing with the agent</Button>
-          <a href={PORTFOLIO_URL} className="ms-auto text-sm text-accent-ink hover:underline">Back to Bisma&apos;s portfolio</a>
+          <a href={PORTFOLIO_URL} onClick={() => track("portfolio_click", { from: "finale" })} className="ms-auto text-sm text-accent-ink hover:underline">Back to Bisma&apos;s portfolio</a>
         </div>
       </div>
     </div>
