@@ -160,16 +160,19 @@ export function SigningMap({ compact = false, part = "all" }: { compact?: boolea
               className={cn("flex flex-col gap-2 p-3 transition-[width] duration-700 ease-out", b.id === "A" ? "border-r border-dashed border-line-strong bg-surface" : "flex-1 bg-panel/50")}
               style={b.id === "A" ? { width: pos(edge) } : undefined}
             >
-              <p className="text-[11px] font-medium text-sub">{b.label}</p>
+              <p className="text-[11px] font-medium text-sub">
+                {b.id === "A" && showGhost ? (
+                  <>
+                    AED 1 to <s className="font-normal text-muted">10,000</s> {fmt(limit)}
+                  </>
+                ) : (
+                  b.label
+                )}
+              </p>
               <div className="flex flex-wrap gap-1.5">{b.combos.map((c) => token(c, b.id))}</div>
             </div>
           ))}
         </div>
-        {showGhost && (
-          <span className="pointer-events-none absolute inset-y-0 border-l border-dashed border-muted/50" style={{ left: pos(10_000) }} aria-hidden>
-            <span className="absolute -bottom-5 -translate-x-1/2 whitespace-nowrap text-[11px] text-muted">was 10,000</span>
-          </span>
-        )}
         {!compact && (
           <span className="pointer-events-none absolute -inset-y-1 z-10 w-0.5 rounded bg-ink transition-[left] duration-150" style={{ left: pos(amount) }} aria-hidden />
         )}

@@ -156,7 +156,7 @@ function ScanCheck({ canAct, onConfirm }: { canAct: boolean; onConfirm: (v: numb
   const match = checked === 25000;
   const check = (x: number | null) => {
     setChecked(x);
-    window.dispatchEvent(new CustomEvent("jointly:scan", { detail: x === 25000 }));
+    window.dispatchEvent(new CustomEvent("jointly:scan", { detail: x }));
   };
   return (
     <div className="mt-4 rounded-lg border border-warn/40 bg-surface p-4">
@@ -180,19 +180,20 @@ function ScanCheck({ canAct, onConfirm }: { canAct: boolean; onConfirm: (v: numb
                 <form
                   onSubmit={(e) => {
                     e.preventDefault();
-                    if (n > 0) check(n);
+                    if (!value.trim() || n === 25000) onConfirm(25000);
+                    else if (n > 0) check(n);
                   }}
                 >
                   <label htmlFor="scan-value" className="text-xs text-muted">
-                    The letter says Khalifa&apos;s limit is
+                    {clean ? "The clean copy says Khalifa's limit is" : "The agent read"}
                   </label>
                   <div className="mt-1 flex items-center gap-2">
                     <span className="text-xs text-muted">AED</span>
-                    <input id="scan-value" inputMode="numeric" autoComplete="off" value={value} onChange={(e) => setValue(e.target.value)} className="tnum h-9 w-32 rounded-lg border border-line bg-surface px-2.5 text-sm outline-none focus:border-accent" />
+                    <input id="scan-value" inputMode="numeric" autoComplete="off" placeholder={clean ? "" : "25,000"} value={value} onChange={(e) => setValue(e.target.value)} className="tnum h-9 w-32 rounded-lg border border-line bg-surface px-2.5 text-sm outline-none focus:border-accent" />
                   </div>
-                  <p className="mt-1 text-xs text-sub">Type what you read. You&apos;ll see the agent&apos;s reading after.</p>
-                  <Button type="submit" variant="primary" className="mt-2" disabled={!(n > 0)}>
-                    Check
+                  <p className="mt-1 text-xs text-sub">{clean ? "Type what you read on the clean copy, and press Enter." : "Check it against the scan. Press Enter if it matches, or type what you read."}</p>
+                  <Button type="submit" className="mt-2" disabled={clean && !(n > 0)}>
+                    {!value.trim() && !clean ? "Confirm AED 25,000" : "Check"}
                   </Button>
                 </form>
               )}
@@ -217,12 +218,12 @@ function ScanCheck({ canAct, onConfirm }: { canAct: boolean; onConfirm: (v: numb
                   )}
                   <div className="mt-2 flex flex-wrap gap-2">
                     {match ? (
-                      <Button variant="primary" data-confirm-scan onClick={() => onConfirm(checked)}>
+                      <Button data-confirm-scan onClick={() => onConfirm(checked)}>
                         Confirm and update the plan
                       </Button>
                     ) : (
                       <>
-                        <Button variant="primary" data-ask-copy onClick={() => dispatch({ type: "askCopy", value: checked })}>
+                        <Button data-ask-copy onClick={() => dispatch({ type: "askCopy", value: checked })}>
                           Ask the branch for a clean copy
                         </Button>
                         <Button data-use-mine onClick={() => dispatch({ type: "useMine", value: checked })}>
@@ -230,7 +231,13 @@ function ScanCheck({ canAct, onConfirm }: { canAct: boolean; onConfirm: (v: numb
                         </Button>
                       </>
                     )}
-                    <Button variant="ghost" onClick={() => check(null)}>
+                    <Button
+                      variant="ghost"
+                      onClick={() => {
+                        setValue("");
+                        check(null);
+                      }}
+                    >
                       Change my reading
                     </Button>
                   </div>
@@ -350,8 +357,8 @@ export function ReviewView() {
             </p>
             <p className="mt-0.5 text-xs text-sub">2 decisions in this case: the letter value, then this sign-off.</p>
           </div>
-          <Button variant="primary" disabled={failing.length > 0} onClick={() => dispatch({ type: "signoff" })}>
-            Sign off plan v{version} · 4 stages <kbd className="ml-1 rounded border border-white/40 px-1 text-[11px]">S</kbd>
+          <Button disabled={failing.length > 0} onClick={() => dispatch({ type: "signoff" })}>
+            Sign off plan v{version} · 4 stages <kbd className="ml-1 rounded border border-current/30 px-1 text-[11px]">S</kbd>
           </Button>
         </Card>
       )}
@@ -510,12 +517,6 @@ export function ReviewView() {
 
                         {canAct && !returning && (
               <div className="mt-3 flex gap-2">
-                {!(s.id === 3 && version === 1) && (
-                  <Button variant="primary" onClick={() => dispatch({ type: "approve", stageId: s.id })}>
-                    <Check className="h-3.5 w-3.5" /> Approve stage {s.id} · {s.items.length} line{s.items.length === 1 ? "" : "s"}
-                    <kbd className="ml-1 rounded border border-onaccent/40 px-1 text-[10px] font-normal opacity-80">A</kbd>
-                  </Button>
-                )}
                                 {canReturn && (
                   <Button variant="ghost" onClick={() => setReturning(true)}>
                     <Undo2 className="h-3.5 w-3.5" /> Return to agent

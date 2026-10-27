@@ -51,14 +51,14 @@ export function NeedsYou() {
   const elig = releaseEligibility(rulesFor(version), held);
   const failing = policyChecks(version, held).filter((c) => !c.pass).length;
   const done = state.log.filter((e) => e.kind === "agent").length;
-  const [scanOk, setScanOk] = useState(false);
+  const [scanVal, setScanVal] = useState<number | null>(null);
   useEffect(() => {
-    const on = (e: Event) => setScanOk(!!(e as CustomEvent<boolean>).detail);
+    const on = (e: Event) => setScanVal((e as CustomEvent<number | null>).detail);
     window.addEventListener("jointly:scan", on);
     return () => window.removeEventListener("jointly:scan", on);
   }, []);
   useEffect(() => {
-    if (state.phase !== "in_review") setScanOk(false);
+    if (state.phase !== "in_review") setScanVal(null);
   }, [state.phase]);
   const go = (t: Tab, anchor: string, focus?: string) => {
     setTab(t);
@@ -125,18 +125,19 @@ export function NeedsYou() {
       <Button variant="primary" onClick={() => { dispatch({ type: "cleanCopy" }); setTimeout(() => go("review", "stage-3", "#scan-value"), 50); }}>Skip ahead: the branch sends a clean copy</Button>
     );
   } else if (state.phase === "in_review" && !allApproved(state)) {
-    sub = "Stages 1 and 2 passed by rule. Stage 3: check a value on a blurry 2023 letter.";
-    if (scanOk) {
-      title = "Your reading matches the agent's";
-      sub = "Confirm it and the agent updates the plan to v2.";
+    sub = "Stages 1 and 2 passed by rule. Check the one value on the blurry 2023 letter.";
+    const differs = scanVal !== null && scanVal !== 25000;
+    if (differs) {
+      title = `You read AED ${scanVal.toLocaleString("en-US")}, but the agent read AED 25,000 and wasn't sure.`;
+      sub = "The agent won't use its value, so ask the branch for a clean copy or use yours.";
     }
     actions = (
       <>
         {handBtn}
-        {scanOk ? (
-          <Button variant="primary" onClick={() => dispatch({ type: "confirm", value: 25000 })}>Confirm and update the plan</Button>
+        {differs ? (
+          <Button variant="primary" onClick={() => dispatch({ type: "askCopy", value: scanVal })}>Ask the branch for a clean copy</Button>
         ) : (
-          <Button variant="primary" onClick={() => go("review", "stage-3", "#scan-value")}>Check the letter</Button>
+          <Button variant="primary" onClick={() => go("review", "stage-3", "#scan-value")}>Confirm AED 25,000 <Key k="Enter" /></Button>
         )}
       </>
     );
@@ -153,14 +154,23 @@ export function NeedsYou() {
   } else if (state.phase === "executed" || state.phase === "rashid_ready") {
     sub = state.phase === "executed" ? elig.summary : "Adding him keeps every approval combination valid.";
     actions = (
-      <Button variant="primary" onClick={() => go("release", "sec-release", state.phase === "rashid_ready" ? "[data-release-rashid]" : "[data-release-main]")}>Go to release</Button>
+      <Button
+        variant="primary"
+        onClick={() => {
+          const sel = state.phase === "rashid_ready" ? "[data-release-rashid]" : "[data-release-main]";
+          go("release", "sec-release", sel);
+          setTimeout(() => document.querySelector<HTMLElement>(sel)?.click(), 120);
+        }}
+      >
+        {state.phase === "rashid_ready" ? "Release Rashid" : "Release Mohammed and Khalifa"}
+      </Button>
     );
   } else if (state.phase === "partially_live") {
     sub = "Rashid joins when his EID clears EFR.";
     actions = <Button variant="ghost" onClick={() => dispatch({ type: "renew" })}>Demo: Rashid renews his EID</Button>;
   } else if (state.phase === "live") {
     sub = "Nothing left to do. Every step is in History.";
-    actions = <Button onClick={() => setTab("audit")}>Open history</Button>;
+    actions = <Button onClick={() => setTab("decisions")}>See the decision record</Button>;
   }
 
   return (

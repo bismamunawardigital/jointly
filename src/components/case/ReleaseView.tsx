@@ -102,13 +102,13 @@ export function ReleaseView() {
                     <Button variant="ghost" onClick={() => setConfirming(false)}>
                       Cancel
                     </Button>
-                    <Button variant="primary" onClick={() => dispatch({ type: "release" })}>
+                    <Button onClick={() => dispatch({ type: "release" })}>
                       Yes, release them
                     </Button>
                   </>
                 ) : (
                   <>
-                    <Button variant="primary" data-release-main disabled={!elig.eligible || failing > 0} onClick={() => setConfirming(true)}>
+                    <Button data-release-main disabled={!elig.eligible || failing > 0} onClick={() => setConfirming(true)}>
                       Release Mohammed and Khalifa
                     </Button>
                     <Button variant="ghost" onClick={() => setPreview(true)}>
@@ -153,7 +153,7 @@ export function ReleaseView() {
                         <Undo>Can&apos;t be undone</Undo> Switches him on and texts him the link.
                       </p>
                       <div className="flex gap-2">
-                        <Button variant="primary" size="sm" onClick={() => dispatch({ type: "releaseRashid" })}>
+                        <Button size="sm" onClick={() => dispatch({ type: "releaseRashid" })}>
                           Yes, release Rashid
                         </Button>
                         <Button variant="ghost" size="sm" onClick={() => setConfirmingR(false)}>
@@ -162,7 +162,7 @@ export function ReleaseView() {
                       </div>
                     </div>
                   ) : (
-                    <Button variant="primary" size="sm" data-release-rashid onClick={() => setConfirmingR(true)}>
+                    <Button size="sm" data-release-rashid onClick={() => setConfirmingR(true)}>
                       Release Rashid
                     </Button>
                   )}
