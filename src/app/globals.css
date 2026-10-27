@@ -111,3 +111,7 @@ h1, h2, h3 {
     transition-duration: 1ms !important;
   }
 }
+
+[data-density="compact"] {
+  font-size: 14px;
+}

@@ -17,6 +17,7 @@ import { ReleaseView } from "./ReleaseView";
 import { AuditView } from "./AuditView";
 import { AutonomyView } from "./AutonomyView";
 import { DecisionView } from "./DecisionView";
+import { CommandPalette } from "@/components/CommandPalette";
 
 const tabs: { id: Tab; label: string }[] = [
   { id: "run", label: "Agent run" },
@@ -83,7 +84,7 @@ export function CaseWorkspace() {
                 <Pill tone={st.tone}>{st.label}</Pill>
               </div>
               <p className="mt-1 text-sm text-sub">
-                Joint signatories (3) · <span className="font-mono text-xs">{business.iban}</span> · {business.accountType}
+                Joint signatories (3) · <bdi dir="ltr" className="font-mono text-xs">{business.iban}</bdi> · {business.accountType}
               </p>
               <p className="mt-0.5 text-xs text-muted">
                 {business.address} · Trade licence {business.licence}
@@ -106,6 +107,9 @@ export function CaseWorkspace() {
               )}
             </div>
           </div>
+          <p className="mt-2 text-[11px] text-muted">
+            <kbd className="rounded border border-line px-1">Ctrl K</kbd> to jump anywhere
+          </p>
           <nav aria-label="Case steps" className="-mb-px mt-5 flex gap-5 overflow-x-auto whitespace-nowrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" role="tablist">
             {tabs.map((t) => (
               <button
@@ -148,6 +152,7 @@ export function CaseWorkspace() {
         </div>
       </div>
       <NeedsYou />
+      <CommandPalette tabs={tabs} />
       {toast && (
         <div role="status" className="fixed left-1/2 top-4 z-50 flex -translate-x-1/2 animate-enter items-center gap-3 rounded-xl border border-line bg-surface px-4 py-2.5 shadow-lg">
           <Bell className="h-4 w-4 text-warn" />

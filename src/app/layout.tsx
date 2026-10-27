@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     "An agentic operations workbench that gets joint-signatory businesses onto digital banking in hours, on top of Finacle and SVS. Portfolio demo by Bisma Munawar.",
 };
 
-const themeScript = `try{if(localStorage.getItem("jointly-theme")==="dark")document.documentElement.dataset.theme="dark"}catch(e){}`;
+const themeScript = `try{if(localStorage.getItem("jointly-theme")==="dark")document.documentElement.dataset.theme="dark";if(localStorage.getItem("jointly-density")==="compact")document.documentElement.dataset.density="compact"}catch(e){}`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
