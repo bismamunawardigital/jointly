@@ -20,7 +20,7 @@ const doingMap: Record<string, string> = {
 };
 const doing = (step: string) => doingMap[step] ?? "working";
 
-export const maker = "Omar K., CF Maker";
+export const maker = "Omar K., maker";
 
 export function legacyBeat(lastId?: string) {
   if (lastId === "ex-workflow-fail") return "Digital Banking Admin timed out at step 5 of 5. Nothing was half-written. Retrying.";

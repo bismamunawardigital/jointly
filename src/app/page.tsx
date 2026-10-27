@@ -16,14 +16,14 @@ const stats = statsEn;
 
 const in30: [string, string][] = [
   ["Problem", "4 to 5 days of manual setup and courier PINs"],
-  ["User", "Sara, a CF checker at a UAE bank"],
+  ["User", "Sara, a checker in a UAE bank's operations team"],
   ["What I built", "An agent that prepares, rules that check, a screen Sara approves on"],
   ["Outcome", "Under 2 hours, 2 setup decisions (synthetic case, not measured)"],
   ["My role", "Research, service design, product design, prototype built with Devin"],
 ];
 
 const swim = {
-  lanes: ["Customer", "CF maker", "CF checker", "Systems", "Courier"],
+  lanes: ["Customer", "Maker", "Checker", "Systems", "Courier"],
   today: "Today",
   jointly: "With Jointly",
   pains: ["4 maker-checker rounds", "Free-text instructions in SVS", "Courier PINs"],
@@ -44,7 +44,7 @@ const learned = ["Check SVS letters", "Reuse existing logins", "Re-check EFR bef
 const gaveUp: { d: string; why: string }[] = [
   { d: "Kept 4 sign-offs, as one action", why: "Bank controls require it. Fewer clicks, same record." },
   { d: "No confidence scores", why: "Regulators ask which rule fired, not how sure the model was." },
-  { d: "Desktop only", why: "CF works on bank laptops. Mobile would be a different product." },
+  { d: "Desktop only", why: "The operations team works on bank laptops. Mobile would be a different product." },
   { d: "Partial release is a hypothesis", why: "No public evidence yet. First thing to test with a bank." },
 ];
 
@@ -217,7 +217,7 @@ export default function CaseStudy() {
           <p className="mt-4 max-w-xl text-base text-sub md:text-lg">An AI agent does a bank&apos;s back-office setup across 4 legacy systems. A person still approves every decision that moves money.</p>
           <p className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm">
             <Gloss term="Joint signatories" def="2 or more people who must approve a company's payments together." />
-            <Gloss term="Customer Fulfillment (CF)" def="The bank team that sets up their online banking by hand." />
+            <Gloss term="Operations team" def="The bank team that sets up their online banking by hand." />
           </p>
           <dl className="mt-6 grid grid-cols-3 gap-4 md:gap-6">
             {stats.map((s) => (
@@ -364,7 +364,7 @@ export default function CaseStudy() {
       <section id="shadow" className="border-t border-line">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className={h2}>It watched before it acted</h2>
-          <p className="mt-2 max-w-2xl text-sub">Before it acts, the agent runs in shadow mode. It watches CF makers and compares its plan with theirs.</p>
+          <p className="mt-2 max-w-2xl text-sub">Before it acts, the agent runs in shadow mode. It watches the operations team&apos;s makers and compares its plan with theirs.</p>
           <div className="mt-8 flex flex-col gap-4 md:flex-row md:items-center">
             <p className="rounded-card border border-line bg-surface px-5 py-4"><span className="tnum font-display text-3xl">12</span> <span className="text-sm text-sub">maker cases observed</span></p>
             <ArrowRight className="h-5 w-5 rotate-90 text-accent md:rotate-0" />
@@ -434,7 +434,7 @@ export default function CaseStudy() {
           <div className="mt-10 max-w-2xl rounded-card border border-line bg-surface p-6">
             <span className="rounded-full border border-line px-2.5 py-0.5 text-xs text-muted">Paraphrased</span>
             <p className="mt-3 font-display text-lg leading-snug">Setting up one joint-signatory business takes 4 to 5 days. Most of it is reading customer documents and free-text instructions in SVS, then setting it up by hand.</p>
-            <p className="mt-2 text-xs text-muted">CF team member, paraphrased from an interview</p>
+            <p className="mt-2 text-xs text-muted">Operations team member, paraphrased from an interview</p>
             <ArrowRight className="my-4 h-4 w-4 rotate-90 text-accent" />
             <p className="text-sm font-medium">So the agent reads, and Sara only checks what it read.</p>
           </div>

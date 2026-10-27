@@ -176,7 +176,7 @@ export default function CaseStudyAr() {
           </p>
           <p className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm">
             <Gloss term="المفوّضون بالتوقيع المشترك" def="شخصان أو أكثر يجب أن يعتمدوا مدفوعات الشركة معًا." />
-            <Gloss term="خدمة العملاء (CF)" def="فريق البنك الذي يُعدّ الخدمات المصرفية الرقمية للشركات يدويًا." />
+            <Gloss term="فريق العمليات" def="فريق البنك الذي يُعدّ الخدمات المصرفية الرقمية للشركات يدويًا." />
           </p>
           <dl className="mt-6 grid grid-cols-3 gap-4 md:gap-6">
             {statsAr.map((s) => (

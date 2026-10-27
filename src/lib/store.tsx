@@ -216,8 +216,8 @@ function reducer(s: State, a: Action): State {
       const reviewing = s.phase === "in_review" || s.phase === "re_review";
       if (s.handedOver || (!s.queue.length && !reviewing)) return s;
       const text = s.queue.length
-        ? `Handed to Omar K., CF Maker: ${s.queue.length} step${s.queue.length === 1 ? "" : "s"} left, nothing half-written`
-        : "Handed to Omar K., CF Maker. Note: please check the 2023 letter against the branch copy";
+        ? `Handed to Omar K., maker: ${s.queue.length} step${s.queue.length === 1 ? "" : "s"} left, nothing half-written`
+        : "Handed to Omar K., maker. Note: please check the 2023 letter against the branch copy";
       return { ...s, paused: s.queue.length ? true : s.paused, handedOver: true, log: [...s.log, human(`handover-${s.log.length}`, nowOf(s), text)] };
     }
     case "sendBack":

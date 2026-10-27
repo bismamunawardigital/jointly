@@ -40,7 +40,7 @@ export function CommandPalette({ tabs }: { tabs: { id: Tab; label: string }[] })
   const items = useMemo(() => {
     const all = [
       ...tabs.map((t) => ({ kind: "Go to", label: t.label, text: t.label, run: () => setTab(t.id) })),
-      { kind: "Go to", label: "Command center", text: "Command center queue", run: () => router.push("/demo/") },
+      { kind: "Go to", label: "Queue", text: "Queue", run: () => router.push("/demo/") },
       { kind: "Action", label: "Reset demo", text: "Reset demo restart", run: () => { dispatch({ type: "reset" }); setTab("run"); } },
       ...(Object.keys(evidence) as EvidenceKey[]).map((k) => {
         const label = `${evidence[k].title} · ${sourceLabel(k)}`;

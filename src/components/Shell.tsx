@@ -23,7 +23,7 @@ export function Logo({ className }: { className?: string }) {
 }
 
 const nav = [
-  { href: "/demo/", label: "Command center", icon: LayoutGrid },
+  { href: "/demo/", label: "Queue", icon: LayoutGrid },
   { href: "/demo/case/", label: business.name, icon: Briefcase },
   { href: "/", label: "Case study", icon: BookOpen },
 ];
