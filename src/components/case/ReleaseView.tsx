@@ -108,7 +108,7 @@ export function ReleaseView() {
                   </>
                 ) : (
                   <>
-                    <Button variant="primary" disabled={!elig.eligible || failing > 0} onClick={() => setConfirming(true)}>
+                    <Button variant="primary" data-release-main disabled={!elig.eligible || failing > 0} onClick={() => setConfirming(true)}>
                       Release Mohammed and Khalifa
                     </Button>
                     <Button variant="ghost" onClick={() => setPreview(true)}>
@@ -162,7 +162,7 @@ export function ReleaseView() {
                       </div>
                     </div>
                   ) : (
-                    <Button variant="primary" size="sm" onClick={() => setConfirmingR(true)}>
+                    <Button variant="primary" size="sm" data-release-rashid onClick={() => setConfirmingR(true)}>
                       Release Rashid
                     </Button>
                   )}

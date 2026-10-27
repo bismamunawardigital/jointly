@@ -142,6 +142,10 @@ function ScanCheck({ canAct, onConfirm, onReturn }: { canAct: boolean; onConfirm
   const [checked, setChecked] = useState<number | null>(null);
   const n = Number(value.replace(/[^0-9.]/g, ""));
   const match = checked === 25000;
+  const check = (x: number | null) => {
+    setChecked(x);
+    window.dispatchEvent(new CustomEvent("jointly:scan", { detail: x === 25000 }));
+  };
   return (
     <div className="mt-4 rounded-lg border border-warn/30 bg-warn-soft/40 p-4">
       <p className="flex items-center gap-1.5 text-sm font-medium text-warn-ink">
@@ -157,7 +161,7 @@ function ScanCheck({ canAct, onConfirm, onReturn }: { canAct: boolean; onConfirm
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                if (n > 0) setChecked(n);
+                if (n > 0) check(n);
               }}
             >
               <label htmlFor="scan-value" className="text-xs text-muted">
@@ -193,10 +197,10 @@ function ScanCheck({ canAct, onConfirm, onReturn }: { canAct: boolean; onConfirm
                 </p>
               )}
               <div className="mt-2 flex flex-wrap gap-2">
-                <Button variant="primary" onClick={() => (match ? onConfirm(checked) : onReturn(checked))}>
+                <Button variant="primary" data-confirm-scan onClick={() => (match ? onConfirm(checked) : onReturn(checked))}>
                   {match ? "Confirm and update the plan" : "Send back with my value"}
                 </Button>
-                <Button variant="ghost" onClick={() => setChecked(null)}>
+                <Button variant="ghost" onClick={() => check(null)}>
                   Change my reading
                 </Button>
               </div>
@@ -224,9 +228,10 @@ export function FailBanner({ n }: { n: number }) {
 }
 
 export function ReviewView() {
-  const { state, dispatch, version, held } = useStore();
+  const { state, dispatch, version, held, setTab } = useStore();
   const failing = policyChecks(version, held).filter((c) => !c.pass);
   const tour = useTourTarget(1);
+  const [expand, setExpand] = useState(false);
   const [returning, setReturning] = useState(false);
   const [note, setNote] = useState("");
   useEffect(() => {
@@ -271,11 +276,36 @@ export function ReviewView() {
   });
   const open = status.filter((x) => x !== "approved").length;
   const judgement = version === 1 && !approvalValid(state.approvals[3], stages[2]);
-  const headline = !open ? "All 4 stages pass. Sign off when ready." : judgement ? "1 thing needs your judgement" : `Nothing needs your judgement: ${open} stage${open === 1 ? "" : "s"} ready to approve`;
+  const byPhase: Partial<Record<string, string>> = {
+    executing: "Signed off. The agent is setting it up.",
+    executed: "Set up and checked. Release is your call.",
+    partially_live: "2 of 3 signatories are live. Rashid is waiting for his EID.",
+    rashid_ready: "2 of 3 signatories are live. Rashid's EID is renewed.",
+    live: "Creekside is live. All 3 signatories, 1h 54m from form to first login.",
+  };
+  const signedOff = ["executing", "executed", "partially_live", "rashid_ready", "live"].includes(state.phase);
+  const chip = (i: number) => status[i] !== "approved" ? statusLabel[status[i]] : signedOff ? "Approved" : state.approvals[stages[i].id]?.by === "Rules" ? "Passed by rule" : "Confirmed by you";
+  const headline = byPhase[state.phase] ?? (!open ? "All 4 stages pass. Sign off when ready." : judgement ? "1 thing needs your judgement" : `Nothing needs your judgement: ${open} stage${open === 1 ? "" : "s"} ready to approve`);
 
   return (
-    <div className="max-w-4xl space-y-4" {...tour}>
+    <div className="space-y-4" {...tour}>
       <h2 className="font-display text-2xl">{headline}</h2>
+      {state.phase === "live" && !expand && (
+        <Card className="flex flex-wrap items-center gap-5 p-5">
+          <span className="flex">
+            {(["mohammed", "khalifa", "rashid"] as const).map((id, n) => (
+              <span key={id} className={n ? "-ml-2" : ""}><Avatar id={id} size={36} /></span>
+            ))}
+          </span>
+          <div className="min-w-0 flex-1 text-sm">
+            <p className="font-medium">Mohammed, Khalifa and Rashid are live. <span className="tnum">1h 54m</span> from form to first login.</p>
+            <p className="mt-0.5 text-sub">Sara made 2 decisions: confirmed the 2023 letter value, then signed off plan v2.</p>
+          </div>
+          <Button onClick={() => setTab("decisions")}>Open the decision record</Button>
+          <Button variant="ghost" onClick={() => setExpand(true)}>Show evidence and stages</Button>
+        </Card>
+      )}
+      {(state.phase !== "live" || expand) && (<>
       {failing.length > 0 && <FailBanner n={failing.length} />}
       <EvidenceGrid />
       {reviewing && allApproved(state) && (
@@ -299,7 +329,7 @@ export function ReviewView() {
             </span>
             <span className="min-w-0">
               <span className="block text-sm font-medium">{s.short}</span>
-              <span className="block text-[11px] text-muted">{statusLabel[status[i]]}</span>
+              <span className="block text-[11px] text-muted">{chip(i)}</span>
             </span>
           </a>
         ))}
@@ -346,7 +376,7 @@ export function ReviewView() {
               <div className="flex flex-col items-end gap-1">
                 {valid ? (
                   <Pill tone="ok">
-                    {approval!.by === "Rules" ? "Verified by rule" : state.returned && s.id < 3 ? "Approval kept" : "Approved"} · {approval!.by === "Rules" ? "exact copy" : approval!.by} {approval!.at}
+                    {approval!.by === "Rules" ? "Verified by rule" : state.returned && s.id < 3 ? "Approval kept" : signedOff ? "Approved" : "Confirmed by you"} · {approval!.by === "Rules" ? "exact copy" : approval!.by} {approval!.at}
                   </Pill>
                 ) : changes.length ? (
                   <Pill tone="accent">Changed, review the diff</Pill>
@@ -482,6 +512,7 @@ export function ReviewView() {
           </Card>
         );
       })}
+      </>)}
     </div>
   );
 }

@@ -169,3 +169,9 @@ h1, h2, h3 {
 @media (prefers-reduced-motion: reduce) {
   .hs, .crawl, .crawl-fast { animation: none !important; }
 }
+
+.flash {
+  outline: 3px solid rgb(200 137 43 / 0.7);
+  outline-offset: 4px;
+  border-radius: 12px;
+}

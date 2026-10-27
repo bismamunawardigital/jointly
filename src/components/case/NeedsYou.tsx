@@ -1,6 +1,7 @@
 "use client";
 
 import { Hand, Pause, Play, Sparkles } from "lucide-react";
+import { useEffect, useState } from "react";
 import { policyChecks, releaseEligibility } from "@/lib/rules";
 import { eventById } from "@/lib/script";
 import { headlineOf } from "@/lib/derive";
@@ -21,6 +22,24 @@ const doing = (step: string) => doingMap[step] ?? "working";
 
 export const maker = "Omar K., CF Maker";
 
+export function legacyBeat(lastId?: string) {
+  if (lastId === "ex-workflow-fail") return "Digital Banking Admin timed out at step 5 of 5. Nothing was half-written. Retrying.";
+  if (lastId === "ex-workflow" || lastId === "ex-readback") return "Retry worked. Read back from Admin: 0 differences from the approved plan.";
+  return null;
+}
+
+export function LegacyBeat() {
+  const { state } = useStore();
+  const beat = legacyBeat(state.log[state.log.length - 1]?.id);
+  if (!beat || !state.queue.length) return null;
+  return (
+    <p role="status" className="flex items-center gap-2 rounded-card border border-line bg-surface px-4 py-3 text-sm">
+      <span className="rounded-full bg-panel px-2 py-0.5 text-[11px] text-sub">Legacy system</span>
+      {beat}
+    </p>
+  );
+}
+
 function Key({ k }: { k: string }) {
   return <kbd className="ml-1 rounded border border-current/30 px-1 text-[11px] opacity-70">{k}</kbd>;
 }
@@ -32,9 +51,27 @@ export function NeedsYou() {
   const elig = releaseEligibility(rulesFor(version), held);
   const failing = policyChecks(version, held).filter((c) => !c.pass).length;
   const done = state.log.filter((e) => e.kind === "agent").length;
-  const go = (t: Tab, anchor?: string) => {
+  const [scanOk, setScanOk] = useState(false);
+  useEffect(() => {
+    const on = (e: Event) => setScanOk(!!(e as CustomEvent<boolean>).detail);
+    window.addEventListener("jointly:scan", on);
+    return () => window.removeEventListener("jointly:scan", on);
+  }, []);
+  useEffect(() => {
+    if (state.phase !== "in_review") setScanOk(false);
+  }, [state.phase]);
+  const go = (t: Tab, anchor: string, focus?: string) => {
     setTab(t);
-    if (anchor) setTimeout(() => document.getElementById(anchor)?.scrollIntoView({ behavior: "smooth", block: "center" }), 50);
+    setTimeout(() => {
+      const el = document.getElementById(anchor);
+      if (!el) return;
+      const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      el.scrollIntoView({ behavior: still ? "auto" : "smooth", block: "center" });
+      el.classList.add("flash");
+      setTimeout(() => el.classList.remove("flash"), 1500);
+      const f = (focus && document.querySelector<HTMLElement>(focus)) || el.querySelector<HTMLElement>("input, button:not([disabled])");
+      f?.focus({ preventScroll: true });
+    }, 80);
   };
   const handBtn = (
     <Button variant="ghost" onClick={() => dispatch({ type: "handover" })}>
@@ -71,8 +108,9 @@ export function NeedsYou() {
       </>
     );
   } else if (working && next) {
-    title = `Agent is ${doing(next.step)}`;
-    sub = "Nothing needed from you.";
+    const beat = legacyBeat(state.log[state.log.length - 1]?.id);
+    title = beat ?? `Agent is ${doing(next.step)}`;
+    sub = beat ? "Legacy system · Digital Banking Admin" : "Nothing needed from you.";
     actions = (
       <Button variant="ghost" onClick={() => dispatch({ type: "pause" })}>
         <Pause className="h-3.5 w-3.5" /> Pause <Key k="P" />
@@ -82,10 +120,18 @@ export function NeedsYou() {
     sub = "Access request in at 09:12. The agent is starting.";
   } else if (state.phase === "in_review") {
     sub = "Stages 1 and 2 passed by rule. Stage 3: check a value on a blurry 2023 letter.";
+    if (scanOk) {
+      title = "Your reading matches the agent's";
+      sub = "Confirm it and the agent updates the plan to v2.";
+    }
     actions = (
       <>
         {handBtn}
-        <Button variant="primary" onClick={() => go("review", "stage-3")}>Check the letter</Button>
+        {scanOk ? (
+          <Button variant="primary" onClick={() => dispatch({ type: "confirm", value: 25000 })}>Confirm and update the plan</Button>
+        ) : (
+          <Button variant="primary" onClick={() => go("review", "stage-3", "#scan-value")}>Check the letter</Button>
+        )}
       </>
     );
   } else if (state.phase === "re_review") {
@@ -101,7 +147,7 @@ export function NeedsYou() {
   } else if (state.phase === "executed" || state.phase === "rashid_ready") {
     sub = state.phase === "executed" ? elig.summary : "Adding him keeps every approval combination valid.";
     actions = (
-      <Button variant="primary" onClick={() => go("release", "sec-release")}>Go to release</Button>
+      <Button variant="primary" onClick={() => go("release", "sec-release", state.phase === "rashid_ready" ? "[data-release-rashid]" : "[data-release-main]")}>Go to release</Button>
     );
   } else if (state.phase === "partially_live") {
     sub = "Rashid joins when his EID clears EFR.";

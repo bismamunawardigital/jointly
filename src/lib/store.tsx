@@ -252,7 +252,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!hydrated || !state.queue.length || state.paused) return;
-    const t = setTimeout(() => dispatch({ type: "reveal" }), 650);
+    const hold: Record<string, number> = { "ex-workflow": 2000, "ex-readback": 1000, "ex-eligibility": 2000 };
+    const t = setTimeout(() => dispatch({ type: "reveal" }), hold[state.queue[0]] ?? 650);
     return () => clearTimeout(t);
   }, [state.queue, state.paused, hydrated]);
 

@@ -7,7 +7,8 @@ import { duration, lastTime, statusOf } from "@/lib/derive";
 import { Tab, hasEvent, useStore } from "@/lib/store";
 import { Pill, cn } from "@/components/ui";
 import { eventById } from "@/lib/script";
-import { NeedsYou } from "./NeedsYou";
+import { LegacyBeat, NeedsYou } from "./NeedsYou";
+import { ReplayRun } from "./ReplayRun";
 import { ProgressView } from "./ProgressView";
 import { SigningMap } from "./SigningMap";
 import { PaymentWorkflow } from "./PaymentWorkflow";
@@ -75,7 +76,6 @@ export function CaseWorkspace() {
   const st = state.handedOver ? { label: "With a maker", tone: "warn" as const } : state.paused && state.queue.length ? { label: "Paused", tone: "warn" as const } : statusOf[state.phase];
   const now = lastTime(state);
   const firstLogin = hasEvent(state, "rel-mohammed-login");
-  const bankDone = hasEvent(state, "ex-readback");
   const reviewDot = state.phase === "in_review" || state.phase === "re_review";
   const releaseDot = state.phase === "executed" || state.phase === "partially_live" || state.phase === "rashid_ready";
   const [mac, setMac] = useState(false);
@@ -113,7 +113,6 @@ export function CaseWorkspace() {
                 <span>
                   {firstLogin ? "Form to first login " : "Elapsed "}
                   <span className="tnum font-medium text-ink">{duration(business.submittedAt, firstLogin ? eventById("rel-mohammed-login").time : now)}</span>
-                  {bankDone && !firstLogin && <span className="tnum"> · bank-side {duration(business.submittedAt, eventById("ex-readback").time)}</span>}
                 </span>
               )}
               <button type="button" onClick={() => setProgressOpen(true)} className="hover:text-ink hover:underline">Agent progress</button>
@@ -139,9 +138,10 @@ export function CaseWorkspace() {
           </nav>
         </header>
         <div className="min-h-0 flex-1 overflow-y-auto px-8 pb-12">
-          <div key={group.id} className="animate-enter">
+          <div key={group.id}>
             {group.id === "review" && (
-              <div className="max-w-4xl space-y-10 pt-6">
+              <div className="max-w-[1280px] space-y-10 pt-6">
+                <LegacyBeat />
                 {agentWorking && <ProgressView />}
                 {hasEvent(state, "submit") ? <ReviewView /> : !agentWorking && <NotYet />}
                 {hasEvent(state, "ex-readback") && (
@@ -207,6 +207,8 @@ export function CaseWorkspace() {
                 <X className="h-4 w-4" />
               </button>
             </div>
+            <ReplayRun onDone={() => { setProgressOpen(false); setTab("review"); }} />
+            <LegacyBeat />
             <ProgressView />
           </div>
         </div>
