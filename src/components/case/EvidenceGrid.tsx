@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AlertTriangle, Check, X } from "lucide-react";
 import { EvidenceKey, evidence, people } from "@/data/seed";
 import { buildRules, fmt, singleLimit } from "@/lib/rules";
@@ -63,7 +63,7 @@ function FinacleCrop({ id }: { id: string }) {
         </div>
       </div>
       <p className="text-ink">
-        The SVS mandate says <q>{svsName}</q> and the form says <q>{p.name}</q>. The agent matched them by Emirates ID and RCIF, so the spelling doesn&apos;t matter.
+        The SVS mandate says <q>{svsName}</q> and the form says <q>{p.name}</q>. The agent matched them by Emirates ID and RCIF, so it doesn&apos;t matter how the name is written.
       </p>
     </div>
   );
@@ -76,6 +76,22 @@ export function EvidenceGrid() {
   const [active, setActive] = useState<string | null>(null);
   const [diff, setDiff] = useState(false);
   const [pinned, setPinned] = useState<string | null>(null);
+  const [rect, setRect] = useState<DOMRect | null>(null);
+  useEffect(() => {
+    if (!pinned) return;
+    const [r, c] = pinned.split("-");
+    const follow = () => {
+      const b = document.querySelector(`[aria-label="Evidence grid"] button[data-r="${r}"][data-c="${c}"]`);
+      if (b) setRect(b.getBoundingClientRect());
+    };
+    follow();
+    window.addEventListener("scroll", follow, true);
+    window.addEventListener("resize", follow);
+    return () => {
+      window.removeEventListener("scroll", follow, true);
+      window.removeEventListener("resize", follow);
+    };
+  }, [pinned]);
   const limit = singleLimit(buildRules(version))!;
   const v2 = version === 2;
   const renewed = hasEvent(state, "ren-kyc");
@@ -197,7 +213,7 @@ export function EvidenceGrid() {
                         data-c={c}
                         tabIndex={r === 0 && c === 0 ? 0 : -1}
                         aria-label={`${row.name}, ${cols[c]}: ${toneWord[cell.tone]}, ${cell.text}`}
-                        onClick={() => act(cell, key)}
+                        onClick={(e) => { setRect(e.currentTarget.getBoundingClientRect()); act(cell, key); }}
                         aria-expanded={pinned === key}
                         onMouseEnter={() => setActive(key)}
                         onMouseLeave={() => setActive(null)}
@@ -217,7 +233,8 @@ export function EvidenceGrid() {
                         <span className={/^(EID|RCIF) /.test(cell.text) ? "min-w-0 whitespace-nowrap font-mono text-[11px]" : "min-w-0"}>{cell.text}</span>
                       </button>
                       {pinned === key && (
-                        <div role="dialog" aria-label={`Source for ${row.name}, ${cols[c]}`} className="absolute left-2 top-full z-30 mt-1 w-80 rounded-lg border border-line bg-surface p-3 text-xs text-sub shadow-lg">
+                        <div role="dialog" aria-label={`Source for ${row.name}, ${cols[c]}`} style={rect ? { left: Math.min(rect.left + 8, window.innerWidth - 336), ...(rect.bottom + 360 > window.innerHeight ? { bottom: window.innerHeight - rect.top + 4 } : { top: rect.bottom + 4 }) } : undefined}
+                          className="fixed z-50 w-80 rounded-lg border border-line bg-surface p-3 text-xs text-sub shadow-lg">
                           <div className="mb-2 flex items-center justify-between gap-2">
                             <span className="font-medium text-ink">{cell.src ? evidence[cell.src].system : cols[c]}</span>
                             <button type="button" aria-label="Close" onClick={() => setPinned(null)} className="rounded p-0.5 text-muted hover:text-ink"><X className="h-3.5 w-3.5" /></button>
