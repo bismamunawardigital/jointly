@@ -1,6 +1,5 @@
 "use client";
 
-import { ChecksBlock } from "@/components/case/SourcePeek";
 import { useState } from "react";
 import { AlertTriangle, BookOpen, Check, ChevronRight, FileText, ListChecks, Radio, ShieldCheck, UserCheck, Users } from "lucide-react";
 import { StepId, eventById } from "@/lib/script";
@@ -58,11 +57,7 @@ export function ProgressView() {
     mandate: [
       ...(has("mandate-conflict") ? [{ tone: "ok" as Tone, lead: "Mandate understood", text: "the SVS mandate is more detailed than Finacle, so we used SVS.", who: "agent" as const, docs: ["svs-man"] as EvidenceKey[] }] : []),
       ...(has("mandate-letter")
-        ? [state.mine
-            ? { tone: "ok" as Tone, lead: "2023 letter: Sara's value", text: `Sara read AED ${(state.confirmed ?? 10000).toLocaleString("en-US")} and the agent wasn't sure, so the plan keeps Sara's value.`, who: "sara" as const, people: ["khalifa"] as PersonId[], docs: ["svs-amd"] as EvidenceKey[] }
-            : state.copy === "requested"
-              ? { tone: "warn" as Tone, lead: "Waiting for a clean copy", text: "Sara disagreed with the agent's reading, so the case waits for the branch.", who: "sara" as const, people: ["khalifa"] as PersonId[], docs: ["svs-amd"] as EvidenceKey[] }
-              : has("rev-amendment")
+        ? [has("rev-amendment")
             ? { tone: "ok" as Tone, lead: "2023 letter confirmed", text: "Sara checked the scan. Khalifa can sign alone up to AED 25,000.", who: "sara" as const, people: ["khalifa"] as PersonId[], docs: ["svs-amd"] as EvidenceKey[] }
             : { tone: "warn" as Tone, lead: "A 2023 letter is unclear", text: "it may raise Khalifa's limit to AED 25,000. Sara checks the scan.", who: "agent" as const, people: ["khalifa"] as PersonId[], docs: ["svs-amd"] as EvidenceKey[] }]
         : []),
@@ -89,7 +84,6 @@ export function ProgressView() {
 
   return (
     <div className="max-w-4xl">
-      <ChecksBlock />
       <h2 className="font-display text-2xl">{headline}</h2>
       <ol className="mt-6 grid grid-cols-6 gap-2" aria-label="Checkpoints">
         {checkpoints.map((c, i) => {
@@ -142,7 +136,7 @@ export function ProgressView() {
                       {tech[key] ? "Hide technical details" : "Technical details"}
                     </button>
                     {tech[key] && (
-                      <ul className="mt-2 space-y-1 tnum text-xs text-muted">
+                      <ul className="mt-2 space-y-1 font-mono text-[11px] text-muted">
                         {events.map((e) => {
                           const ev = eventById(e.id);
                           return <li key={e.id}>{ev.time} · {ev.actor} · {ev.call} → {ev.system}</li>;
@@ -168,7 +162,7 @@ export function ProgressView() {
 function Who({ who }: { who: Line["who"] }) {
   if (who === "agent") return <span className="flex shrink-0 items-center gap-1.5 text-xs text-muted"><AgentMark size={20} /> Agent</span>;
   if (who === "rules") return <span className="flex shrink-0 items-center gap-1.5 text-xs text-muted"><span className="flex h-5 w-5 items-center justify-center rounded-full bg-ok-soft text-ok-ink"><ShieldCheck className="h-3 w-3" /></span> Rules</span>;
-  return <span className="flex shrink-0 items-center gap-1.5 text-xs text-muted"><span className="flex h-5 w-5 items-center justify-center rounded-full border border-ink text-xs font-semibold">SM</span> Sara</span>;
+  return <span className="flex shrink-0 items-center gap-1.5 text-xs text-muted"><span className="flex h-5 w-5 items-center justify-center rounded-full border border-ink text-[9px] font-semibold">SM</span> Sara</span>;
 }
 
 function DocThumb({ k }: { k: EvidenceKey }) {
@@ -190,7 +184,7 @@ function DocThumb({ k }: { k: EvidenceKey }) {
         )}
       </div>
       <figcaption className="mt-1 text-xs text-sub">{e.title}</figcaption>
-      <p className="text-xs text-muted">{e.system}</p>
+      <p className="text-[11px] text-muted">{e.system}</p>
     </figure>
   );
 }

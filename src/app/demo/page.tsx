@@ -25,7 +25,7 @@ export default function CommandCenter() {
   return (
     <div className="h-full overflow-y-auto">
       <div className="mx-auto max-w-5xl px-10 py-10">
-        <p className="text-xs font-medium text-muted">Queue · Operations team</p>
+        <p className="text-xs font-medium text-muted">Command center · Customer Fulfillment</p>
         <h1 className="mt-1 font-display text-[28px] leading-tight text-ink">
           {needsYou === 1 ? "1 case needs you today." : needsYou > 1 ? `${needsYou} cases need you today.` : "Nothing needs you right now."}
         </h1>
@@ -34,7 +34,7 @@ export default function CommandCenter() {
             <div key={s.label} className="bg-surface px-5 py-4">
               <p className="text-xs text-muted">{s.label}</p>
               <p className={`tnum mt-1 text-2xl font-semibold ${s.tone === "warn" && s.value !== "0" ? "text-warn-ink" : ""}`}>{s.value}</p>
-              {s.note && <p className="mt-0.5 text-xs text-muted">{s.note}</p>}
+              {s.note && <p className="mt-0.5 text-[11px] text-muted">{s.note}</p>}
             </div>
           ))}
         </div>
@@ -62,7 +62,7 @@ export default function CommandCenter() {
                   <Link href="/demo/case/" className="flex items-center gap-1.5 font-medium text-ink">
                     {business.name} <ArrowRight className="h-3.5 w-3.5 text-accent" />
                   </Link>
-                  <p className="tnum text-xs text-muted">{business.iban}</p>
+                  <p className="font-mono text-[11px] text-muted">{business.iban}</p>
                 </td>
                 <td className="px-4 py-3 text-sub">Joint signatories (3)</td>
                 <td className="px-4 py-3 text-sub">{state.phase === "live" ? "Done" : active?.label ?? "Intake & EFR"}</td>

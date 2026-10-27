@@ -5,32 +5,32 @@
 :root,
 [data-theme="light"] {
   color-scheme: light;
-  --canvas: 255 255 255;
+  --canvas: 246 247 249;
   --surface: 255 255 255;
-  --panel: 247 248 250;
-  --line: 230 232 236;
+  --panel: 238 241 245;
+  --line: 227 231 237;
   --line-strong: 203 210 220;
-  --ink: 11 19 36;
-  --sub: 75 85 101;
-  --muted: 75 85 101;
+  --ink: 15 27 45;
+  --sub: 64 74 92;
+  --muted: 91 102 118;
   --onaccent: 255 255 255;
-  --brand: 224 154 43;
+  --brand: 200 137 43;
   --brand-soft: 238 241 245;
-  --accent: 11 19 36;
-  --accent-hover: 31 42 61;
+  --accent: 31 58 138;
+  --accent-hover: 24 45 108;
   --accent-soft: 234 238 250;
-  --accent-ink: 29 78 216;
-  --ok: 21 128 61;
-  --ok-soft: 236 253 243;
-  --ok-ink: 21 128 61;
-  --warn: 180 83 9;
-  --warn-soft: 255 247 230;
-  --warn-ink: 180 83 9;
+  --accent-ink: 31 58 138;
+  --ok: 47 125 91;
+  --ok-soft: 229 242 235;
+  --ok-ink: 33 96 69;
+  --warn: 183 121 31;
+  --warn-soft: 250 240 222;
+  --warn-ink: 133 85 16;
   --bad: 180 35 24;
-  --bad-soft: 254 243 242;
-  --bad-ink: 180 35 24;
-  --held: 71 84 103;
-  --held-soft: 242 244 247;
+  --bad-soft: 251 233 231;
+  --bad-ink: 140 26 18;
+  --held: 107 114 128;
+  --held-soft: 247 248 250;
   --p-mohammed: 14 124 134;
   --p-khalifa: 79 70 229;
   --p-rashid: 217 83 79;
@@ -42,20 +42,20 @@
 [data-theme="dark"] {
   color-scheme: dark;
   --canvas: 11 18 32;
-  --surface: 17 26 44;
-  --panel: 13 21 38;
+  --surface: 18 26 43;
+  --panel: 14 22 38;
   --line: 34 48 74;
   --line-strong: 52 68 98;
-  --ink: 238 242 248;
-  --sub: 163 174 194;
-  --muted: 163 174 194;
-  --onaccent: 11 18 32;
-  --brand: 240 180 76;
+  --ink: 232 236 243;
+  --sub: 190 198 210;
+  --muted: 154 166 184;
+  --onaccent: 14 20 32;
+  --brand: 224 168 74;
   --brand-soft: 14 22 38;
-  --accent: 245 247 250;
-  --accent-hover: 220 226 235;
+  --accent: 143 168 255;
+  --accent-hover: 176 194 255;
   --accent-soft: 28 39 70;
-  --accent-ink: 143 168 255;
+  --accent-ink: 176 194 255;
   --ok: 92 190 146;
   --ok-soft: 20 44 35;
   --ok-ink: 132 214 176;
@@ -82,8 +82,8 @@ html {
 
 body {
   @apply bg-canvas text-ink font-sans;
-  font-size: 15px;
-  line-height: 1.55;
+  font-size: 14px;
+  line-height: 1.5;
 }
 
 h1, h2, h3 {
@@ -182,92 +182,3 @@ h1, h2, h3 {
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
 }
-
-.guide-spot { outline: 3px solid rgb(var(--brand)); outline-offset: 3px; border-radius: 8px; }
-@keyframes introBeat { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-.intro-beat { opacity: 0; animation: introBeat 400ms ease-out forwards; }
-@media (prefers-reduced-motion: reduce) { .intro-beat { opacity: 1; animation: none; } }
-
-.band-dark {
-  --canvas: 11 18 32;
-  --surface: 17 26 44;
-  --panel: 13 21 38;
-  --line: 34 48 74;
-  --line-strong: 52 68 98;
-  --ink: 238 242 248;
-  --sub: 163 174 194;
-  --muted: 163 174 194;
-  --onaccent: 11 18 32;
-  --brand: 240 180 76;
-  --brand-soft: 14 22 38;
-  --accent: 245 247 250;
-  --accent-hover: 220 226 235;
-  --accent-soft: 28 39 70;
-  --accent-ink: 143 168 255;
-  --ok: 92 190 146;
-  --ok-soft: 20 44 35;
-  --ok-ink: 132 214 176;
-  --warn: 228 170 82;
-  --warn-soft: 48 36 18;
-  --warn-ink: 240 198 132;
-  --bad: 240 118 106;
-  --bad-soft: 54 24 24;
-  --bad-ink: 246 160 150;
-  --held: 150 158 172;
-  --held-soft: 30 40 58;
-  --p-mohammed: 52 178 188;
-  --p-khalifa: 140 134 248;
-  --p-rashid: 240 124 118;
-  --p-sara: 238 234 226;
-  --p-agent: 156 163 175;
-  --shadow: 0 0 0;
-  background: rgb(var(--canvas));
-  color: rgb(var(--ink));
-}
-
-svg.lucide {
-  stroke-width: 1.5;
-}
-
-/* G11 micro-interactions: 150-300ms ease-out, no bounce */
-@keyframes tick-in { from { opacity: 0; transform: scale(0.6); } to { opacity: 1; transform: none; } }
-@keyframes glow-once { 0% { box-shadow: inset 0 0 0 0 rgb(var(--warn) / 0); } 40% { box-shadow: inset 0 0 0 2px rgb(var(--warn) / 0.6); } 100% { box-shadow: inset 0 0 0 0 rgb(var(--warn) / 0); } }
-@keyframes peek-grow { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: none; } }
-@keyframes pulse-once { 0%, 100% { outline-color: rgb(var(--brand)); } 50% { outline-color: rgb(var(--brand) / 0.2); } }
-@keyframes draw { from { stroke-dashoffset: 24; } to { stroke-dashoffset: 0; } }
-@keyframes slide-in-end { from { opacity: 0; transform: translateX(12px); } to { opacity: 1; transform: none; } }
-@keyframes light-step { 0%, 100% { color: rgb(var(--sub)); } 50% { color: rgb(var(--ink)); } }
-@keyframes amber-pulse { 0%, 100% { background: transparent; } 50% { background: rgb(var(--warn) / 0.12); } }
-.tick-in { animation: tick-in 200ms ease-out both; }
-.glow-once { animation: glow-once 900ms ease-out 1 both; }
-.peek-grow { transform-origin: top left; animation: peek-grow 180ms ease-out both; }
-.peek-grow mark { animation: pulse-once 600ms ease-out 200ms 1; }
-.draw-tick path, .draw-tick polyline { stroke-dasharray: 24; animation: draw 250ms ease-out both; }
-.slide-in-end { animation: slide-in-end 250ms ease-out both; }
-.light-step { animation: light-step 900ms ease-out 1 both; }
-.amber-pulse { animation: amber-pulse 1.2s ease-out infinite; }
-.fade-in { animation: introBeat 200ms ease-out both; }
-@media (prefers-reduced-motion: reduce) {
-  .tick-in, .glow-once, .peek-grow, .peek-grow mark, .draw-tick path, .draw-tick polyline, .slide-in-end, .light-step, .amber-pulse, .fade-in { animation: none !important; opacity: 1; transform: none; stroke-dashoffset: 0; }
-}
-[data-anim] svg { animation: tick-in 200ms ease-out both; animation-delay: calc(var(--c) * 30ms); }
-[data-anim="warn"], [data-anim="bad"] { animation: glow-once 900ms ease-out 400ms 1 both; }
-@media (prefers-reduced-motion: reduce) { [data-anim] svg, [data-anim="warn"], [data-anim="bad"] { animation: none !important; } }
-
-@view-transition { navigation: auto; }
-.vt-hero { view-transition-name: hero-frame; }
-::view-transition-group(hero-frame) { animation-duration: 400ms; animation-timing-function: ease-out; }
-@media (prefers-reduced-motion: reduce) {
-  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
-}
-
-@keyframes draw-long { to { stroke-dashoffset: 0; } }
-@keyframes dash-run { to { stroke-dashoffset: -12; } }
-.draw-line { stroke-dasharray: 600; stroke-dashoffset: 600; animation: draw-long 700ms ease-out forwards; }
-.loop-circle { animation: dash-run 600ms linear 4; }
-@media (prefers-reduced-motion: reduce) {
-  .draw-line { stroke-dasharray: none; stroke-dashoffset: 0; animation: none; }
-  .loop-circle { animation: none; }
-}
-
-[data-dim] { opacity: 0.3; transition: opacity 150ms ease-out; }

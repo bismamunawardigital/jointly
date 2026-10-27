@@ -14,7 +14,7 @@ function Gap({ h, label, on, horizontal = false }: { h: number; label?: string; 
       style={{ ...(on ? hatch : {}), ...(horizontal ? { width: h } : { height: h }) }}
     >
       {on && label && (
-        <span className="absolute -right-12 rounded bg-accent px-1 tnum text-xs leading-[18px] text-onaccent">{label}</span>
+        <span className="absolute -right-12 rounded bg-accent px-1 font-mono text-[9px] leading-[14px] text-onaccent">{label}</span>
       )}
     </div>
   );
@@ -22,7 +22,7 @@ function Gap({ h, label, on, horizontal = false }: { h: number; label?: string; 
 
 function Tag({ children, className }: { children: React.ReactNode; className: string }) {
   return (
-    <span className={`absolute flex items-center gap-1.5 whitespace-nowrap tnum text-xs text-accent-ink ${className}`}>{children}</span>
+    <span className={`absolute flex items-center gap-1.5 whitespace-nowrap font-mono text-[10px] text-accent-ink ${className}`}>{children}</span>
   );
 }
 
@@ -72,7 +72,7 @@ export function SpecDrawing() {
                       <p className="text-xs text-muted">R2</p>
                       <p className="text-sm">Khalifa signs alone up to AED 10,000</p>
                     </div>
-                    <span className="inline-flex shrink-0 items-center gap-1 rounded border border-line px-1.5 py-0.5 tnum text-xs text-sub">
+                    <span className="inline-flex shrink-0 items-center gap-1 rounded border border-line px-1.5 py-0.5 font-mono text-[10px] text-sub">
                       <FileText className="h-3 w-3" /> SVS cl.2
                     </span>
                   </div>
@@ -103,7 +103,7 @@ export function SpecDrawing() {
         {specs.map((s) => (
           <div key={s.k} className="flex justify-between gap-4 py-2">
             <dt className="text-sub">{s.k}</dt>
-            <dd className="tnum text-xs leading-5 text-ink">{s.v}</dd>
+            <dd className="tnum font-mono text-xs leading-5 text-ink">{s.v}</dd>
           </div>
         ))}
       </dl>

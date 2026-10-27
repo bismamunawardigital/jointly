@@ -134,7 +134,7 @@ function TourCard() {
         {!ready && <p className="mt-2 text-xs text-muted">{m.notReady}</p>}
         <div className="mt-4 flex items-center gap-2">
           {i > 0 && (
-            <Button size="sm" onClick={show}>
+            <Button size="sm" variant="primary" onClick={show}>
               Show me
             </Button>
           )}

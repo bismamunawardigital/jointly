@@ -1,4 +1,3 @@
-import { Analytics } from "@vercel/analytics/react";
 import type { Metadata } from "next";
 import { IBM_Plex_Sans, IBM_Plex_Sans_Arabic, IBM_Plex_Mono, Instrument_Sans } from "next/font/google";
 import "./globals.css";
@@ -32,8 +31,8 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://jointly-banking.vercel.app"),
   title: "Jointly · Agentic AI case study by Bisma Munawar",
   description: desc,
-  openGraph: { title: ogTitle, description: desc, url: "/", siteName: "Jointly", type: "website", images: [{ url: "/og-cover.png", width: 1200, height: 630, alt: "Jointly · Agentic AI for bank operations" }] },
-  twitter: { card: "summary_large_image", title: ogTitle, description: desc, images: ["/og-cover.png"] },
+  openGraph: { title: ogTitle, description: desc, url: "/", siteName: "Jointly", type: "website" },
+  twitter: { card: "summary_large_image", title: ogTitle, description: desc },
 };
 
 const themeScript = `try{if(localStorage.getItem("jointly-theme")==="dark")document.documentElement.dataset.theme="dark";if(localStorage.getItem("jointly-density")==="compact")document.documentElement.dataset.density="compact"}catch(e){}`;
@@ -46,7 +45,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <StoreProvider>{children}</StoreProvider>
-        <Analytics />
       </body>
     </html>
   );

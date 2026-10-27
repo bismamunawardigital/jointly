@@ -73,7 +73,7 @@ export function PaymentWorkflow({ diff = false }: { diff?: boolean }) {
           <Step title="Someone starts it" ids={all} />
           <Arrow />
           <Step title="1st approval" ids={all} className="flex-1" />
-          <span className="flex shrink-0 items-center gap-1 rounded-full border border-line bg-surface px-2 py-0.5 text-xs text-sub" title="The second approver must be a different signatory">
+          <span className="flex shrink-0 items-center gap-1 rounded-full border border-line bg-surface px-2 py-0.5 text-[11px] text-sub" title="The second approver must be a different signatory">
             <UserRoundX className="h-3 w-3" /> not the same person
           </span>
           <Step title="2nd approval" ids={all} className="flex-1" />
@@ -90,7 +90,7 @@ export function PaymentWorkflow({ diff = false }: { diff?: boolean }) {
 
       <details>
         <summary className="cursor-pointer text-xs text-muted">Technical details</summary>
-        <ul className="mt-2 space-y-1 tnum text-xs text-muted">
+        <ul className="mt-2 space-y-1 font-mono text-[11px] text-muted">
           <li>WF-AED-LOW · 1 to {fmt(limit)} · rules R2 (single) | R1 (any 2)</li>
           <li>WF-AED-HIGH · above {fmt(limit)} · rule R1 · maker-checker distinct users</li>
           <li>Other currencies · no workflow created</li>

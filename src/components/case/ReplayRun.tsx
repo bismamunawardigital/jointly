@@ -37,7 +37,7 @@ export function ReplayRun({ onDone }: { onDone: () => void }) {
           <span className="min-w-0 flex-1">
             <span className="font-medium">{s.lead}.</span> {s.text}
           </span>
-          <span className="shrink-0 rounded-full bg-panel px-2 py-0.5 text-xs text-sub">{s.src}</span>
+          <span className="shrink-0 rounded-full bg-panel px-2 py-0.5 text-[11px] text-sub">{s.src}</span>
         </li>
       ))}
       <li className="pt-1">

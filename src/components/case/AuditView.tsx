@@ -70,13 +70,13 @@ export function AuditView() {
                   <td className="tnum px-4 py-2.5 text-xs text-sub">{r.time}</td>
                   <td className="px-4 py-2.5">
                     <span className="inline-flex items-center gap-1.5 text-xs font-medium">
-                      {mark[r.lane]} {tech ? r.who : r.legacy ? "System" : l.label}
+                      {mark[r.lane]} {tech ? r.who : l.label}
                     </span>
                   </td>
                   <td className="px-4 py-2.5">
                     {r.what}
-                    {r.legacy && <span className="ml-2 whitespace-nowrap rounded-full bg-panel px-2 py-0.5 text-xs text-sub">Legacy system</span>}
-                    {tech && <p className="mt-0.5 tnum text-xs text-muted">{r.call}</p>}
+                    {r.legacy && <span className="ml-2 whitespace-nowrap rounded-full bg-panel px-2 py-0.5 text-[11px] text-sub">Legacy system</span>}
+                    {tech && <p className="mt-0.5 font-mono text-[11px] text-muted">{r.call}</p>}
                   </td>
                   <td className="px-4 py-2.5">{tech && r.sources ? <Sources keys={r.sources} /> : <span className="whitespace-nowrap text-xs text-muted">{r.sources ? `${r.sources.length} source${r.sources.length > 1 ? "s" : ""}` : "None needed"}</span>}</td>
                 </tr>

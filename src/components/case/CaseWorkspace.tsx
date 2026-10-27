@@ -147,12 +147,11 @@ export function CaseWorkspace() {
         <header className="border-b border-line px-8 pb-0 pt-4">
           <div className="flex items-center gap-3 text-xs">
             <h1 className="truncate font-display text-lg leading-tight text-ink">{business.name}</h1>
-            <button type="button" onClick={() => window.dispatchEvent(new CustomEvent("jointly:intro"))} className="hidden truncate rounded-full border border-line px-2.5 py-0.5 text-xs text-sub hover:text-ink 2xl:inline">Scenario: getting Creekside&apos;s 3 partners onto online banking</button>
             <Pill tone={st.tone}>{st.label}</Pill>
-            <bdi dir="ltr" className="hidden tnum text-muted xl:inline">{business.iban}</bdi>
+            <bdi dir="ltr" className="hidden font-mono text-muted xl:inline">{business.iban}</bdi>
             <span className="ml-auto flex items-center gap-4 text-muted">
               {now && (
-                <span title={firstLogin ? undefined : "Time since the customer's forms arrived. The agent started at 09:12."}>
+                <span>
                   {firstLogin ? "Form to first login " : "Elapsed "}
                   <span className="tnum font-medium text-ink">{duration(business.submittedAt, firstLogin ? eventById("rel-mohammed-login").time : now)}</span>
                 </span>
@@ -202,7 +201,7 @@ export function CaseWorkspace() {
               <div className="max-w-[1280px] space-y-10 pt-6">
                 <LegacyBeat />
                 {agentWorking && <ProgressView />}
-                <div className="vt-hero">{hasEvent(state, "submit") ? <ReviewView /> : !agentWorking && <NotYet />}</div>
+                {hasEvent(state, "submit") ? <ReviewView /> : !agentWorking && <NotYet />}
                 {hasEvent(state, "ex-readback") && (
                   <section id="sec-release" aria-label="Release" className="scroll-mt-6">
                     <ReleaseView />
@@ -295,24 +294,6 @@ export function CaseWorkspace() {
                 </li>
               ))}
             </ul>
-            <p className="mt-6 text-sm font-medium">The agent is a maker that can never be its own checker.</p>
-            <h3 className="mt-6 text-sm font-semibold">What this agent can and cannot do</h3>
-            <div className="mt-3 grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <p className="font-medium text-ok-ink">Can</p>
-                <ul className="mt-1 space-y-1 text-sub">
-                  {["Read Finacle, SVS and EFR", "Build a plan", "Write to Digital Banking Admin after sign-off", "Read back what it wrote", "Ask Sara"].map((x) => <li key={x}>{x}</li>)}
-                </ul>
-              </div>
-              <div>
-                <p className="font-medium text-bad-ink">Cannot</p>
-                <ul className="mt-1 space-y-1 text-sub">
-                  {["Approve anything", "Reject a customer", "Send passwords", "Match by name", "Continue after a timeout without a read-back"].map((x) => <li key={x}>{x}</li>)}
-                </ul>
-              </div>
-            </div>
-            <p className="mt-4 text-sm text-sub">If a case hits 3 rule exceptions, it goes to a senior checker.</p>
-            <p className="mt-4 rounded-lg bg-panel p-3 text-xs text-sub">Autonomy level: Approver. The agent only involves Sara for risky or unclear items.</p>
           </div>
         </div>
       )}

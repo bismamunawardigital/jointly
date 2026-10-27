@@ -29,18 +29,11 @@ const config: Config = {
         warn: { DEFAULT: v("warn"), soft: v("warn-soft"), ink: v("warn-ink") },
         bad: { DEFAULT: v("bad"), soft: v("bad-soft"), ink: v("bad-ink") },
       },
-      fontSize: {
-        xs: ["13px", "18px"],
-        sm: ["14px", "20px"],
-        base: ["16px", "26px"],
-        lg: ["18px", "28px"],
-        xl: ["22px", "28px"],
-      },
-      borderRadius: { card: "12px" },
+      borderRadius: { card: "16px" },
       boxShadow: {
         sm: "0 1px 2px rgb(var(--shadow) / 0.04)",
         md: "0 1px 2px rgb(var(--shadow) / 0.04), 0 4px 12px rgb(var(--shadow) / 0.05)",
-        lg: "0 8px 24px rgba(11, 19, 36, 0.08)",
+        lg: "0 2px 4px rgb(var(--shadow) / 0.04), 0 12px 32px rgb(var(--shadow) / 0.10)",
       },
       transitionTimingFunction: {
         out: "cubic-bezier(0.23, 1, 0.32, 1)",

@@ -22,26 +22,26 @@ function Lane({ lanes, nodes, edges, pains, loop, empty }: { lanes: string[]; no
       {lanes.map((l, i) => (
         <g key={l}>
           <rect x="0" y={i * LH} width="1000" height={LH} fill={i % 2 ? "rgb(var(--panel))" : "rgb(var(--surface))"} />
-          <text x="12" y={i * LH + LH / 2 + 4} fontSize="13" fontWeight="600" fill="rgb(var(--sub))">{l}</text>
+          <text x="12" y={i * LH + LH / 2 + 4} fontSize="12" fontWeight="600" fill="rgb(var(--sub))">{l}</text>
         </g>
       ))}
       {empty?.map((e) => (
-        <text key={e.lane} x={x(3)} y={y(e.lane) + NH / 2 + 4} fontSize="13" fill="rgb(var(--muted))">{e.text}</text>
+        <text key={e.lane} x={x(3)} y={y(e.lane) + NH / 2 + 4} fontSize="11" fill="rgb(var(--muted))">{e.text}</text>
       ))}
       {edges.map(([a, b]) => {
         const A = mid(a), B = mid(b);
         const d = nodes[a].col === nodes[b].col ? `M${A.cx} ${A.cy < B.cy ? A.b : A.t} V${A.cy < B.cy ? B.t : B.b}` : `M${A.r} ${A.cy} H${(A.r + B.l) / 2} V${B.cy} H${B.l - 2}`;
-        return <path key={`${a}-${b}`} d={d} fill="none" stroke="rgb(var(--muted))" strokeWidth="1.5" markerEnd="url(#arr)" className="draw-line" />;
+        return <path key={`${a}-${b}`} d={d} fill="none" stroke="rgb(var(--muted))" strokeWidth="1.5" markerEnd="url(#arr)" />;
       })}
       {loop &&
         [0, 1, 2, 3].map((k) => {
           const A = mid(loop[0]), B = mid(loop[1]);
-          return <path key={k} d={`M${A.cx - 20 + k * 10} ${A.t} C${A.cx - 20 + k * 10} ${A.t - 26 - k * 4}, ${B.cx - 20 + k * 10} ${B.b + 26 + k * 4}, ${B.cx - 20 + k * 10} ${B.b}`} fill="none" stroke="rgb(var(--warn))" strokeWidth="1.25" className="loop-circle" strokeDasharray="3 3" opacity={1 - k * 0.15} />;
+          return <path key={k} d={`M${A.cx - 20 + k * 10} ${A.t} C${A.cx - 20 + k * 10} ${A.t - 26 - k * 4}, ${B.cx - 20 + k * 10} ${B.b + 26 + k * 4}, ${B.cx - 20 + k * 10} ${B.b}`} fill="none" stroke="rgb(var(--warn))" strokeWidth="1.25" strokeDasharray="3 3" opacity={1 - k * 0.15} />;
         })}
       {nodes.map((n, i) => (
         <g key={i}>
           <rect x={x(n.col)} y={y(n.lane)} width={NW} height={NH} rx="8" fill="rgb(var(--surface))" stroke={stroke[n.tone ?? "plain"]} strokeWidth="1.5" />
-          <text x={x(n.col) + NW / 2} y={y(n.lane) + (n.text.includes("|") ? 16 : 24)} textAnchor="middle" fontSize="13" fill="rgb(var(--ink))">
+          <text x={x(n.col) + NW / 2} y={y(n.lane) + (n.text.includes("|") ? 16 : 24)} textAnchor="middle" fontSize="11" fill="rgb(var(--ink))">
             {n.text.split("|").map((t, k) => (
               <tspan key={k} x={x(n.col) + NW / 2} dy={k ? 13 : 0}>{t}</tspan>
             ))}
@@ -51,7 +51,7 @@ function Lane({ lanes, nodes, edges, pains, loop, empty }: { lanes: string[]; no
       {pains.map((p) => (
         <g key={p.n}>
           <circle cx={p.at[0]} cy={p.at[1]} r="10" fill="rgb(var(--warn))" />
-          <text x={p.at[0]} y={p.at[1] + 4} textAnchor="middle" fontSize="13" fontWeight="700" fill="#fff">{p.n}</text>
+          <text x={p.at[0]} y={p.at[1] + 4} textAnchor="middle" fontSize="11" fontWeight="700" fill="#fff">{p.n}</text>
         </g>
       ))}
     </svg>
@@ -103,7 +103,7 @@ export function DaysSwimlane({ t }: { t: { lanes: string[]; today: string; joint
   return (
     <div>
       <div className="mb-4 hidden w-fit gap-1 rounded-full border border-line p-1 md:flex">{tab("today", t.today)}{tab("jointly", t.jointly)}</div>
-      <div key={view} className="fade-in hidden overflow-hidden rounded-card border border-line md:block">{view === "today" ? today : jointly}</div>
+      <div className="hidden overflow-hidden rounded-card border border-line md:block">{view === "today" ? today : jointly}</div>
       <div className="space-y-6 md:hidden">
         <div><p className="mb-2 text-xs font-medium text-muted">{t.today}</p><div className="overflow-x-auto rounded-card border border-line">{today}</div></div>
         <div><p className="mb-2 text-xs font-medium text-muted">{t.jointly}</p><div className="overflow-x-auto rounded-card border border-line">{jointly}</div></div>
@@ -111,7 +111,7 @@ export function DaysSwimlane({ t }: { t: { lanes: string[]; today: string; joint
       <ol className={`mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm text-sub ${view === "jointly" ? "md:invisible" : ""}`}>
         {t.pains.map((p, i) => (
           <li key={p} className="flex items-center gap-2">
-            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-warn text-xs font-bold text-white">{i + 1}</span>
+            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-warn text-[11px] font-bold text-white">{i + 1}</span>
             {p}
           </li>
         ))}

@@ -138,7 +138,7 @@ const scene = {
 const h2 = "text-3xl font-semibold leading-snug md:text-4xl";
 const primary = "inline-flex h-11 items-center gap-1.5 rounded-lg bg-accent px-5 text-sm font-medium text-onaccent transition-colors hover:bg-accent-hover";
 const frame = "overflow-hidden rounded-card border border-line bg-surface shadow-lg";
-const tag = "rounded-full border border-line px-2 py-0.5 text-xs text-muted";
+const tag = "rounded-full border border-line px-2 py-0.5 text-[11px] text-muted";
 const dots = (
   <div className="flex items-center gap-1.5 border-b border-line bg-panel/60 px-4 py-2.5">
     {[0, 1, 2].map((i) => <span key={i} className="h-2.5 w-2.5 rounded-full bg-line-strong" />)}
@@ -176,14 +176,7 @@ export default function CaseStudyAr() {
           </p>
           <p className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm">
             <Gloss term="المفوّضون بالتوقيع المشترك" def="شخصان أو أكثر يجب أن يعتمدوا مدفوعات الشركة معًا." />
-            <Gloss term="فريق العمليات" def="فريق البنك الذي يُعدّ الخدمات المصرفية الرقمية للشركات يدويًا. بعض البنوك تسميه CF." />
-            <Gloss term="RCIF" def="رقم العميل الفريد في النظام المصرفي الأساسي، فلكل شخص رقم واحد مهما اختلفت كتابة اسمه." />
-            <Gloss term="Finacle" def="النظام المصرفي الأساسي للبنك، وفيه بيانات العملاء والحسابات." />
-            <Gloss term="SVS" def="نظام التحقق من التوقيع، ويحفظ التفويضات والخطابات الموقّعة، وغالبًا تكون صورًا ممسوحة." />
-            <Gloss term="EFR" def="التحقق من الهوية الإماراتية بالوجه، ويتأكد أن الهوية سارية وأن الوجه يطابقها." />
-            <Gloss term="التفويض" def="القاعدة المكتوبة للشركة التي تحدد من يعتمد المدفوعات وحتى أي مبلغ." />
-            <Gloss term="المنشئ والمدقق" def="شخص يُعدّ التغيير وشخص ثانٍ يراجعه، والبنوك تطبق هذا على كل تغيير." />
-            <Gloss term="Digital Banking Admin" def="الشاشة الخلفية التي يُعدّ فيها مستخدمو الخدمات المصرفية الرقمية وأدوارهم وقواعد الاعتماد." />
+            <Gloss term="خدمة العملاء (CF)" def="فريق البنك الذي يُعدّ الخدمات المصرفية الرقمية للشركات يدويًا." />
           </p>
           <dl className="mt-6 grid grid-cols-3 gap-4 md:gap-6">
             {statsAr.map((s) => (
@@ -194,11 +187,11 @@ export default function CaseStudyAr() {
             ))}
           </dl>
           <div className="mt-6">
-            <Link href="/demo/case/?lang=ar" className={primary}>
+            <Link href="/demo/case/" className={primary}>
               افتح العرض التجريبي (<B>5</B> دقائق) <ArrowLeft className="h-4 w-4" />
             </Link>
           </div>
-          <p className="mt-3 text-xs text-muted">حالة افتراضية. لم تُقَس في بنك حقيقي. العرض التجريبي باللغة الإنجليزية.</p>
+          <p className="mt-3 text-[11px] text-muted">حالة افتراضية. لم تُقَس في بنك حقيقي. العرض التجريبي باللغة الإنجليزية.</p>
         </div>
         <HeroFrame callouts={["سحب الوكيل كل السجلات من Finacle وSVS وEFR", "الأخضر = نُسخ كما هو. الكهرماني = اضطر الوكيل لقراءة مستند", "سارة تقرر الكهرماني فقط. ثم تعتمد الخطة."]} />
       </section>
@@ -249,7 +242,7 @@ export default function CaseStudyAr() {
                 <div className="mt-2 flex h-8 items-center gap-1">
                   {d.icons.map((I, i) => <I key={i} aria-hidden className="h-4 w-4 text-sub md:h-6 md:w-6" />)}
                 </div>
-                <p className="mt-1 text-xs leading-snug text-sub md:text-xs">{d.label}</p>
+                <p className="mt-1 text-[11px] leading-snug text-sub md:text-xs">{d.label}</p>
               </div>
             ))}
           </div>
@@ -301,7 +294,7 @@ export default function CaseStudyAr() {
               <li key={x.name} className="rounded-card border border-line bg-surface p-5">
                 <div className="flex items-center justify-between gap-2">
                   <p lang="en" dir="ltr" className="font-sans font-semibold">{x.name}</p>
-                  <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${x.k === "w" ? "bg-accent-soft text-accent-ink" : x.k === "c" ? "bg-ok-soft text-ok-ink" : "bg-panel text-sub"}`}>{x.tag}</span>
+                  <span className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${x.k === "w" ? "bg-accent-soft text-accent-ink" : x.k === "c" ? "bg-ok-soft text-ok-ink" : "bg-panel text-sub"}`}>{x.tag}</span>
                 </div>
                 <p className="mt-2 text-sm text-sub">{x.d}</p>
               </li>
@@ -312,7 +305,7 @@ export default function CaseStudyAr() {
               <li key={i} className="flex items-center gap-2 text-sm">
                 {i > 0 && <ArrowLeft aria-hidden className="hidden h-4 w-4 text-muted md:block" />}
                 <span className={`rounded-full px-3 py-1 ${tone === "warn" ? "bg-warn-soft text-warn-ink" : tone === "ok" ? "bg-ok-soft text-ok-ink" : "bg-panel text-sub"}`}>
-                  <bdi className="tnum text-xs">{t}</bdi> {l}
+                  <bdi className="tnum font-mono text-xs">{t}</bdi> {l}
                 </span>
               </li>
             ))}
@@ -370,9 +363,6 @@ export default function CaseStudyAr() {
       <section id="roles" className="border-t border-line">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className={h2}>من يقرر ماذا</h2>
-          <p className="mt-3 text-lg font-medium">الوكيل منشئ، ولا يمكن أبدًا أن يكون مدقق عمله.</p>
-          <p className="mt-1 text-sub">إذا وصلت الحالة إلى 3 استثناءات في القواعد، تنتقل إلى مدقق أقدم.</p>
-          <p className="mt-1 text-xs text-muted">مبني على <a className="underline" href="https://artificialintelligenceact.eu/article/14/" target="_blank" rel="noreferrer">المادة 14 من قانون الذكاء الاصطناعي الأوروبي</a> و<a className="underline" href="https://www.wam.ae/en/article/byvw3l2-cbuae-issues-guidance-note-protect-consumers-and" target="_blank" rel="noreferrer">إرشادات مصرف الإمارات المركزي لعام 2026</a>. هذه قراءتي، وليست رأيًا قانونيًا.</p>
           <div className="mt-10 grid gap-4 sm:grid-cols-2 md:grid-cols-4">
             {lanes.map((l) => (
               <div key={l.title} className="rounded-card border border-line bg-surface p-6">
@@ -386,7 +376,7 @@ export default function CaseStudyAr() {
           </div>
           <p className="mt-8 text-sm text-sub">
             تنتهي كل حالة بسجل قرار يستطيع المدقق قراءته: القاعدة، والاقتباس، والمعتمِد، والوقت.{" "}
-            <Link href="/demo/case/?view=record&lang=ar" className="text-accent-ink underline underline-offset-2">شاهد سجل <B>Creekside</B></Link>
+            <Link href="/demo/case/?view=record" className="text-accent-ink underline underline-offset-2">شاهد سجل <B>Creekside</B></Link>
           </p>
         </div>
       </section>
@@ -514,7 +504,7 @@ export default function CaseStudyAr() {
               المراجعة اللغوية من متحدث أصلي قيد الانتظار · <span lang="en" className="font-sans">Native review pending</span>
             </p>
           </div>
-          <Link href="/demo/case/?lang=ar" className={primary}>
+          <Link href="/demo/case/" className={primary}>
             افتح العرض التجريبي <ArrowLeft className="h-4 w-4" />
           </Link>
         </div>

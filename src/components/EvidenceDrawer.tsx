@@ -23,7 +23,7 @@ export function EvidenceDrawer() {
           <div>
             <p className="text-xs text-muted">{e.system}</p>
             <h3 className="mt-0.5 text-base font-semibold">{e.title}</h3>
-            <p className="tnum mt-1 text-xs text-sub">{e.ref}</p>
+            <p className="mt-1 font-mono text-xs text-sub">{e.ref}</p>
           </div>
           <button onClick={() => openEvidence(null)} className="rounded-md p-1 text-muted hover:bg-panel hover:text-ink" aria-label="Close">
             <X className="h-4 w-4" />

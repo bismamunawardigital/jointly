@@ -1,15 +1,14 @@
 "use client";
 
-import { FocusSources, SourceIcons, SourceTrail } from "@/components/case/SourcePeek";
 import { EvidenceGrid } from "./EvidenceGrid";
 import { PaymentWorkflow } from "./PaymentWorkflow";
 import { SigningMap } from "./SigningMap";
 
-import { useEffect, useRef, useState } from "react";
-import { AlertTriangle, Check, ChevronRight, Repeat, ShieldCheck } from "lucide-react";
+import { useEffect, useState } from "react";
+import { AlertTriangle, Check, ChevronRight, Repeat, ShieldCheck, Undo2 } from "lucide-react";
 import { EvidenceKey, isAgentRead } from "@/data/seed";
 import { approvalValid, buildStages, diffStage, fmt, policyChecks } from "@/lib/rules";
-import { allApproved, hasEvent, useStore, letterLabel } from "@/lib/store";
+import { allApproved, hasEvent, useStore } from "@/lib/store";
 import { useTourTarget } from "@/components/Tour";
 import { Avatar, BasisTag, Button, Card, Empty, Pill, Proof, Tween, cn } from "@/components/ui";
 
@@ -66,7 +65,7 @@ function coverage(stageId: number, version: 1 | 2) {
 function Coverage({ n, of, label }: { n: number; of: number; label: string }) {
   const full = n === of;
   return (
-    <span className={cn("inline-flex items-center gap-1.5 text-xs", full ? "text-ok-ink" : "text-warn-ink")} title={`${label}: ${n} of ${of}`}>
+    <span className={cn("inline-flex items-center gap-1.5 text-[11px]", full ? "text-ok-ink" : "text-warn-ink")} title={`${label}: ${n} of ${of}`}>
       <span className="flex gap-0.5" aria-hidden>
         {Array.from({ length: of }, (_, i) => (
           <span key={i} className={cn("h-1.5 w-3 rounded-full", i < n ? (full ? "bg-ok" : "bg-warn") : "bg-line-strong")} />
@@ -138,127 +137,76 @@ function ScanLens({ src, alt }: { src: string; alt: string }) {
   );
 }
 
-function CleanLetter() {
-  return (
-    <div className="rounded-lg border border-line bg-surface p-5 text-[13px] leading-relaxed text-ink" style={{ fontFamily: "Georgia, serif" }}>
-      <p className="font-semibold">Subject: Amendment to signing mandate</p>
-      <p className="mt-2">The single-signing limit of Khalifa Saeed Al Falasi is revised to AED 25,000 with effect from 01-Mar-2023. All other terms of the 2019 mandate remain unchanged.</p>
-    </div>
-  );
-}
-
-function ScanCheck({ canAct, onConfirm }: { canAct: boolean; onConfirm: (v: number) => void }) {
-  const { state, dispatch } = useStore();
-  const clean = state.copy === "received";
-  const waiting = state.copy === "requested";
+function ScanCheck({ canAct, onConfirm, onReturn }: { canAct: boolean; onConfirm: (v: number) => void; onReturn: (v: number) => void }) {
   const [value, setValue] = useState("");
   const [checked, setChecked] = useState<number | null>(null);
   const n = Number(value.replace(/[^0-9.]/g, ""));
   const match = checked === 25000;
   const check = (x: number | null) => {
     setChecked(x);
-    window.dispatchEvent(new CustomEvent("jointly:scan", { detail: x }));
+    window.dispatchEvent(new CustomEvent("jointly:scan", { detail: x === 25000 }));
   };
-  const submit = () => {
-    if (clean ? n === 25000 : !value.trim() || n === 25000) onConfirm(25000);
-    else if (n > 0) check(n);
-  };
-  const submitRef = useRef(submit);
-  submitRef.current = submit;
-  useEffect(() => {
-    const on = (e: Event) => {
-      if (!canAct || checked !== null) return;
-      (e as CustomEvent<{ handled: boolean }>).detail.handled = true;
-      submitRef.current();
-    };
-    window.addEventListener("jointly:confirm-scan", on);
-    return () => window.removeEventListener("jointly:confirm-scan", on);
-  }, [canAct, checked]);
   return (
     <div className="mt-4 rounded-lg border border-warn/40 bg-surface p-4">
       <p className="flex items-center gap-1.5 text-sm font-medium text-warn-ink">
-        <AlertTriangle className="h-4 w-4 shrink-0" /> {clean ? "The branch sent a clean copy of the 2023 letter." : "A 2023 letter may change Khalifa's limit. The scan is unclear."}
+        <AlertTriangle className="h-4 w-4 shrink-0" /> A 2023 letter may change Khalifa&apos;s limit. The scan is unclear.
       </p>
       <div className="mt-3 flex flex-wrap items-start gap-5">
         <figure className="w-[520px] max-w-full">
-          {!clean && <SourceTrail />}
-          {clean ? <CleanLetter /> : <ScanLens src="/scans/svs-amd-2023.png" alt="Scan of the 2023 amendment letter. The last digits of the amount are smudged." />}
-          <figcaption className="mt-1 text-xs text-muted">{clean ? "Clean copy from the branch" : "2023 amendment letter · scan from SVS · click to zoom"}</figcaption>
+          <ScanLens src="/scans/svs-amd-2023.png" alt="Scan of the 2023 amendment letter. The last digits of the amount are smudged." />
+          <figcaption className="mt-1 text-[11px] text-muted">2023 amendment letter · scan from SVS · click to zoom</figcaption>
         </figure>
         <div className="min-w-[220px] flex-1 space-y-3 text-sm">
-          {waiting ? (
-            <div className="rounded-lg border border-line bg-panel p-3">
-              <p className="font-medium">Waiting for a clean copy · requested 10:07</p>
-              <p className="mt-1 text-xs text-sub">You asked the branch for a clean copy at 10:07, and the case is waiting for it.</p>
-            </div>
-          ) : (
-            <>
-              {canAct && checked === null && (
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    submit();
-                  }}
-                >
-                  <label htmlFor="scan-value" className="text-xs text-muted">
-                    {clean ? "The clean copy says Khalifa's limit is" : "The agent read"}
-                  </label>
-                  <div className="mt-1 flex items-center gap-2">
-                    <span className="text-xs text-muted">AED</span>
-                    <input id="scan-value" inputMode="numeric" autoComplete="off" placeholder={clean ? "" : "25,000"} value={value} onChange={(e) => setValue(e.target.value)} className="tnum h-9 w-32 rounded-lg border border-line bg-surface px-2.5 text-sm outline-none focus:border-accent" />
-                  </div>
-                  <p className="mt-1 text-xs text-sub">{clean ? "Type what you read on the clean copy, and press Enter." : "Check it against the scan. Press Enter if it matches, or type what you read."}</p>
-                </form>
-              )}
-              {(checked !== null || !canAct) && (
-                <div>
-                  <p className="text-xs text-muted">The agent read</p>
-                  <p className="tnum mt-0.5 font-medium">
-                    AED 25,000 {!clean && <span className="text-xs font-normal text-warn-ink">not certain</span>}
-                  </p>
-                </div>
-              )}
-              {canAct && checked !== null && (
-                <div className={cn("rounded-lg border p-3", match ? "border-ok/40 bg-ok-soft" : "border-warn/40 bg-surface")}>
-                  {match ? (
-                    <p className="flex items-center gap-1.5 font-medium text-ok-ink">
-                      <Check className="h-4 w-4" /> You and the agent both read 25,000
-                    </p>
-                  ) : (
-                    <p className="text-warn-ink">
-                      You read <span className="tnum font-medium">AED {fmt(checked)}</span>, but the agent read AED 25,000 and wasn&apos;t sure.
-                    </p>
-                  )}
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {match ? (
-                      <Button data-confirm-scan onClick={() => onConfirm(checked)}>
-                        Confirm and update the plan
-                      </Button>
-                    ) : (
-                      <>
-                        <Button data-ask-copy onClick={() => dispatch({ type: "askCopy", value: checked })}>
-                          Ask the branch for a clean copy
-                        </Button>
-                        <Button data-use-mine onClick={() => dispatch({ type: "useMine", value: checked })}>
-                          Use my value (AED {fmt(checked)})
-                        </Button>
-                      </>
-                    )}
-                    <Button
-                      variant="ghost"
-                      onClick={() => {
-                        setValue("");
-                        check(null);
-                      }}
-                    >
-                      Change my reading
-                    </Button>
-                  </div>
-                </div>
-              )}
-              {!canAct && <p className="text-xs text-sub">Plan v1 keeps AED 10,000 until Sara confirms.</p>}
-            </>
+          {canAct && checked === null && (
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (n > 0) check(n);
+              }}
+            >
+              <label htmlFor="scan-value" className="text-xs text-muted">
+                The letter says Khalifa&apos;s limit is
+              </label>
+              <div className="mt-1 flex items-center gap-2">
+                <span className="text-xs text-muted">AED</span>
+                <input id="scan-value" inputMode="numeric" autoComplete="off" value={value} onChange={(e) => setValue(e.target.value)} className="tnum h-9 w-32 rounded-lg border border-line bg-surface px-2.5 text-sm outline-none focus:border-accent" />
+              </div>
+              <p className="mt-1 text-xs text-sub">Type what you read. You&apos;ll see the agent&apos;s reading after.</p>
+              <Button type="submit" variant="primary" className="mt-2" disabled={!(n > 0)}>
+                Check
+              </Button>
+            </form>
           )}
+          {(checked !== null || !canAct) && (
+            <div>
+              <p className="text-xs text-muted">The agent read</p>
+              <p className="tnum mt-0.5 font-medium">
+                AED 25,000 <span className="text-xs font-normal text-warn-ink">not certain</span>
+              </p>
+            </div>
+          )}
+          {canAct && checked !== null && (
+            <div className={cn("rounded-lg border p-3", match ? "border-ok/40 bg-ok-soft" : "border-warn/40 bg-surface")}>
+              {match ? (
+                <p className="flex items-center gap-1.5 font-medium text-ok-ink">
+                  <Check className="h-4 w-4" /> You and the agent both read 25,000
+                </p>
+              ) : (
+                <p className="text-warn-ink">
+                  You read <span className="tnum font-medium">AED {fmt(checked)}</span>. The agent read AED 25,000.
+                </p>
+              )}
+              <div className="mt-2 flex flex-wrap gap-2">
+                <Button variant="primary" data-confirm-scan onClick={() => (match ? onConfirm(checked) : onReturn(checked))}>
+                  {match ? "Confirm and update the plan" : "Send back with my value"}
+                </Button>
+                <Button variant="ghost" onClick={() => check(null)}>
+                  Change my reading
+                </Button>
+              </div>
+            </div>
+          )}
+          {!canAct && <p className="text-xs text-sub">Plan v1 keeps AED 10,000 until Sara confirms.</p>}
         </div>
       </div>
     </div>
@@ -279,22 +227,13 @@ export function FailBanner({ n }: { n: number }) {
   );
 }
 
-const rashidLive = (s: { log: { id: string }[] }) => s.log.some((e) => e.id === "release-rashid");
-
 export function ReviewView() {
   const { state, dispatch, version, held, setTab } = useStore();
   const failing = policyChecks(version, held).filter((c) => !c.pass);
   const tour = { ...useTourTarget(0), ...useTourTarget(1) };
   const [expand, setExpand] = useState(false);
-  useEffect(() => setExpand(!!sessionStorage.getItem("jointly-details")), []);
   const [returning, setReturning] = useState(false);
   const [note, setNote] = useState("");
-  const [reason, setReason] = useState("");
-  useEffect(() => {
-    const on = () => setReturning(true);
-    window.addEventListener("jointly:return", on);
-    return () => window.removeEventListener("jointly:return", on);
-  }, []);
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const el = e.target as HTMLElement;
@@ -338,30 +277,20 @@ export function ReviewView() {
   const open = status.filter((x) => x !== "approved").length;
   const judgement = version === 1 && !approvalValid(state.approvals[3], stages[2]);
   const byPhase: Partial<Record<string, string>> = {
-    executing: "You've signed off, and the agent is setting it up now.",
-    revising: "The agent is updating the plan with your value.",
-    executed: "Everything is set up, and you decide who goes live.",
-    releasing: "Everything is set up, and you decide who goes live.",
-    partially_live: "Mohammed and Khalifa are live, and Rashid is waiting for his new ID.",
-    renewing: "Mohammed and Khalifa are live, and Rashid is waiting for his new ID.",
-    rashid_ready: "Rashid's new ID has cleared, so you can release him now.",
-    releasing_rashid: "Rashid's new ID has cleared, so you can release him now.",
-    live: "Creekside is live, with all 3 partners online 1 hour 54 minutes after the form arrived.",
+    executing: "Signed off. The agent is setting it up.",
+    executed: "Set up and checked. Release is your call.",
+    partially_live: "2 of 3 signatories are live. Rashid is waiting for his EID.",
+    rashid_ready: "2 of 3 signatories are live. Rashid's EID is renewed.",
+    live: "Creekside is live. All 3 signatories, 1h 54m from form to first login.",
   };
   const signedOff = ["executing", "executed", "partially_live", "rashid_ready", "live"].includes(state.phase);
   const chip = (i: number) => status[i] !== "approved" ? statusLabel[status[i]] : signedOff ? "Approved" : state.approvals[stages[i].id]?.by === "Rules" ? "Passed by rule" : "Confirmed by you";
-  const headline = byPhase[state.phase] ?? (!open || allApproved(state) ? "Everything checks out, so you can sign off when you're ready." : judgement ? "One value on the letter needs your check." : "Everything checks out, so you can sign off when you're ready.");
-  const needsLetter = reviewing && !approvalValid(state.approvals[3], stages[2]) && state.confirmed === undefined;
-  const toggle = () => {
-    const v = !expand;
-    setExpand(v);
-    sessionStorage.setItem("jointly-details", v ? "1" : "");
-  };
+  const headline = byPhase[state.phase] ?? (!open ? "All 4 stages pass. Sign off when ready." : judgement ? "1 thing needs your judgement" : `Nothing needs your judgement: ${open} stage${open === 1 ? "" : "s"} ready to approve`);
 
   return (
     <div className="space-y-4">
       <h2 className="font-display text-2xl">{headline}</h2>
-      {false && (
+      {state.phase === "live" && !expand && (
         <Card className="flex flex-wrap items-center gap-5 p-5">
           <span className="flex">
             {(["mohammed", "khalifa", "rashid"] as const).map((id, n) => (
@@ -376,19 +305,7 @@ export function ReviewView() {
           <Button variant="ghost" onClick={() => setExpand(true)}>Show evidence and stages</Button>
         </Card>
       )}
-      {!expand && reviewing && <FocusSources />}
-      {!expand && needsLetter && <ScanCheck key={state.copy ?? "none"} canAct={!failing.length} onConfirm={(v) => dispatch({ type: "confirm", value: v })} />}
-      {!expand && reviewing && allApproved(state) && (
-        <Card className="p-4 text-sm">
-          <p className="font-medium">When you sign off, Mohammed and Khalifa go live today, and Rashid&apos;s user is created but stays switched off until his ID is renewed.<SourceIcons sys={["finacle", "efr", "svs"]} /></p>
-          <p className="mt-1 text-sub">The agent makes 5 changes in Digital Banking Admin and then reads them back, and no payments are made. You can still change anything before you sign off.</p>
-        </Card>
-      )}
-      <p className="flex items-center gap-3 whitespace-nowrap text-sm text-sub">
-        The agent matched 17 records with the bank&apos;s systems, Rashid is {rashidLive(state) ? "live" : "on hold"}, and {stages.filter((x) => state.approvals[x.id]?.by === "Rules").length} of the 4 stages have passed by rule.
-        <button type="button" onClick={toggle} className="font-medium text-accent-ink hover:underline">{expand ? "Hide details" : "Show details"}</button>
-      </p>
-      {expand && (<>
+      {(state.phase !== "live" || expand) && (<>
       {failing.length > 0 && <FailBanner n={failing.length} />}
       <div {...tour}>
         <EvidenceGrid />
@@ -401,8 +318,8 @@ export function ReviewView() {
             </p>
             <p className="mt-0.5 text-xs text-sub">2 decisions in this case: the letter value, then this sign-off.</p>
           </div>
-          <Button disabled={failing.length > 0} onClick={() => dispatch({ type: "signoff" })}>
-            Sign off plan v{version} · 4 stages <kbd className="ml-1 rounded border border-current/30 px-1 text-xs">S</kbd>
+          <Button variant="primary" disabled={failing.length > 0} onClick={() => dispatch({ type: "signoff" })}>
+            Sign off plan v{version} · 4 stages <kbd className="ml-1 rounded border border-white/40 px-1 text-[11px]">S</kbd>
           </Button>
         </Card>
       )}
@@ -414,7 +331,7 @@ export function ReviewView() {
             </span>
             <span className="min-w-0">
               <span className="block text-sm font-medium">{s.short}</span>
-              <span className="block text-xs text-muted">{chip(i)}</span>
+              <span className="block text-[11px] text-muted">{chip(i)}</span>
             </span>
           </a>
         ))}
@@ -461,10 +378,8 @@ export function ReviewView() {
               <div className="flex flex-col items-end gap-1">
                 {valid ? (
                   <Pill tone="ok">
-                    {approval!.by === "Rules" ? "Verified by rule" : state.returned && s.id < 3 ? "Approval kept" : s.id === 3 ? letterLabel(state) : signedOff ? "Approved" : "Confirmed by you"} · {approval!.by === "Rules" ? "exact copy" : approval!.by} {approval!.at}
+                    {approval!.by === "Rules" ? "Verified by rule" : state.returned && s.id < 3 ? "Approval kept" : signedOff ? "Approved" : "Confirmed by you"} · {approval!.by === "Rules" ? "exact copy" : approval!.by} {approval!.at}
                   </Pill>
-                ) : s.id === 3 && state.copy === "requested" ? (
-                  <Pill tone="neutral">Waiting for a clean copy · requested 10:07</Pill>
                 ) : changes.length ? (
                   <Pill tone="accent">Changed, review the diff</Pill>
                 ) : wasReturned && version === 1 ? (
@@ -474,7 +389,7 @@ export function ReviewView() {
                 ) : (
                   <Pill tone="neutral">{reviewing ? "Approve the stage above first" : "Waiting"}</Pill>
                 )}
-                {stale && <p className="text-xs text-muted">Earlier approval no longer matches</p>}
+                {stale && <p className="text-[11px] text-muted">Earlier approval no longer matches</p>}
               </div>
             </div>
 
@@ -526,20 +441,19 @@ export function ReviewView() {
               )
             )}
 
-            {s.id === 3 && !valid && state.confirmed === undefined && (
-              <ScanCheck key={state.copy ?? "none"} canAct={canAct && !returning} onConfirm={(v) => dispatch({ type: "confirm", value: v })} />
-            )}
-            {s.id === 3 && state.confirmed !== undefined && (
-              <>
-                <p className="mt-3 flex items-center gap-1.5 text-xs text-ok-ink">
-                  <Check className="h-3.5 w-3.5" strokeWidth={3} /> 2023 letter: AED {fmt(state.confirmed)} · {letterLabel(state)}
-                </p>
-                {state.copy === "received" && !state.mine && (
+            {s.id === 3 && !valid && (
+              version === 1 ? (
+                <ScanCheck canAct={canAct && !returning} onConfirm={(v) => dispatch({ type: "confirm", value: v })} onReturn={(v) => dispatch({ type: "return", note: `Sara reads AED ${fmt(v)} on the scan, not AED 25,000. Get a clean copy from the branch.` })} />
+              ) : (
+                <>
+                  <p className="mt-3 flex items-center gap-1.5 text-xs text-ok-ink">
+                    <Check className="h-3.5 w-3.5" strokeWidth={3} /> 2023 letter checked by you: AED 25,000
+                  </p>
                   <div className="mt-3 flex items-start gap-2.5 rounded-lg border border-line bg-panel/60 px-3 py-2.5">
                     <Repeat className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-medium">Make this fix stick?</p>
-                      <p className="mt-0.5 text-xs text-sub">This case only moved once the branch sent a clean copy. The agent proposes asking the branch for a clean copy whenever a scan is unclear, before it builds the plan, and a supervisor has to approve that change.</p>
+                      <p className="mt-0.5 text-xs text-sub">The agent proposes: when a scan is unclear, ask the branch for a clean copy before building the plan. A supervisor has to approve it.</p>
                     </div>
                     {state.log.some((e) => e.id === "lesson") ? (
                       <Pill tone="neutral">Sent to supervisor</Pill>
@@ -549,8 +463,8 @@ export function ReviewView() {
                       </Button>
                     )}
                   </div>
-                )}
-              </>
+                </>
+              )
             )}
 
             {wasReturned && (
@@ -561,15 +475,21 @@ export function ReviewView() {
 
                         {canAct && !returning && (
               <div className="mt-3 flex gap-2">
+                {!(s.id === 3 && version === 1) && (
+                  <Button variant="primary" onClick={() => dispatch({ type: "approve", stageId: s.id })}>
+                    <Check className="h-3.5 w-3.5" /> Approve stage {s.id} · {s.items.length} line{s.items.length === 1 ? "" : "s"}
+                    <kbd className="ml-1 rounded border border-onaccent/40 px-1 text-[10px] font-normal opacity-80">A</kbd>
+                  </Button>
+                )}
+                                {canReturn && (
+                  <Button variant="ghost" onClick={() => setReturning(true)}>
+                    <Undo2 className="h-3.5 w-3.5" /> Return to agent
+                  </Button>
+                )}
               </div>
             )}
             {canReturn && returning && (
               <div className="mt-4 space-y-2">
-                <div role="group" aria-label="Reason" className="flex flex-wrap gap-1.5">
-                  {["Unclear scan", "Wrong source", "Needs the customer", "Other"].map((r) => (
-                    <button key={r} type="button" aria-pressed={reason === r} onClick={() => setReason(r)} className={cn("rounded-md border px-2 py-1 text-xs transition-colors duration-150", reason === r ? "border-ink bg-ink text-surface" : "border-line text-sub hover:bg-panel")}>{r}</button>
-                  ))}
-                </div>
                 <label className="block text-xs text-muted" htmlFor="return-note">
                   Note for the agent
                 </label>
@@ -577,13 +497,13 @@ export function ReviewView() {
                 <div className="flex gap-2">
                   <Button
                     variant="danger"
-                    disabled={!reason && !note.trim()}
+                    disabled={!note.trim()}
                     onClick={() => {
-                      dispatch({ type: "return", note: [reason, note.trim()].filter(Boolean).join(". ") });
+                      dispatch({ type: "return", note: note.trim() });
                       setReturning(false);
                     }}
                   >
-                    Return to the agent
+                    Return stage 3
                   </Button>
                   <Button variant="ghost" onClick={() => setReturning(false)}>
                     Cancel

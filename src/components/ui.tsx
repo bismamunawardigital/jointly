@@ -81,11 +81,11 @@ export function Quote({ k, className }: { k: EvidenceKey; className?: string }) 
 export function BasisTag({ keys }: { keys: EvidenceKey[] }) {
   const read = keys.some(isAgentRead);
   return read ? (
-    <span className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-md bg-warn-soft px-1.5 py-0.5 text-xs font-medium text-warn-ink" title="The agent read this from a document. Check it against the quote.">
+    <span className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-md bg-warn-soft px-1.5 py-0.5 text-[11px] font-medium text-warn-ink" title="The agent read this from a document. Check it against the quote.">
       <Eye className="h-3 w-3" aria-hidden /> Agent read this
     </span>
   ) : (
-    <span className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-md bg-ok-soft px-1.5 py-0.5 text-xs font-medium text-ok-ink" title="Copied from a system record. No interpretation.">
+    <span className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-md bg-ok-soft px-1.5 py-0.5 text-[11px] font-medium text-ok-ink" title="Copied from a system record. No interpretation.">
       <Check className="h-3 w-3" strokeWidth={3} aria-hidden /> Exact match
     </span>
   );
@@ -118,7 +118,7 @@ export function SourceChip({ k, className }: { k: EvidenceKey; className?: strin
         onFocus={(ev) => show(ev.currentTarget)}
         onBlur={() => setPos(null)}
         aria-label={`${e.title}, ${e.system}. Open source`}
-        className="inline-flex max-w-full items-center gap-1 rounded-md border border-line bg-surface px-1.5 py-0.5 tnum text-xs text-sub transition-colors duration-150 ease-out hover:border-accent/40 hover:text-accent-ink active:scale-[0.97]"
+        className="inline-flex max-w-full items-center gap-1 rounded-md border border-line bg-surface px-1.5 py-0.5 font-mono text-[11px] text-sub transition-colors duration-150 ease-out hover:border-accent/40 hover:text-accent-ink active:scale-[0.97]"
       >
         <FileText className="h-3 w-3 shrink-0" aria-hidden />
         <span className="truncate">{sourceLabel(k)}</span>
@@ -127,7 +127,7 @@ export function SourceChip({ k, className }: { k: EvidenceKey; className?: strin
         createPortal(
           <span role="tooltip" className="pointer-events-none fixed z-[60] block w-72 animate-enter rounded-lg border border-line bg-surface p-3 text-left shadow-lg" style={{ left: pos.x, top: pos.y }}>
             <span className="flex items-start justify-between gap-2">
-              <span className="text-xs text-muted">
+              <span className="text-[11px] text-muted">
                 {e.system} · {e.title}
               </span>
               <BasisTag keys={[k]} />
@@ -153,7 +153,7 @@ export function Sources({ keys }: { keys?: EvidenceKey[] }) {
 
 export function AssumptionChip({ children }: { children: React.ReactNode }) {
   return (
-    <span className="inline-flex items-center gap-1 rounded-md border border-dashed border-warn/50 bg-surface px-1.5 py-0.5 text-xs font-medium text-warn-ink">
+    <span className="inline-flex items-center gap-1 rounded-md border border-dashed border-warn/50 bg-surface px-1.5 py-0.5 text-[11px] font-medium text-warn-ink">
       <Info className="h-3 w-3" aria-hidden />
       Assumption: {children}
     </span>
@@ -190,19 +190,19 @@ export function Button({
 
 export const personVar = (id: PersonId | "sara" | "agent") => `--p-${id}`;
 
-export function Avatar({ id, size = 32, held = false }: { id: PersonId; size?: number; held?: boolean }) {
+export function Avatar({ id, size = 28, held = false }: { id: PersonId; size?: number; held?: boolean }) {
   const p = personById(id);
   const c = `var(${personVar(id)})`;
   return (
     <span
       aria-hidden="true"
-      className={cn("inline-flex shrink-0 items-center justify-center rounded-full font-semibold ring-2 ring-surface")}
+      className={cn("inline-flex shrink-0 items-center justify-center rounded-full font-semibold", held && "border-dashed")}
       style={{
         width: size,
         height: size,
-        fontSize: Math.max(13, Math.round(size * 0.38)),
-        outline: held ? "1.5px dashed rgb(var(--held))" : undefined,
-        outlineOffset: held ? -1.5 : undefined,
+        fontSize: Math.max(10, Math.round(size * 0.38)),
+        borderWidth: size >= 32 ? 2 : 1.5,
+        borderColor: held ? "rgb(var(--held))" : `rgb(${c})`,
         background: held ? "rgb(var(--held-soft))" : `rgb(${c} / 0.12)`,
         color: held ? "rgb(var(--held))" : `color-mix(in srgb, rgb(${c}) 62%, rgb(var(--ink)))`,
       }}

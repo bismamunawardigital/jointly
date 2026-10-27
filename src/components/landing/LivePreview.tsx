@@ -9,7 +9,7 @@ import { SigningMap } from "@/components/case/SigningMap";
 
 function Frame({ children }: { children: React.ReactNode }) {
   return (
-    <div className="overflow-hidden rounded-card bg-surface shadow-lg ring-1 ring-line">
+    <div className="overflow-hidden rounded-card border border-line bg-surface shadow-lg">
       <div className="flex items-center gap-1.5 border-b border-line bg-panel px-4 py-2.5">
         <span className="h-2.5 w-2.5 rounded-full bg-line-strong" /><span className="h-2.5 w-2.5 rounded-full bg-line-strong" /><span className="h-2.5 w-2.5 rounded-full bg-line-strong" />
       </div>

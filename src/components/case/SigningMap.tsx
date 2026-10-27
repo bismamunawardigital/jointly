@@ -17,7 +17,7 @@ const solo: Combo = { key: "khalifa", ids: ["khalifa"] };
 const names = (ids: PersonId[]) => ids.map(firstName).join(" and ");
 
 function Badge({ children }: { children: React.ReactNode }) {
-  return <span className="rounded-full border border-line bg-surface px-2 py-0.5 text-xs text-sub">{children}</span>;
+  return <span className="rounded-full border border-line bg-surface px-2 py-0.5 text-[11px] text-sub">{children}</span>;
 }
 
 export function SigningMap({ compact = false, part = "all" }: { compact?: boolean; part?: "all" | "people" }) {
@@ -87,11 +87,11 @@ export function SigningMap({ compact = false, part = "all" }: { compact?: boolea
         )}
       >
         {c.ids.map((id, i) => (
-          <span key={id} className={cn(i > 0 && "ring-link -ml-2")} style={{ "--ring-from": "8px" } as React.CSSProperties}>
+          <span key={id} className={cn(i > 0 && "ring-link -ml-1.5")} style={{ "--ring-from": "8px" } as React.CSSProperties}>
             <Avatar id={id} size={32} held={held.includes(id)} />
           </span>
         ))}
-        {c.ids.length === 1 && <span key={c.ids.join()} className="tick-in ml-1.5 pr-1 text-xs text-sub">alone</span>}
+        {c.ids.length === 1 && <span className="ml-1.5 pr-1 text-[11px] text-sub">alone</span>}
       </button>
     );
   };
@@ -141,8 +141,8 @@ export function SigningMap({ compact = false, part = "all" }: { compact?: boolea
                 ) : (
                   <Badge>Joint signer</Badge>
                 )}
-                {p.id === "khalifa" && showGhost && <span className="text-xs text-muted line-through">was 10,000</span>}
-                {h && <span className="rounded-full bg-held-soft px-2 py-0.5 text-xs font-medium text-held">On hold · EID expired</span>}
+                {p.id === "khalifa" && showGhost && <span className="text-[11px] text-muted line-through">was 10,000</span>}
+                {h && <span className="rounded-full bg-held-soft px-2 py-0.5 text-[11px] font-medium text-held">On hold · EID expired</span>}
               </button>
             );
           })}
@@ -153,29 +153,25 @@ export function SigningMap({ compact = false, part = "all" }: { compact?: boolea
       {showLadder && (
       <>
       <div className="relative mt-10">
-        <div className="flex min-h-[112px] overflow-hidden rounded-xl bg-panel">
+        <div className="flex min-h-[112px] overflow-hidden rounded-xl border border-line">
           {bands.map((b) => (
             <div
               key={b.id}
               className={cn("flex flex-col gap-2 p-3 transition-[width] duration-700 ease-out", b.id === "A" ? "border-r border-dashed border-line-strong bg-surface" : "flex-1 bg-panel/50")}
               style={b.id === "A" ? { width: pos(edge) } : undefined}
             >
-              <p className="text-xs font-medium text-sub">
-                {b.id === "A" && showGhost ? (
-                  <>
-                    AED 1 to <s className="font-normal text-muted">10,000</s> {fmt(limit)}
-                  </>
-                ) : (
-                  b.label
-                )}
-              </p>
-              <p className="text-xs text-muted">{b.id === "A" ? `SVS MAN-2019-0441 cl.2${showGhost || limit !== 10000 ? ", amended by AMD-2023-0107" : ""}` : "SVS MAN-2019-0441 cl.2"}</p>
+              <p className="text-[11px] font-medium text-sub">{b.label}</p>
               <div className="flex flex-wrap gap-1.5">{b.combos.map((c) => token(c, b.id))}</div>
             </div>
           ))}
         </div>
+        {showGhost && (
+          <span className="pointer-events-none absolute inset-y-0 border-l border-dashed border-muted/50" style={{ left: pos(10_000) }} aria-hidden>
+            <span className="absolute -bottom-5 -translate-x-1/2 whitespace-nowrap text-[11px] text-muted">was 10,000</span>
+          </span>
+        )}
         {!compact && (
-          <span className="pointer-events-none absolute -inset-y-1 z-10 w-0.5 rounded bg-ink transition-[left] duration-300 ease-out" style={{ left: pos(amount) }} aria-hidden />
+          <span className="pointer-events-none absolute -inset-y-1 z-10 w-0.5 rounded bg-ink transition-[left] duration-150" style={{ left: pos(amount) }} aria-hidden />
         )}
         <button
           type="button"
@@ -183,7 +179,7 @@ export function SigningMap({ compact = false, part = "all" }: { compact?: boolea
           onMouseLeave={() => setTip(false)}
           onFocus={() => setTip(true)}
           onBlur={() => setTip(false)}
-          className="absolute -top-8 -translate-x-1/2 rounded-full border border-line bg-surface px-2 py-0.5 text-xs font-medium transition-[left] duration-700 ease-out"
+          className="absolute -top-8 -translate-x-1/2 rounded-full border border-line bg-surface px-2 py-0.5 text-[11px] font-medium transition-[left] duration-700 ease-out"
           style={{ left: pos(edge) }}
         >
           AED {fmt(limit)}
@@ -199,7 +195,7 @@ export function SigningMap({ compact = false, part = "all" }: { compact?: boolea
           </div>
         )}
       </div>
-      <div className="mt-6 flex justify-between text-xs text-muted">
+      <div className="mt-6 flex justify-between text-[11px] text-muted">
         <span>AED 0</span>
         <span>No limit</span>
       </div>

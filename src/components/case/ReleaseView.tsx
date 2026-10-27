@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { createPortal } from "react-dom";
 import { Check, MessageSquare, Rocket, TriangleAlert, X } from "lucide-react";
 import { PersonId, business, firstName, people } from "@/data/seed";
@@ -33,7 +33,7 @@ function Rings({ ids, size = 40 }: { ids: PersonId[]; size?: number }) {
 
 function Undo({ children }: { children: React.ReactNode }) {
   return (
-    <span className="inline-flex items-center gap-1 rounded-md bg-bad-soft px-1.5 py-0.5 text-xs font-medium text-bad-ink">
+    <span className="inline-flex items-center gap-1 rounded-md bg-bad-soft px-1.5 py-0.5 text-[11px] font-medium text-bad-ink">
       <TriangleAlert className="h-3 w-3" /> {children}
     </span>
   );
@@ -44,15 +44,6 @@ export function ReleaseView() {
   const tour3 = useTourTarget(2);
   const [confirming, setConfirming] = useState(false);
   const [confirmingR, setConfirmingR] = useState(false);
-  const [undo, setUndo] = useState<"main" | "rashid" | null>(null);
-  useEffect(() => {
-    if (!undo) return;
-    const t = setTimeout(() => {
-      dispatch({ type: undo === "main" ? "release" : "releaseRashid" });
-      setUndo(null);
-    }, 10000);
-    return () => clearTimeout(t);
-  }, [undo, dispatch]);
   const [preview, setPreview] = useState(false);
   if (!hasEvent(state, "ex-readback"))
     return <Empty icon={Rocket} title="Not set up yet" body="After Sara approves all 4 stages, the agent sets them up, checks them and works out who can go live." />;
@@ -68,12 +59,6 @@ export function ReleaseView() {
 
   return (
     <div className="max-w-5xl space-y-5">
-      {undo && (
-        <div role="status" className="fixed bottom-20 left-1/2 z-50 flex -translate-x-1/2 items-center gap-4 rounded-full bg-ink px-5 py-2.5 text-sm text-canvas shadow-lg">
-          {undo === "main" ? "Mohammed and Khalifa are being released, and their messages go out in 10 seconds." : "Rashid is being released, and his message goes out in 10 seconds."}
-          <button type="button" onClick={() => setUndo(null)} className="font-semibold underline underline-offset-2">Undo</button>
-        </div>
-      )}
       {failing > 0 && <FailBanner n={failing} />}
       {live ? (
         <Card className="flex animate-enter items-center gap-5 p-6">
@@ -117,13 +102,13 @@ export function ReleaseView() {
                     <Button variant="ghost" onClick={() => setConfirming(false)}>
                       Cancel
                     </Button>
-                    <Button onClick={() => dispatch({ type: "release" })}>
+                    <Button variant="primary" onClick={() => dispatch({ type: "release" })}>
                       Yes, release them
                     </Button>
                   </>
                 ) : (
                   <>
-                    <Button data-release-main disabled={!elig.eligible || failing > 0} onClick={() => setUndo("main")}>
+                    <Button variant="primary" data-release-main disabled={!elig.eligible || failing > 0} onClick={() => setConfirming(true)}>
                       Release Mohammed and Khalifa
                     </Button>
                     <Button variant="ghost" onClick={() => setPreview(true)}>
@@ -147,7 +132,6 @@ export function ReleaseView() {
                 <Avatar id={p.id} held={h} />
                 <p className="text-sm font-medium">{firstName(p.id)}</p>
                 {h && <Pill tone="neutral">On hold · waiting for EID</Pill>}
-                {h && <p className="mt-2 text-xs text-sub">Owner: Rashid, customer · Reason: Emirates ID expired · Next: renew at any ICP centre, then EFR re-check · Agent re-checks EFR daily</p>}
               </div>
               <ol className="mt-3 space-y-2">
                 {progressFor(state, p.id).map((t) => (
@@ -169,7 +153,7 @@ export function ReleaseView() {
                         <Undo>Can&apos;t be undone</Undo> Switches him on and texts him the link.
                       </p>
                       <div className="flex gap-2">
-                        <Button size="sm" onClick={() => dispatch({ type: "releaseRashid" })}>
+                        <Button variant="primary" size="sm" onClick={() => dispatch({ type: "releaseRashid" })}>
                           Yes, release Rashid
                         </Button>
                         <Button variant="ghost" size="sm" onClick={() => setConfirmingR(false)}>
@@ -178,7 +162,7 @@ export function ReleaseView() {
                       </div>
                     </div>
                   ) : (
-                    <Button size="sm" data-release-rashid onClick={() => setUndo("rashid")}>
+                    <Button variant="primary" size="sm" data-release-rashid onClick={() => setConfirmingR(true)}>
                       Release Rashid
                     </Button>
                   )}
@@ -210,14 +194,14 @@ export function ReleaseView() {
             <div className="mt-5 space-y-4 rounded-[28px] border border-line bg-panel p-4">
               {msgs.map((m) => (
                 <div key={m.afterEvent}>
-                  <p className="text-xs text-muted">
+                  <p className="text-[11px] text-muted">
                     {m.channel} to {m.to}
                   </p>
                   <p className="mt-1 max-w-[90%] rounded-2xl rounded-tl-sm bg-surface px-3 py-2 text-sm shadow-sm">{m.text}</p>
-                  <p className="mt-1 text-xs text-sub">{m.approval === "auto" ? "Pre-approved template, sent automatically" : "Approved by Sara M. with the release"}</p>
+                  <p className="mt-1 text-[11px] text-sub">{m.approval === "auto" ? "Pre-approved template, sent automatically" : "Approved by Sara M. with the release"}</p>
                   <details className="mt-1">
-                    <summary className="cursor-pointer text-xs text-muted">Technical details</summary>
-                    <p className="mt-1 tnum text-xs text-muted">template {m.template}</p>
+                    <summary className="cursor-pointer text-[11px] text-muted">Technical details</summary>
+                    <p className="mt-1 font-mono text-[11px] text-muted">template {m.template}</p>
                   </details>
                 </div>
               ))}

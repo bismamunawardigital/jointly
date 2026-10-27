@@ -9,7 +9,7 @@ import { Avatar, Button, Card, Empty, Pill, SectionTitle, SourceChip, cn } from 
 function Cell({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="min-w-0">
-      <p className="mb-1 text-xs font-medium text-muted">{label}</p>
+      <p className="mb-1 text-[11px] font-medium text-muted">{label}</p>
       {children}
     </div>
   );
@@ -101,7 +101,7 @@ export function EvidenceView() {
                 <p className="text-xs text-muted">Finacle · Mode of Operation</p>
                 <Pill tone="warn">Too coarse</Pill>
               </div>
-              <p className="mt-3 tnum text-sm">JOINTLY - ANY TWO</p>
+              <p className="mt-3 font-mono text-sm">JOINTLY - ANY TWO</p>
               <p className="mt-2 text-sm text-sub">No amount bands. No single-signing right for Khalifa.</p>
               <div className="mt-3">
                 <SourceChip k="finacle-mop" />
@@ -114,14 +114,14 @@ export function EvidenceView() {
               </div>
               <ol className="mt-3 space-y-3 text-sm">
                 <li className="flex gap-3">
-                  <span className="tnum text-xs text-muted">cl.1</span>
+                  <span className="font-mono text-xs text-muted">cl.1</span>
                   <div className="flex-1">
                     <p>Any two of the three sign jointly.</p>
                     <SourceChip k="svs-man-c1" className="mt-1" />
                   </div>
                 </li>
                 <li className="flex gap-3">
-                  <span className="tnum text-xs text-muted">cl.2</span>
+                  <span className="font-mono text-xs text-muted">cl.2</span>
                   <div className="flex-1">
                     <p>
                       Khalifa can sign alone up to{" "}

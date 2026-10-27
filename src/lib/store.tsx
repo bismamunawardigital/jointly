@@ -41,9 +41,6 @@ export interface State {
   approvals: Partial<Record<1 | 2 | 3 | 4, Approval>>;
   returned?: { stageId: 3; note: string };
   confirmed?: number;
-  disagreed?: number;
-  copy?: "requested" | "received";
-  mine?: boolean;
   cleanupTicket: "draft" | "sent";
   tourOn: boolean;
   tourStep: number;
@@ -75,9 +72,6 @@ type Action =
   | { type: "approve"; stageId: 1 | 2 | 3 | 4 }
   | { type: "return"; note: string }
   | { type: "confirm"; value: number }
-  | { type: "askCopy"; value: number }
-  | { type: "cleanCopy" }
-  | { type: "useMine"; value: number }
   | { type: "releaseRashid" }
   | { type: "sendCleanup" }
   | { type: "release" }
@@ -106,15 +100,10 @@ const tourStepFor: Partial<Record<Phase, number>> = { re_review: 1, executed: 2,
 
 
 export function versionOf(s: State): Version {
-  return hasEvent(s, "rev-plan") && !s.mine ? 2 : 1;
+  return hasEvent(s, "rev-plan") ? 2 : 1;
 }
 export function hasEvent(s: State, id: string) {
   return s.log.some((e) => e.kind === "agent" && e.id === id);
-}
-export function letterLabel(s: State) {
-  if (s.mine) return "Sara's value, agent disagreed";
-  if (s.copy === "received") return "Confirmed by Sara";
-  return "Read by agent, confirmed by Sara";
 }
 export const rashidRenewed = (s: State) => hasEvent(s, "ren-kyc");
 
@@ -135,10 +124,10 @@ function autoVerify(s: State): State {
   for (const st of buildStages(version)) {
     if (approvalValid(approvals[st.id], st)) continue;
     const bySara = st.id === 3;
-    if (bySara && !(s.confirmed !== undefined && (version === 2 || s.mine))) break;
+    if (bySara && !(version === 2 && s.confirmed !== undefined)) break;
     const by = bySara ? checker.name : "Rules";
     approvals[st.id] = { stageId: st.id, by, at: approvalTimes[st.id], hash: stageHash(st) };
-    log.push(human(`verify-${st.id}-v${version}`, approvalTimes[st.id], bySara ? `Approved stage 3 with the 2023 letter value. ${letterLabel(s)}` : `Verified by rule: stage ${st.id}, ${st.title}`, by));
+    log.push(human(`verify-${st.id}-v${version}`, approvalTimes[st.id], bySara ? "Approved stage 3 by confirming the 2023 letter value" : `Verified by rule: stage ${st.id}, ${st.title}`, by));
   }
   return { ...s, approvals, log };
 }
@@ -186,36 +175,8 @@ function reducer(s: State, a: Action): State {
       return { ...s, log, returned: { stageId: 3, note: a.note }, phase: "revising", queue: groupEvents("revise"), queueGroup: "revise" };
     }
     case "confirm": {
-      if (s.phase !== "in_review" && s.phase !== "re_review") return s;
-      const v = a.value.toLocaleString("en-US");
-      const text = s.copy === "received" ? `Checked the clean copy of the 2023 letter: AED ${v}. Confirmed by Sara.` : `Checked the 2023 letter scan: AED ${v}, the same as the agent's reading. Read by agent, confirmed by Sara.`;
-      const log = [...s.log, human("confirm-3", "Mon 10:07", text)];
-      if (hasEvent(s, "rev-plan")) return autoVerify({ ...s, log, confirmed: a.value });
+      const log = [...s.log, human("confirm-3", "Mon 10:07", `Checked the 2023 letter scan: AED ${a.value.toLocaleString("en-US")}`)];
       return { ...s, log, confirmed: a.value, phase: "revising", queue: groupEvents("revise"), queueGroup: "revise" };
-    }
-    case "askCopy": {
-      if (s.phase !== "in_review" && s.phase !== "re_review") return s;
-      const v = a.value.toLocaleString("en-US");
-      const log = [
-        ...s.log,
-        human(`read-3-${s.log.length}`, "Mon 10:07", `Read the 2023 letter as AED ${v}. The agent read AED 25,000 and wasn't sure.`),
-        human(`copy-req-${s.log.length}`, "Mon 10:07", "Asked the branch for a clean copy of the 2023 letter. The case waits, and the agent's value is not used."),
-      ];
-      return { ...s, log, disagreed: a.value, copy: "requested" };
-    }
-    case "cleanCopy": {
-      if (s.copy !== "requested") return s;
-      return { ...s, copy: "received", log: [...s.log, human("copy-in", "Mon 10:07", "Demo control: the branch sent a clean copy of the 2023 letter", "Branch")] };
-    }
-    case "useMine": {
-      if (s.phase !== "in_review" && s.phase !== "re_review") return s;
-      const v = a.value.toLocaleString("en-US");
-      const log = [
-        ...s.log,
-        human(`read-3-${s.log.length}`, "Mon 10:07", `Read the 2023 letter as AED ${v}. The agent read AED 25,000 and wasn't sure.`),
-        human("mine-3", "Mon 10:07", `Used Sara's value: AED ${v}. Sara's value, agent disagreed.`),
-      ];
-      return autoVerify({ ...s, log, disagreed: a.value, confirmed: a.value, mine: true, copy: undefined });
     }
     case "releaseRashid": {
       if (s.phase !== "rashid_ready") return s;

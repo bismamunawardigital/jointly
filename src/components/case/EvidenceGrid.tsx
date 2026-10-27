@@ -1,7 +1,6 @@
 "use client";
 
-import { NameMatch, PeekMock } from "@/components/case/SourcePeek";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { AlertTriangle, Check, X } from "lucide-react";
 import { EvidenceKey, evidence, people } from "@/data/seed";
 import { buildRules, fmt, singleLimit } from "@/lib/rules";
@@ -11,16 +10,6 @@ import { Avatar, cn } from "@/components/ui";
 type Tone = "ok" | "warn" | "bad" | "na" | "held";
 type CellData = { tone: Tone; text: string; src?: EvidenceKey; why?: string; changed?: boolean };
 const cols = ["Signed form", "Finacle", "EFR", "Digital Banking", "SVS mandate 2019", "SVS letter 2023", "Planned setup"];
-const ruleFor = [
-  "Rule MR-1: the Emirates ID on the form matches EFR",
-  "Rule MR-2: exact copy from Finacle",
-  "Rule MR-3: the Emirates ID is valid in EFR",
-  "Rule MR-4: one online banking login per RCIF",
-  "Rule MR-5: limits come from the SVS mandate",
-  "Rule MR-5: limits come from the SVS mandate",
-  "Rule MR-6: the plan follows the mandate",
-];
-const stateFor: Record<string, string> = { ok: "Matches source", warn: "Couldn't read", bad: "Mismatch", na: "Read by agent, not verified" };
 const na: CellData = { tone: "na", text: "Not used" };
 
 const glyph: Record<Tone, React.ReactNode> = {
@@ -63,11 +52,7 @@ export function EvidenceGrid() {
         p.id === "khalifa"
           ? v2
             ? { tone: "ok", text: "Solo to 25,000", src: "svs-amd", changed: true }
-            : state.mine
-              ? { tone: "ok", text: `Sara read ${fmt(state.confirmed ?? 10000)}`, src: "svs-amd", why: "Sara read the scan differently from the agent and used her own value, so the agent's reading is not used." }
-              : state.copy === "requested"
-                ? { tone: "held", text: "Waiting for a clean copy", src: "svs-amd", why: "Sara disagreed with the agent's reading, so the case waits for a clean copy from the branch." }
-                : { tone: "warn", text: "25,000? Unclear scan", src: "svs-amd", why: "The amount on the 2023 letter is smudged. Type what you read in stage 3." }
+            : { tone: "warn", text: "25,000? Unclear scan", src: "svs-amd", why: "The amount on the 2023 letter is smudged. Type what you read in stage 3." }
           : na,
         isHeld
           ? { tone: "held", text: "Created, switched off", why: "Set up now, switched on only after EFR passes and Sara releases him." }
@@ -92,17 +77,7 @@ export function EvidenceGrid() {
 
   const all = rows.flatMap((r) => r.cells);
   const count = (t: Tone) => new Set(all.filter((c) => c.tone === t).map((c, i) => (t === "warn" ? c.src : i))).size;
-  const [peek, setPeek] = useState<string | null>(null);
-  const [filter, setFilter] = useState<"All" | "Needs you" | "Verified" | "Changed by Sara">("All");
-  const shown = (c: { tone: Tone; changed?: boolean }) => filter === "All" || (filter === "Needs you" ? c.tone === "warn" || c.tone === "bad" : filter === "Verified" ? c.tone === "ok" : !!c.changed);
-  const [first, setFirst] = useState(false);
-  useEffect(() => {
-    if (sessionStorage.getItem("jointly-ticked")) return;
-    sessionStorage.setItem("jointly-ticked", "1");
-    setFirst(true);
-  }, []);
-  const act = () => (document.activeElement as HTMLElement | null)?.click();
-  const goLetter = (c: CellData) => {
+  const act = (c: CellData) => {
     if (c.tone === "warn") {
       setTab("review");
       setTimeout(() => document.getElementById("stage-3")?.scrollIntoView({ behavior: "smooth", block: "center" }), 50);
@@ -117,7 +92,7 @@ export function EvidenceGrid() {
     const m = move[e.key];
     if (e.key === "Enter") {
       e.preventDefault();
-      act();
+      act(rows[r].cells[c]);
       return;
     }
     if (!m) return;
@@ -131,12 +106,6 @@ export function EvidenceGrid() {
   return (
     <section aria-label="Evidence grid" className="space-y-3">
       <div className="flex flex-wrap items-center gap-4 text-sm">
-        <span role="group" aria-label="Filter the grid" className="flex gap-1">
-          {(["All", "Needs you", "Verified", "Changed by Sara"] as const).map((f) => (
-            <button key={f} type="button" aria-pressed={filter === f} onClick={() => setFilter(f)} className={cn("rounded-md px-2 py-1 text-xs transition-colors duration-150", filter === f ? "bg-ink text-surface" : "text-sub hover:bg-panel")}>{f}</button>
-          ))}
-        </span>
-        <span className="font-medium"><span className="tnum">{count("ok")}</span> of <span className="tnum">{all.filter((x) => x.tone !== "na").length}</span> verified</span>
         <span className="flex items-center gap-1.5">{glyph.ok}<span className="tnum font-medium">{count("ok")}</span> exact matches</span>
         <span className="flex items-center gap-1.5">{glyph.warn}<span className="tnum font-medium">{count("warn")}</span> {count("warn") === 1 ? "needs" : "need"} you</span>
         <span className="flex items-center gap-1.5">{glyph.bad}<span className="tnum font-medium">{count("bad")}</span> blocked</span>
@@ -151,7 +120,7 @@ export function EvidenceGrid() {
         <table className="w-full min-w-[860px] border-collapse text-xs" onKeyDown={onKey}>
           <caption className="sr-only">Evidence for each signatory, by source. Use arrow keys to move, Enter to open.</caption>
           <thead>
-            <tr className="border-b border-line text-left text-xs text-muted">
+            <tr className="border-b border-line text-left text-[11px] text-muted">
               <th scope="col" className="px-3 py-2.5 font-medium">Who</th>
               {cols.map((c) => (
                 <th key={c} scope="col" className="px-3 py-2.5 font-medium">{c}</th>
@@ -161,10 +130,7 @@ export function EvidenceGrid() {
           <tbody>
             {rows.map((row, r) => (
               <tr key={row.id} data-row={row.id} className="border-b border-line last:border-0">
-                <th scope="row" className="group relative whitespace-nowrap px-3 py-2.5 text-left text-sm font-medium">
-                  {row.name.startsWith("Mohammed") ? <span tabIndex={0} className="cursor-help underline decoration-dotted underline-offset-4">{row.label}</span> : row.label}
-                  {row.name.startsWith("Mohammed") && <div className="absolute start-0 top-full z-40 mt-1 hidden rounded-lg border border-line bg-surface p-3 font-normal shadow-lg group-focus-within:block group-hover:block"><NameMatch /></div>}
-                </th>
+                <th scope="row" className="whitespace-nowrap px-3 py-2.5 text-left text-sm font-medium">{row.label}</th>
                 {row.cells.map((cell, c) => {
                   const key = `${r}-${c}`;
                   const tip = cell.why ?? (cell.src ? evidence[cell.src].body : undefined);
@@ -176,18 +142,13 @@ export function EvidenceGrid() {
                         data-c={c}
                         tabIndex={r === 0 && c === 0 ? 0 : -1}
                         aria-label={`${row.name}, ${cols[c]}: ${toneWord[cell.tone]}, ${cell.text}`}
-                        title="View source"
-                        data-anim={first ? cell.tone : undefined}
-                        data-dim={!shown(cell) || undefined}
-                        style={{ ["--c" as string]: c } as React.CSSProperties}
-                        onClick={() => setPeek(peek === key ? null : key)}
-                        onKeyDown={(e) => e.key === "Escape" && setPeek(null)}
+                        onClick={() => act(cell)}
                         onMouseEnter={() => setActive(key)}
                         onMouseLeave={() => setActive(null)}
                         onFocus={() => setActive(key)}
                         onBlur={() => setActive(null)}
                         className={cn(
-                          "flex h-full min-h-[44px] w-full cursor-pointer items-center gap-1.5 px-3 py-2 text-left outline-none transition-colors focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand",
+                          "flex h-full min-h-[44px] w-full items-center gap-1.5 px-3 py-2 text-left outline-none transition-colors focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand",
                           cell.tone === "warn" && "bg-warn-soft/60 font-medium text-warn-ink",
                           cell.tone === "bad" && "bg-bad-soft/60 font-medium text-bad-ink",
                           cell.tone === "held" && "text-held",
@@ -197,25 +158,11 @@ export function EvidenceGrid() {
                         )}
                       >
                         {glyph[cell.tone]}
-                        <span className={/^(EID|RCIF) /.test(cell.text) ? "min-w-0 whitespace-nowrap tnum text-xs" : "min-w-0"}>{cell.text}</span>
+                        <span className={/^(EID|RCIF) /.test(cell.text) ? "min-w-0 whitespace-nowrap font-mono text-[11px]" : "min-w-0"}>{cell.text}</span>
                       </button>
-                      {peek === key && (
-                        <div className="peek-grow absolute start-0 top-full z-40 mt-1 w-80 rounded-lg border border-line bg-surface p-3 text-start shadow-lg">
-                          <PeekMock col={c} person={row.name.split(" ")[0].toLowerCase()} />
-                          <dl className="mt-2 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-xs">
-                            <dt className="text-muted">Value</dt><dd className="tnum font-medium">{cell.text}</dd>
-                            <dt className="text-muted">Rule</dt><dd>{ruleFor[c]}</dd>
-                            <dt className="text-muted">State</dt><dd className={cell.tone === "warn" ? "text-warn-ink" : cell.tone === "bad" ? "text-bad-ink" : cell.tone === "ok" ? "text-ok-ink" : "text-sub"}>{stateFor[cell.tone]}</dd>
-                          </dl>
-                          <div className="mt-2 flex justify-between text-xs">
-                            {cell.tone === "warn" ? <button type="button" className="font-medium text-accent-ink hover:underline" onClick={() => goLetter(cell)}>Check this value</button> : cell.src ? <button type="button" className="text-accent-ink hover:underline" onClick={() => goLetter(cell)}>Open the full source</button> : <span />}
-                            <button type="button" className="text-sub hover:text-ink" onClick={() => setPeek(null)}>Close</button>
-                          </div>
-                        </div>
-                      )}
                       {active === key && tip && (
                         <div role="tooltip" className="absolute left-2 top-full z-20 mt-1 w-64 rounded-lg border border-line bg-surface p-3 text-xs text-sub shadow-lg">
-                          {cell.src && <p className="mb-1 tnum text-xs text-muted">{evidence[cell.src].ref}</p>}
+                          {cell.src && <p className="mb-1 font-mono text-[11px] text-muted">{evidence[cell.src].ref}</p>}
                           {tip}
                         </div>
                       )}
