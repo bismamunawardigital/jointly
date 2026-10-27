@@ -2,12 +2,12 @@ import Link from "next/link";
 import { ArrowRight, Ban, Check, FileText, Inbox, Lock, Mail, ShieldCheck, UserRound } from "lucide-react";
 import { Logo } from "@/components/Shell";
 import { ThemeButton } from "@/components/ThemeToggle";
-import { AgentMark } from "@/components/ui";
+import { AgentMark, Avatar } from "@/components/ui";
 import { HeroStage } from "@/components/landing/HeroStage";
 import { Gloss } from "@/components/landing/Gloss";
 import { DaysSwimlane } from "@/components/landing/DaysSwimlane";
 import { LiveGrid, MandateToggle } from "@/components/landing/LivePreview";
-import { Identity, Live, momentLabels } from "@/components/landing/Moments";
+import { Moments } from "@/components/landing/Moments";
 import { LangSwitch } from "@/components/landing/LangSwitch";
 import { statsEn } from "@/content/stats";
 
@@ -33,6 +33,7 @@ const swim = {
 };
 
 
+const learned = ["Check SVS letters", "Reuse existing logins", "Re-check EFR before release"];
 
 const gaveUp: { d: string; why: string }[] = [
   { d: "Kept 4 sign-offs, as one action", why: "Bank controls require it. Fewer clicks, same record." },
@@ -49,6 +50,84 @@ const lanes: { icon: React.ReactNode; title: string; items: string[]; never?: bo
   { icon: <Ban className="h-10 w-10 text-bad" />, title: "Never allowed", items: ["Approve its own work", "Send passwords", "Match people by name"], never: true },
 ];
 
+const chip = "rounded-full border border-line bg-canvas px-2 py-0.5 text-[11px]";
+const principles: { title: string; why: string; mini: React.ReactNode }[] = [
+  {
+    title: "Match on IDs, never names",
+    why: "Names are spelled 3 ways across systems. IDs aren't.",
+    mini: (
+      <div className="flex items-center gap-2">
+        <span className={`${chip} text-muted line-through`}>Mohd</span>
+        <ArrowRight className="h-3 w-3 text-muted" />
+        <span className={`${chip} font-medium`}>EID 3391</span>
+      </div>
+    ),
+  },
+  {
+    title: "Every claim has a source",
+    why: "Sara checks the source, not the agent's word.",
+    mini: (
+      <div className="flex items-center gap-2">
+        <span className="h-2 w-24 rounded bg-ink/20" />
+        <span className="flex h-8 w-6 items-center justify-center rounded border border-line bg-canvas">
+          <FileText className="h-3 w-3 text-muted" />
+        </span>
+      </div>
+    ),
+  },
+  {
+    title: "Show what it isn't sure about",
+    why: "Sara's attention goes to the 1 value that needs it.",
+    mini: (
+      <div className="flex items-center gap-2">
+        <span className="h-8 w-16 rounded bg-ink/15 blur-[2px]" />
+        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-warn-soft text-xs font-semibold text-warn-ink">?</span>
+      </div>
+    ),
+  },
+  {
+    title: "Approval stays with the content",
+    why: "If the plan changes, the old approval doesn't carry over.",
+    mini: (
+      <div className="flex gap-1.5">
+        {[1, 2].map((n) => (
+          <span key={n} className="flex h-6 w-6 items-center justify-center rounded-full bg-ok text-onaccent">
+            <Check className="h-3 w-3" strokeWidth={3} />
+          </span>
+        ))}
+        {[3, 4].map((n) => (
+          <span key={n} className="h-6 w-6 rounded-full border-2 border-accent" />
+        ))}
+      </div>
+    ),
+  },
+  {
+    title: "Rules live in code",
+    why: "The same input gives the same answer, and audit can replay it.",
+    mini: (
+      <div className="flex items-center gap-2">
+        <ShieldCheck className="h-6 w-6 text-accent" />
+        <span className={`${chip} text-ok-ink`}>yes</span>
+        <span className={`${chip} text-bad-ink`}>no</span>
+      </div>
+    ),
+  },
+  {
+    title: "Release what's safe",
+    why: "2 people go live today, instead of 3 waiting on 1 ID.",
+    mini: (
+      <div className="flex items-center gap-3">
+        <span className="flex">
+          <Avatar id="mohammed" size={28} />
+          <span className="-ml-2">
+            <Avatar id="khalifa" size={28} />
+          </span>
+        </span>
+        <Avatar id="rashid" size={28} held />
+      </div>
+    ),
+  },
+];
 
 const heard = [
   { q: "you start clicking Approve on autopilot and stop reading the diffs.", who: "Agent user, Hacker News", href: "https://news.ycombinator.com/item?id=48830674", d: "Exact copies fold away." },
@@ -110,22 +189,22 @@ const primary = "inline-flex h-11 items-center gap-1.5 rounded-lg bg-accent px-5
 function ServiceCol({ label, text, children }: { label: string; text: string; children: React.ReactNode }) {
   return (
     <div className="rounded-card border border-line bg-surface p-6">
-      <p className="text-[13px] font-medium uppercase tracking-wide text-sub">{label}</p>
+      <p className="text-xs font-medium uppercase tracking-wide text-muted">{label}</p>
       <div className="mt-5 flex h-24 items-center">{children}</div>
-      <p className="mt-4 text-base text-sub">{text}</p>
+      <p className="mt-4 text-sm text-sub">{text}</p>
     </div>
   );
 }
 
 function Partner({ tone = "plain", badge, tag, tagClass }: { tone?: "plain" | "ok" | "muted"; badge?: React.ReactNode; tag?: string; tagClass?: string }) {
-  const look = tone === "ok" ? "border-ok/40 bg-ok-soft text-ok-ink" : tone === "muted" ? "border-line bg-panel text-sub" : "border-line bg-surface text-ink";
+  const look = tone === "ok" ? "border-ok/40 bg-ok-soft text-ok-ink" : tone === "muted" ? "border-line bg-panel text-muted" : "border-line bg-surface text-ink";
   return (
     <span className="flex flex-col items-center gap-1.5">
       <span className={`relative flex h-11 w-11 items-center justify-center rounded-full border ${look}`}>
         <UserRound aria-hidden className="h-5 w-5" />
-        {badge && <span className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-surface shadow-sm">{badge}</span>}
+        {badge && <span className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full border border-line bg-surface">{badge}</span>}
       </span>
-      {tag && <span className={`whitespace-nowrap text-[13px] ${tagClass ?? ""}`}>{tag}</span>}
+      {tag && <span className={`whitespace-nowrap text-[11px] ${tagClass ?? ""}`}>{tag}</span>}
     </span>
   );
 }
@@ -174,12 +253,12 @@ export default function CaseStudy() {
 
       <section id="in30" aria-label="In 30 seconds" className="border-y border-line">
         <div className="mx-auto max-w-6xl px-6 py-8">
-          <p className="text-[13px] font-medium uppercase tracking-wide text-sub">In 30 seconds</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-muted">In 30 seconds</p>
           <dl className="mt-4 grid gap-5 md:grid-cols-5">
             {in30.map(([k, v]) => (
               <div key={k}>
-                <dt className="text-[13px] font-semibold text-ink">{k}</dt>
-                <dd className="mt-1 text-base text-sub">{v}</dd>
+                <dt className="text-xs font-semibold text-ink">{k}</dt>
+                <dd className="mt-1 text-sm text-sub">{v}</dd>
               </div>
             ))}
           </dl>
@@ -213,7 +292,7 @@ export default function CaseStudy() {
                 <Mail aria-hidden className="absolute bottom-0 right-0 h-10 w-10 text-warn" />
               </div>
             </ServiceCol>
-            <ArrowRight aria-hidden className="mx-auto h-5 w-5 rotate-90 self-center text-sub md:rotate-0" />
+            <ArrowRight aria-hidden className="mx-auto h-5 w-5 rotate-90 self-center text-muted md:rotate-0" />
             <ServiceCol label="What I designed at the bank" text="I designed the digital setup for joint signatories in the bank's new business app. Each partner registers, and then they approve each other's access.">
               <div className="flex items-start gap-3">
                 <Partner badge={<Lock aria-hidden className="h-3 w-3 text-sub" />} />
@@ -221,97 +300,118 @@ export default function CaseStudy() {
                 <Partner badge={<Lock aria-hidden className="h-3 w-3 text-sub" />} tag="ID expired" tagClass="rounded-full bg-bad/10 px-1.5 text-bad-ink" />
               </div>
             </ServiceCol>
-            <ArrowRight aria-hidden className="mx-auto h-5 w-5 rotate-90 self-center text-sub md:rotate-0" />
+            <ArrowRight aria-hidden className="mx-auto h-5 w-5 rotate-90 self-center text-muted md:rotate-0" />
             <ServiceCol label="With Jointly" text="An agent prepares everything from records the bank already has. Each partner only verifies their Emirates ID and sets a password, so the others still go live.">
               <div className="flex items-start gap-3">
                 <Partner tone="ok" badge={<Check aria-hidden className="h-3 w-3 text-ok-ink" strokeWidth={3} />} />
                 <Partner tone="ok" badge={<Check aria-hidden className="h-3 w-3 text-ok-ink" strokeWidth={3} />} />
-                <Partner tone="muted" tag="Waiting for ID" tagClass="text-sub" />
+                <Partner tone="muted" tag="Waiting for ID" tagClass="text-muted" />
                 <AgentMark size={28} className="ml-1 mt-2 text-person-agent" />
               </div>
             </ServiceCol>
           </div>
           <p className="mt-8 max-w-3xl font-medium">What I learnt is that self-serve moved the work onto the customer, and one expired Emirates ID could stop every partner.</p>
-          <div className="mt-4 flex flex-wrap gap-x-8 gap-y-2 text-base text-sub">
+          <div className="mt-4 flex flex-wrap gap-x-8 gap-y-2 text-sm text-sub">
             <span className="flex items-center gap-2"><FileText aria-hidden className="h-4 w-4 text-ok" /> Customers have less to fill in.</span>
             <span className="flex items-center gap-2"><Inbox aria-hidden className="h-4 w-4 text-ok" /> The operations team gets fewer tickets.</span>
           </div>
-          <p className="mt-3 text-[13px] text-sub">This is what I would change, and it hasn&apos;t been measured yet.</p>
+          <p className="mt-3 text-[11px] text-muted">This is what I would change, and it hasn&apos;t been measured yet.</p>
         </div>
       </section>
 
       <section id="why" className="border-t border-line">
-        <div className="mx-auto grid max-w-6xl gap-12 px-6 py-20 md:grid-cols-2">
-          <div>
-            <h2 className={h2}>Why an agent, and not a better form</h2>
-            <ul className="mt-8 space-y-6">
-              {why.map(([mess, fix]) => (
-                <li key={mess}>
-                  <p className="text-base text-sub">{mess}</p>
-                  <p className="mt-1 flex items-center gap-2 text-base font-medium text-ok-ink"><ArrowRight aria-hidden className="h-4 w-4 shrink-0" />{fix}</p>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className="rounded-card border border-line bg-surface p-6">
-            <p className="text-[13px] font-medium uppercase tracking-wide text-sub">How it works with 4 legacy systems</p>
-            <ul className="mt-3 divide-y divide-line">
-              {systems.map((x) => (
-                <li key={x.name} className="flex items-baseline justify-between gap-4 py-3">
-                  <span><span className="font-semibold">{x.name}</span> <span className="text-base text-sub">{x.d}</span></span>
-                  <span className="text-[13px] text-sub">{x.tag}</span>
-                </li>
-              ))}
-            </ul>
-            <ol className="mt-5 flex flex-wrap items-center gap-2">
-              {adminRun.map(([t, l, tone], i) => (
-                <li key={l} className="flex items-center gap-2 text-[13px]">
-                  {i > 0 && <ArrowRight aria-hidden className="h-3.5 w-3.5 text-sub" />}
-                  <span className={`rounded-full px-3 py-1 ${tone === "warn" ? "bg-warn-soft text-warn-ink" : tone === "ok" ? "bg-ok-soft text-ok-ink" : "bg-panel text-sub"}`}>
-                    <span className="tnum font-mono">{t}</span> {l}
-                  </span>
-                </li>
-              ))}
-            </ol>
-            <p className="mt-4 text-[13px] text-sub">Synthetic systems and data, modelled on common core-banking setups.</p>
-          </div>
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <h2 className={h2}>Why an agent, and not a better form</h2>
+          <ul className="mt-8 space-y-3">
+            {why.map(([mess, fix]) => (
+              <li key={mess} className="grid items-center gap-3 md:grid-cols-[1fr_auto_1fr]">
+                <p className="rounded-card border border-line bg-surface px-5 py-4 text-sm text-sub">{mess}</p>
+                <ArrowRight aria-hidden className="mx-auto h-5 w-5 rotate-90 text-accent md:rotate-0" />
+                <p className="rounded-card border border-ok/30 bg-ok-soft px-5 py-4 text-sm font-medium text-ok-ink">{fix}</p>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
-      <section id="case" className="border-t border-line bg-panel/40">
+      <section id="legacy" className="border-t border-line">
         <div className="mx-auto max-w-6xl px-6 py-20">
-          <h2 className={h2}>The case</h2>
-          <ol className="mt-12 space-y-20">
-            {[
-              { title: "Matches people by ID, never by name", visual: <div className="flex justify-center rounded-card bg-surface p-10 shadow-sm"><Identity v={momentLabels} /></div> },
-              { title: "Catches the expired ID before any work starts", visual: <LiveGrid />, wide: true },
-              { title: "Reads a blurry 2023 letter, and asks Sara to confirm", visual: <MandateToggle before="Before Sara checks the letter" after="After" label="Open the signing map in the demo" />, wide: true },
-              { title: "Releases what's safe, holds the rest", visual: <div className="flex justify-center rounded-card bg-surface p-10 shadow-sm"><Live v={momentLabels} /></div> },
-            ].map((m, i) => (
-              <li key={m.title} className={`grid items-center gap-8 ${"wide" in m ? "" : "md:grid-cols-[minmax(0,4fr)_minmax(0,8fr)]"}`}>
-                <div className={i === 3 ? "md:order-2" : ""}>
-                  <p className="tnum text-[13px] text-accent-ink">0{i + 1}</p>
-                  <p className="mt-2 font-display text-2xl leading-snug md:text-3xl">{m.title}</p>
-                  <Link href={`/demo/case/?moment=${i + 1}`} className="mt-3 inline-flex items-center gap-1 text-base font-medium text-accent-ink hover:underline">
-                    See it live <ArrowRight className="h-4 w-4" />
-                  </Link>
+          <h2 className={h2}>How it works with 4 legacy systems</h2>
+          <ul className="mt-8 grid grid-cols-2 gap-3 md:grid-cols-4">
+            {systems.map((x) => (
+              <li key={x.name} className="rounded-card border border-line bg-surface p-5">
+                <div className="flex items-center justify-between gap-2">
+                  <p className="font-semibold">{x.name}</p>
+                  <span className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${x.tag === "Write" ? "bg-accent-soft text-accent-ink" : x.tag === "Check" ? "bg-ok-soft text-ok-ink" : "bg-panel text-sub"}`}>{x.tag}</span>
                 </div>
-                <div className="min-w-0">{m.visual}</div>
+                <p className="mt-2 text-sm text-sub">{x.d}</p>
+              </li>
+            ))}
+          </ul>
+          <ol className="mt-4 flex flex-col gap-2 md:ms-auto md:w-fit md:flex-row md:items-center">
+            {adminRun.map(([t, l, tone], i) => (
+              <li key={l} className="flex items-center gap-2 text-sm">
+                {i > 0 && <ArrowRight aria-hidden className="hidden h-4 w-4 text-muted md:block" />}
+                <span className={`rounded-full px-3 py-1 ${tone === "warn" ? "bg-warn-soft text-warn-ink" : tone === "ok" ? "bg-ok-soft text-ok-ink" : "bg-panel text-sub"}`}>
+                  <span className="tnum font-mono text-xs">{t}</span> {l}
+                </span>
               </li>
             ))}
           </ol>
+          <p className="mt-4 text-xs text-muted">Synthetic systems and data, modelled on common core-banking setups.</p>
+        </div>
+      </section>
+
+      <section id="shadow" className="border-t border-line">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <h2 className={h2}>It watched before it acted</h2>
+          <p className="mt-2 max-w-2xl text-sub">First the agent watches the customer fulfilment operations team&apos;s makers and compares its plan with theirs.</p>
+          <div className="mt-8 flex flex-col gap-4 md:flex-row md:items-center">
+            <p className="rounded-card border border-line bg-surface px-5 py-4"><span className="tnum font-display text-3xl">12</span> <span className="text-sm text-sub">maker cases observed</span></p>
+            <ArrowRight className="h-5 w-5 rotate-90 text-accent md:rotate-0" />
+            <p className="rounded-card border border-line bg-surface px-5 py-4"><span className="tnum font-display text-3xl">3</span> <span className="text-sm text-sub">steps missing from the written procedure</span></p>
+            <ArrowRight className="h-5 w-5 rotate-90 text-accent md:rotate-0" />
+            <ul className="flex flex-wrap gap-2">
+              {learned.map((l) => <li key={l} className="rounded-full bg-accent-soft px-3 py-1.5 text-sm text-accent-ink">{l}</li>)}
+            </ul>
+          </div>
+          <p className="mt-4 text-xs text-muted">Illustrative. How the agent learns the unwritten work first.</p>
+        </div>
+      </section>
+
+      <section id="grid" className="mx-auto max-w-6xl px-6 py-20">
+        <h2 className={h2}>Every source in one grid</h2>
+        <div className="mt-8">
+          <LiveGrid />
+        </div>
+      </section>
+
+      <section id="mandate" className="border-t border-line mx-auto max-w-6xl px-6 py-20">
+        <h2 className={h2}>A free-text mandate becomes a picture.</h2>
+        <p className="mt-2 text-sub">Sara can check it in seconds.</p>
+        <div className="mt-8">
+          <MandateToggle before="Before Sara checks the letter" after="After" see="See it live" label="Open the signing map in the demo" />
+        </div>
+      </section>
+
+      <section id="moments" className="border-t border-line">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <h2 className={h2}>4 moments</h2>
+          <div className="mt-10">
+            <Moments />
+          </div>
         </div>
       </section>
 
       <section id="roles" className="border-t border-line">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className={h2}>Who decides what</h2>
-          <div className="mt-10 grid gap-10 sm:grid-cols-2 md:grid-cols-4">
+          <div className="mt-10 grid gap-4 sm:grid-cols-2 md:grid-cols-4">
             {lanes.map((l) => (
-              <div key={l.title}>
+              <div key={l.title} className="rounded-card border border-line bg-surface p-6">
                 {l.icon}
-                <p className="mt-4 text-lg font-semibold">{l.title}</p>
-                <ul className="mt-3 space-y-2 text-base">
+                <p className="mt-4 font-semibold">{l.title}</p>
+                <ul className="mt-3 space-y-1.5 text-sm">
                   {l.items.map((it) => (
                     <li key={it} className={l.never ? "text-bad-ink line-through decoration-bad" : "text-sub"}>
                       {it}
@@ -321,7 +421,7 @@ export default function CaseStudy() {
               </div>
             ))}
           </div>
-          <p className="mt-10 text-base text-sub">
+          <p className="mt-8 text-sm text-sub">
             Every case ends with a decision record an examiner can read.{" "}
             <Link href="/demo/case/?view=record" className="text-accent-ink underline underline-offset-2">See Creekside&apos;s</Link>
           </p>
@@ -331,26 +431,27 @@ export default function CaseStudy() {
       <section id="heard" className="border-t border-line">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className={h2}>What I heard, what I changed</h2>
-          <blockquote className="mt-10 max-w-2xl border-l-2 border-accent pl-6">
-            <p className="font-display text-2xl leading-snug">Setting up one joint-signatory business takes 4 to 5 days.</p>
-            <p className="mt-2 text-[13px] text-sub">Customer fulfilment operations team member, paraphrased from an interview</p>
-            <p className="mt-4 text-base font-medium">So the agent reads, and Sara only checks what it read.</p>
-          </blockquote>
-          <p className="mt-14 text-[13px] font-medium uppercase tracking-wide text-sub">Signals from teams already using agents</p>
-          <ul className="mt-2 divide-y divide-line">
+          <div className="mt-10 max-w-2xl rounded-card border border-line bg-surface p-6">
+            <span className="rounded-full border border-line px-2.5 py-0.5 text-xs text-muted">Paraphrased</span>
+            <p className="mt-3 font-display text-lg leading-snug">Setting up one joint-signatory business takes 4 to 5 days.</p>
+            <p className="mt-2 text-xs text-muted">Customer fulfilment operations team member, paraphrased from an interview</p>
+            <ArrowRight className="my-4 h-4 w-4 rotate-90 text-accent" />
+            <p className="text-sm font-medium">So the agent reads, and Sara only checks what it read.</p>
+          </div>
+          <p className="mt-10 text-xs font-medium uppercase tracking-wide text-muted">Signals from teams already using agents</p>
+          <ul className="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {heard.map((h) => (
-              <li key={h.href} className="grid gap-2 py-5 md:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] md:gap-10">
-                <div>
-                  <p className="font-display text-lg leading-snug">&ldquo;{h.q}&rdquo;</p>
-                  <a href={h.href} target="_blank" rel="noreferrer" className="mt-1 inline-block text-[13px] text-sub underline-offset-2 hover:underline">
-                    {h.who}
-                  </a>
-                </div>
-                <p className="flex items-start gap-2 text-base font-medium"><ArrowRight aria-hidden className="mt-1 h-4 w-4 shrink-0 text-accent" />{h.d}</p>
+              <li key={h.href} className="flex flex-col rounded-card border border-line bg-surface p-6">
+                <p className="font-display text-lg leading-snug">&ldquo;{h.q}&rdquo;</p>
+                <a href={h.href} target="_blank" rel="noreferrer" className="mt-2 text-xs text-muted underline-offset-2 hover:underline">
+                  {h.who}
+                </a>
+                <ArrowRight className="my-4 h-4 w-4 rotate-90 text-accent" />
+                <p className="text-sm font-medium">{h.d}</p>
               </li>
             ))}
           </ul>
-          <details className="mt-6 text-base">
+          <details className="mt-6 text-sm">
             <summary className="cursor-pointer text-sub">Sources</summary>
             <ul className="mt-3 grid gap-2 md:grid-cols-2">
               {sources.map((s) => (
@@ -358,7 +459,7 @@ export default function CaseStudy() {
                   <a href={s.href} target="_blank" rel="noreferrer" className="text-accent-ink underline-offset-2 hover:underline">
                     {s.s}
                   </a>
-                  <span className="text-sub"> · {s.f}</span>
+                  <span className="text-muted"> · {s.f}</span>
                 </li>
               ))}
             </ul>
@@ -366,14 +467,41 @@ export default function CaseStudy() {
         </div>
       </section>
 
+      <section id="patterns" className="border-t border-line">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <h2 className={h2}>6 patterns I&apos;d reuse</h2>
+          <div className="mt-10 grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+            {principles.map((p) => (
+              <div key={p.title} className="rounded-card border border-line bg-surface p-6">
+                <div aria-hidden className="flex h-12 items-center">{p.mini}</div>
+                <p className="mt-4 font-semibold">{p.title}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section id="gaveup" className="border-t border-line">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className={h2}>What I gave up</h2>
-          <ul className="mt-8 grid max-w-4xl gap-x-12 gap-y-4 md:grid-cols-2">
+          <ul className="mt-8 grid gap-4 md:grid-cols-2">
             {gaveUp.map((g) => (
-              <li key={g.d} className="flex gap-3 text-lg">
-                <span aria-hidden className="mt-3.5 h-px w-4 shrink-0 bg-ink" />
-                {g.d}
+              <li key={g.d} className="rounded-card border border-line bg-surface p-6">
+                <p className="font-medium">{g.d}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      <section id="measure" className="border-t border-line">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <h2 className={h2}>How I&apos;d know it works</h2>
+          <ul className="mt-8 grid gap-3 sm:grid-cols-2 md:grid-cols-4">
+            {measures.map((m) => (
+              <li key={m} className="rounded-card border border-line bg-surface p-5">
+                <span className="rounded-full border border-line px-2 py-0.5 text-[11px] text-muted">Plan, not results</span>
+                <p className="mt-3 text-sm font-medium">{m}</p>
               </li>
             ))}
           </ul>
@@ -382,24 +510,31 @@ export default function CaseStudy() {
 
       <section id="next" className="border-t border-line">
         <div className="mx-auto max-w-6xl px-6 py-20">
-          <h2 className={h2}>What&apos;s next</h2>
-          <div className="mt-10 grid gap-10 md:grid-cols-3">
-            <div>
-              <p className="text-lg font-semibold">How I&apos;d know it works</p>
-              <p className="mt-1 text-[13px] text-sub">Plan, not results</p>
-              <ul className="mt-4 space-y-2 text-base text-sub">{measures.map((m) => <li key={m}>{m}</li>)}</ul>
-            </div>
-            <div>
-              <p className="text-lg font-semibold">What I&apos;d test next</p>
-              <ul className="mt-4 space-y-2 text-base text-sub">{unknowns.map((u) => <li key={u}>{u}</li>)}</ul>
-            </div>
-            <div>
-              <p className="text-lg font-semibold">Where I&apos;d use this pattern next</p>
-              <p className="mt-1 text-[13px] text-sub">Illustrative</p>
-              <ul className="mt-4 space-y-2 text-base text-sub">{elsewhere.map(([k]) => <li key={k}>{k}</li>)}</ul>
-              <p className="mt-4 text-base text-sub">Same shape: read messy documents, let rules decide, a person approves, read back what was written.</p>
-            </div>
-          </div>
+          <h2 className={h2}>What I&apos;d test next</h2>
+          <ul className="mt-8 max-w-2xl space-y-3 rounded-card border border-line bg-surface p-6">
+            {unknowns.map((u) => (
+              <li key={u} className="flex gap-3 text-sm text-sub">
+                <span className="mt-0.5 h-4 w-4 shrink-0 rounded border-2 border-line" /> {u}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      <section id="elsewhere" className="border-t border-line">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <h2 className={h2}>Where I&apos;d use this pattern next</h2>
+          <ul className="mt-8 grid gap-3 md:grid-cols-3">
+            {elsewhere.map(([k]) => (
+              <li key={k} className="rounded-card border border-line bg-surface p-5">
+                <div className="flex items-center justify-between">
+                  <p className="font-semibold">{k}</p>
+                  <span className="rounded-full border border-line px-2 py-0.5 text-[11px] text-muted">Illustrative</span>
+                </div>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-6 text-sub">Same shape: read messy documents, let rules decide, a person approves, read back what was written.</p>
         </div>
       </section>
 
@@ -407,13 +542,13 @@ export default function CaseStudy() {
         <div className="mx-auto flex max-w-6xl flex-col items-start gap-6 px-6 py-16 md:flex-row md:items-center md:justify-between">
           <div>
             <p className={h2}>See it for yourself</p>
-            <p className="mt-3 text-base text-sub">
+            <p className="mt-3 text-sm text-sub">
               Designed by Bisma Munawar ·{" "}
               <a href="mailto:bismamunawardigital@gmail.com" className="underline-offset-2 hover:underline">
                 Email
               </a>
             </p>
-            <p className="mt-1 text-[13px] text-sub">All people, accounts and bank systems are synthetic.</p>
+            <p className="mt-1 text-xs text-muted">All people, accounts and bank systems are synthetic.</p>
           </div>
           <Link href="/demo/case/" className={primary}>
             Open the demo <ArrowRight className="h-4 w-4" />
