@@ -11,6 +11,16 @@ import { Avatar, cn } from "@/components/ui";
 type Tone = "ok" | "warn" | "bad" | "na" | "held";
 type CellData = { tone: Tone; text: string; src?: EvidenceKey; why?: string; changed?: boolean };
 const cols = ["Signed form", "Finacle", "EFR", "Digital Banking", "SVS mandate 2019", "SVS letter 2023", "Planned setup"];
+const ruleFor = [
+  "Rule MR-1: the Emirates ID on the form matches EFR",
+  "Rule MR-2: exact copy from Finacle",
+  "Rule MR-3: the Emirates ID is valid in EFR",
+  "Rule MR-4: one online banking login per RCIF",
+  "Rule MR-5: limits come from the SVS mandate",
+  "Rule MR-5: limits come from the SVS mandate",
+  "Rule MR-6: the plan follows the mandate",
+];
+const stateFor: Record<string, string> = { ok: "Matches source", warn: "Couldn't read", bad: "Mismatch", na: "Read by agent, not verified" };
 const na: CellData = { tone: "na", text: "Not used" };
 
 const glyph: Record<Tone, React.ReactNode> = {
@@ -119,6 +129,7 @@ export function EvidenceGrid() {
   return (
     <section aria-label="Evidence grid" className="space-y-3">
       <div className="flex flex-wrap items-center gap-4 text-sm">
+        <span className="font-medium"><span className="tnum">{count("ok")}</span> of <span className="tnum">{all.filter((x) => x.tone !== "na").length}</span> verified</span>
         <span className="flex items-center gap-1.5">{glyph.ok}<span className="tnum font-medium">{count("ok")}</span> exact matches</span>
         <span className="flex items-center gap-1.5">{glyph.warn}<span className="tnum font-medium">{count("warn")}</span> {count("warn") === 1 ? "needs" : "need"} you</span>
         <span className="flex items-center gap-1.5">{glyph.bad}<span className="tnum font-medium">{count("bad")}</span> blocked</span>
@@ -183,6 +194,11 @@ export function EvidenceGrid() {
                       {peek === key && (
                         <div className="peek-grow absolute start-0 top-full z-40 mt-1 w-80 rounded-lg border border-line bg-surface p-3 text-start shadow-lg">
                           <PeekMock col={c} person={row.name.split(" ")[0].toLowerCase()} />
+                          <dl className="mt-2 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-xs">
+                            <dt className="text-muted">Value</dt><dd className="tnum font-medium">{cell.text}</dd>
+                            <dt className="text-muted">Rule</dt><dd>{ruleFor[c]}</dd>
+                            <dt className="text-muted">State</dt><dd className={cell.tone === "warn" ? "text-warn-ink" : cell.tone === "bad" ? "text-bad-ink" : cell.tone === "ok" ? "text-ok-ink" : "text-sub"}>{stateFor[cell.tone]}</dd>
+                          </dl>
                           <div className="mt-2 flex justify-between text-xs">
                             {cell.tone === "warn" ? <button type="button" className="font-medium text-accent-ink hover:underline" onClick={() => goLetter(cell)}>Check this value</button> : cell.src ? <button type="button" className="text-accent-ink hover:underline" onClick={() => goLetter(cell)}>Open the full source</button> : <span />}
                             <button type="button" className="text-sub hover:text-ink" onClick={() => setPeek(null)}>Close</button>

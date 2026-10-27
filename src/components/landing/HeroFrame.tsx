@@ -5,7 +5,7 @@ import { AlertTriangle, Check, Circle } from "lucide-react";
 import { Avatar, cn } from "@/components/ui";
 
 type Tone = "ok" | "warn" | "dot";
-const LOOP = 30;
+const LOOP = 20;
 const FIRST = 6;
 
 function Cell({ tone, label }: { tone: Tone; label: string }) {
@@ -26,23 +26,25 @@ const Pin = ({ n, cls }: { n: number; cls: string }) => (
 
 export function HeroFrame({ callouts, url = "jointly · Creekside · Review" }: { callouts: string[]; url?: string }) {
   const [t, setT] = useState(FIRST);
-  const [paused, setPaused] = useState(false);
+  const [hover, setPaused] = useState(false);
+  const [hold, setHold] = useState(false);
+  const paused = hover || hold;
   useEffect(() => {
     if (matchMedia("(prefers-reduced-motion: reduce)").matches || paused) return;
     const id = setInterval(() => setT((x) => (x + 1) % LOOP), 500);
     return () => clearInterval(id);
   }, [paused]);
   const ticked = (i: number) => t >= Math.min(4, i + 1);
-  const confirmed = t >= 13;
-  const raised = t >= 16;
-  const live = t >= 20;
-  const typed = "25,000".slice(0, Math.max(0, t - 10));
+  const confirmed = false;
+  const raised = false;
+  const live = false;
+  const typed = "";
   const people = [
     { id: "mohammed" as const, name: "Mohammed", letter: ["dot", "Not used"] as [Tone, string], plan: "Link existing login" },
     {
       id: "khalifa" as const,
       name: "Khalifa",
-      letter: (t < 4 ? ["dot", "Reading the scan"] : confirmed ? ["ok", "25,000 · Confirmed by Sara"] : ["warn", "25,000? Unclear scan"]) as [Tone, string],
+      letter: (t < 4 ? ["dot", "Reading the scan…"] : confirmed ? ["ok", "25,000 · Confirmed by Sara"] : ["warn", "25,000? Unclear scan"]) as [Tone, string],
       plan: raised ? "Solo up to 25,000" : "Solo up to 10,000",
     },
     { id: "rashid" as const, name: "Rashid", letter: ["dot", "Not used"] as [Tone, string], plan: "Created, switched off" },
@@ -51,9 +53,9 @@ export function HeroFrame({ callouts, url = "jointly · Creekside · Review" }: 
     ? ["2 of 3 live. Rashid waits for his ID.", "Mohammed and Khalifa can approve together."]
     : raised
       ? ["Signed off · plan v2", "The agent is setting it up."]
-      : t >= 10
-        ? ["Sara types what the letter says", "Her reading is checked against the agent's."]
-        : ["Plan v1 is ready. 1 value needs your eye.", "Stages 1 and 2 passed by rule."];
+      : t >= 4
+        ? ["Awaiting Sara · 1 value to check", "17 items passed by rule."]
+        : [t < 2 ? "Reading mandate…" : "Read mandate", t < 2 ? "Reading Finacle, SVS and EFR…" : "Read Finacle, SVS and EFR."];
   return (
     <figure className="min-w-0">
       <div dir="ltr" className="relative rounded-card bg-panel p-4 md:p-6 md:pb-40">
@@ -94,19 +96,27 @@ export function HeroFrame({ callouts, url = "jointly · Creekside · Review" }: 
               ))}
             </tbody>
           </table>
-          <p className={cn("mt-2 h-5 text-[13px] text-warn-ink transition-opacity", t >= 4 && t < 10 ? "opacity-100" : "opacity-0")}>The scan is unclear. Asking Sara.</p>
+          <p className={cn("mt-2 h-5 text-[13px] text-warn-ink transition-opacity", t >= 4 ? "opacity-100" : "opacity-0")}>The scan is unclear. Asking Sara.</p>
         </div>
         <div className="flex items-center justify-between gap-3 border-t border-line bg-panel px-4 py-3">
           <div className="min-w-0 text-[13px]">
             <p className="font-medium">{bar[0]}</p>
             <p className="text-muted">{bar[1]}</p>
           </div>
-          {t >= 10 && t < 16 ? (
+          {false ? (
             <span className="tnum shrink-0 rounded-lg border-2 border-brand bg-surface px-3 py-1 text-[13px] font-medium">AED {typed || " "}</span>
-          ) : !raised ? (
-            <span className="shrink-0 rounded-lg bg-accent px-3 py-1.5 text-[13px] font-medium text-onaccent">Confirm AED 25,000</span>
+          ) : t >= 4 ? (
+            <span className="fade-in shrink-0 rounded-lg bg-accent px-3 py-1.5 text-[13px] font-medium text-onaccent">Confirm AED 25,000</span>
           ) : null}
         </div>
+        <button
+          type="button"
+          onClick={() => setHold((h) => !h)}
+          aria-label={hold ? "Play the animation" : "Pause the animation"}
+          className="absolute right-2 top-1.5 z-10 rounded-md px-2 py-0.5 text-xs text-sub hover:bg-surface hover:text-ink"
+        >
+          {hold ? "Play" : "Pause"}
+        </button>
         <Pin n={1} cls="left-[50%] top-[30%]" />
         <Pin n={2} cls="left-[60%] top-[50%]" />
         <Pin n={3} cls="right-[8%] bottom-[38px]" />

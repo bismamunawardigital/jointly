@@ -147,6 +147,7 @@ export function ReleaseView() {
                 <Avatar id={p.id} held={h} />
                 <p className="text-sm font-medium">{firstName(p.id)}</p>
                 {h && <Pill tone="neutral">On hold · waiting for EID</Pill>}
+                {h && <p className="mt-2 text-xs text-sub">Owner: Rashid, customer · Reason: Emirates ID expired · Next: renew at any ICP centre, then EFR re-check · Agent re-checks EFR daily</p>}
               </div>
               <ol className="mt-3 space-y-2">
                 {progressFor(state, p.id).map((t) => (

@@ -434,6 +434,7 @@ export default function CaseStudy() {
         <div className={wrap}>
           <p className={eyebrow}>05 · Who decides</p>
           <h2 className={`mt-2 ${h2}`}>Sara makes the decisions, and the agent can&apos;t approve anything.</h2>
+          <p className="mt-3 text-lg font-medium">The agent is a maker that can never be its own checker.</p>
           <p className="mt-2 text-sub">The agent prepares the work, but it can never be the one who checks it.</p>
           <div className="mt-10 grid gap-4 sm:grid-cols-2 md:grid-cols-4">
             {lanes.map((l) => (
