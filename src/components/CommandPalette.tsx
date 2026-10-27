@@ -45,7 +45,7 @@ export function CommandPalette({ tabs }: { tabs: { id: Tab; label: string }[] })
   };
   return (
     <div className="fixed inset-0 z-[70] flex items-start justify-center bg-black/20 pt-[12vh]" onClick={() => setOpen(false)}>
-      <div role="dialog" aria-label="Command palette" className="w-[560px] animate-enter overflow-hidden rounded-xl border border-line bg-surface shadow-lg" onClick={(e) => e.stopPropagation()}>
+      <div role="dialog" aria-modal="true" aria-label="Command palette" onKeyDown={(e) => { if (e.key === "Tab") { e.preventDefault(); input.current?.focus(); } }} className="w-[560px] animate-enter overflow-hidden rounded-xl border border-line bg-surface shadow-lg" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center gap-2 border-b border-line px-4">
           <Search className="h-4 w-4 text-muted" />
           <input
@@ -62,15 +62,19 @@ export function CommandPalette({ tabs }: { tabs: { id: Tab; label: string }[] })
             }}
             placeholder="Jump to a tab or a source"
             aria-label="Search"
+            role="combobox"
+            aria-expanded="true"
+            aria-controls="palette-list"
+            aria-activedescendant={items[i] ? `palette-opt-${i}` : undefined}
             className="h-12 flex-1 bg-transparent text-sm outline-none placeholder:text-muted"
           />
           <kbd className="rounded border border-line px-1.5 text-[10px] text-muted">Esc</kbd>
         </div>
-        <ul role="listbox" className="max-h-80 overflow-y-auto py-1">
+        <ul id="palette-list" role="listbox" className="max-h-80 overflow-y-auto py-1">
           {items.length === 0 && <li className="px-4 py-3 text-sm text-muted">Nothing matches. Try a name, a system or a tab.</li>}
           {items.map((x, n) => (
-            <li key={x.kind + x.label} role="option" aria-selected={n === i}>
-              <button onMouseEnter={() => setI(n)} onClick={() => go(n)} className={cn("flex w-full items-center gap-3 px-4 py-2 text-left text-sm", n === i && "bg-accent-soft text-accent-ink")}>
+            <li key={x.kind + x.label} id={`palette-opt-${n}`} role="option" aria-selected={n === i}>
+              <button tabIndex={-1} onMouseEnter={() => setI(n)} onClick={() => go(n)} className={cn("flex w-full items-center gap-3 px-4 py-2 text-left text-sm", n === i && "bg-accent-soft text-accent-ink")}>
                 <span className="w-14 shrink-0 text-[11px] text-muted">{x.kind}</span>
                 <span className="truncate">{x.label}</span>
               </button>
