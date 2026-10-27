@@ -25,8 +25,10 @@ export default function CommandCenter() {
   return (
     <div className="h-full overflow-y-auto">
       <div className="mx-auto max-w-5xl px-10 py-10">
-        <p className="text-sm text-muted">Customer Fulfillment · Business onboarding</p>
-        <h1 className="mt-1 text-2xl font-semibold tracking-tight">Command center</h1>
+        <p className="text-xs font-medium text-muted">Command center · Customer Fulfillment</p>
+        <h1 className="mt-1 font-display text-[28px] leading-tight text-ink">
+          {needsYou === 1 ? "1 case needs you today." : needsYou > 1 ? `${needsYou} cases need you today.` : "Nothing needs you right now."}
+        </h1>
         <div className="mt-8 grid grid-cols-4 gap-px overflow-hidden rounded-xl border border-line bg-line">
           {stats.map((s) => (
             <div key={s.label} className="bg-surface px-5 py-4">

@@ -3,6 +3,22 @@ import { Tone } from "@/components/ui";
 import { StepId, eventById, steps } from "./script";
 import { Phase, State, hasEvent } from "./store";
 
+export const headlineOf: Record<Phase, string> = {
+  new: "A new access request just came in.",
+  running: "The agent is setting up 3 signatories.",
+  in_review: "Plan v1 is ready. 1 value needs your eye.",
+  revising: "The agent is updating stages 3 and 4.",
+  re_review: "2 stages changed. Check the difference.",
+  executing: "The agent is setting it up in Finacle and Admin.",
+  executed: "Set up and checked. Release is your call.",
+  releasing: "Releasing Mohammed and Khalifa.",
+  partially_live: "2 of 3 signatories are live.",
+  renewing: "Rashid renewed his EID. Checking him again.",
+  rashid_ready: "Rashid is ready. Release him?",
+  releasing_rashid: "Switching Rashid on.",
+  live: "All 3 signatories are live.",
+};
+
 export const statusOf: Record<Phase, { label: string; tone: Tone }> = {
   new: { label: "New", tone: "neutral" },
   running: { label: "Agent working", tone: "accent" },

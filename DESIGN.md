@@ -75,16 +75,20 @@ The product story is always visible in the UI: the agent proposes, rules verify,
 
 ## Colors
 
-All colours are CSS variables in `src/app/globals.css`, with a dark set under `[data-theme="dark"]`. Light is the default, dark is a switch in the sidebar. The full brand guide lives at `public/brand/brand-guidelines.html`.
+All colours are CSS variables in `src/app/globals.css`, with a dark set under `[data-theme="dark"]`. Light is the default. Live reference: `/demo/styleguide`.
 
-- **Neutrals** (ink, sub, muted, line, panel) carry 90% of the screen.
-- **Accent blue** is for the primary action, focus, the active tour target and agent activity. Never decorative.
-- **Green** means verified by rules or by a read-back. **Amber** means a person needs to decide. **Red** means blocked. These three never appear for anything else.
+- **Ink** `#0F1B2D`, **canvas** `#FAF7F2` (dark `#0E1420`), **surface** `#FFFFFF` (dark `#151D2B`), **border** `#E9E3D8` (dark `#243044`).
+- **Saffron** `#C8892B` is the brand accent. Only for the logo, the landing hero and the active step.
+- **Ink blue** `#1F3A8A` is the primary action and focus.
+- **Status only**: verified `#2F7D5B`, needs you `#B7791F`, blocked `#B42318`, held `#6B7280`. Never decorative.
+- **People keep one colour everywhere**: Mohammed teal `#0E7C86`, Khalifa indigo `#4F46E5`, Rashid coral `#D9534F`, Sara ink, the agent graphite with a spark. Avatars, signing map, workflow lanes, audit rows and SMS previews all use them. Held people switch to the held grey with a dashed ring.
 - No gradients, glows or glass.
 
 ## Typography
 
-IBM Plex Sans for UI, IBM Plex Mono for system calls, references and source chips. Tabular numbers for amounts and times. Sentence case everywhere, including table headers. No uppercase tracked labels.
+IBM Plex Sans for UI, IBM Plex Sans Arabic for Arabic, Fraunces for display (its 1 and l stay distinct, which matters for "v1" and amounts). Scale 12 / 14 / 16 / 20 / 28 / 40 / 56 / 72. Product display is 28px, landing display 40 to 72px. Body 14 to 15px, never below 12px. Mono only inside Technical details. Tabular numbers for amounts and times. Sentence case everywhere.
+
+Every product screen starts with a small eyebrow (the case name) and one display sentence that says the situation, like "2 of 3 signatories can go live today."
 
 ## Layout
 
@@ -98,7 +102,7 @@ Flat. Borders separate surfaces. Only the evidence drawer and tour card get a so
 
 ## Shapes
 
-6px for chips, 8px for buttons and inputs, 12px for cards, full for status pills and avatars.
+8px spacing grid. 6px for chips, 12px for buttons and inputs, 16px for cards with 24px padding, full for pills and avatars. One primary button per screen region, everything else ghost or secondary.
 
 ## Components
 
@@ -111,7 +115,7 @@ Flat. Borders separate surfaces. Only the evidence drawer and tour card get a so
 
 ## Motion
 
-Ease-out `cubic-bezier(0.23, 1, 0.32, 1)`, 150 to 220ms. New timeline rows fade up 4px. Buttons scale to 0.97 on press. Nothing loops except the small agent working spinner. `prefers-reduced-motion` reduces all of it to instant.
+Ease-out `cubic-bezier(0.23, 1, 0.32, 1)`. Agent progress steps fade and slide in over 150ms. Signing rings link over 300ms when a combination becomes valid. Diff amounts tween from the old value to the new one. Buttons scale to 0.97 on press. Nothing loops except the small agent working spinner. `prefers-reduced-motion` reduces all of it to instant.
 
 ## Do's and Don'ts
 

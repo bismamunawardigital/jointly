@@ -6,7 +6,7 @@ import { EvidenceKey, isAgentRead } from "@/data/seed";
 import { approvalValid, buildStages, diffStage } from "@/lib/rules";
 import { hasEvent, useStore } from "@/lib/store";
 import { useTourTarget } from "@/components/Tour";
-import { BasisTag, Button, Card, Empty, Pill, Proof, cn } from "@/components/ui";
+import { BasisTag, Button, Card, Empty, Pill, Proof, Tween, cn } from "@/components/ui";
 
 
 function wordDiff(a: string, b: string) {
@@ -18,9 +18,29 @@ function wordDiff(a: string, b: string) {
   return { pre: x.slice(0, p).join(" "), del: x.slice(p, x.length - q).join(" "), ins: y.slice(p, y.length - q).join(" "), post: x.slice(x.length - q).join(" ") };
 }
 
+function TweenFrom({ from, to }: { from: number; to: number }) {
+  const [v, setV] = useState(from);
+  useEffect(() => setV(to), [to]);
+  return <Tween value={v} prefix="AED " />;
+}
+
 function Changed({ before, after }: { before: string; after: string }) {
   if (before === after) return <>{after}</>;
   const d = wordDiff(before, after);
+  const num = (x: string) => /^AED [\d,]+$/.test(x) ? Number(x.slice(4).replace(/,/g, "")) : NaN;
+  const nb = num(d.del), na = num(d.ins);
+  if (!isNaN(nb) && !isNaN(na)) {
+    return (
+      <>
+        {d.pre && `${d.pre} `}
+        <del className="rounded bg-bad-soft px-0.5 text-bad-ink">{d.del}</del>{" "}
+        <ins className="rounded bg-ok-soft px-0.5 font-medium text-ok-ink no-underline">
+          <TweenFrom from={nb} to={na} />
+        </ins>
+        {d.post && ` ${d.post}`}
+      </>
+    );
+  }
   return (
     <>
       {d.pre && `${d.pre} `}

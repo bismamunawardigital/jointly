@@ -3,7 +3,7 @@
 import { Bell, Check, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { business } from "@/data/seed";
-import { duration, lastTime, statusOf } from "@/lib/derive";
+import { duration, headlineOf, lastTime, statusOf } from "@/lib/derive";
 import { Tab, hasEvent, useStore } from "@/lib/store";
 import { Pill, cn } from "@/components/ui";
 import { eventById } from "@/lib/script";
@@ -82,10 +82,11 @@ export function CaseWorkspace() {
         <header className="border-b border-line px-8 pb-0 pt-6">
           <div className="flex items-start justify-between gap-6">
             <div>
-              <div className="flex items-center gap-3">
-                <h1 className="text-xl font-semibold tracking-tight">{business.name}</h1>
+              <div className="flex items-center gap-2.5">
+                <p className="text-xs font-medium text-muted">{business.name}</p>
                 <Pill tone={st.tone}>{st.label}</Pill>
               </div>
+              <h1 className="mt-1 font-display text-[28px] leading-tight text-ink">{headlineOf[state.phase]}</h1>
               <p className="mt-1 text-sm text-sub">
                 Joint signatories (3) · <bdi dir="ltr" className="font-mono text-xs">{business.iban}</bdi> · {business.accountType}
               </p>
@@ -120,7 +121,7 @@ export function CaseWorkspace() {
                 role="tab"
                 aria-selected={tab === t.id}
                 onClick={() => setTab(t.id)}
-                className={cn("relative flex shrink-0 items-center gap-1.5 border-b-2 pb-2.5 text-sm transition-colors duration-150", tab === t.id ? "border-ink font-medium text-ink" : "border-transparent text-muted hover:text-ink")}
+                className={cn("relative flex shrink-0 items-center gap-1.5 border-b-2 pb-2.5 text-sm transition-colors duration-150", tab === t.id ? "border-brand font-medium text-ink" : "border-transparent text-muted hover:text-ink")}
               >
                 {doneAt[t.id] ? (
                   <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-ok text-onaccent" aria-label="done">

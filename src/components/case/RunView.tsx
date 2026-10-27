@@ -67,7 +67,7 @@ export function RunView() {
   for (const entry of state.log) {
     if (entry.kind === "human") {
       rows.push(
-        <li key={entry.id} className="relative flex gap-4 pb-5 animate-enter">
+        <li key={entry.id} className="relative flex gap-4 pb-5 animate-step">
           <span className="tnum w-[72px] shrink-0 pt-0.5 text-xs text-muted">{entry.time}</span>
           <span className="relative z-10 mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-ink bg-surface">
             <UserRound className="h-3 w-3" />
@@ -101,7 +101,7 @@ export function RunView() {
       detail = `Boundary tests at AED ${limit} and one dirham above, EFR hold on Rashid, USD not covered, every signatory has a user and role.`;
     }
     rows.push(
-      <li key={e.id} className="relative flex gap-4 pb-5 animate-enter">
+      <li key={e.id} className="relative flex gap-4 pb-5 animate-step">
         <span className="tnum w-[72px] shrink-0 pt-0.5 text-xs text-muted">{e.time}</span>
         <span className={cn("relative z-10 mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border bg-surface", e.status === "block" ? "border-bad/40" : e.status === "warn" ? "border-warn/40" : "border-line")}>
           {icon[e.status]}

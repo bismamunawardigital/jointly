@@ -2,64 +2,77 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
+:root,
+[data-theme="light"] {
   color-scheme: light;
-  --canvas: 251 250 247;
+  --canvas: 250 247 242;
   --surface: 255 255 255;
-  --panel: 244 242 238;
-  --line: 231 228 222;
-  --line-strong: 214 210 202;
-  --ink: 22 23 26;
-  --sub: 74 76 82;
-  --muted: 110 111 115;
+  --panel: 244 240 232;
+  --line: 233 227 216;
+  --line-strong: 214 206 192;
+  --ink: 15 27 45;
+  --sub: 64 74 92;
+  --muted: 104 112 126;
   --onaccent: 255 255 255;
-  --accent: 36 73 180;
-  --accent-hover: 28 58 147;
-  --accent-soft: 238 243 252;
-  --accent-ink: 28 58 147;
-  --ok: 21 122 67;
-  --ok-soft: 230 244 236;
-  --ok-ink: 15 92 50;
-  --warn: 166 90 11;
-  --warn-soft: 251 240 225;
-  --warn-ink: 127 68 7;
-  --bad: 179 38 30;
-  --bad-soft: 251 234 232;
-  --bad-ink: 138 28 22;
-  --shadow: 22 23 26;
-  --tint-1: #e5ecfb;
-  --tint-2: #e3f2e9;
-  --tint-3: #f8ecdc;
+  --brand: 200 137 43;
+  --brand-soft: 248 236 214;
+  --accent: 31 58 138;
+  --accent-hover: 24 45 108;
+  --accent-soft: 234 238 250;
+  --accent-ink: 31 58 138;
+  --ok: 47 125 91;
+  --ok-soft: 229 242 235;
+  --ok-ink: 33 96 69;
+  --warn: 183 121 31;
+  --warn-soft: 250 240 222;
+  --warn-ink: 133 85 16;
+  --bad: 180 35 24;
+  --bad-soft: 251 233 231;
+  --bad-ink: 140 26 18;
+  --held: 107 114 128;
+  --held-soft: 240 240 242;
+  --p-mohammed: 14 124 134;
+  --p-khalifa: 79 70 229;
+  --p-rashid: 217 83 79;
+  --p-sara: 15 27 45;
+  --p-agent: 75 85 99;
+  --shadow: 15 27 45;
 }
 
 [data-theme="dark"] {
   color-scheme: dark;
-  --canvas: 15 17 21;
-  --surface: 22 25 31;
-  --panel: 28 32 40;
-  --line: 42 47 56;
-  --line-strong: 58 64 75;
-  --ink: 236 237 239;
-  --sub: 180 184 192;
-  --muted: 139 144 154;
-  --onaccent: 15 17 21;
-  --accent: 127 160 240;
-  --accent-hover: 163 188 245;
-  --accent-soft: 26 36 64;
-  --accent-ink: 163 188 245;
-  --ok: 76 194 126;
-  --ok-soft: 18 41 29;
-  --ok-ink: 122 217 161;
-  --warn: 233 165 75;
-  --warn-soft: 46 33 18;
-  --warn-ink: 242 192 126;
-  --bad: 240 122 112;
-  --bad-soft: 50 23 22;
-  --bad-ink: 245 163 155;
+  --canvas: 14 20 32;
+  --surface: 21 29 43;
+  --panel: 27 37 54;
+  --line: 36 48 68;
+  --line-strong: 52 66 90;
+  --ink: 238 234 226;
+  --sub: 186 190 198;
+  --muted: 140 148 162;
+  --onaccent: 14 20 32;
+  --brand: 222 166 84;
+  --brand-soft: 52 39 20;
+  --accent: 140 165 240;
+  --accent-hover: 172 192 246;
+  --accent-soft: 28 39 70;
+  --accent-ink: 172 192 246;
+  --ok: 92 190 146;
+  --ok-soft: 20 44 35;
+  --ok-ink: 132 214 176;
+  --warn: 228 170 82;
+  --warn-soft: 48 36 18;
+  --warn-ink: 240 198 132;
+  --bad: 240 118 106;
+  --bad-soft: 54 24 24;
+  --bad-ink: 246 160 150;
+  --held: 150 158 172;
+  --held-soft: 34 42 56;
+  --p-mohammed: 52 178 188;
+  --p-khalifa: 140 134 248;
+  --p-rashid: 240 124 118;
+  --p-sara: 238 234 226;
+  --p-agent: 156 163 175;
   --shadow: 0 0 0;
-  --tint-1: #24314f;
-  --tint-2: #1d3728;
-  --tint-3: #3b2c17;
 }
 
 html {
@@ -75,6 +88,19 @@ body {
 
 h1, h2, h3 {
   letter-spacing: -0.01em;
+}
+
+.font-display {
+  letter-spacing: -0.005em;
+  font-weight: 400;
+}
+
+@keyframes ring-link {
+  from { transform: translateX(var(--ring-from, 6px)); opacity: 0.4; }
+  to { transform: translateX(0); opacity: 1; }
+}
+.ring-link {
+  animation: ring-link 300ms cubic-bezier(0.23, 1, 0.32, 1) both;
 }
 
 .font-mono, .tnum {
@@ -98,7 +124,7 @@ h1, h2, h3 {
 }
 
 [data-tour-active="true"] {
-  box-shadow: 0 0 0 2px rgb(var(--surface)), 0 0 0 4px rgb(var(--accent));
+  box-shadow: 0 0 0 2px rgb(var(--surface)), 0 0 0 4px rgb(var(--brand));
   border-radius: 8px;
   transition: box-shadow 200ms cubic-bezier(0.23, 1, 0.32, 1);
 }

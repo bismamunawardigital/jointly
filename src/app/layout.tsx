@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Sans, IBM_Plex_Sans_Arabic, IBM_Plex_Mono } from "next/font/google";
+import { IBM_Plex_Sans, IBM_Plex_Sans_Arabic, IBM_Plex_Mono, Fraunces } from "next/font/google";
 import "./globals.css";
 import { StoreProvider } from "@/lib/store";
 
@@ -12,6 +12,11 @@ const arabic = IBM_Plex_Sans_Arabic({
   subsets: ["arabic"],
   weight: ["400", "500", "600"],
   variable: "--font-arabic",
+});
+const display = Fraunces({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  variable: "--font-display",
 });
 const mono = IBM_Plex_Mono({
   subsets: ["latin"],
@@ -29,7 +34,7 @@ const themeScript = `try{if(localStorage.getItem("jointly-theme")==="dark")docum
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${sans.variable} ${arabic.variable} ${mono.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${sans.variable} ${arabic.variable} ${mono.variable} ${display.variable}`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
