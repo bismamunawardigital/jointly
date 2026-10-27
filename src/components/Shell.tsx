@@ -23,7 +23,7 @@ export function Logo({ className }: { className?: string }) {
 }
 
 const nav = [
-  { href: "/demo/", label: "Command center", icon: LayoutGrid },
+  { href: "/demo/", label: "Queue", icon: LayoutGrid },
   { href: "/demo/case/", label: business.name, icon: Briefcase },
   { href: "/", label: "Case study", icon: BookOpen },
 ];
@@ -45,7 +45,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
         <aside className="flex w-[232px] shrink-0 flex-col border-r border-line bg-panel/70">
           <div className="px-5 pb-6 pt-5">
             <Logo />
-            <p className="mt-1 text-xs text-muted">joint signatories live in hours</p>
+            <p className="mt-1 text-xs text-muted">Operations workbench</p>
           </div>
           <nav className="flex flex-col gap-0.5 px-3">
             {nav.map(({ href, label, icon: Icon }) => {

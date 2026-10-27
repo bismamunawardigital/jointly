@@ -5,7 +5,7 @@ import { PaymentWorkflow } from "./PaymentWorkflow";
 import { SigningMap } from "./SigningMap";
 
 import { useEffect, useState } from "react";
-import { AlertTriangle, Check, ChevronRight, Repeat, ShieldCheck, Undo2 } from "lucide-react";
+import { AlertTriangle, Check, ChevronRight, Repeat, ShieldCheck } from "lucide-react";
 import { EvidenceKey, isAgentRead } from "@/data/seed";
 import { approvalValid, buildStages, diffStage, fmt, policyChecks } from "@/lib/rules";
 import { allApproved, hasEvent, useStore, letterLabel } from "@/lib/store";
@@ -266,13 +266,21 @@ export function FailBanner({ n }: { n: number }) {
   );
 }
 
+const rashidLive = (s: { log: { id: string }[] }) => s.log.some((e) => e.id === "release-rashid");
+
 export function ReviewView() {
   const { state, dispatch, version, held, setTab } = useStore();
   const failing = policyChecks(version, held).filter((c) => !c.pass);
   const tour = { ...useTourTarget(0), ...useTourTarget(1) };
   const [expand, setExpand] = useState(false);
+  useEffect(() => setExpand(!!sessionStorage.getItem("jointly-details")), []);
   const [returning, setReturning] = useState(false);
   const [note, setNote] = useState("");
+  useEffect(() => {
+    const on = () => setReturning(true);
+    window.addEventListener("jointly:return", on);
+    return () => window.removeEventListener("jointly:return", on);
+  }, []);
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const el = e.target as HTMLElement;
@@ -316,20 +324,30 @@ export function ReviewView() {
   const open = status.filter((x) => x !== "approved").length;
   const judgement = version === 1 && !approvalValid(state.approvals[3], stages[2]);
   const byPhase: Partial<Record<string, string>> = {
-    executing: "Signed off. The agent is setting it up.",
-    executed: "Set up and checked. Release is your call.",
-    partially_live: "2 of 3 signatories are live. Rashid is waiting for his EID.",
-    rashid_ready: "2 of 3 signatories are live. Rashid's EID is renewed.",
-    live: "Creekside is live. All 3 signatories, 1h 54m from form to first login.",
+    executing: "You've signed off, and the agent is setting it up now.",
+    revising: "The agent is updating the plan with your value.",
+    executed: "Everything is set up, and you decide who goes live.",
+    releasing: "Everything is set up, and you decide who goes live.",
+    partially_live: "Mohammed and Khalifa are live, and Rashid is waiting for his new ID.",
+    renewing: "Mohammed and Khalifa are live, and Rashid is waiting for his new ID.",
+    rashid_ready: "Rashid's new ID has cleared, so you can release him now.",
+    releasing_rashid: "Rashid's new ID has cleared, so you can release him now.",
+    live: "Creekside is live, with all 3 partners online 1 hour 54 minutes after the form arrived.",
   };
   const signedOff = ["executing", "executed", "partially_live", "rashid_ready", "live"].includes(state.phase);
   const chip = (i: number) => status[i] !== "approved" ? statusLabel[status[i]] : signedOff ? "Approved" : state.approvals[stages[i].id]?.by === "Rules" ? "Passed by rule" : "Confirmed by you";
-  const headline = byPhase[state.phase] ?? (!open ? "All 4 stages pass. Sign off when ready." : judgement ? "1 thing needs your judgement" : `Nothing needs your judgement: ${open} stage${open === 1 ? "" : "s"} ready to approve`);
+  const headline = byPhase[state.phase] ?? (!open || allApproved(state) ? "Everything checks out, so you can sign off when you're ready." : judgement ? "One value on the letter needs your check." : "Everything checks out, so you can sign off when you're ready.");
+  const needsLetter = reviewing && !approvalValid(state.approvals[3], stages[2]) && state.confirmed === undefined;
+  const toggle = () => {
+    const v = !expand;
+    setExpand(v);
+    sessionStorage.setItem("jointly-details", v ? "1" : "");
+  };
 
   return (
     <div className="space-y-4">
       <h2 className="font-display text-2xl">{headline}</h2>
-      {state.phase === "live" && !expand && (
+      {false && (
         <Card className="flex flex-wrap items-center gap-5 p-5">
           <span className="flex">
             {(["mohammed", "khalifa", "rashid"] as const).map((id, n) => (
@@ -344,7 +362,18 @@ export function ReviewView() {
           <Button variant="ghost" onClick={() => setExpand(true)}>Show evidence and stages</Button>
         </Card>
       )}
-      {(state.phase !== "live" || expand) && (<>
+      {!expand && needsLetter && <ScanCheck key={state.copy ?? "none"} canAct={!failing.length} onConfirm={(v) => dispatch({ type: "confirm", value: v })} />}
+      {!expand && reviewing && allApproved(state) && (
+        <Card className="p-4 text-sm">
+          <p className="font-medium">When you sign off, Mohammed and Khalifa go live today, and Rashid&apos;s user is created but stays switched off until his ID is renewed.</p>
+          <p className="mt-1 text-sub">The agent makes 5 changes in Digital Banking Admin and then reads them back, and no payments are made. You can still change anything before you sign off.</p>
+        </Card>
+      )}
+      <p className="flex items-center gap-3 whitespace-nowrap text-sm text-sub">
+        The agent matched 17 records with the bank&apos;s systems, Rashid is {rashidLive(state) ? "live" : "on hold"}, and {stages.filter((x) => state.approvals[x.id]?.by === "Rules").length} of the 4 stages have passed by rule.
+        <button type="button" onClick={toggle} className="font-medium text-accent-ink hover:underline">{expand ? "Hide details" : "Show details"}</button>
+      </p>
+      {expand && (<>
       {failing.length > 0 && <FailBanner n={failing.length} />}
       <div {...tour}>
         <EvidenceGrid />
@@ -517,11 +546,6 @@ export function ReviewView() {
 
                         {canAct && !returning && (
               <div className="mt-3 flex gap-2">
-                                {canReturn && (
-                  <Button variant="ghost" onClick={() => setReturning(true)}>
-                    <Undo2 className="h-3.5 w-3.5" /> Return to agent
-                  </Button>
-                )}
               </div>
             )}
             {canReturn && returning && (

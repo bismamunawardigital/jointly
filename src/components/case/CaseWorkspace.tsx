@@ -152,7 +152,7 @@ export function CaseWorkspace() {
             <bdi dir="ltr" className="hidden font-mono text-muted xl:inline">{business.iban}</bdi>
             <span className="ml-auto flex items-center gap-4 text-muted">
               {now && (
-                <span>
+                <span title={firstLogin ? undefined : "Time since the customer's forms arrived. The agent started at 09:12."}>
                   {firstLogin ? "Form to first login " : "Elapsed "}
                   <span className="tnum font-medium text-ink">{duration(business.submittedAt, firstLogin ? eventById("rel-mohammed-login").time : now)}</span>
                 </span>

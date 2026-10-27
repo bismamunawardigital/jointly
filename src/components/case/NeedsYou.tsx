@@ -74,9 +74,16 @@ export function NeedsYou() {
     }, 80);
   };
   const handBtn = (
-    <Button variant="ghost" onClick={() => dispatch({ type: "handover" })}>
-      <Hand className="h-3.5 w-3.5" /> Hand to a maker <Key k="H" />
-    </Button>
+    <details className="relative">
+      <summary className="flex cursor-pointer list-none items-center gap-1.5 rounded-lg px-3 py-2 text-sm text-sub hover:bg-panel hover:text-ink">More</summary>
+      <div className="absolute bottom-full right-0 z-30 mb-2 w-52 rounded-lg border border-line bg-surface p-1 shadow-lg">
+        <button type="button" className="block w-full rounded px-3 py-2 text-left text-sm hover:bg-panel" onClick={() => { window.dispatchEvent(new CustomEvent("jointly:return")); go("review", "stage-3", "#return-note"); }}>Return to the agent</button>
+        <button type="button" className="block w-full rounded px-3 py-2 text-left text-sm hover:bg-panel" onClick={() => { window.dispatchEvent(new CustomEvent("jointly:return", { detail: "override" })); go("review", "stage-3", "#return-note"); }}>Override with reason</button>
+        <button type="button" className="flex w-full items-center gap-1.5 rounded px-3 py-2 text-left text-sm hover:bg-panel" onClick={() => dispatch({ type: "handover" })}>
+          <Hand className="h-3.5 w-3.5" /> Hand to a maker <Key k="H" />
+        </button>
+      </div>
+    </details>
   );
 
   let title = headlineOf[state.phase];

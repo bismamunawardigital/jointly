@@ -25,7 +25,7 @@ export default function CommandCenter() {
   return (
     <div className="h-full overflow-y-auto">
       <div className="mx-auto max-w-5xl px-10 py-10">
-        <p className="text-xs font-medium text-muted">Command center · Customer Fulfillment</p>
+        <p className="text-xs font-medium text-muted">Queue · Operations team</p>
         <h1 className="mt-1 font-display text-[28px] leading-tight text-ink">
           {needsYou === 1 ? "1 case needs you today." : needsYou > 1 ? `${needsYou} cases need you today.` : "Nothing needs you right now."}
         </h1>

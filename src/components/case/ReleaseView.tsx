@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { Check, MessageSquare, Rocket, TriangleAlert, X } from "lucide-react";
 import { PersonId, business, firstName, people } from "@/data/seed";
@@ -44,6 +44,15 @@ export function ReleaseView() {
   const tour3 = useTourTarget(2);
   const [confirming, setConfirming] = useState(false);
   const [confirmingR, setConfirmingR] = useState(false);
+  const [undo, setUndo] = useState<"main" | "rashid" | null>(null);
+  useEffect(() => {
+    if (!undo) return;
+    const t = setTimeout(() => {
+      dispatch({ type: undo === "main" ? "release" : "releaseRashid" });
+      setUndo(null);
+    }, 10000);
+    return () => clearTimeout(t);
+  }, [undo, dispatch]);
   const [preview, setPreview] = useState(false);
   if (!hasEvent(state, "ex-readback"))
     return <Empty icon={Rocket} title="Not set up yet" body="After Sara approves all 4 stages, the agent sets them up, checks them and works out who can go live." />;
@@ -59,6 +68,12 @@ export function ReleaseView() {
 
   return (
     <div className="max-w-5xl space-y-5">
+      {undo && (
+        <div role="status" className="fixed bottom-20 left-1/2 z-50 flex -translate-x-1/2 items-center gap-4 rounded-full bg-ink px-5 py-2.5 text-sm text-canvas shadow-lg">
+          {undo === "main" ? "Mohammed and Khalifa are being released, and their messages go out in 10 seconds." : "Rashid is being released, and his message goes out in 10 seconds."}
+          <button type="button" onClick={() => setUndo(null)} className="font-semibold underline underline-offset-2">Undo</button>
+        </div>
+      )}
       {failing > 0 && <FailBanner n={failing} />}
       {live ? (
         <Card className="flex animate-enter items-center gap-5 p-6">
@@ -108,7 +123,7 @@ export function ReleaseView() {
                   </>
                 ) : (
                   <>
-                    <Button data-release-main disabled={!elig.eligible || failing > 0} onClick={() => setConfirming(true)}>
+                    <Button data-release-main disabled={!elig.eligible || failing > 0} onClick={() => setUndo("main")}>
                       Release Mohammed and Khalifa
                     </Button>
                     <Button variant="ghost" onClick={() => setPreview(true)}>
@@ -162,7 +177,7 @@ export function ReleaseView() {
                       </div>
                     </div>
                   ) : (
-                    <Button size="sm" data-release-rashid onClick={() => setConfirmingR(true)}>
+                    <Button size="sm" data-release-rashid onClick={() => setUndo("rashid")}>
                       Release Rashid
                     </Button>
                   )}
