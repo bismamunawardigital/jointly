@@ -1,8 +1,10 @@
 "use client";
 
-import { X } from "lucide-react";
+import { Eye, Lock, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Button } from "@/components/ui";
+import { AgentMark, Button } from "@/components/ui";
+
+const systems = ["Finacle", "SVS", "EFR", "Digital Banking", "Signed forms"];
 
 const KEY = "jointly-scenario-seen";
 
@@ -40,6 +42,15 @@ export function ScenarioCard({ onStart, onWatch }: { onStart: () => void; onWatc
         <p className="pr-6 text-base leading-relaxed text-ink">
           You&apos;re Sara, a checker in a bank&apos;s customer fulfilment operations team. Creekside General Trading has 3 partners who sign payments together, and they need online banking. The agent does the work and only comes to you when it needs a person.
         </p>
+        <div className="mt-5 rounded-xl border border-line bg-panel p-4">
+          <p className="flex items-center gap-1.5 text-xs font-medium text-sub"><AgentMark size={14} className="text-person-agent" /> The agent will read</p>
+          <ul className="mt-2 flex flex-wrap gap-1.5">
+            {systems.map((x) => (
+              <li key={x} className="flex items-center gap-1 rounded-md border border-line bg-surface px-2 py-1 text-xs text-ink"><Eye className="h-3 w-3 text-muted" aria-hidden />{x}</li>
+            ))}
+          </ul>
+          <p className="mt-3 flex items-center gap-1.5 text-xs text-sub"><Lock className="h-3 w-3" aria-hidden /> It won&apos;t change anything until you approve.</p>
+        </div>
         <div className="mt-6 flex gap-3">
           <Button variant="primary" autoFocus onClick={() => { close(); onStart(); }}>Start</Button>
           <Button onClick={() => { close(); onWatch(); }}>Watch it play (90 s)</Button>
