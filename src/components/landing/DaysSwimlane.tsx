@@ -96,7 +96,7 @@ export function DaysSwimlane({ t }: { t: { lanes: string[]; today: string; joint
     />
   );
   const tab = (v: "today" | "jointly", label: string) => (
-    <button type="button" aria-pressed={view === v} onClick={() => setView(v)} className={`rounded-full px-3 py-1 text-xs ${view === v ? "bg-ink text-canvas" : "text-sub hover:text-ink"}`}>
+    <button type="button" aria-pressed={view === v} onClick={() => setView(v)} className={`rounded-full px-3 py-1 text-[13px] ${view === v ? "bg-ink text-canvas" : "text-sub hover:text-ink"}`}>
       {label}
     </button>
   );
@@ -105,10 +105,10 @@ export function DaysSwimlane({ t }: { t: { lanes: string[]; today: string; joint
       <div className="mb-4 hidden w-fit gap-1 rounded-full border border-line p-1 md:flex">{tab("today", t.today)}{tab("jointly", t.jointly)}</div>
       <div className="hidden overflow-hidden rounded-card border border-line md:block">{view === "today" ? today : jointly}</div>
       <div className="space-y-6 md:hidden">
-        <div><p className="mb-2 text-xs font-medium text-muted">{t.today}</p><div className="overflow-x-auto rounded-card border border-line">{today}</div></div>
-        <div><p className="mb-2 text-xs font-medium text-muted">{t.jointly}</p><div className="overflow-x-auto rounded-card border border-line">{jointly}</div></div>
+        <div><p className="mb-2 text-[13px] font-medium text-sub">{t.today}</p><div className="overflow-x-auto rounded-card border border-line">{today}</div></div>
+        <div><p className="mb-2 text-[13px] font-medium text-sub">{t.jointly}</p><div className="overflow-x-auto rounded-card border border-line">{jointly}</div></div>
       </div>
-      <ol className={`mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm text-sub ${view === "jointly" ? "md:invisible" : ""}`}>
+      <ol className={`mt-4 flex flex-wrap gap-x-6 gap-y-2 text-base text-sub ${view === "jointly" ? "md:invisible" : ""}`}>
         {t.pains.map((p, i) => (
           <li key={p} className="flex items-center gap-2">
             <span className="flex h-5 w-5 items-center justify-center rounded-full bg-warn text-[11px] font-bold text-white">{i + 1}</span>
@@ -116,7 +116,7 @@ export function DaysSwimlane({ t }: { t: { lanes: string[]; today: string; joint
           </li>
         ))}
       </ol>
-      <p className="mt-3 text-xs text-muted">{t.caption}</p>
+      <p className="mt-3 text-[13px] text-sub">{t.caption}</p>
     </div>
   );
 }

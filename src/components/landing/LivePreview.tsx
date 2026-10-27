@@ -9,7 +9,7 @@ import { SigningMap } from "@/components/case/SigningMap";
 
 function Frame({ children }: { children: React.ReactNode }) {
   return (
-    <div className="overflow-hidden rounded-card border border-line bg-surface shadow-lg">
+    <div className="overflow-hidden rounded-card bg-surface shadow-lg ring-1 ring-line">
       <div className="flex items-center gap-1.5 border-b border-line bg-panel px-4 py-2.5">
         <span className="h-2.5 w-2.5 rounded-full bg-line-strong" /><span className="h-2.5 w-2.5 rounded-full bg-line-strong" /><span className="h-2.5 w-2.5 rounded-full bg-line-strong" />
       </div>
@@ -34,13 +34,13 @@ export function LiveGrid() {
   );
 }
 
-export function MandateToggle({ before, after, see, label }: { before: string; after: string; see: string; label: string }) {
+export function MandateToggle({ before, after, see, label }: { before: string; after: string; see?: string; label: string }) {
   const [v, setV] = useState<1 | 2>(1);
   return (
     <div>
       <div className="mb-4 flex w-fit gap-1 rounded-full border border-line p-1">
         {([1, 2] as const).map((n) => (
-          <button key={n} type="button" aria-pressed={v === n} onClick={() => setV(n)} className={`rounded-full px-3 py-1 text-xs ${v === n ? "bg-ink text-canvas" : "text-sub hover:text-ink"}`}>
+          <button key={n} type="button" aria-pressed={v === n} onClick={() => setV(n)} className={`rounded-full px-3 py-1 text-[13px] ${v === n ? "bg-ink text-canvas" : "text-sub hover:text-ink"}`}>
             {n === 1 ? before : after}
           </button>
         ))}
@@ -52,9 +52,9 @@ export function MandateToggle({ before, after, see, label }: { before: string; a
           </StoreProvider>
         </div>
       </Frame>
-      <Link href="/demo/case/?view=map" aria-label={label} className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-accent-ink hover:underline">
+      {see && <Link href="/demo/case/?view=map" aria-label={label} className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-accent-ink hover:underline">
         {see} <ArrowRight className="h-3.5 w-3.5 rtl:-scale-x-100" />
-      </Link>
+      </Link>}
     </div>
   );
 }

@@ -7,9 +7,9 @@ import { Avatar, cn } from "@/components/ui";
 import { HeroScene, type SceneText } from "./HeroScene";
 
 type Labels = { id: string; expired: string; letter: string; alt: string; scene?: SceneText };
-const en: Labels = { id: "EID ending", expired: "EID expired 14 Aug", letter: "The letter says AED", alt: "Blurry scan of the 2023 amendment letter" };
+export const momentLabels: Labels = { id: "EID ending", expired: "EID expired 14 Aug", letter: "The letter says AED", alt: "Blurry scan of the 2023 amendment letter" };
 
-function Identity({ v }: { v: Labels }) {
+export function Identity({ v }: { v: Labels }) {
   return (
     <div className="flex flex-col items-center gap-2.5">
       {["Mohammed Al Mansoori", "MOHAMMED ALMANSOORI", "Mohd Al-Mansouri"].map((n) => (
@@ -54,7 +54,7 @@ function Scan({ v }: { v: Labels }) {
   );
 }
 
-function Live({ v }: { v: Labels }) {
+export function Live({ v }: { v: Labels }) {
   return (
     <div className="w-full max-w-md">
       <HeroScene t={v.scene} />
@@ -69,7 +69,7 @@ const steps = [
   { title: "Releases what's safe, holds the rest", tab: "release", V: Live },
 ];
 
-export function Moments({ titles, see = "See it live", v = en }: { titles?: string[]; see?: string; v?: Labels }) {
+export function Moments({ titles, see = "See it live", v = momentLabels }: { titles?: string[]; see?: string; v?: Labels }) {
   const [active, setActive] = useState(0);
   const refs = useRef<(HTMLLIElement | null)[]>([]);
   useEffect(() => {
