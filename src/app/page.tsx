@@ -58,7 +58,7 @@ const heard = [
 const grounded = [
   { source: "Vasconcelos et al., CSCW 2023", href: "https://doi.org/10.1145/3579605", finding: "People over-trust AI less when checking is easier than trusting.", where: "the clause quote sits next to every line in review" },
   { source: "Steyvers and Kumar, 2024", href: "https://journals.sagepub.com/doi/full/10.1177/17456916231181102", finding: "Showing how sure the AI is helps people rely on it the right amount.", where: "Exact match vs Agent read this tags" },
-  { source: "Buçinca et al., CSCW 2021", href: "https://doi.org/10.1145/3449287", finding: "A small forced check cuts rubber-stamping.", where: "approve unlocks after Sara compares the highlighted words" },
+  { source: "Buçinca et al., CSCW 2021", href: "https://doi.org/10.1145/3449287", finding: "A small forced check cuts rubber-stamping.", where: "Approve only works after Sara compares the highlighted words" },
   { source: "Amershi et al., CHI 2019", href: "https://doi.org/10.1145/3290605.3300233", finding: "Support quick correction, and let the AI learn from it.", where: "return one stage, then make the fix stick" },
   { source: "EU AI Act, Article 14", href: "https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-14", finding: "Humans must be able to stop the system.", where: "Pause agent and Hand to a maker" },
   { source: "Feng, McDonald and Zhang, 2025", href: "https://arxiv.org/html/2506.12469v1", finding: "Autonomy is a design choice, set by the user's role.", where: "the autonomy map: Sara is the approver" },
@@ -82,16 +82,32 @@ export default function CaseStudy() {
 
       <section className="mx-auto max-w-5xl px-6 pb-16 pt-12">
         <p className="text-sm text-muted">
-          Case study · Agentic AI product design · Bisma Munawar
+          Case study · Designing an AI agent people can check · Bisma Munawar
         </p>
         <h1 className="mt-3 max-w-3xl text-4xl font-semibold leading-tight tracking-tight md:text-5xl">
-          Joint signatories live in hours, not days.
+          A 4 day bank chore, done before lunch. And a person still signs off.
         </h1>
         <p className="mt-5 max-w-2xl text-lg text-sub">
-          Jointly is a workbench for bank operations teams. An agent does the
-          slow, careful assembly across Finacle and SVS. A person still approves
-          every stage. Rules, not the AI, decide who can sign.
+          Setting up online banking for a business with 3 signatories takes a
+          bank about 4 to 5 days of back and forth. In Jointly, an agent does
+          the copying and cross-checking across 4 old systems, Sara checks the
+          parts it had to interpret, and fixed rules decide who can sign. The
+          agent never approves its own work.
         </p>
+        <dl className="mt-8 grid max-w-2xl grid-cols-3 gap-px overflow-hidden rounded-xl border border-line bg-line">
+          {[
+            { k: "Bank-side work", v: "1h 34m", n: "was 4 to 5 days" },
+            { k: "Clicks to approve", v: "4 stages", n: "only 1 needed a close look" },
+            { k: "Things the agent approved", v: "0", n: "by design" },
+          ].map((x) => (
+            <div key={x.k} className="bg-surface px-4 py-3">
+              <dt className="text-xs text-muted">{x.k}</dt>
+              <dd className="tnum mt-0.5 text-xl font-semibold">{x.v}</dd>
+              <dd className="text-[11px] text-muted">{x.n}</dd>
+            </div>
+          ))}
+        </dl>
+        <p className="mt-2 text-[11px] text-muted">Demo numbers from a scripted, synthetic case. Not measured in a real bank.</p>
         <div className="mt-8 flex flex-wrap items-center gap-2 text-sm">
           {[
             { icon: Bot, label: "Agent proposes" },
@@ -119,11 +135,12 @@ export default function CaseStudy() {
       </section>
 
       <section className="mx-auto max-w-5xl px-6 py-16">
-        <h2 className="text-2xl font-semibold tracking-tight">What I heard</h2>
+        <h2 className="text-2xl font-semibold tracking-tight">The problem isn&apos;t hard. It&apos;s slow.</h2>
         <p className="mt-2 max-w-2xl text-sub">
-          I mapped the single, joint and non-signatory flows and spoke with
-          people who run them. The work isn&apos;t hard. It&apos;s slow, manual
-          and easy to get slightly wrong.
+          I mapped the single, joint and non-signatory flows and spoke with the
+          people who run them. Nobody is confused. They&apos;re copying the
+          same names between 4 systems, waiting on each other, and one missed
+          letter can change who is allowed to sign.
         </p>
         <div className="mt-8 grid gap-px overflow-hidden rounded-xl border border-line bg-line sm:grid-cols-2 md:grid-cols-4">
           {findings.map((f) => (
@@ -137,7 +154,7 @@ export default function CaseStudy() {
 
       <section className="mx-auto max-w-5xl px-6 pb-16">
         <h2 className="text-2xl font-semibold tracking-tight">
-          Who decides what
+          Before any screen: who decides what
         </h2>
         <p className="mt-2 max-w-2xl text-sub">
           The first thing I designed wasn&apos;t a screen. It was this map.
@@ -182,7 +199,7 @@ export default function CaseStudy() {
       <section className="border-t border-line">
         <div className="mx-auto max-w-5xl px-6 py-16">
           <h2 className="text-2xl font-semibold tracking-tight">
-            Agent design patterns
+            6 patterns I&apos;d reuse on any agent
           </h2>
           <p className="mt-2 max-w-2xl text-sub">
             Six patterns I&apos;d bring to any agent that works inside old
@@ -212,7 +229,7 @@ export default function CaseStudy() {
       <section className="border-t border-line">
         <div className="mx-auto max-w-5xl px-6 py-16">
           <h2 className="text-2xl font-semibold tracking-tight">
-            The card Sara lives in
+            The one card Sara uses all day
           </h2>
           <p className="mt-2 max-w-2xl text-sub">
             The checker spends most of her day on this one card, so I sweated
@@ -246,7 +263,7 @@ export default function CaseStudy() {
       <section className="border-t border-line">
         <div className="mx-auto max-w-5xl px-6 py-16">
           <h2 className="text-2xl font-semibold tracking-tight">Grounded in research</h2>
-          <p className="mt-2 max-w-2xl text-sub">Each pattern comes from a study or guideline, not a hunch.</p>
+          <p className="mt-2 max-w-2xl text-sub">Where a decision came from a paper or a rule, here it is, so you can check me.</p>
           <ul className="mt-8 grid gap-3 text-sm md:grid-cols-2">
             {grounded.map((g) => (
               <li key={g.href} className="rounded-xl border border-line bg-surface p-4">
@@ -264,7 +281,7 @@ export default function CaseStudy() {
       <section className="border-t border-line bg-panel/50">
         <div className="mx-auto max-w-5xl px-6 py-16">
           <h2 className="text-2xl font-semibold tracking-tight">
-            What I&apos;d test next
+            What I don&apos;t know yet
           </h2>
           <ul className="mt-6 grid gap-3 text-sm text-sub md:grid-cols-2">
             <li className="rounded-xl border border-dashed border-warn/50 bg-surface p-4">
