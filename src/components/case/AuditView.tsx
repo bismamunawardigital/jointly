@@ -29,6 +29,13 @@ export function AuditView() {
     const lane: Lane = e.actor === "Rules engine" ? "rules" : "agent";
     return { key: entry.id, time: e.time, lane, who: e.actor, what: e.title, call: `${e.call} · ${e.system}`, sources: e.evidence };
   });
+  const day: Record<string, number> = { Mon: 0, Tue: 1, Wed: 2, Thu: 3, Fri: 4 };
+  const at = (t: string) => {
+    const [d, hm] = t.split(" ");
+    const [h, m] = (hm ?? "0:0").split(":").map(Number);
+    return (day[d] ?? 0) * 1440 + h * 60 + m;
+  };
+  rows.sort((a, b) => at(a.time) - at(b.time));
   const visible = rows.filter((r) => show === "all" || r.lane === show);
   return (
     <div className="space-y-3">

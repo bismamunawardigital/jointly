@@ -4,7 +4,8 @@ import { useState } from "react";
 import { createPortal } from "react-dom";
 import { Check, MessageSquare, Rocket, TriangleAlert, X } from "lucide-react";
 import { PersonId, business, firstName, people } from "@/data/seed";
-import { releaseEligibility } from "@/lib/rules";
+import { policyChecks, releaseEligibility } from "@/lib/rules";
+import { FailBanner } from "./ReviewView";
 import { customerMessages, eventById } from "@/lib/script";
 import { progressFor } from "@/lib/derive";
 import { hasEvent, rulesFor, useStore } from "@/lib/store";
@@ -47,6 +48,7 @@ export function ReleaseView() {
   if (!hasEvent(state, "ex-readback"))
     return <Empty icon={Rocket} title="Not set up yet" body="After Sara approves all 4 stages, the agent sets them up, checks them and works out who can go live." />;
   const elig = releaseEligibility(rulesFor(version), held);
+  const failing = policyChecks(version, held).filter((c) => !c.pass).length;
   const sent = customerMessages.filter((m) => hasEvent(state, m.afterEvent));
   const pending = customerMessages.filter((m) => m.afterEvent.startsWith("rel-"));
   const live = state.phase === "live";
@@ -57,6 +59,7 @@ export function ReleaseView() {
 
   return (
     <div className="max-w-5xl space-y-5">
+      {failing > 0 && <FailBanner n={failing} />}
       {live ? (
         <Card className="flex animate-enter items-center gap-5 p-6">
           <Rings ids={people.map((p) => p.id)} size={48} />
@@ -79,9 +82,11 @@ export function ReleaseView() {
               </div>
               <div className="flex-1">
                 <p className="font-display text-xl leading-snug">{sentence}</p>
-                <div className="mt-2">
-                  <AssumptionChip>partial release, validate with bank</AssumptionChip>
-                </div>
+                {held.includes("rashid") && (
+                  <div className="mt-2">
+                    <AssumptionChip>partial release, validate with bank</AssumptionChip>
+                  </div>
+                )}
               </div>
             </div>
             {state.phase === "executed" && (
@@ -103,7 +108,7 @@ export function ReleaseView() {
                   </>
                 ) : (
                   <>
-                    <Button variant="primary" disabled={!elig.eligible} onClick={() => setConfirming(true)}>
+                    <Button variant="primary" disabled={!elig.eligible || failing > 0} onClick={() => setConfirming(true)}>
                       Release Mohammed and Khalifa
                     </Button>
                     <Button variant="ghost" onClick={() => setPreview(true)}>

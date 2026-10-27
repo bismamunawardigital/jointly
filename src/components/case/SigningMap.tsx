@@ -3,7 +3,7 @@
 import { useEffect, useId, useState } from "react";
 import { Building2, Check, KeyRound, X } from "lucide-react";
 import { PersonId, business, firstName, people } from "@/data/seed";
-import { boundaryTests, buildRules, evaluate, fmt, singleLimit } from "@/lib/rules";
+import { boundaryTests, buildRules, evaluate, fmt, outcomeLabel, singleLimit } from "@/lib/rules";
 import { hasEvent, useStore } from "@/lib/store";
 import { Avatar, cn } from "@/components/ui";
 
@@ -63,6 +63,7 @@ export function SigningMap({ compact = false, part = "all" }: { compact?: boolea
   const desc = bands.map((b) => `${b.label}: ${b.combos.map((c) => `${names(c.ids)}${c.ids.length === 1 ? " alone" : " together"}${isHeld(c) ? " (not available until Rashid's EID clears)" : ""}`).join(", ")}.`).join(" ");
   const tests = boundaryTests(rules, held);
   const fromLetter = version === 2;
+  const showGhost = fromLetter && !hasEvent(state, "rel-mohammed");
 
   const token = (c: Combo, b: string) => {
     const h = isHeld(c);
@@ -141,7 +142,7 @@ export function SigningMap({ compact = false, part = "all" }: { compact?: boolea
                 ) : (
                   <Badge>Joint signer</Badge>
                 )}
-                {p.id === "khalifa" && fromLetter && <span className="text-[11px] text-muted line-through">was 10,000</span>}
+                {p.id === "khalifa" && showGhost && <span className="text-[11px] text-muted line-through">was 10,000</span>}
                 {h && <span className="rounded-full bg-held-soft px-2 py-0.5 text-[11px] font-medium text-held">On hold · EID expired</span>}
               </button>
             );
@@ -165,7 +166,7 @@ export function SigningMap({ compact = false, part = "all" }: { compact?: boolea
             </div>
           ))}
         </div>
-        {fromLetter && (
+        {showGhost && (
           <span className="pointer-events-none absolute inset-y-0 border-l border-dashed border-muted/50" style={{ left: pos(10_000) }} aria-hidden>
             <span className="absolute -bottom-5 -translate-x-1/2 whitespace-nowrap text-[11px] text-muted">was 10,000</span>
           </span>
@@ -229,7 +230,7 @@ export function SigningMap({ compact = false, part = "all" }: { compact?: boolea
             <ul className="mt-2 space-y-1 text-sm">
               {tests.map((t) => (
                 <li key={t.id} className="flex items-center gap-2">
-                  {t.pass ? <Check className="h-3.5 w-3.5 text-ok" /> : <X className="h-3.5 w-3.5 text-bad" />} {t.label}
+                  {t.pass ? <Check className="h-3.5 w-3.5 text-ok" /> : <X className="h-3.5 w-3.5 text-bad" />} {t.label} → {outcomeLabel[t.expected]}
                 </li>
               ))}
             </ul>

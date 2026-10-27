@@ -145,7 +145,7 @@ h1, h2, h3 {
 }
 
 /* Landing hero scene: 8s loop. Base styles are the final frame for reduced motion. */
-.hs { animation-duration: 8s; animation-iteration-count: infinite; animation-timing-function: ease-in-out; animation-fill-mode: both; }
+.hs { animation-delay: -6.7s; animation-duration: 8s; animation-iteration-count: infinite; animation-timing-function: ease-in-out; animation-fill-mode: both; }
 .hs-forms { opacity: 0; animation-name: hs-forms; }
 @keyframes hs-forms { 0% { opacity: 0; transform: translateY(-12px); } 6%, 16% { opacity: 1; transform: none; } 22%, 100% { opacity: 0; transform: scale(0.7); } }
 .hs-people { animation-name: hs-people; }

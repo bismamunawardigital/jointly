@@ -108,6 +108,9 @@ export function CaseWorkspace() {
           <button type="button" onClick={() => setHowOpen(true)} className="ml-4 mt-2 text-[11px] text-muted underline-offset-2 hover:text-ink hover:underline">
             How this agent works
           </button>
+          <button type="button" onClick={() => dispatch({ type: "watchRun" })} className="ml-4 mt-2 text-[11px] text-muted underline-offset-2 hover:text-ink hover:underline">
+            Watch the agent run from the start
+          </button>
           <nav aria-label="Case steps" className="-mb-px mt-5 flex gap-5 overflow-x-auto whitespace-nowrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" role="tablist">
             {groups.map((g) => (
               <button

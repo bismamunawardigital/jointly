@@ -6,7 +6,7 @@ import { SigningMap } from "./SigningMap";
 import { useEffect, useState } from "react";
 import { AlertTriangle, Check, ChevronRight, Repeat, ShieldCheck, Undo2 } from "lucide-react";
 import { EvidenceKey, isAgentRead } from "@/data/seed";
-import { approvalValid, buildStages, diffStage, fmt } from "@/lib/rules";
+import { approvalValid, buildStages, diffStage, fmt, policyChecks } from "@/lib/rules";
 import { hasEvent, useStore } from "@/lib/store";
 import { useTourTarget } from "@/components/Tour";
 import { Avatar, BasisTag, Button, Card, Empty, Pill, Proof, Tween, cn } from "@/components/ui";
@@ -94,44 +94,114 @@ function ClaimRow({ label, value, sources }: { label: React.ReactNode; value: Re
   );
 }
 
+function ScanLens({ src, alt }: { src: string; alt: string }) {
+  const [zoom, setZoom] = useState(false);
+  const [pos, setPos] = useState({ x: 0, y: 0, w: 1, h: 1 });
+  const move = (e: React.PointerEvent<HTMLButtonElement>) => {
+    const r = e.currentTarget.getBoundingClientRect();
+    setPos({ x: e.clientX - r.left, y: e.clientY - r.top, w: r.width, h: r.height });
+  };
+  const L = 180;
+  return (
+    <button
+      type="button"
+      aria-label={zoom ? "Zoom out of the scan" : "Zoom into the scan, 2x"}
+      aria-pressed={zoom}
+      onClick={(e) => {
+        move(e as unknown as React.PointerEvent<HTMLButtonElement>);
+        setZoom((z) => !z);
+      }}
+      onPointerMove={move}
+      className={cn("relative block w-full overflow-hidden rounded-md border border-line", zoom ? "cursor-zoom-out" : "cursor-zoom-in")}
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={src} alt={alt} className="block w-full" draggable={false} />
+      {zoom && (
+        <span
+          aria-hidden
+          className="pointer-events-none absolute rounded-full border-2 border-surface shadow-lg"
+          style={{
+            width: L,
+            height: L,
+            left: pos.x - L / 2,
+            top: pos.y - L / 2,
+            backgroundImage: `url(${src})`,
+            backgroundRepeat: "no-repeat",
+            backgroundSize: `${pos.w * 2}px ${pos.h * 2}px`,
+            backgroundPosition: `${-(pos.x * 2 - L / 2)}px ${-(pos.y * 2 - L / 2)}px`,
+          }}
+        />
+      )}
+    </button>
+  );
+}
+
 function ScanCheck({ canAct, onConfirm, onReturn }: { canAct: boolean; onConfirm: (v: number) => void; onReturn: (v: number) => void }) {
   const [value, setValue] = useState("");
+  const [checked, setChecked] = useState<number | null>(null);
   const n = Number(value.replace(/[^0-9.]/g, ""));
-  const mismatch = value.trim() !== "" && n > 0 && n !== 25000;
+  const match = checked === 25000;
   return (
-    <div className="mt-4 rounded-lg border border-warn/30 bg-warn-soft/40 p-3">
+    <div className="mt-4 rounded-lg border border-warn/30 bg-warn-soft/40 p-4">
       <p className="flex items-center gap-1.5 text-sm font-medium text-warn-ink">
         <AlertTriangle className="h-4 w-4 shrink-0" /> A 2023 letter may change Khalifa&apos;s limit. The scan is unclear.
       </p>
-      <div className="mt-3 grid grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] gap-4">
-        <figure>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/scans/svs-amd-2023.png" alt="Scan of the 2023 amendment letter. The amount is blurred." className="w-full rounded-md border border-line" />
-          <figcaption className="mt-1 text-[11px] text-muted">2023 amendment letter · scan from SVS</figcaption>
+      <div className="mt-3 flex flex-wrap items-start gap-5">
+        <figure className="w-[520px] max-w-full">
+          <ScanLens src="/scans/svs-amd-2023.png" alt="Scan of the 2023 amendment letter. The last digits of the amount are smudged." />
+          <figcaption className="mt-1 text-[11px] text-muted">2023 amendment letter · scan from SVS · click to zoom</figcaption>
         </figure>
-        <div className="space-y-3 text-sm">
-          <div>
-            <p className="text-xs text-muted">The agent read</p>
-            <p className="mt-0.5 font-medium">
-              AED 25,000 <span className="text-xs font-normal text-warn-ink">not certain</span>
-            </p>
-            <p className="mt-1 text-xs text-sub">Plan v1 keeps AED 10,000 until you confirm.</p>
-          </div>
-          {canAct && (
-            <div>
+        <div className="min-w-[220px] flex-1 space-y-3 text-sm">
+          {canAct && checked === null && (
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (n > 0) setChecked(n);
+              }}
+            >
               <label htmlFor="scan-value" className="text-xs text-muted">
                 The letter says Khalifa&apos;s limit is
               </label>
               <div className="mt-1 flex items-center gap-2">
                 <span className="text-xs text-muted">AED</span>
-                <input id="scan-value" inputMode="numeric" value={value} onChange={(e) => setValue(e.target.value)} placeholder="25,000" className="h-9 w-32 rounded-lg border border-line bg-surface px-2.5 text-sm outline-none focus:border-accent" />
+                <input id="scan-value" inputMode="numeric" autoComplete="off" value={value} onChange={(e) => setValue(e.target.value)} className="tnum h-9 w-32 rounded-lg border border-line bg-surface px-2.5 text-sm outline-none focus:border-accent" />
               </div>
-              {mismatch && <p className="mt-1 text-xs text-warn-ink">That&apos;s not what the agent read. This sends the stage back with your value.</p>}
-              <Button variant="primary" className="mt-2" disabled={!(n > 0)} onClick={() => (n === 25000 ? onConfirm(n) : onReturn(n))}>
-                <Check className="h-3.5 w-3.5" /> {mismatch ? "Send back with my value" : "Confirm and update the plan"}
+              <p className="mt-1 text-xs text-sub">Type what you read. You&apos;ll see the agent&apos;s reading after.</p>
+              <Button type="submit" variant="primary" className="mt-2" disabled={!(n > 0)}>
+                Check
               </Button>
+            </form>
+          )}
+          {(checked !== null || !canAct) && (
+            <div>
+              <p className="text-xs text-muted">The agent read</p>
+              <p className="tnum mt-0.5 font-medium">
+                AED 25,000 <span className="text-xs font-normal text-warn-ink">not certain</span>
+              </p>
             </div>
           )}
+          {canAct && checked !== null && (
+            <div className={cn("rounded-lg border p-3", match ? "border-ok/40 bg-ok-soft" : "border-warn/40 bg-surface")}>
+              {match ? (
+                <p className="flex items-center gap-1.5 font-medium text-ok-ink">
+                  <Check className="h-4 w-4" /> You and the agent both read 25,000
+                </p>
+              ) : (
+                <p className="text-warn-ink">
+                  You read <span className="tnum font-medium">AED {fmt(checked)}</span>. The agent read AED 25,000.
+                </p>
+              )}
+              <div className="mt-2 flex flex-wrap gap-2">
+                <Button variant="primary" onClick={() => (match ? onConfirm(checked) : onReturn(checked))}>
+                  {match ? "Confirm and update the plan" : "Send back with my value"}
+                </Button>
+                <Button variant="ghost" onClick={() => setChecked(null)}>
+                  Change my reading
+                </Button>
+              </div>
+            </div>
+          )}
+          {!canAct && <p className="text-xs text-sub">Plan v1 keeps AED 10,000 until Sara confirms.</p>}
         </div>
       </div>
     </div>
@@ -142,8 +212,19 @@ type Status = "approved" | "needs" | "changed" | "waiting";
 const ring: Record<Status, string> = { approved: "border-ok bg-ok text-onaccent", needs: "border-warn", changed: "border-accent", waiting: "border-line" };
 const statusLabel: Record<Status, string> = { approved: "Approved", needs: "Needs you", changed: "Changed", waiting: "Waiting" };
 
+export function FailBanner({ n }: { n: number }) {
+  return (
+    <div role="alert" className="flex items-center gap-2 rounded-card border border-bad bg-bad-soft px-4 py-3 text-sm text-bad-ink">
+      <AlertTriangle className="h-4 w-4 shrink-0" />
+      {n} check{n === 1 ? "" : "s"} failed. Approval is blocked until {n === 1 ? "it passes" : "they pass"}.
+      <a href="?tab=map" className="ml-auto font-medium underline underline-offset-2">See the failing test</a>
+    </div>
+  );
+}
+
 export function ReviewView() {
-  const { state, dispatch, version } = useStore();
+  const { state, dispatch, version, held } = useStore();
+  const failing = policyChecks(version, held).filter((c) => !c.pass);
   const tour = useTourTarget(1);
   const [returning, setReturning] = useState(false);
   const [note, setNote] = useState("");
@@ -154,12 +235,12 @@ export function ReviewView() {
       if (state.phase !== "in_review" && state.phase !== "re_review") return;
       const list = buildStages(version);
       const next = list.find((st, n) => !approvalValid(state.approvals[st.id], st) && list.slice(0, n).every((p) => approvalValid(state.approvals[p.id], p)));
-      if (!next || (next.id === 3 && version === 1)) return;
+      if (!next || (next.id === 3 && version === 1) || failing.length) return;
       dispatch({ type: "approve", stageId: next.id });
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [state, version, dispatch]);
+  }, [state, version, dispatch, failing.length]);
   if (!hasEvent(state, "submit")) return <Empty icon={ShieldCheck} title="Nothing to review yet" body="The agent sends you all 4 stages at once, so you review in one sitting." />;
   const stages = buildStages(version);
   const v1 = buildStages(1);
@@ -177,6 +258,7 @@ export function ReviewView() {
   return (
     <div className="max-w-4xl space-y-4" {...tour}>
       <h2 className="font-display text-2xl">{headline}</h2>
+      {failing.length > 0 && <FailBanner n={failing.length} />}
       <div className="grid grid-cols-4 gap-2">
         {stages.map((s, i) => (
           <a key={s.id} href={`#stage-${s.id}`} className="flex items-center gap-2.5 rounded-card border border-line bg-surface px-3 py-2.5 hover:border-line-strong">
@@ -214,7 +296,7 @@ export function ReviewView() {
         const prevOk = stages.slice(0, i).every((p) => approvalValid(state.approvals[p.id], p));
         const changes = version === 2 ? diffStage(v1[i], s) : [];
         const wasReturned = state.returned?.stageId === s.id;
-        const canAct = reviewing && !valid && prevOk;
+        const canAct = reviewing && !valid && prevOk && !failing.length;
         const canReturn = canAct && version === 1 && s.id === 3;
         const cov = coverage(s.id, version);
         const readItems = s.items.filter((it) => it.sources.some(isAgentRead));

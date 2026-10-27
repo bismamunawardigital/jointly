@@ -47,15 +47,15 @@ export function HeroScene() {
       </div>
       <div className="absolute inset-x-0 top-[192px] flex justify-center md:top-[248px]">
         <span className="hs hs-link-l relative z-10">
-          <Avatar id="mohammed" size={44} />
+          <Avatar id="mohammed" size={56} />
         </span>
         <span className="hs hs-link-r -ml-3">
-          <Avatar id="khalifa" size={44} />
+          <Avatar id="khalifa" size={56} />
         </span>
       </div>
       <div className="absolute inset-x-0 bottom-6 flex justify-center md:bottom-10">
         <span className="hs hs-live inline-flex items-center gap-2 rounded-full border border-ok/30 bg-ok-soft px-4 py-1.5 text-sm font-semibold text-ok-ink">
-          <span className="h-2 w-2 rounded-full bg-ok" /> Live
+          <span className="h-2 w-2 rounded-full bg-ok" /> Live · 2 of 3
         </span>
       </div>
     </div>

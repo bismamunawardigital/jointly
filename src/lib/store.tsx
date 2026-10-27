@@ -48,7 +48,7 @@ export interface State {
   handedOver?: boolean;
 }
 
-export const initialState: State = {
+const blankState: State = {
   phase: "new",
   log: [],
   queue: [],
@@ -56,6 +56,12 @@ export const initialState: State = {
   cleanupTicket: "draft",
   tourOn: true,
   tourStep: 0,
+};
+
+export const initialState: State = {
+  ...blankState,
+  phase: "in_review",
+  log: groupEvents("run").map((id) => ({ id, kind: "agent" as const })),
 };
 
 type Action =
@@ -74,6 +80,7 @@ type Action =
   | { type: "lesson" }
   | { type: "tour"; on?: boolean; step?: number }
   | { type: "reset" }
+  | { type: "watchRun" }
   | { type: "hydrate"; state: State };
 
 const groupPhase: Record<Group, { running: Phase; done: Phase }> = {
@@ -108,6 +115,8 @@ function reducer(s: State, a: Action): State {
       return a.state;
     case "reset":
       return { ...initialState, tourOn: s.tourOn };
+    case "watchRun":
+      return { ...blankState, tourOn: false, tourStep: s.tourStep };
     case "start": {
       if (s.queue.length) return s;
       return { ...s, phase: groupPhase[a.group].running, queue: groupEvents(a.group), queueGroup: a.group };
@@ -172,7 +181,7 @@ function reducer(s: State, a: Action): State {
   }
 }
 
-const KEY = "jointly-demo-v3";
+const KEY = "jointly-demo-v4";
 
 interface Ctx {
   state: State;
