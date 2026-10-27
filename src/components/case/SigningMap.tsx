@@ -81,15 +81,15 @@ export function SigningMap({ compact = false, part = "all" }: { compact?: boolea
         onBlur={() => setHover(null)}
         className={cn(
           "inline-flex items-center rounded-full border bg-surface px-1.5 py-1 transition-[opacity,box-shadow] duration-150",
-          !compact && b !== band && "opacity-60",
+          !compact && b !== band && "opacity-80",
           lit ? "border-ok ring-2 ring-ok/30" : "border-line",
-          h && "border-dashed border-held opacity-40",
-          dimCombo(c) && "opacity-20",
+          h && "border-dashed border-held opacity-70",
+          dimCombo(c) && "opacity-35",
         )}
       >
         {c.ids.map((id, i) => (
           <span key={id} className={cn(i > 0 && "ring-link -ml-1.5")} style={{ "--ring-from": "8px" } as React.CSSProperties}>
-            <Avatar id={id} size={28} held={held.includes(id)} />
+            <Avatar id={id} size={32} held={held.includes(id)} />
           </span>
         ))}
         {c.ids.length === 1 && <span className="ml-1.5 pr-1 text-[11px] text-sub">alone</span>}
