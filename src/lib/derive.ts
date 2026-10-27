@@ -8,7 +8,7 @@ export const headlineOf: Record<Phase, string> = {
   running: "The agent is setting up 3 signatories.",
   in_review: "Plan v1 is ready. 1 value needs your eye.",
   revising: "The agent is updating stages 3 and 4.",
-  re_review: "2 stages changed. Check the difference.",
+  re_review: "Plan v2 passes every check. Sign it off.",
   executing: "The agent is setting it up in Finacle and Admin.",
   executed: "Set up and checked. Release is your call.",
   releasing: "Releasing Mohammed and Khalifa.",

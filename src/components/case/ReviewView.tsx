@@ -257,7 +257,7 @@ export function ReviewView() {
   });
   const open = status.filter((x) => x !== "approved").length;
   const judgement = version === 1 && !approvalValid(state.approvals[3], stages[2]);
-  const headline = !open ? "All 4 stages approved" : judgement ? "1 thing needs your judgement" : `Nothing needs your judgement: ${open} stage${open === 1 ? "" : "s"} ready to approve`;
+  const headline = !open ? "All 4 stages pass. Sign off when ready." : judgement ? "1 thing needs your judgement" : `Nothing needs your judgement: ${open} stage${open === 1 ? "" : "s"} ready to approve`;
 
   return (
     <div className="max-w-4xl space-y-4" {...tour}>

@@ -85,6 +85,7 @@ export function NeedsYou() {
     body = (
       <>
         <p className="text-sm font-medium">Review plan v1</p>
+        <p className="mt-1 text-sm text-sub">Stages 1 and 2 passed by rule.</p>
         <p className="mt-3 rounded-lg bg-warn-soft px-3 py-2 text-xs text-warn-ink">Stage 3: check a value on a blurry 2023 letter.</p>
         <Button variant="primary" className="mt-4 w-full" onClick={() => setTab("review")}>
           Open checker review
@@ -94,10 +95,10 @@ export function NeedsYou() {
   } else if (state.phase === "re_review") {
     body = (
       <>
-        <p className="text-sm font-medium">Review the changes in plan v2</p>
-        <p className="mt-1 text-sm text-sub">Stages 3 and 4 changed. 1 and 2 keep your approval.</p>
+        <p className="text-sm font-medium">Sign off plan v2</p>
+        <p className="mt-1 text-sm text-sub">Your letter value is in. Stages 1, 2 and 4 passed by rule.</p>
         <Button variant="primary" className="mt-4 w-full" onClick={() => setTab("review")}>
-          Review 2 changed stages
+          Open sign-off
         </Button>
       </>
     );
