@@ -5,7 +5,7 @@ import { EvidenceGrid } from "./EvidenceGrid";
 import { PaymentWorkflow } from "./PaymentWorkflow";
 import { SigningMap } from "./SigningMap";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AlertTriangle, Check, ChevronRight, Repeat, ShieldCheck } from "lucide-react";
 import { EvidenceKey, isAgentRead } from "@/data/seed";
 import { approvalValid, buildStages, diffStage, fmt, policyChecks } from "@/lib/rules";
@@ -159,6 +159,21 @@ function ScanCheck({ canAct, onConfirm }: { canAct: boolean; onConfirm: (v: numb
     setChecked(x);
     window.dispatchEvent(new CustomEvent("jointly:scan", { detail: x }));
   };
+  const submit = () => {
+    if (clean ? n === 25000 : !value.trim() || n === 25000) onConfirm(25000);
+    else if (n > 0) check(n);
+  };
+  const submitRef = useRef(submit);
+  submitRef.current = submit;
+  useEffect(() => {
+    const on = (e: Event) => {
+      if (!canAct || checked !== null) return;
+      (e as CustomEvent<{ handled: boolean }>).detail.handled = true;
+      submitRef.current();
+    };
+    window.addEventListener("jointly:confirm-scan", on);
+    return () => window.removeEventListener("jointly:confirm-scan", on);
+  }, [canAct, checked]);
   return (
     <div className="mt-4 rounded-lg border border-warn/40 bg-surface p-4">
       <p className="flex items-center gap-1.5 text-sm font-medium text-warn-ink">
@@ -182,8 +197,7 @@ function ScanCheck({ canAct, onConfirm }: { canAct: boolean; onConfirm: (v: numb
                 <form
                   onSubmit={(e) => {
                     e.preventDefault();
-                    if (!value.trim() || n === 25000) onConfirm(25000);
-                    else if (n > 0) check(n);
+                    submit();
                   }}
                 >
                   <label htmlFor="scan-value" className="text-xs text-muted">
@@ -194,9 +208,6 @@ function ScanCheck({ canAct, onConfirm }: { canAct: boolean; onConfirm: (v: numb
                     <input id="scan-value" inputMode="numeric" autoComplete="off" placeholder={clean ? "" : "25,000"} value={value} onChange={(e) => setValue(e.target.value)} className="tnum h-9 w-32 rounded-lg border border-line bg-surface px-2.5 text-sm outline-none focus:border-accent" />
                   </div>
                   <p className="mt-1 text-xs text-sub">{clean ? "Type what you read on the clean copy, and press Enter." : "Check it against the scan. Press Enter if it matches, or type what you read."}</p>
-                  <Button type="submit" className="mt-2" disabled={clean && !(n > 0)}>
-                    {!value.trim() && !clean ? "Confirm AED 25,000" : "Check"}
-                  </Button>
                 </form>
               )}
               {(checked !== null || !canAct) && (

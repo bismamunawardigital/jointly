@@ -287,4 +287,4 @@ export const otherCases: QueueCase[] = [
   },
 ];
 
-export const checker = { name: "Sara M.", role: "CF Checker", initials: "SM" };
+export const checker = { name: "Sara M.", role: "Checker, Operations", initials: "SM" };

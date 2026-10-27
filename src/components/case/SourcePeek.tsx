@@ -53,11 +53,14 @@ export function NotChecked() {
 }
 
 export function SystemsStrip({ onOpen }: { onOpen?: (s: Sys) => void }) {
+  const { state } = useStore();
+  const letterDone = state.confirmed !== undefined || !!state.mine || hasEvent(state, "rev-plan");
   const tally = (s: Sys) => {
+    if (s === "svs" && letterDone) return "ok";
     const v = (["mohammed", "khalifa", "rashid"] as const).map((p) => checks[p][s][0]);
     return v.includes("bad") ? "bad" : v.includes("warn") ? "warn" : "ok";
   };
-  const note: Record<Sys, string> = { finacle: "3 people", svs: "1 unclear value", efr: "1 ID expired", admin: "1 login found" };
+  const note: Record<Sys, string> = { finacle: "3 people", svs: letterDone ? "Letter checked by Sara" : "1 unclear value", efr: "1 ID expired", admin: "1 login found" };
   return (
     <ul aria-label="Systems the agent checked" className="grid grid-cols-2 gap-2 md:grid-cols-4">
       {order.map((s) => {

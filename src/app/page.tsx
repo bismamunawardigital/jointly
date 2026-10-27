@@ -13,7 +13,7 @@ import { LangSwitch } from "@/components/landing/LangSwitch";
 import { SectionNav } from "@/components/landing/SectionNav";
 import { Tabs } from "@/components/landing/Tabs";
 import { statsEn } from "@/content/stats";
-import { CountUp, hm } from "@/components/CountUp";
+import { CountUp } from "@/components/CountUp";
 import { PORTFOLIO_URL } from "@/content/links";
 
 const stats = statsEn;
@@ -243,7 +243,7 @@ export default function CaseStudy() {
           <dl className="mt-6 grid grid-cols-3 gap-4 md:gap-6">
             {stats.map((s) => (
               <div key={s.k}>
-                <dd className="tnum whitespace-nowrap font-display text-2xl md:text-3xl"><CountUp to={s.n} format={s.n === 114 ? hm : undefined} /></dd>
+                <dd className="tnum whitespace-nowrap font-display text-2xl md:text-3xl">{s.n === 114 ? "1h 54m" : <CountUp to={s.n} />}</dd>
                 <dt className="mt-1 text-xs text-muted">{s.k}</dt>
               </div>
             ))}

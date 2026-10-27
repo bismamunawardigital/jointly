@@ -155,7 +155,7 @@ export function NeedsYou() {
         {differs ? (
           <Button variant="primary" onClick={() => dispatch({ type: "askCopy", value: scanVal })}>Ask the branch for a clean copy</Button>
         ) : (
-          <Button variant="primary" onClick={() => go("review", "stage-3", "#scan-value")}>Confirm AED 25,000 <Key k="Enter" /></Button>
+          <Button variant="primary" onClick={() => { const d = { handled: false }; window.dispatchEvent(new CustomEvent("jointly:confirm-scan", { detail: d })); if (!d.handled) go("review", "stage-3", "#scan-value"); }}>Confirm AED 25,000 <Key k="Enter" /></Button>
         )}
       </>
     );

@@ -4,7 +4,7 @@ import { useLang } from "@/lib/lang";
 import { track } from "@/lib/track";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Check, RotateCcw, Sparkles } from "lucide-react";
+import { Check, RotateCcw } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { hasEvent, useStore } from "@/lib/store";
 import { PORTFOLIO_URL } from "@/content/links";
@@ -196,11 +196,11 @@ export function GuideRail() {
 }
 
 export function Guide() {
-  const { tasks, bonus, decisions, phone, skips, tx } = copy[useLang()];
+  const { tasks, bonus, phone, skips, tx } = copy[useLang()];
   const { state, dispatch, hydrated, setTab } = useStore();
   const path = usePathname();
   const [mode, setModeRaw] = useState<Mode>("off");
-  const [card, setCard] = useState<string | null>(null);
+  const [, setCard] = useState<string | null>(null);
   const [skip, setSkip] = useState<string | null>(null);
   const [phoneAt, setPhoneAt] = useState(-1);
   const [box, setBox] = useState<{ top: number; left: number; away: boolean } | null>(null);
@@ -261,7 +261,7 @@ export function Guide() {
   useEffect(() => {
     if (prevPhase.current === state.phase) return;
     prevPhase.current = state.phase;
-    if (!active || !skips[state.phase]) return;
+    if (!skips[state.phase]) return;
     setSkip(skips[state.phase]);
     const t = setTimeout(() => setSkip(null), 3000);
     if (state.phase === "partially_live" && !shown.current.has("phone")) {
@@ -325,7 +325,7 @@ export function Guide() {
   return (
     <>
       {mode === "intro" && <Intro onStart={() => { setMode("guide"); setTab("review"); }} onAuto={() => { dispatch({ type: "reset" }); setTab("review"); setMode("auto"); }} onExplore={() => setMode("off")} />}
-      {active && skip && <div role="status" className="fixed left-1/2 top-24 z-50 -translate-x-1/2 animate-enter rounded-full bg-ink px-4 py-1.5 text-sm font-medium text-canvas shadow-lg">{skip}</div>}
+      {skip && <div role="status" className="fixed left-1/2 top-24 z-50 -translate-x-1/2 animate-enter rounded-full bg-ink px-4 py-1.5 text-sm font-medium text-canvas shadow-lg">{skip}</div>}
       {active && (wait || (box && task)) && state.phase !== "live" && (
         <div role="status" className="fixed z-40 w-[360px] rounded-card border border-brand/40 bg-surface p-4 text-sm shadow-lg" style={wait || !box ? { left: 260, bottom: 84 } : { top: box.top, left: box.left }}>
           <p className="text-sub">{wait ?? task!.hint}</p>
@@ -339,13 +339,6 @@ export function Guide() {
       )}
       {active && box?.away && !wait && (
         <button type="button" onClick={() => emit("jointly:spot-go")} className="fixed bottom-24 end-8 z-40 rounded-full border border-line bg-surface px-3 py-1.5 text-xs font-medium shadow-lg">Take me back</button>
-      )}
-      {active && card && (
-        <div role="status" className="fixed bottom-24 end-8 z-40 w-[340px] animate-enter rounded-card border border-line bg-surface p-4 shadow-lg">
-          <p className="flex items-center gap-1.5 text-xs font-medium text-brand"><Sparkles className="h-3.5 w-3.5" /> Design decision</p>
-          <p className="mt-1 text-sm font-semibold">{decisions[card][0]}</p>
-          <p className="mt-1 text-xs text-sub">{decisions[card][1]}</p>
-        </div>
       )}
       {phoneAt >= 0 && phoneAt < phone.length && (
         <div className="fixed end-8 top-24 z-50 w-[240px] animate-enter rounded-[28px] border-4 border-ink bg-surface p-4 shadow-xl" role="status" aria-label="What the customer saw">
