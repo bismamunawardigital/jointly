@@ -1,6 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Ban, Check, FileText, Printer, Search, ShieldCheck, Truck, Undo2, UserRound } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+import { ArrowRight, Ban, Check, FileText, Inbox, Lock, Mail, ShieldCheck, UserRound } from "lucide-react";
 import { Logo } from "@/components/Shell";
 import { ThemeButton } from "@/components/ThemeToggle";
 import { AgentMark, Avatar } from "@/components/ui";
@@ -16,50 +15,38 @@ const stats = statsEn;
 
 const in30: [string, string][] = [
   ["Problem", "5 days of manual setup"],
-  ["User", "Sara, a checker"],
+  ["User", "A checker in the customer fulfilment operations team"],
   ["What I built", "An agent, rules and a review screen"],
   ["Outcome", "Under 2 hours (synthetic case, not measured)"],
   ["My role", "Research, design, prototype"],
 ];
 
 const swim = {
-  lanes: ["Customer", "Maker", "Checker", "Systems", "Courier"],
+  lanes: ["Customer", "Person who sets it up", "Person who checks it", "Systems", "Courier"],
   today: "Today",
   jointly: "With Jointly",
-  pains: ["4 maker-checker rounds", "Free-text instructions in SVS", "Courier PINs"],
+  pains: ["4 rounds of checking", "Free-text instructions in SVS", "PINs sent by post"],
   todayNodes: ["Signs forms", "Reads Finacle|and SVS", "SVS free text", "Sets up|a stage", "Reviews|returns it", "PIN mailer|printed", "Courier|delivers", "First login|day 5"],
   jointlyNodes: ["Signs forms", "Agent prepares|4 systems", "Sara checks|1 thing", "Signs off", "Agent sets up|Admin", "SMS activation|first login"],
   empty: "No step needed",
   caption: "Illustrative and simplified. Redrawn for this case study, not the bank's internal map.",
 };
 
-const inbox: { who: ("mohammed" | "khalifa" | "rashid")[]; line: string; time: string }[] = [
-  { who: ["khalifa"], line: "Confirm a value on a blurry letter · Creekside", time: "2 min" },
-  { who: ["mohammed", "khalifa"], line: "Approve a new payments maker · Saffron Bay", time: "1 min" },
-  { who: ["rashid"], line: "Release Rashid, his ID is renewed · Creekside", time: "30 s" },
-];
 
 const learned = ["Check SVS letters", "Reuse existing logins", "Re-check EFR before release"];
 
 const gaveUp: { d: string; why: string }[] = [
   { d: "Kept 4 sign-offs, as one action", why: "Bank controls require it. Fewer clicks, same record." },
   { d: "No confidence scores", why: "Regulators ask which rule fired, not how sure the model was." },
-  { d: "Desktop only", why: "The accounts operations team works on bank laptops. Mobile would be a different product." },
+  { d: "Desktop only", why: "The customer fulfilment operations team works on bank laptops. Mobile would be a different product." },
   { d: "Partial release is a hypothesis", why: "No public evidence yet. First thing to test with a bank." },
 ];
 
-const days: { day: string; label: string; icons: LucideIcon[] }[] = [
-  { day: "Day 1", label: "Forms arrive", icons: [FileText] },
-  { day: "Day 2", label: "Maker reads Finacle and SVS", icons: [Search] },
-  { day: "Day 3", label: "4 maker-checker rounds", icons: [Undo2, Undo2, Undo2, Undo2] },
-  { day: "Day 4", label: "PIN mailers printed", icons: [Printer] },
-  { day: "Day 5", label: "Courier delivers", icons: [Truck] },
-];
 
 const lanes: { icon: React.ReactNode; title: string; items: string[]; never?: boolean }[] = [
   { icon: <AgentMark size={40} className="text-person-agent" />, title: "Agent does", items: ["Reads every record", "Builds the plan", "Sets it up after approval"] },
   { icon: <ShieldCheck className="h-10 w-10 text-accent" />, title: "Rules decide", items: ["Who can sign", "Up to what amount", "Who can go live"] },
-  { icon: <UserRound className="h-10 w-10 text-ink" />, title: "Sara approves", items: ["Unclear values", "The plan sign-off", "Every release"] },
+  { icon: <UserRound className="h-10 w-10 text-ink" />, title: "A person approves", items: ["Unclear values", "The plan sign-off", "Every release"] },
   { icon: <Ban className="h-10 w-10 text-bad" />, title: "Never allowed", items: ["Approve its own work", "Send passwords", "Match people by name"], never: true },
 ];
 
@@ -199,6 +186,29 @@ const unknowns = [
 const h2 = "font-display text-3xl tracking-tight md:text-4xl";
 const primary = "inline-flex h-11 items-center gap-1.5 rounded-lg bg-accent px-5 text-sm font-medium text-onaccent transition-colors hover:bg-accent-hover";
 
+function ServiceCol({ label, text, children }: { label: string; text: string; children: React.ReactNode }) {
+  return (
+    <div className="rounded-card border border-line bg-surface p-6">
+      <p className="text-xs font-medium uppercase tracking-wide text-muted">{label}</p>
+      <div className="mt-5 flex h-24 items-center">{children}</div>
+      <p className="mt-4 text-sm text-sub">{text}</p>
+    </div>
+  );
+}
+
+function Partner({ tone = "plain", badge, tag, tagClass }: { tone?: "plain" | "ok" | "muted"; badge?: React.ReactNode; tag?: string; tagClass?: string }) {
+  const look = tone === "ok" ? "border-ok/40 bg-ok-soft text-ok-ink" : tone === "muted" ? "border-line bg-panel text-muted" : "border-line bg-surface text-ink";
+  return (
+    <span className="flex flex-col items-center gap-1.5">
+      <span className={`relative flex h-11 w-11 items-center justify-center rounded-full border ${look}`}>
+        <UserRound aria-hidden className="h-5 w-5" />
+        {badge && <span className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full border border-line bg-surface">{badge}</span>}
+      </span>
+      {tag && <span className={`whitespace-nowrap text-[11px] ${tagClass ?? ""}`}>{tag}</span>}
+    </span>
+  );
+}
+
 export default function CaseStudy() {
   return (
     <div className="alt min-h-screen bg-canvas">
@@ -217,7 +227,7 @@ export default function CaseStudy() {
           <p className="mt-3 max-w-xl text-base text-sub md:text-lg">Jointly is an AI agent that prepares the setup from the bank&apos;s old systems, and a person approves every step.</p>
           <p className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm">
             <Gloss term="Joint signatories" def="2 or more people who must approve a company's payments together." />
-            <Gloss term="Accounts operations team" def="The bank team that sets up their online banking by hand." />
+            <Gloss term="Customer fulfilment operations team" def="The bank team that sets up their online banking by hand." />
           </p>
           <div className="mt-4 flex flex-wrap items-end justify-between gap-6">
             <dl className="grid grid-cols-3 gap-4 md:gap-8">
@@ -255,61 +265,6 @@ export default function CaseStudy() {
         </div>
       </section>
 
-      <section id="inbox" className="mx-auto max-w-6xl px-6 pb-20">
-        <div className="flex items-center gap-3">
-          <h2 className={h2}>Where Sara starts her day</h2>
-          <span className="rounded-full border border-line px-2.5 py-0.5 text-xs text-muted">Concept</span>
-        </div>
-        <div className="mt-8 max-w-3xl">
-          <div className="overflow-hidden rounded-card border border-line bg-surface shadow-lg">
-            <div className="flex items-center gap-1.5 border-b border-line bg-panel/60 px-4 py-2.5">
-              <span className="h-2.5 w-2.5 rounded-full bg-line-strong" /><span className="h-2.5 w-2.5 rounded-full bg-line-strong" /><span className="h-2.5 w-2.5 rounded-full bg-line-strong" />
-            </div>
-            <ul className="divide-y divide-line">
-              {inbox.map((d) => (
-                <li key={d.line} className="flex items-center gap-4 px-5 py-4">
-                  <span className="flex -space-x-2">{d.who.map((w) => <Avatar key={w} id={w} size={32} />)}</span>
-                  <span className="min-w-0 flex-1 text-sm font-medium md:text-base">{d.line}</span>
-                  <span className="tnum text-xs text-muted">{d.time}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      <section id="slow" className="border-y border-line">
-        <div className="mx-auto max-w-6xl px-6 py-20">
-          <h2 className={h2}>The work isn&apos;t hard. It&apos;s slow.</h2>
-          <p className="mt-2 text-sub">4 systems, 4 handoffs, 1 courier.</p>
-          <p className="mt-10 text-xs font-medium uppercase tracking-wide text-muted">Today</p>
-          <div className="mt-3 grid grid-cols-5 gap-2">
-            {days.map((d) => (
-              <div key={d.day}>
-                <p className="text-xs text-muted">{d.day}</p>
-                <div className="mt-2 flex h-8 items-center gap-1">
-                  {d.icons.map((I, i) => (
-                    <I key={i} aria-hidden className="h-4 w-4 text-sub md:h-6 md:w-6" />
-                  ))}
-                </div>
-                <p className="mt-1 text-[11px] leading-snug text-sub md:text-xs">{d.label}</p>
-              </div>
-            ))}
-          </div>
-          <div className="mt-3 h-2 overflow-hidden rounded-full bg-line">
-            <div className="crawl h-full rounded-full bg-warn max-md:[animation:none]" />
-          </div>
-          <p className="mt-8 text-xs font-medium uppercase tracking-wide text-muted">With Jointly</p>
-          <div className="mt-3 flex items-center gap-3">
-            <div className="h-2 w-[8%] min-w-8 overflow-hidden rounded-full bg-line">
-              <div className="crawl-fast h-full rounded-full bg-ok" />
-            </div>
-            <span className="text-sm font-medium text-ok-ink">1h 54m</span>
-          </div>
-        </div>
-      </section>
-
-
       <section id="days" className="border-t border-line">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className={h2}>Where the days go</h2>
@@ -317,6 +272,50 @@ export default function CaseStudy() {
           <div className="mt-8">
             <DaysSwimlane t={swim} />
           </div>
+        </div>
+      </section>
+
+      <section id="service" className="border-t border-line">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <h2 className={h2}>I learnt how the systems work before I designed anything.</h2>
+          <p className="mt-2 max-w-3xl text-sub">At a UAE bank, I mapped how a business onboarding case moves between the customer, the customer fulfilment operations team and the bank&apos;s old systems.</p>
+          <div className="mt-10 grid gap-4 md:grid-cols-[1fr_auto_1fr_auto_1fr]">
+            <ServiceCol label="Before" text="Customers filled in paper forms, the team went through 4 review rounds, and PINs arrived by courier.">
+              <div className="relative h-20 w-32">
+                {[0, 1, 2].map((i) => (
+                  <span key={i} className="absolute flex h-16 w-12 flex-col gap-1.5 rounded-md border border-line bg-surface p-2 shadow-sm" style={{ left: i * 12, top: i * 2, transform: `rotate(${(i - 1) * 6}deg)` }}>
+                    <span className="h-1 w-full rounded bg-line" />
+                    <span className="h-1 w-3/4 rounded bg-line" />
+                    <span className="h-1 w-5/6 rounded bg-line" />
+                  </span>
+                ))}
+                <Mail aria-hidden className="absolute bottom-0 right-0 h-10 w-10 text-warn" />
+              </div>
+            </ServiceCol>
+            <ArrowRight aria-hidden className="mx-auto h-5 w-5 rotate-90 self-center text-muted md:rotate-0" />
+            <ServiceCol label="What I designed at the bank" text="I designed the digital setup for joint signatories in the bank's new business app. Each partner registers, and then they approve each other's access.">
+              <div className="flex items-start gap-3">
+                <Partner badge={<Lock aria-hidden className="h-3 w-3 text-sub" />} />
+                <Partner badge={<Lock aria-hidden className="h-3 w-3 text-sub" />} />
+                <Partner badge={<Lock aria-hidden className="h-3 w-3 text-sub" />} tag="ID expired" tagClass="rounded-full bg-bad/10 px-1.5 text-bad-ink" />
+              </div>
+            </ServiceCol>
+            <ArrowRight aria-hidden className="mx-auto h-5 w-5 rotate-90 self-center text-muted md:rotate-0" />
+            <ServiceCol label="With Jointly" text="An agent prepares everything from records the bank already has. Each partner only verifies their Emirates ID and sets a password, so the others still go live.">
+              <div className="flex items-start gap-3">
+                <Partner tone="ok" badge={<Check aria-hidden className="h-3 w-3 text-ok-ink" strokeWidth={3} />} />
+                <Partner tone="ok" badge={<Check aria-hidden className="h-3 w-3 text-ok-ink" strokeWidth={3} />} />
+                <Partner tone="muted" tag="Waiting for ID" tagClass="text-muted" />
+                <AgentMark size={28} className="ml-1 mt-2 text-person-agent" />
+              </div>
+            </ServiceCol>
+          </div>
+          <p className="mt-8 max-w-3xl font-medium">What I learnt is that self-serve moved the work onto the customer, and one expired Emirates ID could stop every partner.</p>
+          <div className="mt-4 flex flex-wrap gap-x-8 gap-y-2 text-sm text-sub">
+            <span className="flex items-center gap-2"><FileText aria-hidden className="h-4 w-4 text-ok" /> Customers have less to fill in.</span>
+            <span className="flex items-center gap-2"><Inbox aria-hidden className="h-4 w-4 text-ok" /> The operations team gets fewer tickets.</span>
+          </div>
+          <p className="mt-3 text-[11px] text-muted">This is what I would change, and it hasn&apos;t been measured yet.</p>
         </div>
       </section>
 
@@ -366,7 +365,7 @@ export default function CaseStudy() {
       <section id="shadow" className="border-t border-line">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className={h2}>It watched before it acted</h2>
-          <p className="mt-2 max-w-2xl text-sub">First the agent watches the accounts operations team&apos;s makers and compares its plan with theirs.</p>
+          <p className="mt-2 max-w-2xl text-sub">First the agent watches the customer fulfilment operations team&apos;s makers and compares its plan with theirs.</p>
           <div className="mt-8 flex flex-col gap-4 md:flex-row md:items-center">
             <p className="rounded-card border border-line bg-surface px-5 py-4"><span className="tnum font-display text-3xl">12</span> <span className="text-sm text-sub">maker cases observed</span></p>
             <ArrowRight className="h-5 w-5 rotate-90 text-accent md:rotate-0" />
@@ -435,7 +434,7 @@ export default function CaseStudy() {
           <div className="mt-10 max-w-2xl rounded-card border border-line bg-surface p-6">
             <span className="rounded-full border border-line px-2.5 py-0.5 text-xs text-muted">Paraphrased</span>
             <p className="mt-3 font-display text-lg leading-snug">Setting up one joint-signatory business takes 4 to 5 days.</p>
-            <p className="mt-2 text-xs text-muted">Accounts operations team member, paraphrased from an interview</p>
+            <p className="mt-2 text-xs text-muted">Customer fulfilment operations team member, paraphrased from an interview</p>
             <ArrowRight className="my-4 h-4 w-4 rotate-90 text-accent" />
             <p className="text-sm font-medium">So the agent reads, and Sara only checks what it read.</p>
           </div>
