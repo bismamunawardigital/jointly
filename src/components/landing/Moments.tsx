@@ -76,7 +76,7 @@ const steps = [
   { title: "Releases what's safe, holds the rest", tab: "release", V: Live },
 ];
 
-export function Moments() {
+export function Moments({ titles, see = "See it live" }: { titles?: string[]; see?: string }) {
   const [active, setActive] = useState(0);
   const refs = useRef<(HTMLLIElement | null)[]>([]);
   useEffect(() => {
@@ -108,12 +108,12 @@ export function Moments() {
             className="flex flex-col justify-center md:min-h-[34vh]"
           >
             <p className={cn("tnum text-sm", i === active ? "text-accent-ink" : "text-muted")}>0{i + 1}</p>
-            <p className={cn("mt-2 font-display text-2xl leading-snug md:text-3xl", i !== active && "md:text-muted")}>{s.title}</p>
+            <p className={cn("mt-2 font-display text-2xl leading-snug md:text-3xl", i !== active && "md:text-muted")}>{titles?.[i] ?? s.title}</p>
             <div aria-hidden className="mt-4 flex justify-center rounded-card border border-line bg-surface p-6 md:hidden">
               <s.V />
             </div>
             <Link href={`/demo/case/?tab=${s.tab}`} className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-accent-ink hover:underline">
-              See it live <ArrowRight className="h-3.5 w-3.5" />
+              {see} <ArrowRight className="h-3.5 w-3.5 rtl:-scale-x-100" />
             </Link>
           </li>
         ))}

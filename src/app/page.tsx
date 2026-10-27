@@ -6,12 +6,10 @@ import { ThemeButton } from "@/components/ThemeToggle";
 import { AgentMark, Avatar } from "@/components/ui";
 import { HeroScene } from "@/components/landing/HeroScene";
 import { Moments } from "@/components/landing/Moments";
+import { LangSwitch } from "@/components/landing/LangSwitch";
+import { statsEn } from "@/content/stats";
 
-const stats = [
-  { v: "1h 54m", k: "form to first login (was 4–5 days)" },
-  { v: "2", k: "decisions by Sara, not 4 review rounds" },
-  { v: "0", k: "approvals by the agent" },
-];
+const stats = statsEn;
 
 const inbox: { who: ("mohammed" | "khalifa" | "rashid")[]; line: string; time: string }[] = [
   { who: ["khalifa"], line: "Confirm a value on a blurry letter · Creekside", time: "2 min" },
@@ -148,14 +146,12 @@ export default function CaseStudy() {
       <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
         <Logo />
         <div className="flex items-center gap-2">
-          <Link href="/ar/" lang="ar" className="inline-flex h-9 items-center rounded-lg border border-line px-3 font-arabic text-sm text-sub hover:text-ink">
-            العربية
-          </Link>
+          <LangSwitch href="/ar/" lang="ar" label="العربية" className="inline-flex h-9 items-center rounded-lg border border-line px-3 font-arabic text-sm text-sub hover:text-ink" />
           <ThemeButton />
         </div>
       </header>
 
-      <section className="mx-auto grid max-w-6xl items-center gap-10 px-6 pb-20 pt-4 md:grid-cols-2 md:pt-8">
+      <section id="hero" className="mx-auto grid max-w-6xl items-center gap-10 px-6 pb-20 pt-4 md:grid-cols-2 md:pt-8">
         <div>
           <h1 className="font-display text-[40px] leading-[1.05] tracking-tight md:text-[64px]">Sara sets up 3 signatories before lunch. The agent can&apos;t sign anything.</h1>
           <p className="mt-5 max-w-xl text-lg text-sub">An agent for bank operations that works across Finacle, SVS and EFR, and stops when it isn&apos;t sure.</p>
@@ -177,7 +173,7 @@ export default function CaseStudy() {
         <HeroScene />
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 pb-20">
+      <section id="inbox" className="mx-auto max-w-6xl px-6 pb-20">
         <div className="flex items-center gap-3">
           <h2 className={h2}>Where Sara starts her day</h2>
           <span className="rounded-full border border-line px-2.5 py-0.5 text-xs text-muted">Concept</span>
@@ -201,7 +197,7 @@ export default function CaseStudy() {
         <p className="mt-4 text-sm text-sub">The agent works in the background. Sara only sees decisions.</p>
       </section>
 
-      <section className="border-y border-line bg-panel/50">
+      <section id="slow" className="border-y border-line bg-panel/50">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className={h2}>The work isn&apos;t hard. It&apos;s slow.</h2>
           <p className="mt-2 text-sub">4 systems, 4 handoffs, 1 courier.</p>
@@ -231,7 +227,7 @@ export default function CaseStudy() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 py-20">
+      <section id="maps" className="mx-auto max-w-6xl px-6 py-20">
         <h2 className={h2}>The real before and after</h2>
         <div className="mt-8 grid gap-4 md:grid-cols-2">
           {["Current state", "Future state"].map((t) => (
@@ -252,7 +248,7 @@ export default function CaseStudy() {
         <p className="mt-4 text-sm text-sub">Mapped from interviews with the CF team and 3 journeys: single, joint and non-signatory.</p>
       </section>
 
-      <section className="border-t border-line bg-panel/50">
+      <section id="shadow" className="border-t border-line bg-panel/50">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className={h2}>It watched before it acted</h2>
           <div className="mt-8 flex flex-col gap-4 md:flex-row md:items-center">
@@ -268,7 +264,7 @@ export default function CaseStudy() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 py-20">
+      <section id="grid" className="mx-auto max-w-6xl px-6 py-20">
         <h2 className={h2}>Every source in one grid</h2>
         <div className="mt-8">
           <div className="overflow-hidden rounded-card border border-line bg-surface shadow-lg">
@@ -282,7 +278,7 @@ export default function CaseStudy() {
         <p className="mt-4 text-sm text-sub">17 cells match bank records. Sara checks the 1 value the agent had to read.</p>
       </section>
 
-      <section className="border-t border-line mx-auto max-w-6xl px-6 py-20">
+      <section id="mandate" className="border-t border-line mx-auto max-w-6xl px-6 py-20">
         <h2 className={h2}>A free-text mandate becomes a picture.</h2>
         <figure className="mt-8">
           <Link href="/demo/case/?tab=map" className="block overflow-hidden rounded-card border border-line bg-surface shadow-sm">
@@ -298,7 +294,7 @@ export default function CaseStudy() {
         </figure>
       </section>
 
-      <section className="border-t border-line">
+      <section id="moments" className="border-t border-line">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className={h2}>4 moments</h2>
           <div className="mt-10">
@@ -307,7 +303,7 @@ export default function CaseStudy() {
         </div>
       </section>
 
-      <section className="border-t border-line bg-panel/50">
+      <section id="roles" className="border-t border-line bg-panel/50">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className={h2}>Who decides what</h2>
           <div className="mt-10 grid gap-4 sm:grid-cols-2 md:grid-cols-4">
@@ -332,7 +328,7 @@ export default function CaseStudy() {
         </div>
       </section>
 
-      <section className="border-t border-line">
+      <section id="patterns" className="border-t border-line">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className={h2}>6 patterns I&apos;d reuse</h2>
           <div className="mt-10 grid gap-4 sm:grid-cols-2 md:grid-cols-3">
@@ -346,7 +342,7 @@ export default function CaseStudy() {
         </div>
       </section>
 
-      <section className="border-t border-line">
+      <section id="gaveup" className="border-t border-line">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className={h2}>What I gave up</h2>
           <ul className="mt-8 grid gap-4 md:grid-cols-2">
@@ -360,7 +356,7 @@ export default function CaseStudy() {
         </div>
       </section>
 
-      <section className="border-t border-line bg-panel/50">
+      <section id="heard" className="border-t border-line bg-panel/50">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className={h2}>What I heard, what I changed</h2>
           <ul className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -397,7 +393,7 @@ export default function CaseStudy() {
         </div>
       </section>
 
-      <section className="border-t border-line">
+      <section id="next" className="border-t border-line">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className={h2}>What I&apos;d test next</h2>
           <ul className="mt-8 max-w-2xl space-y-3 rounded-card border border-line bg-surface p-6">

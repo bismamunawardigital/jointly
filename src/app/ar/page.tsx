@@ -1,118 +1,343 @@
 import Link from "next/link";
-import { ArrowLeft, Bot, Check, ShieldCheck, UserRound } from "lucide-react";
+import { AlertTriangle, ArrowLeft, Ban, Check, FileText, Printer, Search, ShieldCheck, Truck, Undo2, UserRound } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import { Logo } from "@/components/Shell";
+import { ThemeButton } from "@/components/ThemeToggle";
+import { AgentMark, Avatar } from "@/components/ui";
+import { HeroScene } from "@/components/landing/HeroScene";
+import { Moments } from "@/components/landing/Moments";
+import { LangSwitch } from "@/components/landing/LangSwitch";
+import { statsAr } from "@/content/stats";
 
-const flow = [
-  { icon: Bot, label: "الوكيل يقترح" },
-  { icon: ShieldCheck, label: "القواعد تتحقق" },
-  { icon: UserRound, label: "الموظف يعتمد" },
-  { icon: Bot, label: "الوكيل ينفّذ" },
-  { icon: Check, label: "النظام يتأكد" },
+const B = ({ children }: { children: React.ReactNode }) => <bdi>{children}</bdi>;
+
+const inbox: { who: ("mohammed" | "khalifa" | "rashid")[]; line: React.ReactNode; time: string }[] = [
+  { who: ["khalifa"], line: <>تأكيد قيمة في خطاب غير واضح · <B>Creekside</B></>, time: "2 د" },
+  { who: ["mohammed", "khalifa"], line: <>اعتماد مُدخِل مدفوعات جديد · <B>Saffron Bay</B></>, time: "1 د" },
+  { who: ["rashid"], line: <>تفعيل راشد بعد تجديد هويته · <B>Creekside</B></>, time: "30 ث" },
 ];
 
-const proof = [
-  { k: "عمل البنك", v: "1h 34m", n: "بدلاً من 4 إلى 5 أيام" },
-  { k: "مراحل الاعتماد", v: "4", n: "واحدة فقط احتاجت تدقيقاً" },
-  { k: "ما اعتمده الوكيل بنفسه", v: "0", n: "عن قصد" },
+const days: { day: string; icons: { I: LucideIcon; label: string }[] }[] = [
+  { day: "اليوم 1", icons: [{ I: FileText, label: "نموذج ورقي" }] },
+  { day: "اليوم 2", icons: [{ I: Search, label: "مراجعة السجلات" }] },
+  { day: "اليوم 3", icons: [{ I: Undo2, label: "إرجاع" }, { I: Undo2, label: "إرجاع" }, { I: Undo2, label: "إرجاع" }] },
+  { day: "اليوم 4", icons: [{ I: Printer, label: "طباعة الأرقام السرية" }] },
+  { day: "اليوم 5", icons: [{ I: Truck, label: "مندوب التوصيل" }] },
 ];
 
-const patterns = [
-  { t: "المطابقة بالهوية لا بالاسم", b: "الاسم يُكتب بثلاث طرق في ثلاثة أنظمة. الوكيل يطابق برقم الهوية الإماراتية ورقم العميل فقط." },
-  { t: "الدليل بجانب القرار", b: "كل سطر في الخطة يعرض النص الأصلي من SVS أو Finacle مع تظليل الكلمات المطابقة." },
-  { t: "ما لا يتأكد منه الوكيل", b: "عندما يكون المسح غير واضح، تعرض البطاقة الصورة بجانب ما قرأه الوكيل. وسارة تتحقق من المبلغ بنفسها." },
-  { t: "القواعد تقرر، لا الذكاء الاصطناعي", b: "من يحق له التوقيع ومتى يُحسم بمحرّك قواعد ثابت، ويمكن اختباره بأي مبلغ." },
-  { t: "أطلق الجاهز، وأمسك الباقي", b: "محمد وخليفة يبدآن اليوم لأن أي اثنين يكفيان. راشد ينضم بعد تجديد هويته." },
-  { t: "سجل قرار لكل حالة", b: "لماذا اعتُمدت هذه الحالة؟ القاعدة، والنص، ومن اعتمد، ومتى. جاهز للمدقق." },
+const callouts: React.ReactNode[] = [
+  <><B>4</B> جولات بين المُدخِل والمُدقِّق</>,
+  <>تفويض بنص حر في <B>SVS</B></>,
+  "أرقام سرية عبر مندوب التوصيل",
+];
+const learned: React.ReactNode[] = [<>مراجعة خطابات <B>SVS</B></>, "إعادة استخدام حسابات الدخول الحالية", <>إعادة فحص <B>EFR</B> قبل التفعيل</>];
+
+const lanes: { icon: React.ReactNode; title: string; items: string[]; never?: boolean }[] = [
+  { icon: <AgentMark size={40} />, title: "الوكيل يقوم بـ", items: ["قراءة كل السجلات", "بناء الخطة", "التنفيذ بعد الاعتماد"] },
+  { icon: <ShieldCheck className="h-10 w-10 text-accent" />, title: "القواعد تحدد", items: ["من يوقّع", "حتى أي مبلغ", "من يُفعَّل"] },
+  { icon: <UserRound className="h-10 w-10 text-ink" />, title: "سارة تعتمد", items: ["القيم غير الواضحة", "اعتماد الخطة", "كل تفعيل"] },
+  { icon: <Ban className="h-10 w-10 text-bad" />, title: "ممنوع دائمًا", items: ["اعتماد عمله بنفسه", "إرسال كلمات المرور", "مطابقة الأشخاص بالاسم"], never: true },
 ];
 
-export default function ArabicCaseStudy() {
+const patterns: { I: LucideIcon; title: string }[] = [
+  { I: Search, title: "طابِق بالمعرّف، لا بالاسم" },
+  { I: FileText, title: "لكل ادعاء مصدر" },
+  { I: AlertTriangle, title: "أظهِر ما لست متأكدًا منه" },
+  { I: Check, title: "الاعتماد يبقى مع المحتوى" },
+  { I: ShieldCheck, title: "القواعد مكتوبة في الكود" },
+  { I: UserRound, title: "فعّل الآمن، وأوقف الباقي" },
+];
+
+const gaveUp: { d: React.ReactNode; why: string }[] = [
+  { d: <>أبقيت <B>4</B> اعتمادات، كإجراء واحد</>, why: "ضوابط البنك تتطلب ذلك. نقرات أقل، والسجل نفسه." },
+  { d: "بدون درجات ثقة", why: "الجهات الرقابية تسأل أي قاعدة طُبّقت، لا مدى ثقة النموذج." },
+  { d: "لسطح المكتب فقط", why: "فريق خدمة العملاء يعمل على أجهزة البنك. الجوال منتج مختلف." },
+  { d: "التفعيل الجزئي فرضية", why: "لا يوجد دليل منشور بعد. أول ما يجب اختباره مع بنك." },
+];
+
+// Real quotes stay in their original English so nothing is put in someone's mouth.
+const heard = [
+  { q: "you start clicking Approve on autopilot and stop reading the diffs.", who: "Agent user, Hacker News", href: "https://news.ycombinator.com/item?id=48830674", d: "النسخ المطابقة تُطوى." },
+  { q: "The bank showed them a confidence score. The regulator shut it down.", who: "Banking AI lead, LinkedIn", href: "https://www.linkedin.com/posts/johnforrester_a-regulator-asked-a-bank-to-explain-its-ai-activity-7438239662009114624-WaU0", d: "قواعد، لا درجات." },
+  { q: "didn't know when to escalate, and quietly routed around it.", who: "Ops leader, LinkedIn", href: "https://www.linkedin.com/posts/jeffreytking_our-first-agentic-rollout-failed-in-three-activity-7465363738846638080-lVjb", d: "مكان واحد يقول ما يحتاجك." },
+];
+
+const unknowns: React.ReactNode[] = [
+  "هل يبني إظهار ما لم يبحث عنه الوكيل الثقة؟",
+  <>هل سيسمح البنك بتفعيل <B>2</B> من <B>3</B> مفوّضين؟</>,
+  "هل سيقبل فريق الأمن التفعيل الذاتي؟",
+  "هل يمكن لمستخدم نظام أن يكون المُدخِل؟",
+];
+
+const h2 = "text-3xl font-semibold leading-snug md:text-4xl";
+const primary = "inline-flex h-11 items-center gap-1.5 rounded-lg bg-accent px-5 text-sm font-medium text-onaccent transition-colors hover:bg-accent-hover";
+const frame = "overflow-hidden rounded-card border border-line bg-surface shadow-lg";
+const dots = (
+  <div className="flex items-center gap-1.5 border-b border-line bg-panel/60 px-4 py-2.5">
+    {[0, 1, 2].map((i) => <span key={i} className="h-2.5 w-2.5 rounded-full bg-line-strong" />)}
+  </div>
+);
+
+export const metadata = { title: "Jointly · دراسة حالة" };
+
+export default function CaseStudyAr() {
   return (
-    <div dir="rtl" lang="ar" className="min-h-screen bg-canvas font-arabic">
-      <header className="mx-auto flex max-w-5xl items-center justify-between px-6 py-6">
-        <p className="text-lg font-semibold">
-          <bdi dir="ltr">Jointly</bdi>
-        </p>
+    <div lang="ar" dir="rtl" className="min-h-screen bg-canvas font-arabic">
+      <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
+        <Logo />
         <div className="flex items-center gap-2">
-          <Link href="/" className="inline-flex h-9 items-center rounded-lg border border-line px-3 text-sm text-sub hover:text-ink">
-            English
-          </Link>
-          <Link href="/demo/" className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-accent px-3.5 text-sm font-medium text-onaccent hover:bg-accent-hover">
-            افتح العرض التجريبي <ArrowLeft className="h-3.5 w-3.5" />
-          </Link>
+          <LangSwitch href="/" lang="en" label="English" className="inline-flex h-9 items-center rounded-lg border border-line px-3 font-sans text-sm text-sub hover:text-ink" />
+          <ThemeButton />
         </div>
       </header>
 
-      <section className="mx-auto max-w-5xl px-6 pb-16 pt-12">
-        <p className="text-sm text-muted">دراسة حالة · تصميم وكيل ذكاء اصطناعي يمكن التحقق منه · بسمة منور</p>
-        <h1 className="mt-3 max-w-3xl text-4xl font-semibold leading-snug md:text-5xl">مهمة بنكية تأخذ 4 أيام، تنتهي قبل الغداء. والموظف ما زال صاحب القرار.</h1>
-        <p className="mt-5 max-w-2xl text-lg leading-relaxed text-sub">
-          تفعيل الخدمات المصرفية الرقمية لشركة لديها 3 مفوّضين بالتوقيع يأخذ عادةً من 4 إلى 5 أيام من المراسلات. في
-          <bdi dir="ltr"> Jointly </bdi>
-          يتولى الوكيل النسخ والمطابقة بين 4 أنظمة قديمة، وتراجع سارة ما احتاج إلى تفسير فقط، وتحدد القواعد الثابتة من يحق له التوقيع. الوكيل لا يعتمد عمله بنفسه أبداً.
-        </p>
-        <dl className="mt-8 grid max-w-2xl grid-cols-3 gap-px overflow-hidden rounded-xl border border-line bg-line">
-          {proof.map((x) => (
-            <div key={x.k} className="bg-surface px-4 py-3">
-              <dt className="text-xs text-muted">{x.k}</dt>
-              <dd className="tnum mt-0.5 text-xl font-semibold">
-                <bdi dir="ltr">{x.v}</bdi>
-              </dd>
-              <dd className="text-[11px] text-muted">{x.n}</dd>
-            </div>
-          ))}
-        </dl>
-        <p className="mt-2 text-[11px] text-muted">أرقام من حالة تجريبية مصطنعة، وليست قياساً من بنك حقيقي.</p>
-        <div className="mt-8 flex flex-wrap items-center gap-2 text-sm">
-          {flow.map(({ icon: Icon, label }, i) => (
-            <span key={label} className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-line px-3 py-1.5">
-                <Icon className="h-3.5 w-3.5 text-accent" /> {label}
-              </span>
-              {i < flow.length - 1 && <ArrowLeft className="h-3.5 w-3.5 text-muted" />}
-            </span>
-          ))}
+      <section id="hero" className="mx-auto grid max-w-6xl items-center gap-10 px-6 pb-20 pt-4 md:grid-cols-2 md:pt-8">
+        <div>
+          <h1 className="text-[36px] font-semibold leading-[1.3] md:text-[54px]">سارة تُفعِّل <B>3</B> مفوّضين بالتوقيع قبل الغداء. ولا يستطيع الوكيل توقيع أي شيء.</h1>
+          <p className="mt-5 max-w-xl text-lg text-sub">
+            وكيل لعمليات البنك يشتغل على <B>Finacle</B> و<B>SVS</B> و<B>EFR</B>، ويوقف إذا ما كان متأكد.
+          </p>
+          <dl className="mt-8 grid grid-cols-3 gap-4 md:gap-6">
+            {statsAr.map((s) => (
+              <div key={s.k}>
+                <dd dir="ltr" className="tnum whitespace-nowrap text-end font-display text-2xl md:text-4xl">{s.v}</dd>
+                <dt className="mt-1 text-xs text-muted">{s.k}</dt>
+              </div>
+            ))}
+          </dl>
+          <div className="mt-8">
+            <Link href="/demo/case/" className={primary}>
+              افتح العرض التجريبي (<B>5</B> دقائق) <ArrowLeft className="h-4 w-4" />
+            </Link>
+          </div>
+          <p className="mt-3 text-[11px] text-muted">حالة افتراضية. لم تُقَس في بنك حقيقي.</p>
+        </div>
+        {/* Money axes stay low to high, left to right, as in the product. Do not mirror. */}
+        <div dir="ltr">
+          <HeroScene />
         </div>
       </section>
 
-      <section className="border-t border-line">
-        <div className="mx-auto max-w-5xl px-6 py-16">
-          <h2 className="text-2xl font-semibold">المشكلة ليست صعبة. إنها بطيئة.</h2>
-          <p className="mt-2 max-w-2xl leading-relaxed text-sub">
-            لا أحد محتار. الفريق ينسخ الأسماء نفسها بين 4 أنظمة، وينتظر بعضه بعضاً، وخطاب واحد فائت قد يغيّر من يحق له التوقيع. مثلاً: تعديل عام 2023 رفع حد خليفة من{" "}
-            <bdi dir="ltr">AED 10,000</bdi> إلى{" "}
-            <bdi dir="ltr">AED 25,000</bdi>.
+      <section id="inbox" className="mx-auto max-w-6xl px-6 pb-20">
+        <div className="flex items-center gap-3">
+          <h2 className={h2}>من هنا تبدأ سارة يومها</h2>
+          <span className="rounded-full border border-line px-2.5 py-0.5 text-xs text-muted">مفهوم</span>
+        </div>
+        <div className={`mt-8 max-w-3xl ${frame}`}>
+          {dots}
+          <ul className="divide-y divide-line">
+            {inbox.map((d, i) => (
+              <li key={i} className="flex items-center gap-4 px-5 py-4">
+                <span className="flex -space-x-2 rtl:space-x-reverse">{d.who.map((w) => <Avatar key={w} id={w} size={32} />)}</span>
+                <span className="min-w-0 flex-1 text-sm font-medium md:text-base">{d.line}</span>
+                <span className="tnum text-xs text-muted">{d.time}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <p className="mt-4 text-sm text-sub">الوكيل يعمل في الخلفية. سارة لا ترى إلا القرارات.</p>
+      </section>
+
+      <section id="slow" className="border-y border-line bg-panel/50">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <h2 className={h2}>العمل ليس صعبًا. إنه بطيء.</h2>
+          <p className="mt-2 text-sub"><B>4</B> أنظمة، <B>4</B> تسليمات، ومندوب توصيل واحد.</p>
+          <p className="mt-10 text-xs font-medium text-muted">اليوم</p>
+          <div className="mt-3 grid grid-cols-5 gap-2">
+            {days.map((d) => (
+              <div key={d.day}>
+                <p className="text-xs text-muted">{d.day}</p>
+                <div className="mt-2 flex h-8 items-center gap-1">
+                  {d.icons.map(({ I, label }, i) => <I key={i} aria-label={label} className="h-5 w-5 text-sub md:h-6 md:w-6" />)}
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="mt-3 h-2 overflow-hidden rounded-full bg-line">
+            <div className="crawl h-full rounded-full bg-warn" style={{ transformOrigin: "right" }} />
+          </div>
+          <p className="mt-8 text-xs font-medium text-muted">مع <B>Jointly</B></p>
+          <div className="mt-3 flex items-center gap-3">
+            <div className="h-2 w-[8%] min-w-8 overflow-hidden rounded-full bg-line">
+              <div className="crawl-fast h-full rounded-full bg-ok" style={{ transformOrigin: "right" }} />
+            </div>
+            <span className="text-sm font-medium text-ok-ink"><B>1h 54m</B></span>
+          </div>
+        </div>
+      </section>
+
+      <section id="maps" className="mx-auto max-w-6xl px-6 py-20">
+        <h2 className={h2}>قبل وبعد، من الواقع</h2>
+        <div className="mt-8 grid gap-4 md:grid-cols-2">
+          {["خريطة الوضع الحالي", "خريطة الوضع المستقبلي"].map((t) => (
+            <div key={t} className="flex aspect-[4/3] flex-col items-center justify-center rounded-card border-2 border-dashed border-line bg-surface p-6 text-center">
+              <p className="text-sm font-medium">{t}</p>
+              <p className="mt-1 text-xs text-muted">قريبًا. خريطة خدمة حقيقية، بدون أسماء البنوك.</p>
+            </div>
+          ))}
+        </div>
+        <ol className="mt-6 flex flex-wrap gap-3">
+          {callouts.map((c, i) => (
+            <li key={i} className="flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1.5 text-sm">
+              <span className="tnum inline-flex h-5 w-5 items-center justify-center rounded-full bg-brand text-[11px] font-semibold text-white">{i + 1}</span>
+              {c}
+            </li>
+          ))}
+        </ol>
+        <p className="mt-4 text-sm text-sub">رُسمت من مقابلات مع فريق خدمة العملاء و<B>3</B> رحلات: مفوّض منفرد، ومشترك، وغير مفوّض.</p>
+      </section>
+
+      <section id="shadow" className="border-t border-line bg-panel/50">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <h2 className={h2}>راقب قبل أن يتصرف</h2>
+          <div className="mt-8 flex flex-col gap-4 md:flex-row md:items-center">
+            <p className="rounded-card border border-line bg-surface px-5 py-4"><span className="tnum font-display text-3xl">12</span> <span className="text-sm text-sub">حالة مُدخِل تمت مراقبتها</span></p>
+            <ArrowLeft className="h-5 w-5 -rotate-90 text-accent md:rotate-0" />
+            <p className="rounded-card border border-line bg-surface px-5 py-4"><span className="tnum font-display text-3xl">3</span> <span className="text-sm text-sub">خطوات غير موجودة في الإجراءات</span></p>
+            <ArrowLeft className="h-5 w-5 -rotate-90 text-accent md:rotate-0" />
+            <ul className="flex flex-wrap gap-2">
+              {learned.map((l, i) => <li key={i} className="rounded-full bg-accent-soft px-3 py-1.5 text-sm text-accent-ink">{l}</li>)}
+            </ul>
+          </div>
+          <p className="mt-4 text-xs text-muted">توضيحي. هكذا يتعلم الوكيل العمل غير المكتوب أولًا.</p>
+        </div>
+      </section>
+
+      <section id="grid" className="mx-auto max-w-6xl px-6 py-20">
+        <h2 className={h2}>كل المصادر في جدول واحد</h2>
+        <div dir="ltr" className={`mt-8 ${frame}`}>
+          {dots}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/landing/evidence-grid.png" alt="جدول الأدلة: صفوف لمحمد وخليفة وراشد والتفويض، وخلية واحدة كهرمانية على خطاب 2023" className="w-full object-cover object-left max-md:h-56" />
+        </div>
+        <p className="mt-4 text-sm text-sub"><B>17</B> خلية تطابق سجلات البنك. سارة تراجع القيمة الوحيدة التي اضطر الوكيل لقراءتها.</p>
+      </section>
+
+      <section id="mandate" className="mx-auto max-w-6xl border-t border-line px-6 py-20">
+        <h2 className={h2}>تفويض بنص حر يصبح صورة.</h2>
+        <figure className="mt-8">
+          <Link href="/demo/case/?tab=map" dir="ltr" className={`block ${frame}`}>
+            {dots}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/landing/signing-map.png" alt="خريطة التوقيع: محمد وخليفة وراشد مع أزواج الاعتماد حسب المبلغ" className="w-full" />
+          </Link>
+          <figcaption className="mt-3 text-sub">تستطيع سارة مراجعتها في ثوانٍ.</figcaption>
+        </figure>
+      </section>
+
+      <section id="moments" className="border-t border-line">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <h2 className={h2}><B>4</B> لحظات</h2>
+          <div className="mt-10">
+            <Moments
+              see="شاهدها مباشرة"
+              titles={["يطابق الأشخاص برقم الهوية، لا بالاسم أبدًا", "يكتشف الهوية المنتهية قبل بدء أي عمل", "يقرأ خطابًا غير واضح من 2023، ويطلب من سارة التأكيد", "يفعّل ما هو آمن، ويوقف الباقي"]}
+            />
+          </div>
+        </div>
+      </section>
+
+      <section id="roles" className="border-t border-line bg-panel/50">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <h2 className={h2}>من يقرر ماذا</h2>
+          <div className="mt-10 grid gap-4 sm:grid-cols-2 md:grid-cols-4">
+            {lanes.map((l) => (
+              <div key={l.title} className="rounded-card border border-line bg-surface p-6">
+                {l.icon}
+                <p className="mt-4 font-semibold">{l.title}</p>
+                <ul className="mt-3 space-y-1.5 text-sm">
+                  {l.items.map((it) => <li key={it} className={l.never ? "text-bad-ink line-through decoration-bad" : "text-sub"}>{it}</li>)}
+                </ul>
+              </div>
+            ))}
+          </div>
+          <p className="mt-8 text-sm text-sub">
+            تنتهي كل حالة بسجل قرار يستطيع المدقق قراءته: القاعدة، والاقتباس، والمعتمِد، والوقت.{" "}
+            <Link href="/demo/case/?tab=decisions" className="text-accent-ink underline underline-offset-2">شاهد سجل <B>Creekside</B></Link>
           </p>
         </div>
       </section>
 
-      <section className="border-t border-line">
-        <div className="mx-auto max-w-5xl px-6 py-16">
-          <h2 className="text-2xl font-semibold">6 أنماط أعيد استخدامها مع أي وكيل</h2>
-          <div className="mt-8 grid gap-4 sm:grid-cols-2 md:grid-cols-3">
-            {patterns.map((p, i) => (
-              <div key={p.t} className="rounded-xl border border-line p-5">
-                <p className="tnum text-xs text-muted">
-                  <bdi dir="ltr">0{i + 1}</bdi>
-                </p>
-                <p className="mt-2 font-semibold">{p.t}</p>
-                <p className="mt-1 text-sm leading-relaxed text-sub">{p.b}</p>
+      <section id="patterns" className="border-t border-line">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <h2 className={h2}><B>6</B> أنماط أعيد استخدامها</h2>
+          <div className="mt-10 grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+            {patterns.map(({ I, title }) => (
+              <div key={title} className="rounded-card border border-line bg-surface p-6">
+                <I aria-hidden className="h-6 w-6 text-accent" />
+                <p className="mt-4 font-semibold">{title}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="border-t border-line bg-panel/50">
-        <div className="mx-auto max-w-5xl px-6 py-16">
-          <h2 className="text-2xl font-semibold">رسالة العميل، بلهجة إماراتية</h2>
-          <div className="mt-6 max-w-md rounded-2xl rounded-tr-sm border border-line bg-surface p-4 text-sm leading-relaxed">
-            هلا محمد، حسابك الرقمي لشركة كريك سايد جاهز. تقدر تبدأ الحين، وأي دفعة تحتاج توقيعين بتحتاجك إنت وخليفة لين ما ينضم راشد. أي شي تحتاجه، كلمنا.
-          </div>
-          <p className="mt-3 text-xs text-muted">الواجهة والقواعد بالفصحى، واللحظات الودية بالإماراتية. يحتاج النص العربي إلى مراجعة متحدث إماراتي قبل النشر.</p>
+      <section id="gaveup" className="border-t border-line">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <h2 className={h2}>ما الذي تنازلت عنه</h2>
+          <ul className="mt-8 grid gap-4 md:grid-cols-2">
+            {gaveUp.map((g) => (
+              <li key={g.why} className="rounded-card border border-line bg-surface p-6">
+                <p className="font-medium">{g.d}</p>
+                <p className="mt-1 text-sm text-sub">{g.why}</p>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
-      <footer className="mx-auto max-w-5xl px-6 py-10 text-xs text-muted">
-        عرض تجريبي لمحفظة أعمال. بيانات مصطنعة، ولا اتصال بأنظمة بنكية حقيقية.
+      <section id="heard" className="border-t border-line bg-panel/50">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <h2 className={h2}>ماذا سمعت، وماذا غيّرت</h2>
+          <ul className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {heard.map((h) => (
+              <li key={h.href} className="flex flex-col rounded-card border border-line bg-surface p-6">
+                <p lang="en" dir="ltr" className="font-sans text-lg leading-snug">&ldquo;{h.q}&rdquo;</p>
+                <a href={h.href} target="_blank" rel="noreferrer" lang="en" className="mt-2 font-sans text-xs text-muted underline-offset-2 hover:underline">{h.who}</a>
+                <ArrowLeft className="my-4 h-4 w-4 -rotate-90 text-accent" />
+                <p className="text-sm font-medium">{h.d}</p>
+              </li>
+            ))}
+            {/* TODO(Bisma): replace with a real quote from your own CF interviews. */}
+            <li className="flex flex-col rounded-card border-2 border-dashed border-warn/50 bg-surface p-6">
+              <span className="w-fit rounded-full bg-warn-soft px-2 py-0.5 text-[11px] font-medium text-warn-ink">TODO</span>
+              <p className="mt-3 text-lg leading-snug text-muted">[اقتباس من مقابلة مع فريق خدمة العملاء]</p>
+              <p className="mt-2 text-xs text-muted">مقابلة مع فريق خدمة العملاء</p>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="next" className="border-t border-line">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <h2 className={h2}>ما الذي سأختبره بعد ذلك</h2>
+          <ul className="mt-8 max-w-2xl space-y-3 rounded-card border border-line bg-surface p-6">
+            {unknowns.map((u, i) => (
+              <li key={i} className="flex gap-3 text-sm text-sub">
+                <span className="mt-0.5 h-4 w-4 shrink-0 rounded border-2 border-line" /> {u}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      <footer className="border-t border-line bg-panel/50">
+        <div className="mx-auto flex max-w-6xl flex-col items-start gap-6 px-6 py-16 md:flex-row md:items-center md:justify-between">
+          <div>
+            <p className={h2}>شوفه بنفسك</p>
+            <p className="mt-3 text-sm text-sub">
+              تصميم بسمة منور ·{" "}
+              <a href="mailto:bismamunawardigital@gmail.com" className="underline-offset-2 hover:underline">البريد</a>
+            </p>
+            <p className="mt-1 text-xs text-muted">كل الأشخاص والحسابات والأنظمة البنكية افتراضية.</p>
+            <p className="mt-3 inline-flex items-center gap-2 rounded-full bg-warn-soft px-3 py-1 text-xs font-medium text-warn-ink">
+              المراجعة اللغوية من متحدث أصلي قيد الانتظار · <span lang="en" className="font-sans">Native review pending</span>
+            </p>
+          </div>
+          <Link href="/demo/case/" className={primary}>
+            افتح العرض التجريبي <ArrowLeft className="h-4 w-4" />
+          </Link>
+        </div>
       </footer>
     </div>
   );
