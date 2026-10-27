@@ -14,7 +14,8 @@ const groupTitle: Record<Group, string> = {
   revise: "Revision after Sara's return",
   execute: "Execution",
   release: "Release",
-  renew: "Rashid added later",
+  renew: "Rashid renews his EID",
+  rashid: "Sara releases Rashid",
 };
 
 const icon = {
@@ -56,7 +57,7 @@ export function RunView() {
         </ul>
         <p className="mt-3 text-xs text-muted">What I didn&apos;t do</p>
         <ul className="mt-1.5 flex flex-wrap gap-2 text-xs text-sub">
-          {!hasEvent(state, "rev-amendment") && <li className="rounded-md border border-warn/40 px-2 py-1">Read SVS letters (searched Mandates only)</li>}
+          {!hasEvent(state, "rev-plan") && <li className="rounded-md border border-warn/40 px-2 py-1">Use the 2023 letter&apos;s limit (scan unclear, Sara checks it)</li>}
           <li className="rounded-md border border-line px-2 py-1">Set up USD (mandate is AED only)</li>
           <li className="rounded-md border border-line px-2 py-1">Give Rashid a login (EFR first)</li>
           <li className="rounded-md border border-line px-2 py-1">Approve anything myself</li>

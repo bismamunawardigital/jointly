@@ -84,6 +84,7 @@ export type EvidenceKey =
   | "form-rashid"
   | "eid-rashid"
   | "finacle-cif"
+  | "cif-mohammed"
   | "cif-khalifa"
   | "cif-rashid"
   | "finacle-mop"
@@ -102,6 +103,7 @@ export interface Evidence {
   body: string;
   highlight?: string;
   note?: string;
+  image?: string;
 }
 
 const mandateText =
@@ -148,6 +150,14 @@ export const evidence: Record<EvidenceKey, Evidence> = {
     ref: "RCIF 100234 · 100587 · 100912",
     body: "100234 MOHD A MANSOURI, EID ending 3391. 100587 KHALIFA S ALFALASI, EID ending 7714. 100912 RASHID O SUWAIDI, EID ending 5082.",
     highlight: "MOHD A MANSOURI",
+  },
+  "cif-mohammed": {
+    key: "cif-mohammed",
+    title: "Customer record (inquiryCIF)",
+    system: "Finacle",
+    ref: "RCIF 100234",
+    body: "100234 MOHD A MANSOURI, EID ending 3391.",
+    highlight: "EID ending 3391",
   },
   "cif-khalifa": {
     key: "cif-khalifa",
@@ -214,7 +224,8 @@ export const evidence: Record<EvidenceKey, Evidence> = {
     ref: "SVS-AMD-2023-0107",
     body: "The single-signing limit of Khalifa Saeed Al Falasi is revised to AED 25,000 with effect from 01-Mar-2023.",
     highlight: "revised to AED 25,000",
-    note: "Filed under document type Letter, not Mandate.",
+    note: "Poor scan. The agent read 'AED 25,000' but isn't certain, so a person checks the image.",
+    image: "/scans/svs-amd-2023.png",
   },
   "admin-user-mohammed": {
     key: "admin-user-mohammed",

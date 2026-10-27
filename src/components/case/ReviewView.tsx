@@ -35,7 +35,7 @@ function Changed({ before, after }: { before: string; after: string }) {
 function coverage(stageId: number, version: 1 | 2) {
   if (stageId === 1) return { label: "Finacle records", n: 3, of: 3 };
   if (stageId === 2) return { label: "SVS signatories", n: 3, of: 3 };
-  return { label: "SVS documents read", n: version === 1 ? 1 : 2, of: 2 };
+  return { label: "SVS documents confirmed", n: version === 1 ? 1 : 2, of: 2 };
 }
 
 function Coverage({ n, of, label }: { n: number; of: number; label: string }) {
@@ -71,6 +71,50 @@ function ClaimRow({ label, value, sources }: { label: React.ReactNode; value: Re
   );
 }
 
+function ScanCheck({ canAct, onConfirm }: { canAct: boolean; onConfirm: (v: number) => void }) {
+  const [value, setValue] = useState("");
+  const n = Number(value.replace(/[^0-9.]/g, ""));
+  const mismatch = value.trim() !== "" && n > 0 && n !== 25000;
+  return (
+    <div className="mt-4 rounded-lg border border-warn/30 bg-warn-soft/40 p-3">
+      <p className="flex items-center gap-1.5 text-sm font-medium text-warn-ink">
+        <AlertTriangle className="h-4 w-4 shrink-0" /> A 2023 letter may change Khalifa&apos;s limit. The scan is unclear.
+      </p>
+      <div className="mt-3 grid grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] gap-4">
+        <figure>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/scans/svs-amd-2023.png" alt="Scan of the 2023 amendment letter. The amount is blurred." className="w-full rounded-md border border-line" />
+          <figcaption className="mt-1 text-[11px] text-muted">2023 amendment letter · scan from SVS</figcaption>
+        </figure>
+        <div className="space-y-3 text-sm">
+          <div>
+            <p className="text-xs text-muted">The agent read</p>
+            <p className="mt-0.5 font-medium">
+              AED 25,000 <span className="text-xs font-normal text-warn-ink">not certain</span>
+            </p>
+            <p className="mt-1 text-xs text-sub">Plan v1 keeps AED 10,000 until you confirm.</p>
+          </div>
+          {canAct && (
+            <div>
+              <label htmlFor="scan-value" className="text-xs text-muted">
+                What limit does the letter say? Type it from the image.
+              </label>
+              <div className="mt-1 flex items-center gap-2">
+                <span className="text-xs text-muted">AED</span>
+                <input id="scan-value" inputMode="numeric" value={value} onChange={(e) => setValue(e.target.value)} placeholder="25,000" className="h-9 w-32 rounded-lg border border-line bg-surface px-2.5 text-sm outline-none focus:border-accent" />
+              </div>
+              {mismatch && <p className="mt-1 text-xs text-bad-ink">That doesn&apos;t match the agent&apos;s reading. Return the stage with a note instead.</p>}
+              <Button variant="primary" className="mt-2" disabled={n !== 25000} onClick={() => onConfirm(n)}>
+                <Check className="h-3.5 w-3.5" /> Confirm and update the plan
+              </Button>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function ReviewView() {
   const { state, dispatch, version, setTab } = useStore();
   const tour = useTourTarget(1);
@@ -78,6 +122,7 @@ export function ReviewView() {
   const [note, setNote] = useState("");
   const [checked, setChecked] = useState<Record<number, boolean>>({});
   const [hint, setHint] = useState(false);
+  useEffect(() => setChecked({}), [version]);
   useEffect(() => {
     try {
       setHint(localStorage.getItem("jointly-hint") !== "off");
@@ -90,7 +135,7 @@ export function ReviewView() {
       if (state.phase !== "in_review" && state.phase !== "re_review") return;
       const list = buildStages(version);
       const next = list.find((st, n) => !approvalValid(state.approvals[st.id], st) && list.slice(0, n).every((p) => approvalValid(state.approvals[p.id], p)));
-      if (!next) return;
+      if (!next || (next.id === 3 && version === 1)) return;
       const needs = next.items.some((it) => it.sources.some(isAgentRead));
       if (needs && !checked[next.id]) return;
       dispatch({ type: "approve", stageId: next.id });
@@ -212,22 +257,17 @@ export function ReviewView() {
 
             {s.id === 3 && !valid && (
               version === 1 ? (
-                <div className="mt-3 flex gap-2.5 rounded-lg border border-warn/30 bg-warn-soft px-3 py-2.5 text-sm text-warn-ink">
-                  <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
-                  <p>
-                    <span className="font-medium">The agent didn&apos;t read everything.</span> It searched SVS for Mandates only. 1 Letter on this account, filed 01-Mar-2023, was not read, so these rules may be out of date.
-                  </p>
-                </div>
+                <ScanCheck canAct={canAct && !returning} onConfirm={(v) => dispatch({ type: "confirm", value: v })} />
               ) : (
                 <>
                   <p className="mt-3 flex items-center gap-1.5 text-xs text-ok-ink">
-                    <Check className="h-3.5 w-3.5" strokeWidth={3} /> Read every SVS document on this account (2 of 2)
+                    <Check className="h-3.5 w-3.5" strokeWidth={3} /> 2023 letter checked by you: AED 25,000
                   </p>
                   <div className="mt-3 flex items-start gap-2.5 rounded-lg border border-line bg-panel/60 px-3 py-2.5">
                     <Repeat className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-medium">Make this fix stick?</p>
-                      <p className="mt-0.5 text-xs text-sub">The agent proposes: on every case, read all SVS document types, not just Mandates. A supervisor has to approve it.</p>
+                      <p className="mt-0.5 text-xs text-sub">The agent proposes: when a scan is unclear, ask the branch for a clean copy before building the plan. A supervisor has to approve it.</p>
                     </div>
                     {state.log.some((e) => e.id === "lesson") ? (
                       <Pill tone="neutral">Sent to supervisor</Pill>
@@ -247,7 +287,7 @@ export function ReviewView() {
               </p>
             )}
 
-            {canAct && !returning && needsCheck && (
+            {canAct && !returning && needsCheck && !(s.id === 3 && version === 1) && (
               <label className="mt-4 flex cursor-pointer items-center gap-2 text-sm text-sub">
                 <input type="checkbox" className="accent-accent" checked={!!checked[s.id]} onChange={(e) => setChecked((c) => ({ ...c, [s.id]: e.target.checked }))} />
                 I compared the highlighted words with the agent&apos;s lines
@@ -255,10 +295,12 @@ export function ReviewView() {
             )}
             {canAct && !returning && (
               <div className="mt-3 flex gap-2">
-                <Button variant="primary" disabled={needsCheck && !checked[s.id]} onClick={() => dispatch({ type: "approve", stageId: s.id })}>
-                  <Check className="h-3.5 w-3.5" /> Approve stage {s.id} · {s.items.length} line{s.items.length === 1 ? "" : "s"}
-                  <kbd className="ml-1 rounded border border-onaccent/40 px-1 text-[10px] font-normal opacity-80">A</kbd>
-                </Button>
+                {!(s.id === 3 && version === 1) && (
+                  <Button variant="primary" disabled={needsCheck && !checked[s.id]} onClick={() => dispatch({ type: "approve", stageId: s.id })}>
+                    <Check className="h-3.5 w-3.5" /> Approve stage {s.id} · {s.items.length} line{s.items.length === 1 ? "" : "s"}
+                    <kbd className="ml-1 rounded border border-onaccent/40 px-1 text-[10px] font-normal opacity-80">A</kbd>
+                  </Button>
+                )}
                 {s.id === 3 && (
                   <Button variant="ghost" onClick={() => setTab("simulator")}>
                     <FlaskConical className="h-3.5 w-3.5" /> Test a payment

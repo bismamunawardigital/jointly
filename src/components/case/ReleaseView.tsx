@@ -15,6 +15,7 @@ export function ReleaseView() {
   const tour3 = useTourTarget(2);
   const tour4 = useTourTarget(3);
   const [confirming, setConfirming] = useState(false);
+  const [confirmingR, setConfirmingR] = useState(false);
   if (!hasEvent(state, "ex-readback"))
     return <Empty icon={Rocket} title="Not set up yet" body="After Sara approves all 4 stages, the agent sets them up, reads them back and checks who can be released." />;
   const elig = releaseEligibility(rulesFor(version), held);
@@ -23,6 +24,51 @@ export function ReleaseView() {
 
   return (
     <div className="max-w-5xl space-y-8">
+      {hasEvent(state, "ren-eligibility") && (
+        <section>
+          <SectionTitle>Rashid&apos;s EID is renewed. Release Rashid?</SectionTitle>
+          <Card className="p-5">
+            <div className="flex items-center gap-4">
+              <Avatar id="rashid" size={40} />
+              <div>
+                <p className="text-sm font-medium">Adding Rashid keeps every approval combination valid.</p>
+                <p className="mt-0.5 text-xs text-muted">Future payments only. Payments already waiting keep their approvers.</p>
+                <div className="mt-2">
+                  <Sources keys={["eid-rashid", "svs-man-c1"]} />
+                </div>
+              </div>
+            </div>
+            <div className="mt-5 border-t border-line pt-4">
+              {state.phase !== "rashid_ready" ? (
+                <p className="flex items-center gap-1.5 text-sm text-ok-ink">
+                  <Check className="h-3.5 w-3.5" strokeWidth={3} /> Released by Sara M. · Wed 09:41
+                </p>
+              ) : confirmingR ? (
+                <div className="space-y-3">
+                  <p className="flex items-center gap-2 text-sm text-sub">
+                    <span className="inline-flex items-center gap-1 rounded-md bg-bad-soft px-1.5 py-0.5 text-[11px] font-medium text-bad-ink">
+                      <TriangleAlert className="h-3 w-3" /> Can&apos;t be undone
+                    </span>
+                    Switches on his user and texts him the activation link.
+                  </p>
+                  <div className="flex gap-2">
+                    <Button variant="primary" onClick={() => dispatch({ type: "releaseRashid" })}>
+                      Yes, release Rashid
+                    </Button>
+                    <Button variant="ghost" onClick={() => setConfirmingR(false)}>
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <Button variant="primary" onClick={() => setConfirmingR(true)}>
+                  Release Rashid
+                </Button>
+              )}
+            </div>
+          </Card>
+        </section>
+      )}
       <section {...tour3}>
         <SectionTitle aside={<AssumptionChip>partial release, validate with bank</AssumptionChip>}>Can we go live without Rashid?</SectionTitle>
         <Card className="p-5">
@@ -143,7 +189,7 @@ export function ReleaseView() {
 
       {sent.length > 0 && (
         <section>
-          <SectionTitle aside={<p className="text-xs text-muted">Approved templates, filled by the agent</p>}>Messages to customers</SectionTitle>
+          <SectionTitle aside={<p className="text-xs text-muted">The agent drafts every message</p>}>Messages to customers</SectionTitle>
           <div className="grid grid-cols-2 gap-4">
             {sent.map((m) => (
               <Card key={m.afterEvent} className="p-4">
@@ -151,6 +197,11 @@ export function ReleaseView() {
                   {m.channel} to {m.to}
                 </p>
                 <p className="mt-2 rounded-lg rounded-tl-sm bg-panel px-3 py-2 text-sm">{m.text}</p>
+                <p className="mt-2 text-xs text-sub">{m.approval === "auto" ? "Pre-approved template, sent automatically" : "Approved by Sara M. with the release"}</p>
+                <details className="mt-1">
+                  <summary className="cursor-pointer text-[11px] text-muted">Technical details</summary>
+                  <p className="mt-1 font-mono text-[11px] text-muted">template {m.template}</p>
+                </details>
               </Card>
             ))}
           </div>

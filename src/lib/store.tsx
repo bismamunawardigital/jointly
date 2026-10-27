@@ -16,6 +16,8 @@ export type Phase =
   | "releasing"
   | "partially_live"
   | "renewing"
+  | "rashid_ready"
+  | "releasing_rashid"
   | "live";
 
 export interface HumanEntry {
@@ -38,6 +40,7 @@ export interface State {
   queueGroup?: Group;
   approvals: Partial<Record<1 | 2 | 3 | 4, Approval>>;
   returned?: { stageId: 3; note: string };
+  confirmed?: number;
   cleanupTicket: "draft" | "sent";
   tourOn: boolean;
   tourStep: number;
@@ -60,6 +63,8 @@ type Action =
   | { type: "reveal" }
   | { type: "approve"; stageId: 1 | 2 | 3 | 4 }
   | { type: "return"; note: string }
+  | { type: "confirm"; value: number }
+  | { type: "releaseRashid" }
   | { type: "sendCleanup" }
   | { type: "release" }
   | { type: "renew" }
@@ -76,7 +81,8 @@ const groupPhase: Record<Group, { running: Phase; done: Phase }> = {
   revise: { running: "revising", done: "re_review" },
   execute: { running: "executing", done: "executed" },
   release: { running: "releasing", done: "partially_live" },
-  renew: { running: "renewing", done: "live" },
+  renew: { running: "renewing", done: "rashid_ready" },
+  rashid: { running: "releasing_rashid", done: "live" },
 };
 
 const tourStepFor: Partial<Record<Phase, number>> = { re_review: 1, executed: 2, partially_live: 3 };
@@ -134,6 +140,15 @@ function reducer(s: State, a: Action): State {
       const log = [...s.log, human("return-3", "Mon 10:07", `Returned stage 3: ${a.note}`)];
       return { ...s, log, returned: { stageId: 3, note: a.note }, phase: "revising", queue: groupEvents("revise"), queueGroup: "revise" };
     }
+    case "confirm": {
+      const log = [...s.log, human("confirm-3", "Mon 10:07", `Checked the 2023 letter scan: AED ${a.value.toLocaleString("en-US")}`)];
+      return { ...s, log, confirmed: a.value, phase: "revising", queue: groupEvents("revise"), queueGroup: "revise" };
+    }
+    case "releaseRashid": {
+      if (s.phase !== "rashid_ready") return s;
+      const log = [...s.log, human("release-rashid", "Wed 09:41", "Released Rashid")];
+      return { ...s, log, phase: "releasing_rashid", queue: groupEvents("rashid"), queueGroup: "rashid" };
+    }
     case "sendCleanup":
       return { ...s, cleanupTicket: "sent", log: [...s.log, human("cleanup", "Mon 09:40", "Sent Finacle Mode of Operation cleanup ticket to Data Quality")] };
     case "release": {
@@ -151,13 +166,13 @@ function reducer(s: State, a: Action): State {
     case "handover":
       return { ...s, handedOver: true, log: [...s.log, human(`handover-${s.log.length}`, nowOf(s), `Handed to a maker: ${s.queue.length} step${s.queue.length === 1 ? "" : "s"} left, nothing half-written`)] };
     case "lesson":
-      return s.log.some((e) => e.id === "lesson") ? s : { ...s, log: [...s.log, human("lesson", "Mon 10:39", "Sent a lasting change to the supervisor: always read every SVS document type")] };
+      return s.log.some((e) => e.id === "lesson") ? s : { ...s, log: [...s.log, human("lesson", "Mon 10:39", "Sent a lasting change to the supervisor: ask the branch for a clean copy when a scan is unclear")] };
     case "tour":
       return { ...s, tourOn: a.on ?? s.tourOn, tourStep: a.step ?? s.tourStep };
   }
 }
 
-const KEY = "jointly-demo-v2";
+const KEY = "jointly-demo-v3";
 
 interface Ctx {
   state: State;

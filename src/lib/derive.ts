@@ -14,6 +14,8 @@ export const statusOf: Record<Phase, { label: string; tone: Tone }> = {
   releasing: { label: "Releasing", tone: "accent" },
   partially_live: { label: "Partially live", tone: "ok" },
   renewing: { label: "Agent working", tone: "accent" },
+  rashid_ready: { label: "Needs you", tone: "warn" },
+  releasing_rashid: { label: "Releasing", tone: "accent" },
   live: { label: "Live", tone: "ok" },
 };
 
@@ -25,6 +27,8 @@ const phaseStep: Partial<Record<Phase, StepId>> = {
   releasing: "release",
   partially_live: "release",
   renewing: "release",
+  rashid_ready: "release",
+  releasing_rashid: "release",
 };
 
 export type StepState = "todo" | "active" | "done";
@@ -80,7 +84,9 @@ export function progressFor(s: State, id: PersonId): Track[] {
       { label: "First login", done: hasEvent(s, "rel-khalifa-login"), time: t("rel-khalifa-login") },
     ];
   return [
-    { label: "Configured", done: hasEvent(s, "ren-enable"), time: t("ren-enable"), note: hasEvent(s, "ex-users") && !hasEvent(s, "ren-enable") ? "Created, switched off" : undefined },
+    hasEvent(s, "ren-enable")
+      ? { label: "Switched on", done: true, time: t("ren-enable") }
+      : { label: "Created (switched off)", done: hasEvent(s, "ex-users"), time: t("ex-users") },
     { label: "Credentials claimed", done: hasEvent(s, "ren-login"), time: t("ren-login"), note: hasEvent(s, "ren-link") ? "Link sent " + eventById("ren-link").time : undefined },
     { label: "First login", done: hasEvent(s, "ren-login"), time: t("ren-login") },
   ];

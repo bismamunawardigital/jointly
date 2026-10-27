@@ -48,7 +48,9 @@ export function CaseWorkspace() {
     release: state.phase === "live",
   };
   const reviewDot = state.phase === "in_review" || state.phase === "re_review";
-  const releaseDot = state.phase === "executed" || state.phase === "partially_live";
+  const releaseDot = state.phase === "executed" || state.phase === "partially_live" || state.phase === "rashid_ready";
+  const [mac, setMac] = useState(false);
+  useEffect(() => setMac(/Mac|iPhone|iPad/.test(navigator.userAgent)), []);
   useEffect(() => {
     if (!hydrated) return;
     const want = new URLSearchParams(window.location.search).get("tab");
@@ -67,6 +69,7 @@ export function CaseWorkspace() {
       in_review: { text: "Plan v1 is ready. 1 thing needs your eye in stage 3.", tab: "review" },
       re_review: { text: "The agent fixed stage 3. Only 2 stages changed.", tab: "review" },
       executed: { text: "Set up and read back. Release decision is yours.", tab: "release" },
+      rashid_ready: { text: "Rashid's EID is renewed. Release Rashid?", tab: "release" },
     };
     const t = ask[state.phase];
     if (t && tab !== t.tab) setToast(t);
@@ -107,9 +110,9 @@ export function CaseWorkspace() {
               )}
             </div>
           </div>
-          <p className="mt-2 text-[11px] text-muted">
-            <kbd className="rounded border border-line px-1">Ctrl K</kbd> to jump anywhere
-          </p>
+          <button type="button" onClick={() => window.dispatchEvent(new Event("jointly:palette"))} className="mt-2 text-[11px] text-muted hover:text-ink">
+            <kbd className="rounded border border-line px-1">{mac ? "⌘K" : "Ctrl K"}</kbd> to jump anywhere
+          </button>
           <nav aria-label="Case steps" className="-mb-px mt-5 flex gap-5 overflow-x-auto whitespace-nowrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" role="tablist">
             {tabs.map((t) => (
               <button

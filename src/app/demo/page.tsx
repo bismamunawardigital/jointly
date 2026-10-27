@@ -13,7 +13,7 @@ const toneOf: Record<string, Tone> = { "Agent working": "accent", "Needs you": "
 export default function CommandCenter() {
   const { state } = useStore();
   const router = useRouter();
-  const st = statusOf[state.phase];
+  const st = state.paused && state.queue.length ? { label: state.handedOver ? "With a maker" : "Paused", tone: "warn" as const } : statusOf[state.phase];
   const active = stepStates(state).find((s) => s.state === "active");
   const needsYou = otherCases.filter((c) => c.status === "Needs you").length + (st.label === "Needs you" ? 1 : 0);
   const stats = [
@@ -47,7 +47,7 @@ export default function CommandCenter() {
                 <Link href="/demo/case/" className="flex items-center justify-between rounded-xl border border-warn/40 bg-warn-soft/40 px-4 py-3 hover:bg-warn-soft/70">
                   <span className="text-sm">
                     <span className="font-medium">{business.name}</span>
-                    <span className="text-sub"> · {state.phase === "executed" ? "Release decision" : state.phase === "re_review" ? "2 changed stages to review" : "Plan v1 to review, stage 3 has a gap"}</span>
+                    <span className="text-sub"> · {state.phase === "executed" ? "Release decision" : state.phase === "rashid_ready" ? "Release Rashid" : state.phase === "re_review" ? "2 changed stages to review" : "Plan v1 to review, check a blurry letter in stage 3"}</span>
                   </span>
                   <ArrowRight className="h-4 w-4 text-warn-ink" />
                 </Link>

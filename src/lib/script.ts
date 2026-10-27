@@ -1,6 +1,6 @@
 import { EvidenceKey } from "@/data/seed";
 
-export type Group = "run" | "revise" | "execute" | "release" | "renew";
+export type Group = "run" | "revise" | "execute" | "release" | "renew" | "rashid";
 export type EventStatus = "ok" | "warn" | "block" | "info";
 export type Actor =
   | "Intake Agent"
@@ -61,7 +61,13 @@ export const script: AgentEvent[] = [
     id: "kyc-request", group: "run", step: "intake", time: "Mon 09:13", actor: "EFR Agent",
     call: "efr.requestEIDUpdate", system: "EFR service", status: "warn",
     title: "Started an EID update request for Rashid",
-    detail: "Sent Rashid an SMS with the renewal steps, using an approved template. I'll recheck EFR once it's renewed.",
+    detail: "I'll recheck EFR once it's renewed.",
+  },
+  {
+    id: "kyc-sms", group: "run", step: "intake", time: "Mon 09:13", actor: "Messaging",
+    call: "notify.send(template=T-EID-01)", system: "SMS gateway", status: "info",
+    title: "Drafted an SMS to Rashid. Sent automatically using a pre-approved template",
+    detail: "Only pre-approved templates go out on their own. Anything else waits for Sara.",
   },
   {
     id: "id-finacle", group: "run", step: "identity", time: "Mon 09:15", actor: "Identity Agent",
@@ -92,10 +98,17 @@ export const script: AgentEvent[] = [
   },
   {
     id: "mandate-svs", group: "run", step: "mandate", time: "Mon 09:20", actor: "Mandate Agent",
-    call: "svs.getDocuments(type=MANDATE)", system: "SVS", status: "info",
-    title: "Found mandate SVS-MAN-2019-0441",
-    detail: "Searched document type: Mandate. Not searched: Letter, Board resolution.",
-    evidence: ["svs-man"],
+    call: "svs.getDocuments(type=ALL)", system: "SVS", status: "info",
+    title: "Found the 2019 mandate and a 2023 letter",
+    detail: "Searched every document type on this account.",
+    evidence: ["svs-man", "svs-amd"],
+  },
+  {
+    id: "mandate-letter", group: "run", step: "mandate", time: "Mon 09:20", actor: "Mandate Agent",
+    call: "ocr.read(SVS-AMD-2023-0107) · confidence 0.58", system: "SVS", status: "warn",
+    title: "A 2023 letter may change Khalifa's limit. The scan is unclear",
+    detail: "I read 'AED 25,000' but I'm not certain. Plan v1 keeps the 2019 limit of AED 10,000 until a person confirms it against the image.",
+    evidence: ["svs-amd"],
   },
   {
     id: "mandate-conflict", group: "run", step: "mandate", time: "Mon 09:21", actor: "Mandate Agent",
@@ -124,9 +137,9 @@ export const script: AgentEvent[] = [
 
   {
     id: "rev-amendment", group: "revise", step: "mandate", time: "Mon 10:08", actor: "Mandate Agent",
-    call: "svs.getDocuments(type=ALL)", system: "SVS", status: "warn",
-    title: "Found amendment SVS-AMD-2023-0107",
-    detail: "Sara returned stage 3 because of the unread letter. It's filed as a Letter, so my first search missed it. I now search every document type on this account.",
+    call: "rules.applyAmendment(SVS-AMD-2023-0107)", system: "Jointly", status: "ok",
+    title: "Used the 2023 letter, checked by Sara",
+    detail: "Sara checked the scan. Khalifa's single limit goes from AED 10,000 to AED 25,000.",
     evidence: ["svs-amd"],
   },
   {
@@ -202,13 +215,13 @@ export const script: AgentEvent[] = [
 
   {
     id: "rel-mohammed", group: "release", step: "release", time: "Mon 10:52", actor: "Messaging",
-    call: "notify.send", system: "SMS gateway", status: "ok",
-    title: "Told Mohammed that Creekside General Trading is on his existing login",
+    call: "notify.send(template=T-REL-01)", system: "SMS gateway", status: "ok",
+    title: "Sent Mohammed the SMS Sara approved with the release",
   },
   {
     id: "rel-khalifa-link", group: "release", step: "release", time: "Mon 10:53", actor: "Messaging",
-    call: "activation.send", system: "SMS gateway", status: "ok",
-    title: "Sent Khalifa a secure activation link",
+    call: "activation.send(template=T-ACT-01)", system: "SMS gateway", status: "ok",
+    title: "Sent Khalifa the activation link Sara approved with the release",
     detail: "He verifies his EID with a face check and sets his own credentials. No password is created, seen or sent by the agent.",
     assumption: "Digital activation, subject to bank security approval",
   },
@@ -237,20 +250,21 @@ export const script: AgentEvent[] = [
     id: "ren-eligibility", group: "renew", step: "release", time: "Wed 09:40", actor: "Release Agent",
     call: "release.checkEligibility", system: "Jointly", status: "ok",
     title: "Adding Rashid keeps every approval combination valid",
+    detail: "Releasing him is Sara's call. I won't switch him on until she says so.",
   },
   {
-    id: "ren-enable", group: "renew", step: "execute", time: "Wed 09:41", actor: "Executor Agent",
+    id: "ren-enable", group: "rashid", step: "execute", time: "Wed 09:41", actor: "Executor Agent",
     call: "admin.enableUser", system: "Digital Banking Admin", status: "ok",
     title: "Switched on Rashid's user",
     detail: "Added for future transactions only. Payments already waiting keep their original approvers.",
   },
   {
-    id: "ren-link", group: "renew", step: "release", time: "Wed 09:41", actor: "Messaging",
-    call: "activation.send", system: "SMS gateway", status: "ok",
-    title: "Sent Rashid a secure activation link",
+    id: "ren-link", group: "rashid", step: "release", time: "Wed 09:41", actor: "Messaging",
+    call: "activation.send(template=T-ACT-01)", system: "SMS gateway", status: "ok",
+    title: "Sent Rashid the activation link Sara approved",
   },
   {
-    id: "ren-login", group: "renew", step: "release", time: "Wed 11:15", actor: "Release Agent",
+    id: "ren-login", group: "rashid", step: "release", time: "Wed 11:15", actor: "Release Agent",
     call: "admin.watchLogin", system: "Digital Banking Admin", status: "ok",
     title: "Rashid's first login. All 3 signatories are live",
   },
@@ -261,6 +275,8 @@ export const groupEvents = (g: Group) => script.filter((e) => e.group === g).map
 
 export interface CustomerMessage {
   afterEvent: string;
+  template: string;
+  approval: "auto" | "sara";
   to: string;
   channel: "SMS";
   text: string;
@@ -268,25 +284,33 @@ export interface CustomerMessage {
 
 export const customerMessages: CustomerMessage[] = [
   {
-    afterEvent: "kyc-request",
+    afterEvent: "kyc-sms",
+    template: "T-EID-01",
+    approval: "auto",
     to: "Rashid Omar Al Suwaidi · mobile ending 9935",
     channel: "SMS",
-    text: "Hi Rashid, your Emirates ID on file expired on 14 Aug. Please renew it with ICP. Mohammed and Khalifa can go ahead today, and we'll add you automatically once it's renewed. No need to fill in the form again.",
+    text: "Hi Rashid, your Emirates ID on file expired on 14 Aug. Please renew it with ICP. Mohammed and Khalifa can go ahead today, and we'll set up your access once it's renewed. No need to fill in the form again.",
   },
   {
     afterEvent: "rel-mohammed",
+    template: "T-REL-01",
+    approval: "sara",
     to: "Mohammed Al Mansoori · mobile ending 2207",
     channel: "SMS",
     text: "Hi Mohammed, Creekside General Trading LLC is now on your existing digital banking login. No new password needed. Rashid joins once his Emirates ID is renewed. Until then, any payment that needs two approvers needs both Mohammed and Khalifa.",
   },
   {
     afterEvent: "rel-khalifa-link",
+    template: "T-ACT-01",
+    approval: "sara",
     to: "Khalifa Saeed Al Falasi · mobile ending 4410",
     channel: "SMS",
     text: "Hi Khalifa, your Creekside General Trading access is ready. Tap the secure link to verify your Emirates ID and set up your login. The link works for 24 hours. Rashid joins once his Emirates ID is renewed. Until then, any payment that needs two approvers needs both Mohammed and Khalifa.",
   },
   {
     afterEvent: "ren-link",
+    template: "T-ACT-01",
+    approval: "sara",
     to: "Rashid Omar Al Suwaidi · mobile ending 9935",
     channel: "SMS",
     text: "Hi Rashid, thanks for renewing your Emirates ID. Your Creekside General Trading access is ready. Tap the secure link to set up your login.",

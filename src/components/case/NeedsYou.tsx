@@ -75,7 +75,7 @@ export function NeedsYou() {
     body = (
       <>
         <p className="text-sm font-medium">Review plan v1</p>
-        <p className="mt-3 rounded-lg bg-warn-soft px-3 py-2 text-xs text-warn-ink">Stage 3: 1 SVS letter not read.</p>
+        <p className="mt-3 rounded-lg bg-warn-soft px-3 py-2 text-xs text-warn-ink">Stage 3: check a value on a blurry 2023 letter.</p>
         <Button variant="primary" className="mt-4 w-full" onClick={() => setTab("review")}>
           Open checker review
         </Button>
@@ -112,6 +112,16 @@ export function NeedsYou() {
             Skip ahead: Rashid renews his EID
           </Button>
         </div>
+      </>
+    );
+  } else if (state.phase === "rashid_ready") {
+    body = (
+      <>
+        <p className="text-sm font-medium">Rashid&apos;s EID is renewed. Release Rashid?</p>
+        <p className="mt-1 text-sm text-sub">Adding him keeps every approval combination valid.</p>
+        <Button variant="primary" className="mt-4 w-full" onClick={() => setTab("release")}>
+          Open release decision
+        </Button>
       </>
     );
   } else if (state.phase === "live") {

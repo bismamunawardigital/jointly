@@ -7,12 +7,13 @@ import { hasEvent, useStore } from "@/lib/store";
 import { BasisTag, Button, Card, Empty, Quote, SourceChip } from "@/components/ui";
 
 export function DecisionView() {
-  const { state, version, held } = useStore();
+  const { state, version } = useStore();
   const stages = buildStages(version);
   const approved = stages.filter((s) => approvalValid(state.approvals[s.id], s));
   if (!approved.length && !state.returned)
     return <Empty icon={FileCheck2} title="No decisions yet" body="Every approval, return and release lands here with the rule, the source and who signed off." />;
-  const elig = releaseEligibility(buildRules(version), held);
+  const first = releaseEligibility(buildRules(version), ["rashid"]);
+  const rashidReleased = state.log.some((e) => e.id === "release-rashid");
   const released = state.log.some((e) => e.id === "release");
   return (
     <div className="max-w-4xl space-y-4">
@@ -31,7 +32,16 @@ export function DecisionView() {
         <Card className="p-4">
           <p className="text-xs text-muted">Mon 10:07 · {checker.name} returned stage 3</p>
           <p className="mt-1 text-sm">&ldquo;{state.returned.note}&rdquo;</p>
-          <p className="mt-1 text-xs text-sub">Reason on screen: the agent had read 1 of 2 SVS documents. Fixed in plan v2 using the 2023 amendment letter.</p>
+          <p className="mt-1 text-xs text-sub">Reason on screen: the 2023 letter scan was unclear. Fixed in plan v2.</p>
+        </Card>
+      )}
+      {state.confirmed && (
+        <Card className="p-4">
+          <p className="text-xs text-muted">Mon 10:07 · {checker.name} checked the 2023 letter scan</p>
+          <p className="mt-1 text-sm">Typed AED {state.confirmed.toLocaleString("en-US")} from the image. It matched the agent&apos;s reading, so plan v2 uses it.</p>
+          <div className="mt-1.5 flex gap-1">
+            <SourceChip k="svs-amd" />
+          </div>
         </Card>
       )}
       {approved.map((s) => {
@@ -73,10 +83,21 @@ export function DecisionView() {
       })}
       {released && (
         <Card className="p-4">
-          <p className="text-xs text-muted">Mon 10:51 · {checker.name} released 2 of 3</p>
-          <p className="mt-1 text-sm">{elig.summary}</p>
+          <p className="text-xs text-muted">Mon 10:51 · {checker.name}</p>
+          <p className="mt-1 text-sm font-medium">Released Mohammed and Khalifa</p>
+          <p className="mt-0.5 text-sm text-sub">{first.summary}</p>
           <div className="mt-1.5 flex gap-1">
             <SourceChip k="svs-man-c1" />
+            <SourceChip k="eid-rashid" />
+          </div>
+        </Card>
+      )}
+      {rashidReleased && (
+        <Card className="p-4">
+          <p className="text-xs text-muted">Wed 09:41 · {checker.name}</p>
+          <p className="mt-1 text-sm font-medium">Released Rashid</p>
+          <p className="mt-0.5 text-sm text-sub">His EID is renewed. Adding him keeps every approval combination valid. Future payments only.</p>
+          <div className="mt-1.5 flex gap-1">
             <SourceChip k="eid-rashid" />
           </div>
         </Card>

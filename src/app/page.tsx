@@ -28,8 +28,8 @@ const patterns = [
     tab: "plan",
   },
   {
-    title: "Show what wasn't searched",
-    body: "The approval card says which documents the agent didn't read. Sara catches the miss from the screen, not from memory.",
+    title: "Show what the agent isn't sure about",
+    body: "When a scan is blurry, the card shows the image next to what the agent read. Sara checks the value herself, not from memory.",
     tab: "review",
   },
   {

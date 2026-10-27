@@ -27,7 +27,7 @@ export const moments: Moment[] = [
   },
   {
     title: "Pattern: approval is tied to the content",
-    body: "Stage 3 says the agent didn't read one SVS letter. Sara returns it. The agent reads the letter, and only stages 3 and 4 come back as a diff. Her first two approvals stay.",
+    body: "Stage 3 shows a blurry 2023 letter next to what the agent read. Sara types the value from the image, and only stages 3 and 4 come back as a diff. Her first two approvals stay.",
     tab: "review",
     readyWhen: after("in_review"),
     notReady: "This opens once the agent sends the plan for review.",
