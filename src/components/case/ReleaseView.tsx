@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import { Check, MessageSquare, Rocket, TriangleAlert, X } from "lucide-react";
 import { PersonId, business, firstName, people } from "@/data/seed";
 import { releaseEligibility } from "@/lib/rules";
@@ -48,9 +49,9 @@ export function ReleaseView() {
   const elig = releaseEligibility(rulesFor(version), held);
   const sent = customerMessages.filter((m) => hasEvent(state, m.afterEvent));
   const pending = customerMessages.filter((m) => m.afterEvent.startsWith("rel-"));
-  const msgs = sent.length ? sent : pending;
   const live = state.phase === "live";
   const released = hasEvent(state, "rel-mohammed");
+  const msgs = released ? sent : pending;
   const firstLogin = hasEvent(state, "rel-mohammed-login") ? mins(eventById("rel-mohammed-login").time) - mins(eventById("intake-forms").time) : 0;
   const sentence = state.phase === "rashid_ready" ? "Rashid's EID is renewed. Release Rashid?" : released ? "Mohammed and Khalifa are live. Rashid joins after his EID." : "Mohammed and Khalifa can approve together. They can go live today.";
 
@@ -122,7 +123,7 @@ export function ReleaseView() {
           const rashidDecision = p.id === "rashid" && state.phase === "rashid_ready";
           return (
             <Card key={p.id} className={cn("p-4", rashidDecision && "border-warn")}>
-              <div className="flex items-center gap-2.5">
+              <div className="flex flex-wrap items-center gap-2.5">
                 <Avatar id={p.id} held={h} />
                 <p className="text-sm font-medium">{firstName(p.id)}</p>
                 {h && <Pill tone="neutral">On hold · waiting for EID</Pill>}
@@ -173,12 +174,13 @@ export function ReleaseView() {
         </button>
       )}
 
-      {preview && (
+      {preview &&
+        createPortal(
         <>
           <div className="fixed inset-0 z-40 bg-ink/20" onClick={() => setPreview(false)} aria-hidden />
           <aside className="fixed inset-y-0 right-0 z-50 w-[380px] animate-enter overflow-y-auto border-l border-line bg-surface p-6 shadow-lg" role="dialog" aria-label="Customer messages">
             <div className="flex items-center justify-between">
-              <p className="font-display text-xl">{sent.length ? "Messages sent" : "Messages to send"}</p>
+              <p className="font-display text-xl">{released ? "Messages sent" : "Messages to send"}</p>
               <button onClick={() => setPreview(false)} aria-label="Close" className="rounded-lg p-1 text-muted hover:text-ink">
                 <X className="h-4 w-4" />
               </button>
@@ -200,7 +202,8 @@ export function ReleaseView() {
               ))}
             </div>
           </aside>
-        </>
+        </>,
+        document.body,
       )}
     </div>
   );
