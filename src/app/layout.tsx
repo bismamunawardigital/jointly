@@ -24,10 +24,15 @@ const mono = IBM_Plex_Mono({
   variable: "--font-mono",
 });
 
+const desc = "An AI agent sets up joint-signatory online banking across 4 legacy systems. A person still approves every decision.";
+const ogTitle = "Jointly · Agentic AI for bank operations · Bisma Munawar";
+
 export const metadata: Metadata = {
-  title: "Jointly: joint signatories live in hours",
-  description:
-    "An agentic operations workbench that gets joint-signatory businesses onto digital banking in hours, on top of Finacle and SVS. Portfolio demo by Bisma Munawar.",
+  metadataBase: new URL("https://jointly-banking.vercel.app"),
+  title: "Jointly · Agentic AI case study by Bisma Munawar",
+  description: desc,
+  openGraph: { title: ogTitle, description: desc, url: "/", siteName: "Jointly", type: "website" },
+  twitter: { card: "summary_large_image", title: ogTitle, description: desc },
 };
 
 const themeScript = `try{if(localStorage.getItem("jointly-theme")==="dark")document.documentElement.dataset.theme="dark";if(localStorage.getItem("jointly-density")==="compact")document.documentElement.dataset.density="compact"}catch(e){}`;

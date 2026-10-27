@@ -41,7 +41,7 @@ function Scan() {
   return (
     <div className="w-full max-w-sm space-y-3">
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/scans/svs-amd-2023.png" alt="Blurry scan of the 2023 amendment letter" className="w-full rounded-lg border border-line" />
+      <img src="/scans/svs-amd-2023.png" width={1100} height={380} loading="lazy" decoding="async" alt="Blurry scan of the 2023 amendment letter" className="w-full rounded-lg border border-line" />
       <div className="flex items-center gap-2 text-sm text-sub">
         The letter says AED
         <span className="rounded-md border-2 border-accent bg-surface px-2 py-0.5 font-medium text-ink">25,000</span>
@@ -102,7 +102,7 @@ export function Moments({ titles, see = "See it live" }: { titles?: string[]; se
             <div aria-hidden className="mt-4 flex justify-center rounded-card border border-line bg-surface p-6 md:hidden">
               <s.V />
             </div>
-            <Link href={`/demo/case/?tab=${s.tab}`} className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-accent-ink hover:underline">
+            <Link href={`/demo/case/?moment=${i + 1}`} className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-accent-ink hover:underline">
               {see} <ArrowRight className="h-3.5 w-3.5 rtl:-scale-x-100" />
             </Link>
           </li>

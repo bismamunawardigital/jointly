@@ -423,7 +423,7 @@ export default function CaseStudy() {
           </div>
           <p className="mt-8 text-sm text-sub">
             Every case ends with a decision record an examiner can read: rule, quote, approver, time.{" "}
-            <Link href="/demo/case/?tab=decisions" className="text-accent-ink underline underline-offset-2">See Creekside&apos;s</Link>
+            <Link href="/demo/case/?view=record" className="text-accent-ink underline underline-offset-2">See Creekside&apos;s</Link>
           </p>
         </div>
       </section>

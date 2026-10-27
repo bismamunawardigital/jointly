@@ -189,7 +189,7 @@ export function SigningMap({ compact = false, part = "all" }: { compact?: boolea
             <p className="text-xs font-medium">Source: {fromLetter ? "2023 amendment letter" : "2019 mandate"}</p>
             {fromLetter && (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src="/scans/svs-amd-2023.png" alt="2023 amendment letter" className="mt-2 h-16 w-full rounded border border-line object-cover" />
+              <img src="/scans/svs-amd-2023.png" width={1100} height={380} loading="lazy" decoding="async" alt="2023 amendment letter" className="mt-2 h-16 w-full rounded border border-line object-cover" />
             )}
             {!fromLetter && hasEvent(state, "mandate-letter") && <p className="mt-1 text-xs text-sub">A 2023 letter may change this. Sara checks it.</p>}
           </div>

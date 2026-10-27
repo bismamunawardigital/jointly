@@ -195,6 +195,7 @@ export function Avatar({ id, size = 28, held = false }: { id: PersonId; size?: n
   const c = `var(${personVar(id)})`;
   return (
     <span
+      aria-hidden="true"
       className={cn("inline-flex shrink-0 items-center justify-center rounded-full font-semibold", held && "border-dashed")}
       style={{
         width: size,

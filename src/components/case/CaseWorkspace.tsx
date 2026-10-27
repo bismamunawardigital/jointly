@@ -4,7 +4,7 @@ import { Ban, Bot, Scale, UserCheck, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { business } from "@/data/seed";
 import { duration, lastTime, statusOf } from "@/lib/derive";
-import { Tab, hasEvent, useStore } from "@/lib/store";
+import { Tab, hasEvent, useStore, jumpState, initialState } from "@/lib/store";
 import { Pill, cn } from "@/components/ui";
 import { eventById } from "@/lib/script";
 import { LegacyBeat, NeedsYou } from "./NeedsYou";
@@ -80,11 +80,48 @@ export function CaseWorkspace() {
   const releaseDot = state.phase === "executed" || state.phase === "partially_live" || state.phase === "rashid_ready";
   const [mac, setMac] = useState(false);
   useEffect(() => setMac(/Mac|iPhone|iPad/.test(navigator.userAgent)), []);
+  const [jumped, setJumped] = useState(false);
+  const skipPhase = useRef(false);
   useEffect(() => {
     if (!hydrated) return;
-    const want = new URLSearchParams(window.location.search).get("tab");
+    const q = new URLSearchParams(window.location.search);
+    const want = q.get("tab");
+    const moment = q.get("moment");
+    const view = q.get("view");
+    const spot = (sel: string, focus?: string) =>
+      setTimeout(() => {
+        const el = document.querySelector<HTMLElement>(sel);
+        if (!el) return;
+        const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        el.scrollIntoView({ behavior: still ? "auto" : "smooth", block: sel.startsWith("#sec-") ? "start" : "center" });
+        el.classList.add("flash");
+        setTimeout(() => el.classList.remove("flash"), 1500);
+        if (focus) document.querySelector<HTMLElement>(focus)?.focus({ preventScroll: true });
+      }, 300);
+    if (moment || view) {
+      setJumped(true);
+      const next = moment === "4" ? jumpState("executed") : view === "record" ? jumpState("live") : initialState;
+      skipPhase.current = next.phase !== prevPhase.current;
+      dispatch({ type: "hydrate", state: next });
+      if (moment === "4") {
+        setTab("release");
+        spot("#sec-release");
+      } else if (view === "record") {
+        setTab("decisions");
+        spot("#sec-decisions");
+      } else if (view === "map") {
+        setTab("map");
+        spot("#sec-map");
+      } else {
+        setTab("review");
+        if (moment === "1") spot('tr[data-row="mohammed"]');
+        if (moment === "2") spot('tr[data-row="rashid"] [data-c="2"]');
+        if (moment === "3") spot("#stage-3", "#scan-value");
+      }
+      return;
+    }
     if (want && groups.some((g) => g.sections.some((x) => x.id === want))) setTab(want as Tab);
-  }, [hydrated, setTab]);
+  }, [hydrated, setTab, dispatch]);
   useEffect(() => {
     if (hydrated && state.phase === "new" && !state.queue.length) dispatch({ type: "start", group: "run" });
   }, [hydrated, state.phase, state.queue.length, dispatch]);
@@ -94,6 +131,10 @@ export function CaseWorkspace() {
     const was = prevPhase.current;
     prevPhase.current = state.phase;
     if (!hydrated || was === state.phase) return;
+    if (skipPhase.current) {
+      skipPhase.current = false;
+      return;
+    }
     const go: Partial<Record<string, Tab>> = { in_review: "review", re_review: "review", executed: "release", rashid_ready: "release" };
     const t = go[state.phase];
     if (t) setTab(t);
@@ -137,6 +178,23 @@ export function CaseWorkspace() {
             ))}
           </nav>
         </header>
+        {jumped && (
+          <div role="status" className="flex items-center gap-3 border-b border-line bg-panel px-8 py-2 text-xs text-sub">
+            You jumped ahead. Reset demo to start from the beginning.
+            <button
+              type="button"
+              onClick={() => {
+                setJumped(false);
+                window.history.replaceState(null, "", window.location.pathname);
+                dispatch({ type: "reset" });
+                setTab("review");
+              }}
+              className="rounded-md border border-line bg-surface px-2.5 py-1 font-medium text-ink hover:bg-canvas"
+            >
+              Reset
+            </button>
+          </div>
+        )}
         <div className="min-h-0 flex-1 overflow-y-auto px-8 pb-12">
           <div key={group.id}>
             {group.id === "review" && (

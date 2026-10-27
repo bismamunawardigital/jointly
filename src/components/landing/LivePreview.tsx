@@ -52,7 +52,7 @@ export function MandateToggle({ before, after, see, label }: { before: string; a
           </StoreProvider>
         </div>
       </Frame>
-      <Link href="/demo/case/?tab=map" aria-label={label} className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-accent-ink hover:underline">
+      <Link href="/demo/case/?view=map" aria-label={label} className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-accent-ink hover:underline">
         {see} <ArrowRight className="h-3.5 w-3.5 rtl:-scale-x-100" />
       </Link>
     </div>

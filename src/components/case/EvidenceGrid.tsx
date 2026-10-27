@@ -129,7 +129,7 @@ export function EvidenceGrid() {
           </thead>
           <tbody>
             {rows.map((row, r) => (
-              <tr key={row.id} className="border-b border-line last:border-0">
+              <tr key={row.id} data-row={row.id} className="border-b border-line last:border-0">
                 <th scope="row" className="whitespace-nowrap px-3 py-2.5 text-left text-sm font-medium">{row.label}</th>
                 {row.cells.map((cell, c) => {
                   const key = `${r}-${c}`;

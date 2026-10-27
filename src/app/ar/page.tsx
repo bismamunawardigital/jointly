@@ -191,7 +191,7 @@ export default function CaseStudyAr() {
       <section id="mandate" className="mx-auto max-w-6xl border-t border-line px-6 py-20">
         <h2 className={h2}>تفويض بنص حر يصبح صورة.</h2>
         <figure className="mt-8">
-          <Link href="/demo/case/?tab=map" dir="ltr" className={`block ${frame}`}>
+          <Link href="/demo/case/?view=map" aria-label="افتح خريطة التوقيع في العرض" dir="ltr" className={`block ${frame}`}>
             {dots}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/landing/signing-map.png" alt="خريطة التوقيع: محمد وخليفة وراشد مع أزواج الاعتماد حسب المبلغ" className="w-full" />
@@ -228,7 +228,7 @@ export default function CaseStudyAr() {
           </div>
           <p className="mt-8 text-sm text-sub">
             تنتهي كل حالة بسجل قرار يستطيع المدقق قراءته: القاعدة، والاقتباس، والمعتمِد، والوقت.{" "}
-            <Link href="/demo/case/?tab=decisions" className="text-accent-ink underline underline-offset-2">شاهد سجل <B>Creekside</B></Link>
+            <Link href="/demo/case/?view=record" className="text-accent-ink underline underline-offset-2">شاهد سجل <B>Creekside</B></Link>
           </p>
         </div>
       </section>

@@ -237,6 +237,22 @@ export function previewState(v: 1 | 2): State {
   return autoVerify({ ...initialState, confirmed: 25000, log: [...initialState.log, ...groupEvents("revise").map((id) => ({ id, kind: "agent" as const }))] });
 }
 
+export function jumpState(to: "executed" | "live"): State {
+  const run = (s: State, a: Parameters<typeof reducer>[1]) => {
+    let n = reducer(s, a);
+    while (n.queue.length) n = reducer(n, { type: "reveal" });
+    return n;
+  };
+  let s = run(initialState, { type: "confirm", value: 25000 });
+  s = run(s, { type: "signoff" });
+  if (to === "live") {
+    s = run(s, { type: "release" });
+    s = run(s, { type: "renew" });
+    s = run(s, { type: "releaseRashid" });
+  }
+  return s;
+}
+
 export function StoreProvider({ children, frozen = false, initial }: { children: React.ReactNode; frozen?: boolean; initial?: State }) {
   const [state, dispatch] = useReducer(reducer, initial ?? initialState);
   const [hydrated, setHydrated] = useState(false);
