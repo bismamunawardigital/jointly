@@ -203,7 +203,7 @@ export function Avatar({ id, size = 28, held = false }: { id: PersonId; size?: n
         borderWidth: size >= 32 ? 2 : 1.5,
         borderColor: held ? "rgb(var(--held))" : `rgb(${c})`,
         background: held ? "rgb(var(--held-soft))" : `rgb(${c} / 0.12)`,
-        color: held ? "rgb(var(--held))" : `rgb(${c})`,
+        color: held ? "rgb(var(--held))" : `color-mix(in srgb, rgb(${c}) 62%, rgb(var(--ink)))`,
       }}
       title={held ? `${p.name} (held)` : p.name}
     >
