@@ -1,5 +1,7 @@
 "use client";
 
+import { PaymentWorkflow } from "./PaymentWorkflow";
+
 import { useEffect, useState } from "react";
 import { AlertTriangle, Check, ChevronRight, FlaskConical, Repeat, ShieldCheck, Undo2 } from "lucide-react";
 import { EvidenceKey, isAgentRead } from "@/data/seed";
@@ -208,7 +210,11 @@ export function ReviewView() {
               </div>
             </div>
 
-            {changes.length > 0 && !valid ? (
+            {s.id === 4 && !valid ? (
+              <div className="mt-4">
+                <PaymentWorkflow diff={version === 2} />
+              </div>
+            ) : changes.length > 0 && !valid ? (
               <ul className="mt-4 divide-y divide-accent/20 rounded-lg border border-accent/30 bg-accent-soft/30">
                 {changes.map((c) => (
                   <ClaimRow key={c.key} label={<Changed before={c.beforeLabel} after={c.afterLabel} />} value={<Changed before={c.before} after={c.after} />} sources={c.sources} />

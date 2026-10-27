@@ -10,6 +10,7 @@ import { eventById } from "@/lib/script";
 import { NeedsYou } from "./NeedsYou";
 import { ProgressView } from "./ProgressView";
 import { SigningMap } from "./SigningMap";
+import { PaymentWorkflow } from "./PaymentWorkflow";
 import { EvidenceView } from "./EvidenceView";
 import { PlanView } from "./PlanView";
 import { SimulatorView } from "./SimulatorView";
@@ -145,7 +146,17 @@ export function CaseWorkspace() {
               </div>
             )}
             {tab === "run" && <ProgressView />}
-            {tab === "map" && <SigningMap />}
+            {tab === "map" && (
+              <div className="max-w-4xl space-y-8">
+                <SigningMap />
+                {hasEvent(state, "plan-build") && (
+                  <div>
+                    <h3 className="mb-3 text-sm font-semibold">How a payment gets approved</h3>
+                    <PaymentWorkflow />
+                  </div>
+                )}
+              </div>
+            )}
             {tab === "evidence" && <EvidenceView />}
             {tab === "plan" && <PlanView />}
             {tab === "simulator" && <SimulatorView />}
