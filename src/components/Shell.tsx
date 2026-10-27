@@ -7,7 +7,6 @@ import { business, checker } from "@/data/seed";
 import { useStore } from "@/lib/store";
 import { cn } from "./ui";
 import { EvidenceDrawer } from "./EvidenceDrawer";
-import { Tour } from "./Tour";
 import { DensitySwitch, ThemeSwitch } from "./ThemeToggle";
 
 export function Logo({ className }: { className?: string }) {
@@ -67,7 +66,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
           </nav>
           <div className="mt-auto space-y-3 border-t border-line px-4 py-4">
             <button onClick={() => dispatch({ type: "tour", on: true, step: 0 })} className="flex items-center gap-2 text-sm text-sub hover:text-ink">
-              <Compass className="h-3.5 w-3.5" /> Replay tour
+              <Compass className="h-3.5 w-3.5" /> Show guide
             </button>
             <ThemeSwitch />
             <DensitySwitch />
@@ -93,7 +92,6 @@ export function Shell({ children }: { children: React.ReactNode }) {
         <main className="min-w-0 flex-1 overflow-hidden">{children}</main>
       </div>
       <EvidenceDrawer />
-      <Tour />
     </>
   );
 }

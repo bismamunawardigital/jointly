@@ -145,7 +145,7 @@ function reducer(s: State, a: Action): State {
     case "reset":
       return { ...initialState, tourOn: s.tourOn };
     case "watchRun":
-      return { ...blankState, tourOn: false, tourStep: s.tourStep };
+      return { ...blankState, tourOn: s.tourOn, tourStep: s.tourStep };
     case "start": {
       if (s.queue.length) return s;
       return { ...s, phase: groupPhase[a.group].running, queue: groupEvents(a.group), queueGroup: a.group };

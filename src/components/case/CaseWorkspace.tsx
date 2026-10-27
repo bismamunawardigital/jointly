@@ -4,7 +4,7 @@ import { Ban, Bot, Scale, UserCheck, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { business } from "@/data/seed";
 import { duration, lastTime, statusOf } from "@/lib/derive";
-import { Tab, hasEvent, useStore, jumpState, initialState } from "@/lib/store";
+import { Tab, hasEvent, useStore, jumpState, initialState, allApproved, State } from "@/lib/store";
 import { Pill, cn } from "@/components/ui";
 import { eventById } from "@/lib/script";
 import { LegacyBeat, NeedsYou } from "./NeedsYou";
@@ -198,6 +198,14 @@ export function CaseWorkspace() {
             ))}
           </nav>
         </header>
+        {state.tourOn && (
+          <div role="status" aria-label="Guide" className="flex items-center justify-between gap-3 border-b border-line bg-panel px-8 py-2 text-sm text-ink">
+            <p>{guideLine(state, agentWorking)}</p>
+            <button type="button" aria-label="Hide guide" onClick={() => dispatch({ type: "tour", on: false })} className="rounded p-1 text-muted hover:text-ink">
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        )}
         {jumped && (
           <div role="status" className="flex items-center gap-3 border-b border-line bg-panel px-8 py-2 text-xs text-sub">
             You jumped ahead. Reset demo to start from the beginning.
@@ -330,4 +338,30 @@ export function CaseWorkspace() {
       )}
     </div>
   );
+}
+
+function guideLine(s: State, working: boolean): string {
+  if (s.copy === "requested") return "Your reading is different, so the case waits for a clean copy from the branch.";
+  if (s.copy === "received" && s.confirmed === undefined) return "Check the clean copy from the branch, then confirm the value.";
+  if (working && s.queueGroup === "run") return "Watch the agent read the forms and the bank's systems on the right.";
+  if (working) return "The agent is working. Watch its steps on the right.";
+  switch (s.phase) {
+    case "in_review":
+    case "re_review":
+      return allApproved(s) ? "Everything checks out. Sign off the plan." : "Check the agent's reading on the letter, then confirm it.";
+    case "revising":
+      return "The agent is updating the plan with your value.";
+    case "executing":
+      return "The agent is setting things up. Nothing needed from you.";
+    case "executed":
+    case "releasing":
+      return "Release Mohammed and Khalifa now. Rashid waits for his new ID.";
+    case "partially_live":
+    case "renewing":
+      return "When Rashid's ID is renewed, release him too.";
+    case "live":
+      return "Everyone is live. Reset the demo to try it again.";
+    default:
+      return "Watch the agent read the forms and the bank's systems on the right.";
+  }
 }
