@@ -8,7 +8,7 @@ import { Tab, hasEvent, useStore } from "@/lib/store";
 import { Pill, cn } from "@/components/ui";
 import { eventById } from "@/lib/script";
 import { NeedsYou } from "./NeedsYou";
-import { RunView } from "./RunView";
+import { ProgressView } from "./ProgressView";
 import { EvidenceView } from "./EvidenceView";
 import { PlanView } from "./PlanView";
 import { SimulatorView } from "./SimulatorView";
@@ -22,7 +22,7 @@ type Group = { id: "review" | "setup" | "history"; label: string; sections: { id
 const groups: Group[] = [
   { id: "review", label: "Review", sections: [{ id: "review", label: "Checker review" }, { id: "release", label: "Release" }] },
   { id: "setup", label: "Setup", sections: [{ id: "evidence", label: "Identity" }, { id: "plan", label: "Users and roles" }, { id: "simulator", label: "Simulator" }] },
-  { id: "history", label: "History", sections: [{ id: "run", label: "Progress" }, { id: "decisions", label: "Decision record" }, { id: "audit", label: "Audit log" }] },
+  { id: "history", label: "History", sections: [{ id: "run", label: "Progress" }, { id: "audit", label: "Timeline" }, { id: "decisions", label: "Decision record" }] },
 ];
 const groupOf = (t: Tab) => groups.find((g) => g.sections.some((x) => x.id === t)) ?? groups[2];
 const how = [
@@ -143,7 +143,7 @@ export function CaseWorkspace() {
                 </p>
               </div>
             )}
-            {tab === "run" && <RunView />}
+            {tab === "run" && <ProgressView />}
             {tab === "evidence" && <EvidenceView />}
             {tab === "plan" && <PlanView />}
             {tab === "simulator" && <SimulatorView />}
