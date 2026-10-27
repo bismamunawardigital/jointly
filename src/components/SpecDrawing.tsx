@@ -1,16 +1,21 @@
+"use client";
+
+import { useState } from "react";
 import { Check, FileText, Undo2 } from "lucide-react";
 
 const hatch = {
   backgroundImage: "repeating-linear-gradient(45deg, rgb(var(--accent) / 0.16) 0 1px, transparent 1px 6px)",
 };
 
-function Gap({ h, label, horizontal = false }: { h: number; label: string; horizontal?: boolean }) {
+function Gap({ h, label, on, horizontal = false }: { h: number; label?: string; on: boolean; horizontal?: boolean }) {
   return (
     <div
-      className="relative flex shrink-0 items-center justify-center"
-      style={{ ...hatch, ...(horizontal ? { width: h } : { height: h }) }}
+      className="relative flex shrink-0 items-center justify-end"
+      style={{ ...(on ? hatch : {}), ...(horizontal ? { width: h } : { height: h }) }}
     >
-      <span className="absolute z-10 rounded bg-accent px-1 font-mono text-[9px] leading-[14px] text-onaccent">{label}</span>
+      {on && label && (
+        <span className="absolute -right-12 rounded bg-accent px-1 font-mono text-[9px] leading-[14px] text-onaccent">{label}</span>
+      )}
     </div>
   );
 }
@@ -32,15 +37,21 @@ const specs = [
 ];
 
 export function SpecDrawing() {
+  const [on, setOn] = useState(false);
   return (
     <div className="grid items-center gap-10 md:grid-cols-[1fr_220px]">
-      <div className="relative px-10 py-10">
-        <Tag className="left-10 top-3">
-          <span className="h-3 w-3 rounded-tl-[12px] border-l border-t border-accent" /> r 12
-        </Tag>
-        <Tag className="right-10 top-3">stage card · 560 max</Tag>
-        <div className="overflow-hidden rounded-xl border border-line-strong" style={hatch} aria-hidden>
-          <div className="m-5 flex flex-col bg-surface">
+      <div className="relative py-10 pl-2 pr-16">
+        <button
+          type="button"
+          aria-pressed={on}
+          onClick={() => setOn((v) => !v)}
+          className="absolute left-2 top-0 inline-flex h-7 items-center rounded-md border border-line bg-surface px-2.5 text-xs text-sub hover:text-ink"
+        >
+          {on ? "Hide spacing" : "Show spacing"}
+        </button>
+        {on && <Tag className="right-16 top-1.5">stage card · 560 max · r 12</Tag>}
+        <div className="rounded-xl border border-line-strong bg-surface" style={on ? hatch : undefined} aria-hidden>
+          <div className="m-5 flex flex-col rounded-sm bg-surface">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-xs text-muted">Stage 3 of 4</p>
@@ -50,10 +61,10 @@ export function SpecDrawing() {
                 <span className="h-1.5 w-1.5 rounded-full bg-warn" /> Waiting for you
               </span>
             </div>
-            <Gap h={16} label="16" />
+            <Gap h={16} label="16" on={on} />
             <div className="overflow-hidden rounded-lg border border-line">
-              <div className="flex" style={hatch}>
-                <Gap h={12} label="12" horizontal />
+              <div className="flex" style={on ? hatch : undefined}>
+                <Gap h={12} on={on} horizontal />
                 <div className="flex flex-1 flex-col">
                   <div className="h-2.5" />
                   <div className="flex items-start justify-between gap-4 bg-surface">
@@ -70,21 +81,23 @@ export function SpecDrawing() {
                 <div className="w-3" />
               </div>
             </div>
-            <Gap h={16} label="16" />
+            <Gap h={16} label="16" on={on} />
             <div className="flex">
               <span className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-accent px-3 text-sm font-medium text-onaccent">
                 <Check className="h-3.5 w-3.5" /> Approve stage 3
               </span>
-              <Gap h={8} label="8" horizontal />
+              <Gap h={8} on={on} horizontal />
               <span className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-bad/30 px-3 text-sm font-medium text-bad-ink">
                 <Undo2 className="h-3.5 w-3.5" /> Return to agent
               </span>
             </div>
           </div>
         </div>
-        <Tag className="bottom-3 left-10">
-          <span className="h-3 w-5" style={hatch} /> 20 padding all round
-        </Tag>
+        {on && (
+          <Tag className="bottom-2 left-2">
+            <span className="h-3 w-5" style={hatch} /> hatched = space. 20 card, 12 / 10 rows, 8 between buttons
+          </Tag>
+        )}
       </div>
       <dl className="divide-y divide-line border-y border-line text-sm">
         {specs.map((s) => (
