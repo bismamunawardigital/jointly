@@ -9,6 +9,7 @@ import { Pill, cn } from "@/components/ui";
 import { eventById } from "@/lib/script";
 import { NeedsYou } from "./NeedsYou";
 import { ProgressView } from "./ProgressView";
+import { SigningMap } from "./SigningMap";
 import { EvidenceView } from "./EvidenceView";
 import { PlanView } from "./PlanView";
 import { SimulatorView } from "./SimulatorView";
@@ -21,7 +22,7 @@ import { CommandPalette } from "@/components/CommandPalette";
 type Group = { id: "review" | "setup" | "history"; label: string; sections: { id: Tab; label: string }[] };
 const groups: Group[] = [
   { id: "review", label: "Review", sections: [{ id: "review", label: "Checker review" }, { id: "release", label: "Release" }] },
-  { id: "setup", label: "Setup", sections: [{ id: "evidence", label: "Identity" }, { id: "plan", label: "Users and roles" }, { id: "simulator", label: "Simulator" }] },
+  { id: "setup", label: "Setup", sections: [{ id: "map", label: "Signing map" }, { id: "evidence", label: "Identity" }, { id: "plan", label: "Users and roles" }, { id: "simulator", label: "Simulator" }] },
   { id: "history", label: "History", sections: [{ id: "run", label: "Progress" }, { id: "audit", label: "Timeline" }, { id: "decisions", label: "Decision record" }] },
 ];
 const groupOf = (t: Tab) => groups.find((g) => g.sections.some((x) => x.id === t)) ?? groups[2];
@@ -35,7 +36,7 @@ const paletteTabs = groups.map((g) => ({ id: g.sections[0].id, label: g.label })
 
 export function CaseWorkspace() {
   const { state, dispatch, tab, setTab, hydrated } = useStore();
-  const readyAt: Partial<Record<Tab, string>> = { evidence: "id-digital", plan: "plan-build", simulator: "plan-build", review: "submit", release: "ex-readback" };
+  const readyAt: Partial<Record<Tab, string>> = { map: "plan-build", evidence: "id-digital", plan: "plan-build", simulator: "plan-build", review: "submit", release: "ex-readback" };
   const notStarted = !!readyAt[tab] && !hasEvent(state, readyAt[tab]!);
   const st = state.paused && state.queue.length ? { label: state.handedOver ? "With a maker" : "Paused", tone: "warn" as const } : statusOf[state.phase];
   const now = lastTime(state);
@@ -144,10 +145,16 @@ export function CaseWorkspace() {
               </div>
             )}
             {tab === "run" && <ProgressView />}
+            {tab === "map" && <SigningMap />}
             {tab === "evidence" && <EvidenceView />}
             {tab === "plan" && <PlanView />}
             {tab === "simulator" && <SimulatorView />}
-            {tab === "review" && <ReviewView />}
+            {tab === "review" && (
+              <>
+                <div className="mb-6 max-w-4xl"><SigningMap compact /></div>
+                <ReviewView />
+              </>
+            )}
             {tab === "release" && <ReleaseView />}
             {tab === "decisions" && <DecisionView />}
             {tab === "audit" && <AuditView />}

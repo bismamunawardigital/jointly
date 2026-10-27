@@ -186,7 +186,7 @@ interface Ctx {
   setTab: (t: Tab) => void;
 }
 
-export type Tab = "run" | "evidence" | "plan" | "simulator" | "review" | "release" | "decisions" | "audit";
+export type Tab = "run" | "map" | "evidence" | "plan" | "simulator" | "review" | "release" | "decisions" | "audit";
 
 const StoreContext = createContext<Ctx | null>(null);
 
