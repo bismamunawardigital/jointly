@@ -4,9 +4,12 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, Check } from "lucide-react";
 import { Avatar, cn } from "@/components/ui";
-import { HeroScene } from "./HeroScene";
+import { HeroScene, type SceneText } from "./HeroScene";
 
-function Identity() {
+type Labels = { id: string; expired: string; letter: string; alt: string; scene?: SceneText };
+const en: Labels = { id: "EID ending", expired: "EID expired 14 Aug", letter: "The letter says AED", alt: "Blurry scan of the 2023 amendment letter" };
+
+function Identity({ v }: { v: Labels }) {
   return (
     <div className="flex flex-col items-center gap-2.5">
       {["Mohammed Al Mansoori", "MOHAMMED ALMANSOORI", "Mohd Al-Mansouri"].map((n) => (
@@ -16,13 +19,13 @@ function Identity() {
       ))}
       <ArrowRight className="h-4 w-4 rotate-90 text-muted" />
       <span className="flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1.5 text-sm font-medium">
-        <Avatar id="mohammed" size={28} /> EID ending 3391
+        <Avatar id="mohammed" size={28} /> {v.id} <bdi>3391</bdi>
       </span>
     </div>
   );
 }
 
-function Hold() {
+function Hold({ v }: { v: Labels }) {
   return (
     <div className="flex items-end gap-6">
       <Avatar id="mohammed" size={52} />
@@ -30,20 +33,20 @@ function Hold() {
       <div className="flex flex-col items-center gap-2">
         <Avatar id="rashid" size={52} held />
         <span className="whitespace-nowrap rounded-md border border-bad/30 bg-bad-soft px-2.5 py-1 font-mono text-[11px] font-medium text-bad-ink">
-          EID expired 14 Aug
+          {v.expired}
         </span>
       </div>
     </div>
   );
 }
 
-function Scan() {
+function Scan({ v }: { v: Labels }) {
   return (
     <div className="w-full max-w-sm space-y-3">
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/scans/svs-amd-2023.png" width={1100} height={380} loading="lazy" decoding="async" alt="Blurry scan of the 2023 amendment letter" className="w-full rounded-lg border border-line" />
+      <img src="/scans/svs-amd-2023.png" width={1100} height={380} loading="lazy" decoding="async" alt={v.alt} className="w-full rounded-lg border border-line" />
       <div className="flex items-center gap-2 text-sm text-sub">
-        The letter says AED
+        {v.letter}
         <span className="rounded-md border-2 border-accent bg-surface px-2 py-0.5 font-medium text-ink">25,000</span>
         <Check className="h-4 w-4 text-ok" strokeWidth={3} />
       </div>
@@ -51,10 +54,10 @@ function Scan() {
   );
 }
 
-function Live() {
+function Live({ v }: { v: Labels }) {
   return (
     <div className="w-full max-w-md">
-      <HeroScene />
+      <HeroScene t={v.scene} />
     </div>
   );
 }
@@ -66,7 +69,7 @@ const steps = [
   { title: "Releases what's safe, holds the rest", tab: "release", V: Live },
 ];
 
-export function Moments({ titles, see = "See it live" }: { titles?: string[]; see?: string }) {
+export function Moments({ titles, see = "See it live", v = en }: { titles?: string[]; see?: string; v?: Labels }) {
   const [active, setActive] = useState(0);
   const refs = useRef<(HTMLLIElement | null)[]>([]);
   useEffect(() => {
@@ -83,7 +86,7 @@ export function Moments({ titles, see = "See it live" }: { titles?: string[]; se
       <div className="hidden md:block">
         <div aria-hidden className="sticky top-24 flex h-[380px] items-center justify-center rounded-card border border-line bg-surface p-8 shadow-sm">
           <div key={active} className="flex w-full animate-enter justify-center">
-            <V />
+            <V v={v} />
           </div>
         </div>
       </div>
@@ -100,7 +103,7 @@ export function Moments({ titles, see = "See it live" }: { titles?: string[]; se
             <p className={cn("tnum text-sm", i === active ? "text-accent-ink" : "text-muted")}>0{i + 1}</p>
             <p className={cn("mt-2 font-display text-2xl leading-snug md:text-3xl", i !== active && "md:text-muted")}>{titles?.[i] ?? s.title}</p>
             <div aria-hidden className="mt-4 flex justify-center rounded-card border border-line bg-surface p-6 md:hidden">
-              <s.V />
+              <s.V v={v} />
             </div>
             <Link href={`/demo/case/?moment=${i + 1}`} className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-accent-ink hover:underline">
               {see} <ArrowRight className="h-3.5 w-3.5 rtl:-scale-x-100" />
