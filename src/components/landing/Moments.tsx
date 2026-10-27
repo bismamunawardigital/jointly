@@ -29,7 +29,7 @@ function Hold() {
       <Avatar id="khalifa" size={52} />
       <div className="flex flex-col items-center gap-2">
         <Avatar id="rashid" size={52} held />
-        <span className="whitespace-nowrap rounded-full px-2 py-0.5 text-[11px] font-medium" style={{ background: "rgb(var(--held-soft))", color: "rgb(var(--held))" }}>
+        <span className="whitespace-nowrap rounded-md border border-bad/30 bg-bad-soft px-2.5 py-1 font-mono text-[11px] font-medium text-bad-ink">
           EID expired 14 Aug
         </span>
       </div>

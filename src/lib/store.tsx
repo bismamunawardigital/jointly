@@ -232,8 +232,13 @@ export type Tab = "run" | "map" | "evidence" | "plan" | "simulator" | "review" |
 
 const StoreContext = createContext<Ctx | null>(null);
 
-export function StoreProvider({ children, frozen = false }: { children: React.ReactNode; frozen?: boolean }) {
-  const [state, dispatch] = useReducer(reducer, initialState);
+export function previewState(v: 1 | 2): State {
+  if (v === 1) return initialState;
+  return autoVerify({ ...initialState, confirmed: 25000, log: [...initialState.log, ...groupEvents("revise").map((id) => ({ id, kind: "agent" as const }))] });
+}
+
+export function StoreProvider({ children, frozen = false, initial }: { children: React.ReactNode; frozen?: boolean; initial?: State }) {
+  const [state, dispatch] = useReducer(reducer, initial ?? initialState);
   const [hydrated, setHydrated] = useState(false);
   const [evidenceOpen, setEvidenceOpen] = useState<EvidenceKey | null>(null);
   const [tab, setTab] = useState<Tab>("review");

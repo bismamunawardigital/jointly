@@ -7,6 +7,7 @@ import { AgentMark, Avatar } from "@/components/ui";
 import { HeroFrame } from "@/components/landing/HeroFrame";
 import { Gloss } from "@/components/landing/Gloss";
 import { DaysSwimlane } from "@/components/landing/DaysSwimlane";
+import { LiveGrid, MandateToggle } from "@/components/landing/LivePreview";
 import { Moments } from "@/components/landing/Moments";
 import { LangSwitch } from "@/components/landing/LangSwitch";
 import { statsEn } from "@/content/stats";
@@ -63,9 +64,10 @@ const lanes: { icon: React.ReactNode; title: string; items: string[]; never?: bo
 ];
 
 const chip = "rounded-full border border-line bg-canvas px-2 py-0.5 text-[11px]";
-const principles: { title: string; mini: React.ReactNode }[] = [
+const principles: { title: string; why: string; mini: React.ReactNode }[] = [
   {
     title: "Match on IDs, never names",
+    why: "Names are spelled 3 ways across systems. IDs aren't.",
     mini: (
       <div className="flex items-center gap-2">
         <span className={`${chip} text-muted line-through`}>Mohd</span>
@@ -76,6 +78,7 @@ const principles: { title: string; mini: React.ReactNode }[] = [
   },
   {
     title: "Every claim has a source",
+    why: "Sara checks the source, not the agent's word.",
     mini: (
       <div className="flex items-center gap-2">
         <span className="h-2 w-24 rounded bg-ink/20" />
@@ -87,6 +90,7 @@ const principles: { title: string; mini: React.ReactNode }[] = [
   },
   {
     title: "Show what it isn't sure about",
+    why: "Sara's attention goes to the 1 value that needs it.",
     mini: (
       <div className="flex items-center gap-2">
         <span className="h-8 w-16 rounded bg-ink/15 blur-[2px]" />
@@ -96,6 +100,7 @@ const principles: { title: string; mini: React.ReactNode }[] = [
   },
   {
     title: "Approval stays with the content",
+    why: "If the plan changes, the old approval doesn't carry over.",
     mini: (
       <div className="flex gap-1.5">
         {[1, 2].map((n) => (
@@ -111,6 +116,7 @@ const principles: { title: string; mini: React.ReactNode }[] = [
   },
   {
     title: "Rules live in code",
+    why: "The same input gives the same answer, and audit can replay it.",
     mini: (
       <div className="flex items-center gap-2">
         <ShieldCheck className="h-6 w-6 text-accent" />
@@ -121,6 +127,7 @@ const principles: { title: string; mini: React.ReactNode }[] = [
   },
   {
     title: "Release what's safe",
+    why: "2 people go live today, instead of 3 waiting on 1 ID.",
     mini: (
       <div className="flex items-center gap-3">
         <span className="flex">
@@ -148,6 +155,38 @@ const sources = [
   { s: "Amershi et al., CHI 2019", href: "https://doi.org/10.1145/3290605.3300233", f: "Support quick correction." },
   { s: "EU AI Act, Article 14", href: "https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-14", f: "Humans must be able to stop the system." },
   { s: "Feng, McDonald and Zhang, 2025", href: "https://arxiv.org/html/2506.12469v1", f: "Autonomy is a design choice." },
+];
+
+const why: [string, string][] = [
+  ["The mandate is free text. 'Khalifa alone up to 10,000' lives in a scanned letter, not a field.", "The agent reads it and quotes the line."],
+  ["The systems disagree. Finacle says 'any two'. SVS has the detail.", "Rules pick the newer, more specific source and show why."],
+  ["There's no API to write to. Digital Banking Admin is a screen that times out.", "The agent writes step by step, reads it back and retries safely."],
+];
+
+const systems: { name: string; tag: "Read" | "Write" | "Check"; d: string }[] = [
+  { name: "Finacle", tag: "Read", d: "Customer records and the short mandate code" },
+  { name: "SVS", tag: "Read", d: "Signed mandates and letters, often scanned" },
+  { name: "EFR", tag: "Check", d: "Is the Emirates ID valid today?" },
+  { name: "Digital Banking Admin", tag: "Write", d: "Users, roles, rules, workflows. Assumed: no write API." },
+];
+
+const adminRun: [string, string, "warn" | "plain" | "ok"][] = [
+  ["10:45", "Timed out. Nothing half-written.", "warn"],
+  ["10:45", "Retried.", "plain"],
+  ["10:46", "Read back: 0 differences from the approved plan.", "ok"],
+];
+
+const measures = [
+  "Shadow agreement: how often the agent's plan matches the maker's",
+  "Override rate: how often Sara changes what the agent read",
+  "Form to first login, per case",
+  "Unapproved writes: must stay at 0",
+];
+
+const elsewhere: [string, string][] = [
+  ["Government", "Renewing a trade licence across registries that don't share data."],
+  ["Healthcare", "Insurance pre-approval from free-text referral letters."],
+  ["Banking", "Mandate changes on existing accounts, using the same 4 systems."],
 ];
 
 const unknowns = [
@@ -233,7 +272,7 @@ export default function CaseStudy() {
             </ul>
           </div>
         </div>
-        <p className="mt-4 text-sm text-sub">The agent works in the background. Sara only sees decisions.</p>
+        <p className="mt-4 text-sm text-sub">A typical morning across several cases. The demo opens one of them.</p>
       </section>
 
       <section id="slow" className="border-y border-line">
@@ -278,13 +317,58 @@ export default function CaseStudy() {
         </div>
       </section>
 
+      <section id="why" className="border-t border-line">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <h2 className={h2}>Why an agent, and not a better form</h2>
+          <ul className="mt-8 space-y-3">
+            {why.map(([mess, fix]) => (
+              <li key={mess} className="grid items-center gap-3 md:grid-cols-[1fr_auto_1fr]">
+                <p className="rounded-card border border-line bg-surface px-5 py-4 text-sm text-sub">{mess}</p>
+                <ArrowRight aria-hidden className="mx-auto h-5 w-5 rotate-90 text-accent md:rotate-0" />
+                <p className="rounded-card border border-ok/30 bg-ok-soft px-5 py-4 text-sm font-medium text-ok-ink">{fix}</p>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-6 max-w-3xl text-sub">A rules-only bot breaks on the first free-text line. A model alone can&apos;t be trusted with money. So the model reads and the rules decide.</p>
+        </div>
+      </section>
+
+      <section id="legacy" className="border-t border-line">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <h2 className={h2}>How it works with 4 legacy systems</h2>
+          <ul className="mt-8 grid grid-cols-2 gap-3 md:grid-cols-4">
+            {systems.map((x) => (
+              <li key={x.name} className="rounded-card border border-line bg-surface p-5">
+                <div className="flex items-center justify-between gap-2">
+                  <p className="font-semibold">{x.name}</p>
+                  <span className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${x.tag === "Write" ? "bg-accent-soft text-accent-ink" : x.tag === "Check" ? "bg-ok-soft text-ok-ink" : "bg-panel text-sub"}`}>{x.tag}</span>
+                </div>
+                <p className="mt-2 text-sm text-sub">{x.d}</p>
+              </li>
+            ))}
+          </ul>
+          <ol className="mt-4 flex flex-col gap-2 md:ms-auto md:w-fit md:flex-row md:items-center">
+            {adminRun.map(([t, l, tone], i) => (
+              <li key={l} className="flex items-center gap-2 text-sm">
+                {i > 0 && <ArrowRight aria-hidden className="hidden h-4 w-4 text-muted md:block" />}
+                <span className={`rounded-full px-3 py-1 ${tone === "warn" ? "bg-warn-soft text-warn-ink" : tone === "ok" ? "bg-ok-soft text-ok-ink" : "bg-panel text-sub"}`}>
+                  <span className="tnum font-mono text-xs">{t}</span> {l}
+                </span>
+              </li>
+            ))}
+          </ol>
+          <p className="mt-4 text-xs text-muted">Synthetic systems and data, modelled on common core-banking setups.</p>
+        </div>
+      </section>
+
       <section id="shadow" className="border-t border-line">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className={h2}>It watched before it acted</h2>
+          <p className="mt-2 max-w-2xl text-sub">Before it acts, the agent runs in shadow mode. It watches CF makers and compares its plan with theirs.</p>
           <div className="mt-8 flex flex-col gap-4 md:flex-row md:items-center">
             <p className="rounded-card border border-line bg-surface px-5 py-4"><span className="tnum font-display text-3xl">12</span> <span className="text-sm text-sub">maker cases observed</span></p>
             <ArrowRight className="h-5 w-5 rotate-90 text-accent md:rotate-0" />
-            <p className="rounded-card border border-line bg-surface px-5 py-4"><span className="tnum font-display text-3xl">3</span> <span className="text-sm text-sub">steps missing from the SOP</span></p>
+            <p className="rounded-card border border-line bg-surface px-5 py-4"><span className="tnum font-display text-3xl">3</span> <span className="text-sm text-sub">steps missing from the written procedure</span></p>
             <ArrowRight className="h-5 w-5 rotate-90 text-accent md:rotate-0" />
             <ul className="flex flex-wrap gap-2">
               {learned.map((l) => <li key={l} className="rounded-full bg-accent-soft px-3 py-1.5 text-sm text-accent-ink">{l}</li>)}
@@ -297,31 +381,17 @@ export default function CaseStudy() {
       <section id="grid" className="mx-auto max-w-6xl px-6 py-20">
         <h2 className={h2}>Every source in one grid</h2>
         <div className="mt-8">
-          <div className="overflow-hidden rounded-card border border-line bg-surface shadow-lg">
-            <div className="flex items-center gap-1.5 border-b border-line bg-panel/60 px-4 py-2.5">
-              <span className="h-2.5 w-2.5 rounded-full bg-line-strong" /><span className="h-2.5 w-2.5 rounded-full bg-line-strong" /><span className="h-2.5 w-2.5 rounded-full bg-line-strong" />
-            </div>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/landing/evidence-grid.png" alt="The evidence grid. Rows for Mohammed, Khalifa, Rashid and the mandate. One amber cell on the 2023 letter." className="w-full object-cover object-left max-md:h-56" />
-          </div>
+          <LiveGrid />
         </div>
         <p className="mt-4 text-sm text-sub">17 cells match bank records. Sara checks the 1 value the agent had to read.</p>
       </section>
 
       <section id="mandate" className="border-t border-line mx-auto max-w-6xl px-6 py-20">
         <h2 className={h2}>A free-text mandate becomes a picture.</h2>
-        <figure className="mt-8">
-          <Link href="/demo/case/?tab=map" className="block overflow-hidden rounded-card border border-line bg-surface shadow-sm">
-            <div className="flex gap-1.5 border-b border-line px-4 py-2.5">
-              {[0, 1, 2].map((i) => (
-                <span key={i} className="h-2.5 w-2.5 rounded-full bg-line" />
-              ))}
-            </div>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/landing/signing-map.png" alt="Signing map: Mohammed, Khalifa and Rashid with approval pairs by amount" className="w-full" />
-          </Link>
-          <figcaption className="mt-3 text-sub">Sara can check it in seconds.</figcaption>
-        </figure>
+        <p className="mt-2 text-sub">Sara can check it in seconds.</p>
+        <div className="mt-8">
+          <MandateToggle before="Before Sara checks the letter" after="After" see="See it live" label="Open the signing map in the demo" />
+        </div>
       </section>
 
       <section id="moments" className="border-t border-line">
@@ -358,38 +428,18 @@ export default function CaseStudy() {
         </div>
       </section>
 
-      <section id="patterns" className="border-t border-line">
-        <div className="mx-auto max-w-6xl px-6 py-20">
-          <h2 className={h2}>6 patterns I&apos;d reuse</h2>
-          <div className="mt-10 grid gap-4 sm:grid-cols-2 md:grid-cols-3">
-            {principles.map((p) => (
-              <div key={p.title} className="rounded-card border border-line bg-surface p-6">
-                <div aria-hidden className="flex h-12 items-center">{p.mini}</div>
-                <p className="mt-4 font-semibold">{p.title}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section id="gaveup" className="border-t border-line">
-        <div className="mx-auto max-w-6xl px-6 py-20">
-          <h2 className={h2}>What I gave up</h2>
-          <ul className="mt-8 grid gap-4 md:grid-cols-2">
-            {gaveUp.map((g) => (
-              <li key={g.d} className="rounded-card border border-line bg-surface p-6">
-                <p className="font-medium">{g.d}</p>
-                <p className="mt-1 text-sm text-sub">{g.why}</p>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
-
       <section id="heard" className="border-t border-line">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className={h2}>What I heard, what I changed</h2>
-          <ul className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-10 max-w-2xl rounded-card border border-line bg-surface p-6">
+            <span className="rounded-full border border-line px-2.5 py-0.5 text-xs text-muted">Paraphrased</span>
+            <p className="mt-3 font-display text-lg leading-snug">Setting up one joint-signatory business takes 4 to 5 days. Most of it is reading customer documents and free-text instructions in SVS, then setting it up by hand.</p>
+            <p className="mt-2 text-xs text-muted">CF team member, paraphrased from an interview</p>
+            <ArrowRight className="my-4 h-4 w-4 rotate-90 text-accent" />
+            <p className="text-sm font-medium">So the agent reads, and Sara only checks what it read.</p>
+          </div>
+          <p className="mt-10 text-xs font-medium uppercase tracking-wide text-muted">Signals from teams already using agents</p>
+          <ul className="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {heard.map((h) => (
               <li key={h.href} className="flex flex-col rounded-card border border-line bg-surface p-6">
                 <p className="font-display text-lg leading-snug">&ldquo;{h.q}&rdquo;</p>
@@ -417,6 +467,49 @@ export default function CaseStudy() {
         </div>
       </section>
 
+      <section id="patterns" className="border-t border-line">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <h2 className={h2}>6 patterns I&apos;d reuse</h2>
+          <div className="mt-10 grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+            {principles.map((p) => (
+              <div key={p.title} className="rounded-card border border-line bg-surface p-6">
+                <div aria-hidden className="flex h-12 items-center">{p.mini}</div>
+                <p className="mt-4 font-semibold">{p.title}</p>
+                <p className="mt-1 text-sm text-sub">{p.why}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="gaveup" className="border-t border-line">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <h2 className={h2}>What I gave up</h2>
+          <ul className="mt-8 grid gap-4 md:grid-cols-2">
+            {gaveUp.map((g) => (
+              <li key={g.d} className="rounded-card border border-line bg-surface p-6">
+                <p className="font-medium">{g.d}</p>
+                <p className="mt-1 text-sm text-sub">{g.why}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      <section id="measure" className="border-t border-line">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <h2 className={h2}>How I&apos;d know it works</h2>
+          <ul className="mt-8 grid gap-3 sm:grid-cols-2 md:grid-cols-4">
+            {measures.map((m) => (
+              <li key={m} className="rounded-card border border-line bg-surface p-5">
+                <span className="rounded-full border border-line px-2 py-0.5 text-[11px] text-muted">Plan, not results</span>
+                <p className="mt-3 text-sm font-medium">{m}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
       <section id="next" className="border-t border-line">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className={h2}>What I&apos;d test next</h2>
@@ -427,10 +520,24 @@ export default function CaseStudy() {
               </li>
             ))}
           </ul>
-          <details className="mt-6 max-w-2xl text-sm">
-            <summary className="cursor-pointer text-sub">Why not just fix the data?</summary>
-            <p className="mt-2 text-muted">Clean data still has to become users, roles and workflows. That translation is the job.</p>
-          </details>
+        </div>
+      </section>
+
+      <section id="elsewhere" className="border-t border-line">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <h2 className={h2}>Where I&apos;d use this pattern next</h2>
+          <ul className="mt-8 grid gap-3 md:grid-cols-3">
+            {elsewhere.map(([k, v]) => (
+              <li key={k} className="rounded-card border border-line bg-surface p-5">
+                <div className="flex items-center justify-between">
+                  <p className="font-semibold">{k}</p>
+                  <span className="rounded-full border border-line px-2 py-0.5 text-[11px] text-muted">Illustrative</span>
+                </div>
+                <p className="mt-2 text-sm text-sub">{v}</p>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-6 text-sub">Same shape: read messy documents, let rules decide, a person approves, read back what was written.</p>
         </div>
       </section>
 
