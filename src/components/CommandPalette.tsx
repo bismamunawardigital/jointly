@@ -80,14 +80,14 @@ export function CommandPalette({ tabs }: { tabs: { id: Tab; label: string }[] })
             aria-activedescendant={items[i] ? `palette-opt-${i}` : undefined}
             className="h-12 flex-1 bg-transparent text-sm outline-none placeholder:text-muted"
           />
-          <kbd className="rounded border border-line px-1.5 text-[10px] text-muted">Esc</kbd>
+          <kbd className="rounded border border-line px-1.5 text-xs text-muted">Esc</kbd>
         </div>
         <ul id="palette-list" role="listbox" className="max-h-80 overflow-y-auto py-1">
           {items.length === 0 && <li className="px-4 py-3 text-sm text-muted">Nothing matches. Try a name, a system or a tab.</li>}
           {items.map((x, n) => (
             <li key={x.kind + x.label} id={`palette-opt-${n}`} role="option" aria-selected={n === i}>
               <button tabIndex={-1} onMouseEnter={() => setI(n)} onClick={() => go(n)} className={cn("flex w-full items-center gap-3 px-4 py-2 text-left text-sm", n === i && "bg-accent-soft text-accent-ink")}>
-                <span className="w-14 shrink-0 text-[11px] text-muted">{x.kind}</span>
+                <span className="w-14 shrink-0 text-xs text-muted">{x.kind}</span>
                 <span className="truncate">{x.label}</span>
               </button>
             </li>

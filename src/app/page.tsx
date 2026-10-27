@@ -99,7 +99,7 @@ const lanes: { icon: React.ReactNode; title: string; items: string[]; never?: bo
   { icon: <Ban className="h-10 w-10 text-bad" />, title: "Never allowed", items: ["The agent never approves its own work, never sends passwords and never matches people by name."], never: true },
 ];
 
-const chip = "rounded-full border border-line bg-canvas px-2 py-0.5 text-[11px]";
+const chip = "rounded-full border border-line bg-canvas px-2 py-0.5 text-xs";
 const heard = [
   { q: "you start clicking Approve on autopilot and stop reading the diffs.", who: "Agent user, Hacker News", href: "https://news.ycombinator.com/item?id=48830674", d: "Exact copies fold away." },
   { q: "The bank showed them a confidence score. The regulator shut it down.", who: "Banking AI lead, LinkedIn", href: "https://www.linkedin.com/posts/johnforrester_a-regulator-asked-a-bank-to-explain-its-ai-activity-7438239662009114624-WaU0", d: "Rules, not scores." },
@@ -241,7 +241,7 @@ export default function CaseStudy() {
               </div>
             ))}
           </dl>
-          <p className="mt-2 text-[11px] text-muted">These numbers come from a scripted demo case, not from a real bank.</p>
+          <p className="mt-2 text-xs text-muted">These numbers come from a scripted demo case, not from a real bank.</p>
           <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3">
             <Sara />
             <a href="#problem" className="text-sm text-accent-ink hover:underline">Or read the case study in 3 minutes ↓</a>
@@ -362,7 +362,7 @@ export default function CaseStudy() {
               <li key={x.name} className={`${card} p-5`}>
                 <div className="flex items-center justify-between gap-2">
                   <p className="font-semibold">{x.name}</p>
-                  <span className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${x.tag === "Write" ? "bg-accent-soft text-accent-ink" : x.tag === "Check" ? "bg-ok-soft text-ok-ink" : "bg-panel text-sub"}`}>{x.tag}</span>
+                  <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${x.tag === "Write" ? "bg-accent-soft text-accent-ink" : x.tag === "Check" ? "bg-ok-soft text-ok-ink" : "bg-panel text-sub"}`}>{x.tag}</span>
                 </div>
                 <p className="mt-2 text-sm text-sub">{x.d}</p>
               </li>
@@ -373,7 +373,7 @@ export default function CaseStudy() {
               <li key={l} className="flex items-center gap-2 text-sm">
                 {i > 0 && <ArrowRight aria-hidden className="hidden h-4 w-4 text-muted md:block" />}
                 <span className={`rounded-full px-3 py-1 ${tone === "warn" ? "bg-warn-soft text-warn-ink" : tone === "ok" ? "bg-ok-soft text-ok-ink" : "bg-panel text-sub"}`}>
-                  <span className="tnum font-mono text-xs">{t}</span> {l}
+                  <span className="tnum text-xs">{t}</span> {l}
                 </span>
               </li>
             ))}

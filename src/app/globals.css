@@ -224,3 +224,7 @@ h1, h2, h3 {
   background: rgb(var(--canvas));
   color: rgb(var(--ink));
 }
+
+svg.lucide {
+  stroke-width: 1.5;
+}

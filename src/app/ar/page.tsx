@@ -138,7 +138,7 @@ const scene = {
 const h2 = "text-3xl font-semibold leading-snug md:text-4xl";
 const primary = "inline-flex h-11 items-center gap-1.5 rounded-lg bg-accent px-5 text-sm font-medium text-onaccent transition-colors hover:bg-accent-hover";
 const frame = "overflow-hidden rounded-card border border-line bg-surface shadow-lg";
-const tag = "rounded-full border border-line px-2 py-0.5 text-[11px] text-muted";
+const tag = "rounded-full border border-line px-2 py-0.5 text-xs text-muted";
 const dots = (
   <div className="flex items-center gap-1.5 border-b border-line bg-panel/60 px-4 py-2.5">
     {[0, 1, 2].map((i) => <span key={i} className="h-2.5 w-2.5 rounded-full bg-line-strong" />)}
@@ -191,7 +191,7 @@ export default function CaseStudyAr() {
               افتح العرض التجريبي (<B>5</B> دقائق) <ArrowLeft className="h-4 w-4" />
             </Link>
           </div>
-          <p className="mt-3 text-[11px] text-muted">حالة افتراضية. لم تُقَس في بنك حقيقي. العرض التجريبي باللغة الإنجليزية.</p>
+          <p className="mt-3 text-xs text-muted">حالة افتراضية. لم تُقَس في بنك حقيقي. العرض التجريبي باللغة الإنجليزية.</p>
         </div>
         <HeroFrame callouts={["سحب الوكيل كل السجلات من Finacle وSVS وEFR", "الأخضر = نُسخ كما هو. الكهرماني = اضطر الوكيل لقراءة مستند", "سارة تقرر الكهرماني فقط. ثم تعتمد الخطة."]} />
       </section>
@@ -242,7 +242,7 @@ export default function CaseStudyAr() {
                 <div className="mt-2 flex h-8 items-center gap-1">
                   {d.icons.map((I, i) => <I key={i} aria-hidden className="h-4 w-4 text-sub md:h-6 md:w-6" />)}
                 </div>
-                <p className="mt-1 text-[11px] leading-snug text-sub md:text-xs">{d.label}</p>
+                <p className="mt-1 text-xs leading-snug text-sub md:text-xs">{d.label}</p>
               </div>
             ))}
           </div>
@@ -294,7 +294,7 @@ export default function CaseStudyAr() {
               <li key={x.name} className="rounded-card border border-line bg-surface p-5">
                 <div className="flex items-center justify-between gap-2">
                   <p lang="en" dir="ltr" className="font-sans font-semibold">{x.name}</p>
-                  <span className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${x.k === "w" ? "bg-accent-soft text-accent-ink" : x.k === "c" ? "bg-ok-soft text-ok-ink" : "bg-panel text-sub"}`}>{x.tag}</span>
+                  <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${x.k === "w" ? "bg-accent-soft text-accent-ink" : x.k === "c" ? "bg-ok-soft text-ok-ink" : "bg-panel text-sub"}`}>{x.tag}</span>
                 </div>
                 <p className="mt-2 text-sm text-sub">{x.d}</p>
               </li>
@@ -305,7 +305,7 @@ export default function CaseStudyAr() {
               <li key={i} className="flex items-center gap-2 text-sm">
                 {i > 0 && <ArrowLeft aria-hidden className="hidden h-4 w-4 text-muted md:block" />}
                 <span className={`rounded-full px-3 py-1 ${tone === "warn" ? "bg-warn-soft text-warn-ink" : tone === "ok" ? "bg-ok-soft text-ok-ink" : "bg-panel text-sub"}`}>
-                  <bdi className="tnum font-mono text-xs">{t}</bdi> {l}
+                  <bdi className="tnum text-xs">{t}</bdi> {l}
                 </span>
               </li>
             ))}

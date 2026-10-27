@@ -65,7 +65,7 @@ function coverage(stageId: number, version: 1 | 2) {
 function Coverage({ n, of, label }: { n: number; of: number; label: string }) {
   const full = n === of;
   return (
-    <span className={cn("inline-flex items-center gap-1.5 text-[11px]", full ? "text-ok-ink" : "text-warn-ink")} title={`${label}: ${n} of ${of}`}>
+    <span className={cn("inline-flex items-center gap-1.5 text-xs", full ? "text-ok-ink" : "text-warn-ink")} title={`${label}: ${n} of ${of}`}>
       <span className="flex gap-0.5" aria-hidden>
         {Array.from({ length: of }, (_, i) => (
           <span key={i} className={cn("h-1.5 w-3 rounded-full", i < n ? (full ? "bg-ok" : "bg-warn") : "bg-line-strong")} />
@@ -166,7 +166,7 @@ function ScanCheck({ canAct, onConfirm }: { canAct: boolean; onConfirm: (v: numb
       <div className="mt-3 flex flex-wrap items-start gap-5">
         <figure className="w-[520px] max-w-full">
           {clean ? <CleanLetter /> : <ScanLens src="/scans/svs-amd-2023.png" alt="Scan of the 2023 amendment letter. The last digits of the amount are smudged." />}
-          <figcaption className="mt-1 text-[11px] text-muted">{clean ? "Clean copy from the branch" : "2023 amendment letter · scan from SVS · click to zoom"}</figcaption>
+          <figcaption className="mt-1 text-xs text-muted">{clean ? "Clean copy from the branch" : "2023 amendment letter · scan from SVS · click to zoom"}</figcaption>
         </figure>
         <div className="min-w-[220px] flex-1 space-y-3 text-sm">
           {waiting ? (
@@ -387,7 +387,7 @@ export function ReviewView() {
             <p className="mt-0.5 text-xs text-sub">2 decisions in this case: the letter value, then this sign-off.</p>
           </div>
           <Button disabled={failing.length > 0} onClick={() => dispatch({ type: "signoff" })}>
-            Sign off plan v{version} · 4 stages <kbd className="ml-1 rounded border border-current/30 px-1 text-[11px]">S</kbd>
+            Sign off plan v{version} · 4 stages <kbd className="ml-1 rounded border border-current/30 px-1 text-xs">S</kbd>
           </Button>
         </Card>
       )}
@@ -399,7 +399,7 @@ export function ReviewView() {
             </span>
             <span className="min-w-0">
               <span className="block text-sm font-medium">{s.short}</span>
-              <span className="block text-[11px] text-muted">{chip(i)}</span>
+              <span className="block text-xs text-muted">{chip(i)}</span>
             </span>
           </a>
         ))}
@@ -459,7 +459,7 @@ export function ReviewView() {
                 ) : (
                   <Pill tone="neutral">{reviewing ? "Approve the stage above first" : "Waiting"}</Pill>
                 )}
-                {stale && <p className="text-[11px] text-muted">Earlier approval no longer matches</p>}
+                {stale && <p className="text-xs text-muted">Earlier approval no longer matches</p>}
               </div>
             </div>
 

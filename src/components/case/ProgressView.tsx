@@ -140,7 +140,7 @@ export function ProgressView() {
                       {tech[key] ? "Hide technical details" : "Technical details"}
                     </button>
                     {tech[key] && (
-                      <ul className="mt-2 space-y-1 font-mono text-[11px] text-muted">
+                      <ul className="mt-2 space-y-1 tnum text-xs text-muted">
                         {events.map((e) => {
                           const ev = eventById(e.id);
                           return <li key={e.id}>{ev.time} · {ev.actor} · {ev.call} → {ev.system}</li>;
@@ -166,7 +166,7 @@ export function ProgressView() {
 function Who({ who }: { who: Line["who"] }) {
   if (who === "agent") return <span className="flex shrink-0 items-center gap-1.5 text-xs text-muted"><AgentMark size={20} /> Agent</span>;
   if (who === "rules") return <span className="flex shrink-0 items-center gap-1.5 text-xs text-muted"><span className="flex h-5 w-5 items-center justify-center rounded-full bg-ok-soft text-ok-ink"><ShieldCheck className="h-3 w-3" /></span> Rules</span>;
-  return <span className="flex shrink-0 items-center gap-1.5 text-xs text-muted"><span className="flex h-5 w-5 items-center justify-center rounded-full border border-ink text-[9px] font-semibold">SM</span> Sara</span>;
+  return <span className="flex shrink-0 items-center gap-1.5 text-xs text-muted"><span className="flex h-5 w-5 items-center justify-center rounded-full border border-ink text-xs font-semibold">SM</span> Sara</span>;
 }
 
 function DocThumb({ k }: { k: EvidenceKey }) {
@@ -188,7 +188,7 @@ function DocThumb({ k }: { k: EvidenceKey }) {
         )}
       </div>
       <figcaption className="mt-1 text-xs text-sub">{e.title}</figcaption>
-      <p className="text-[11px] text-muted">{e.system}</p>
+      <p className="text-xs text-muted">{e.system}</p>
     </figure>
   );
 }

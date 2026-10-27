@@ -60,7 +60,7 @@ export function DecisionView() {
                 {s.title}
               </p>
               <p className="tnum text-xs text-muted">
-                Approved by {a.by} · {a.at} · <span className="font-mono">#{a.hash.length.toString(16)}{s.items.length}</span>
+                Approved by {a.by} · {a.at} · <span className="tnum">#{a.hash.length.toString(16)}{s.items.length}</span>
               </p>
             </div>
             <ul className="mt-3 divide-y divide-line">

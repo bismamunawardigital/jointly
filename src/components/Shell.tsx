@@ -82,13 +82,13 @@ export function Shell({ children }: { children: React.ReactNode }) {
               <RotateCcw className="h-3.5 w-3.5" /> Reset demo
             </button>
             <div className="flex items-center gap-2.5 pt-2">
-              <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-surface text-[11px] font-semibold shadow-sm ring-1 ring-line">{checker.initials}</span>
+              <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-surface text-xs font-semibold shadow-sm ring-1 ring-line">{checker.initials}</span>
               <div className="leading-tight">
                 <p className="text-sm font-medium">{checker.name}</p>
                 <p className="text-xs text-muted">{checker.role}</p>
               </div>
             </div>
-            <p className="text-[11px] leading-snug text-muted">Portfolio demo. Synthetic data, no real bank systems.</p>
+            <p className="text-xs leading-snug text-muted">Portfolio demo. Synthetic data, no real bank systems.</p>
           </div>
         </aside>
         <main className="min-w-0 flex-1 overflow-hidden">{children}</main>

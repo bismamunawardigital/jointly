@@ -32,7 +32,7 @@ function Hold({ v }: { v: Labels }) {
       <Avatar id="khalifa" size={52} />
       <div className="flex flex-col items-center gap-2">
         <Avatar id="rashid" size={52} held />
-        <span className="whitespace-nowrap rounded-md border border-bad/30 bg-bad-soft px-2.5 py-1 font-mono text-[11px] font-medium text-bad-ink">
+        <span className="whitespace-nowrap rounded-md border border-bad/30 bg-bad-soft px-2.5 py-1 tnum text-xs font-medium text-bad-ink">
           {v.expired}
         </span>
       </div>

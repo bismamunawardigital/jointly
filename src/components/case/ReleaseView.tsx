@@ -33,7 +33,7 @@ function Rings({ ids, size = 40 }: { ids: PersonId[]; size?: number }) {
 
 function Undo({ children }: { children: React.ReactNode }) {
   return (
-    <span className="inline-flex items-center gap-1 rounded-md bg-bad-soft px-1.5 py-0.5 text-[11px] font-medium text-bad-ink">
+    <span className="inline-flex items-center gap-1 rounded-md bg-bad-soft px-1.5 py-0.5 text-xs font-medium text-bad-ink">
       <TriangleAlert className="h-3 w-3" /> {children}
     </span>
   );
@@ -209,14 +209,14 @@ export function ReleaseView() {
             <div className="mt-5 space-y-4 rounded-[28px] border border-line bg-panel p-4">
               {msgs.map((m) => (
                 <div key={m.afterEvent}>
-                  <p className="text-[11px] text-muted">
+                  <p className="text-xs text-muted">
                     {m.channel} to {m.to}
                   </p>
                   <p className="mt-1 max-w-[90%] rounded-2xl rounded-tl-sm bg-surface px-3 py-2 text-sm shadow-sm">{m.text}</p>
-                  <p className="mt-1 text-[11px] text-sub">{m.approval === "auto" ? "Pre-approved template, sent automatically" : "Approved by Sara M. with the release"}</p>
+                  <p className="mt-1 text-xs text-sub">{m.approval === "auto" ? "Pre-approved template, sent automatically" : "Approved by Sara M. with the release"}</p>
                   <details className="mt-1">
-                    <summary className="cursor-pointer text-[11px] text-muted">Technical details</summary>
-                    <p className="mt-1 font-mono text-[11px] text-muted">template {m.template}</p>
+                    <summary className="cursor-pointer text-xs text-muted">Technical details</summary>
+                    <p className="mt-1 tnum text-xs text-muted">template {m.template}</p>
                   </details>
                 </div>
               ))}

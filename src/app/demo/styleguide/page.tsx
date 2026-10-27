@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { AgentMark, Avatar, Button, Card, Pill, ScreenHead, Tween } from "@/components/ui";
+import { Database, FileSignature, ScanFace, Settings } from "lucide-react";
 import { Logo } from "@/components/Shell";
 
 const swatches: [string, string, string][] = [
@@ -48,7 +49,7 @@ function Board({ theme }: { theme: "light" | "dark" }) {
             <div key={token}>
               <div className="h-12 rounded-xl border border-line" style={{ background: `rgb(var(--${token}))` }} />
               <p className="mt-1.5 text-xs font-medium">{name}</p>
-              <p className="text-[11px] text-muted">{use}</p>
+              <p className="text-xs text-muted">{use}</p>
             </div>
           ))}
         </div>
@@ -87,7 +88,7 @@ function Board({ theme }: { theme: "light" | "dark" }) {
         <div className="space-y-1">
           {scale.map((s) => (
             <div key={s} className="flex items-baseline gap-4">
-              <span className="tnum w-8 text-[11px] text-muted">{s}</span>
+              <span className="tnum w-8 text-xs text-muted">{s}</span>
               <span className={s >= 28 ? "font-display leading-none" : ""} style={{ fontSize: s }}>
                 {s >= 28 ? "2 of 3 can go live" : "Khalifa can approve alone up to AED 25,000"}
               </span>
@@ -97,6 +98,23 @@ function Board({ theme }: { theme: "light" | "dark" }) {
       </section>
 
       <section>
+        <div className="mb-8">
+          <h2 className="mb-3 text-xs font-medium text-muted">Type scale, surfaces, avatars, icons</h2>
+          <ul className="space-y-2">
+            <li className="font-display text-[56px] font-semibold leading-[60px]">Display 56/60</li>
+            <li className="font-display text-[40px] font-semibold leading-[44px]">H2 40/44</li>
+            <li className="text-[22px] font-semibold leading-[28px]">H3 22/28</li>
+            <li className="text-lg">Body-L 18/28</li>
+            <li className="text-base">Body 16/26 (landing)</li>
+            <li className="text-sm">UI 14/20 (demo)</li>
+            <li className="tnum text-xs">Small 13/18 · times, amounts and IDs use tabular figures: 10:45 · AED 25,000 · RCIF 100587</li>
+          </ul>
+          <p className="mt-4 text-sm text-sub">Cards are 12px radius with a 1px border and no shadow. Floating things get one soft shadow. At most 2 bordered levels, inner groups use the sunk fill. Pills are for status only.</p>
+          <div className="mt-4 flex items-center gap-6">
+            <span className="flex">{(["mohammed", "khalifa", "rashid"] as const).map((id, i) => <span key={id} className={i ? "-ml-2" : ""}><Avatar id={id} size={40} /></span>)}</span>
+            <span className="flex items-center gap-4 text-sm text-sub"><Database className="h-5 w-5" />Finacle<FileSignature className="h-5 w-5" />SVS<ScanFace className="h-5 w-5" />EFR<Settings className="h-5 w-5" />Digital Banking Admin</span>
+          </div>
+        </div>
         <h2 className="mb-3 text-xs font-medium text-muted">Buttons and status</h2>
         <div className="flex flex-wrap items-center gap-2">
           <Button variant="primary">Approve stage 1</Button>

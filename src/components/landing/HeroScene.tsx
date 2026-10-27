@@ -28,7 +28,7 @@ export function HeroScene({ t = en }: { t?: SceneText }) {
                 <span className="hs hs-r-held absolute">
                   <Avatar id="rashid" size={56} held />
                 </span>
-                <span className="hs hs-r-held absolute -bottom-8 whitespace-nowrap rounded-full px-2 py-0.5 text-[11px] font-medium" style={held}>
+                <span className="hs hs-r-held absolute -bottom-8 whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-medium" style={held}>
                   {t.hold}
                 </span>
               </>
@@ -41,7 +41,7 @@ export function HeroScene({ t = en }: { t?: SceneText }) {
         ))}
       </div>
       <div className="hs hs-ladder absolute inset-x-8 top-[130px] md:inset-x-14 md:top-[175px]">
-        <div className="flex h-9 overflow-hidden rounded-lg border border-line text-[11px] text-sub">
+        <div className="flex h-9 overflow-hidden rounded-lg border border-line text-xs text-sub">
           <div className="flex w-1/2 items-center px-3" style={{ background: "rgb(var(--brand-soft))" }}>
             {t.low}
           </div>

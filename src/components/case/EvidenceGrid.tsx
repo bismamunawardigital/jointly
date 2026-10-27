@@ -124,7 +124,7 @@ export function EvidenceGrid() {
         <table className="w-full min-w-[860px] border-collapse text-xs" onKeyDown={onKey}>
           <caption className="sr-only">Evidence for each signatory, by source. Use arrow keys to move, Enter to open.</caption>
           <thead>
-            <tr className="border-b border-line text-left text-[11px] text-muted">
+            <tr className="border-b border-line text-left text-xs text-muted">
               <th scope="col" className="px-3 py-2.5 font-medium">Who</th>
               {cols.map((c) => (
                 <th key={c} scope="col" className="px-3 py-2.5 font-medium">{c}</th>
@@ -163,11 +163,11 @@ export function EvidenceGrid() {
                         )}
                       >
                         {glyph[cell.tone]}
-                        <span className={/^(EID|RCIF) /.test(cell.text) ? "min-w-0 whitespace-nowrap font-mono text-[11px]" : "min-w-0"}>{cell.text}</span>
+                        <span className={/^(EID|RCIF) /.test(cell.text) ? "min-w-0 whitespace-nowrap tnum text-xs" : "min-w-0"}>{cell.text}</span>
                       </button>
                       {active === key && tip && (
                         <div role="tooltip" className="absolute left-2 top-full z-20 mt-1 w-64 rounded-lg border border-line bg-surface p-3 text-xs text-sub shadow-lg">
-                          {cell.src && <p className="mb-1 font-mono text-[11px] text-muted">{evidence[cell.src].ref}</p>}
+                          {cell.src && <p className="mb-1 tnum text-xs text-muted">{evidence[cell.src].ref}</p>}
                           {tip}
                         </div>
                       )}

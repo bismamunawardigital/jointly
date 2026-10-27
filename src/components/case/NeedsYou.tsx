@@ -34,14 +34,14 @@ export function LegacyBeat() {
   if (!beat || !state.queue.length) return null;
   return (
     <p role="status" className="flex items-center gap-2 rounded-card border border-line bg-surface px-4 py-3 text-sm">
-      <span className="rounded-full bg-panel px-2 py-0.5 text-[11px] text-sub">Legacy system</span>
+      <span className="rounded-full bg-panel px-2 py-0.5 text-xs text-sub">Legacy system</span>
       {beat}
     </p>
   );
 }
 
 function Key({ k }: { k: string }) {
-  return <kbd className="ml-1 rounded border border-current/30 px-1 text-[11px] opacity-70">{k}</kbd>;
+  return <kbd className="ml-1 rounded border border-current/30 px-1 text-xs opacity-70">{k}</kbd>;
 }
 
 export function NeedsYou() {

@@ -272,7 +272,7 @@ export function Guide() {
           <div className="flex h-[300px] flex-col items-center justify-center gap-3 rounded-2xl bg-canvas p-4 text-center">
             <Avatar id="khalifa" size={48} />
             <p className="text-sm font-medium">{phone[phoneAt]}</p>
-            <p className="text-[11px] text-muted">{phoneAt + 1} of {phone.length}</p>
+            <p className="text-xs text-muted">{phoneAt + 1} of {phone.length}</p>
           </div>
           <button type="button" className="mt-2 w-full text-center text-xs text-sub hover:text-ink" onClick={() => setPhoneAt(phone.length)}>Skip</button>
         </div>

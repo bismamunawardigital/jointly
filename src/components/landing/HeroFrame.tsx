@@ -56,6 +56,7 @@ export function HeroFrame({ callouts, url = "jointly · Creekside · Review" }: 
         : ["Plan v1 is ready. 1 value needs your eye.", "Stages 1 and 2 passed by rule."];
   return (
     <figure className="min-w-0">
+      <div dir="ltr" className="relative rounded-card bg-panel p-4 md:p-6 md:pb-40">
       <div
         dir="ltr"
         onMouseEnter={() => setPaused(true)}
@@ -110,11 +111,24 @@ export function HeroFrame({ callouts, url = "jointly · Creekside · Review" }: 
         <Pin n={2} cls="left-[60%] top-[50%]" />
         <Pin n={3} cls="right-[8%] bottom-[38px]" />
       </div>
-      <p className="mt-2 text-xs text-muted">Watch the agent get stuck on a blurry letter and ask Sara for help instead of guessing.</p>
+      <div aria-hidden className="absolute -bottom-2 left-6 hidden w-[46%] rounded-card border border-line bg-surface p-3 shadow-lg md:block">
+        <p className="text-xs font-medium text-muted">SVS letter 2023 · clause 2</p>
+        <div className="mt-2 overflow-hidden rounded-md bg-panel">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/scans/svs-amd-2023.png" alt="" className="h-16 w-full scale-[2.2] object-cover object-[62%_58%] blur-[0.4px]" />
+        </div>
+        <p className="mt-2 text-xs text-sub">Khalifa may approve alone up to AED <span className="tnum font-medium text-ink">25,000</span></p>
+      </div>
+      <div aria-hidden className="absolute -bottom-10 right-4 hidden w-[150px] rounded-[22px] border-[5px] border-ink bg-surface p-2.5 shadow-lg md:block">
+        <p className="text-center text-xs text-muted">Messages</p>
+        <p className="mt-2 rounded-2xl rounded-bl-md bg-panel p-2 text-xs leading-[17px] text-ink">Creekside General Trading: your online banking is ready. Tap to verify your Emirates ID and set your password.</p>
+      </div>
+      </div>
+      <p className="mt-14 text-xs text-muted">Watch the agent get stuck on a blurry letter and ask Sara for help instead of guessing.</p>
       <ol className="mt-3 space-y-1.5 text-sm text-sub">
         {callouts.map((c, i) => (
           <li key={c} className="flex gap-2.5">
-            <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-ink text-[11px] font-semibold text-canvas">{i + 1}</span>
+            <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-ink text-xs font-semibold text-canvas">{i + 1}</span>
             {c}
           </li>
         ))}

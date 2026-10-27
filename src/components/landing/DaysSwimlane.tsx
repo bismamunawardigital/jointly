@@ -22,11 +22,11 @@ function Lane({ lanes, nodes, edges, pains, loop, empty }: { lanes: string[]; no
       {lanes.map((l, i) => (
         <g key={l}>
           <rect x="0" y={i * LH} width="1000" height={LH} fill={i % 2 ? "rgb(var(--panel))" : "rgb(var(--surface))"} />
-          <text x="12" y={i * LH + LH / 2 + 4} fontSize="12" fontWeight="600" fill="rgb(var(--sub))">{l}</text>
+          <text x="12" y={i * LH + LH / 2 + 4} fontSize="13" fontWeight="600" fill="rgb(var(--sub))">{l}</text>
         </g>
       ))}
       {empty?.map((e) => (
-        <text key={e.lane} x={x(3)} y={y(e.lane) + NH / 2 + 4} fontSize="11" fill="rgb(var(--muted))">{e.text}</text>
+        <text key={e.lane} x={x(3)} y={y(e.lane) + NH / 2 + 4} fontSize="13" fill="rgb(var(--muted))">{e.text}</text>
       ))}
       {edges.map(([a, b]) => {
         const A = mid(a), B = mid(b);
@@ -41,7 +41,7 @@ function Lane({ lanes, nodes, edges, pains, loop, empty }: { lanes: string[]; no
       {nodes.map((n, i) => (
         <g key={i}>
           <rect x={x(n.col)} y={y(n.lane)} width={NW} height={NH} rx="8" fill="rgb(var(--surface))" stroke={stroke[n.tone ?? "plain"]} strokeWidth="1.5" />
-          <text x={x(n.col) + NW / 2} y={y(n.lane) + (n.text.includes("|") ? 16 : 24)} textAnchor="middle" fontSize="11" fill="rgb(var(--ink))">
+          <text x={x(n.col) + NW / 2} y={y(n.lane) + (n.text.includes("|") ? 16 : 24)} textAnchor="middle" fontSize="13" fill="rgb(var(--ink))">
             {n.text.split("|").map((t, k) => (
               <tspan key={k} x={x(n.col) + NW / 2} dy={k ? 13 : 0}>{t}</tspan>
             ))}
@@ -51,7 +51,7 @@ function Lane({ lanes, nodes, edges, pains, loop, empty }: { lanes: string[]; no
       {pains.map((p) => (
         <g key={p.n}>
           <circle cx={p.at[0]} cy={p.at[1]} r="10" fill="rgb(var(--warn))" />
-          <text x={p.at[0]} y={p.at[1] + 4} textAnchor="middle" fontSize="11" fontWeight="700" fill="#fff">{p.n}</text>
+          <text x={p.at[0]} y={p.at[1] + 4} textAnchor="middle" fontSize="13" fontWeight="700" fill="#fff">{p.n}</text>
         </g>
       ))}
     </svg>
@@ -111,7 +111,7 @@ export function DaysSwimlane({ t }: { t: { lanes: string[]; today: string; joint
       <ol className={`mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm text-sub ${view === "jointly" ? "md:invisible" : ""}`}>
         {t.pains.map((p, i) => (
           <li key={p} className="flex items-center gap-2">
-            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-warn text-[11px] font-bold text-white">{i + 1}</span>
+            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-warn text-xs font-bold text-white">{i + 1}</span>
             {p}
           </li>
         ))}
