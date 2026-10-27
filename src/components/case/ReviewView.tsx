@@ -7,7 +7,7 @@ import { SigningMap } from "./SigningMap";
 
 import { useEffect, useState } from "react";
 import { AlertTriangle, Check, ChevronRight, Repeat, ShieldCheck, Undo2 } from "lucide-react";
-import { EvidenceKey, isAgentRead } from "@/data/seed";
+import { EvidenceKey, isAgentRead, people } from "@/data/seed";
 import { approvalValid, buildStages, diffStage, fmt, policyChecks } from "@/lib/rules";
 import { allApproved, hasEvent, useStore } from "@/lib/store";
 import { useTourTarget } from "@/components/Tour";
@@ -303,6 +303,7 @@ export function ReviewView() {
       <div {...tour}>
         <EvidenceGrid />
       </div>
+      {reviewing && allApproved(state) && <SetupConfirm limit={version === 1 ? 10_000 : 25_000} />}
       {reviewing && allApproved(state) && (
         <Card className="flex flex-wrap items-center gap-4 border-line-strong p-4">
           <div className="min-w-0 flex-1">
@@ -502,5 +503,31 @@ export function ReviewView() {
       })}
       </>)}
     </div>
+  );
+}
+
+function SetupConfirm({ limit }: { limit: number }) {
+  const login = people.find((p) => p.id === "mohammed")?.digitalUser;
+  const rows = [
+    { id: "mohammed" as const, role: "Signs with any one other partner", access: login?.existing ? `Keeps his login ${login.userId}` : "New login", stage: 2 },
+    { id: "khalifa" as const, role: `Signs alone up to AED ${fmt(limit)}, above that with one other`, access: "New login", stage: 3 },
+    { id: "rashid" as const, role: "Signs with any one other partner", access: "New login once his ID is renewed", stage: 1, held: true },
+  ];
+  return (
+    <Card className="p-4">
+      <p className="text-sm font-medium">What gets set up when you sign off</p>
+      <ul className="mt-2 divide-y divide-line">
+        {rows.map((r) => (
+          <li key={r.id} className="flex items-center gap-3 py-2.5">
+            <Avatar id={r.id} size={28} held={r.held} />
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-medium">{people.find((p) => p.id === r.id)?.name}</p>
+              <p className="text-xs text-sub">{r.role} · {r.access}</p>
+            </div>
+            <a href={`#stage-${r.stage}`} className="shrink-0 text-xs font-medium text-accent-ink hover:underline">Edit in stage {r.stage}</a>
+          </li>
+        ))}
+      </ul>
+    </Card>
   );
 }
