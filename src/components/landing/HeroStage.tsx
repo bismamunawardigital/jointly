@@ -46,9 +46,11 @@ export function HeroStage() {
     const status = (k: string) => { const p = $("spill"); p.dataset.s = k; $("stext").textContent = STATUS[k]; };
     const logReset = (title: string) => { $("lt").textContent = title; $("lines").replaceChildren(); };
     const logAdd = ([time, text, cls]: [string, string, string?], tone = "") => {
-      const el = document.createElement("div"); el.className = "ll " + (cls ?? tone);
-      const b = document.createElement("b"); b.textContent = time; el.append(b, document.createTextNode(text));
+      const el = document.createElement("div"); el.className = "e " + (cls ?? tone);
+      const tm = document.createElement("time"); tm.textContent = time;
+      const sp = document.createElement("span"); sp.textContent = text; el.append(tm, sp);
       const box = $("lines"); box.append(el); while (box.children.length > 3) box.firstElementChild?.remove();
+      requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add("on")));
     };
     const setTab = (j: boolean) => { $("tToday").setAttribute("aria-pressed", String(!j)); $("tJointly").setAttribute("aria-pressed", String(j)); };
     const resetAll = () => {
@@ -62,10 +64,10 @@ export function HeroStage() {
     };
     async function today(t: number) {
       setTab(false); resetAll(); todayLayout(); clockTo("Day 1"); status("manual"); logReset("Email thread");
-      S("p1", "manual"); await sleep(700, t);
-      for (let i = 0; i < 4; i++) { S(docs[i], "manual"); S(wires[i], "manual"); if (i === 0) logAdd(TODAY_LOG[0], "manual"); if (i === 2) { clockTo("Day 2"); logAdd(TODAY_LOG[1], "manual"); } await sleep(750, t); }
+      S("p1", "manual"); logAdd(TODAY_LOG[0], "manual"); await sleep(700, t);
+      for (let i = 0; i < 4; i++) { S(docs[i], "manual"); S(wires[i], "manual"); if (i === 2) { clockTo("Day 2"); logAdd(TODAY_LOG[1], "manual"); } await sleep(750, t); }
       S("p2", "manual"); S("wDown", "manual"); S("wLoop", "manual");
-      for (let n = 1; n <= 4; n++) { $("status").textContent = "Sent back and forth, round " + n + " of 4"; if (n === 2) { clockTo("Day 3"); logAdd(TODAY_LOG[2], "manual"); } if (n === 4) { clockTo("Day 4"); logAdd(TODAY_LOG[3], "manual"); } await sleep(700, t); }
+      for (let n = 1; n <= 4; n++) { $("status").textContent = "Sent back and forth, round " + n + " of 4"; if (n === 1) logAdd(TODAY_LOG[2], "manual"); if (n === 4) logAdd(TODAY_LOG[3], "manual"); if (n === 2) clockTo("Day 3"); if (n === 4) clockTo("Day 4"); await sleep(700, t); }
       S("wOut", "manual"); S("phone", "manual"); $("pill").textContent = "Still waiting"; $("status").textContent = "The customer is still waiting"; clockTo("Day 5");
       await sleep(2400, t);
     }
@@ -91,8 +93,8 @@ export function HeroStage() {
       $("bubble").classList.remove("on"); S("approve", "ok"); S("d2", "ok"); S("w2", "done"); S("wDown", "done");
       ["w0", "w1", "w3"].forEach((w) => S(w, "done")); $("status").textContent = "Approved once"; status("agent"); logAdd(AGENT_LOG[4]);
       await tweenClock(53, 98, 700, t);
-      S("wOut", "ok"); await tweenClock(98, 114, 500, t);
-      S("wOut", "done"); S("phone", "ok"); $("pill").textContent = "Ready"; $("status").textContent = ""; status("ok"); logAdd(AGENT_LOG[5]);
+      S("wOut", "ok"); logAdd(AGENT_LOG[5]); await tweenClock(98, 114, 500, t);
+      S("wOut", "done"); S("phone", "ok"); $("pill").textContent = "Ready"; $("status").textContent = ""; status("ok");
       await sleep(1200, t);
       $("phone").classList.add("home-on");
       await sleep(2800, t);
@@ -101,12 +103,12 @@ export function HeroStage() {
       setTab(true); resetAll(); $("p1").style.opacity = "0"; $("p2").style.opacity = "0"; $("wLoop").style.opacity = "0";
       $("agent").classList.add("on"); $("approve").classList.add("on"); docs.forEach((d) => S(d, "ok")); ["w0", "w1", "w2", "w3", "wDown", "wOut"].forEach((w) => S(w, "done"));
       S("approve", "ok"); S("phone", "ok"); $("pill").textContent = "Ready"; clockTo("1h 54m"); $("was").classList.add("on");
-      $("phone").classList.add("home-on"); status("ok"); logReset("Agent activity"); AGENT_LOG.slice(3).forEach((l) => logAdd(l));
+      $("phone").classList.add("home-on"); status("ok"); logReset("Agent activity");
     };
     const todayFinal = () => {
       setTab(false); resetAll(); todayLayout(); docs.forEach((d) => S(d, "manual")); wires.forEach((w) => S(w, "manual"));
       ["p1", "p2"].forEach((n) => S(n, "manual")); S("wLoop", "manual"); S("wDown", "manual"); S("wOut", "manual"); S("phone", "manual"); $("pill").textContent = "Still waiting"; clockTo("Day 5");
-      status("manual"); logReset("Email thread"); TODAY_LOG.slice(1).forEach((l) => logAdd(l, "manual"));
+      status("manual"); logReset("Email thread");
     };
     async function run(startJointly: boolean) {
       const t = ++token;
@@ -140,7 +142,7 @@ export function HeroStage() {
         <div className="win">
         <div className="titlebar">
           <span className="dots" aria-hidden="true"><i /><i /><i /></span>
-          <span className="ttl">Jointly · Creekside General Trading LLC</span>
+          <span><b>Jointly</b> · Creekside General Trading LLC</span>
           <span className="spill" id="jh-spill" data-s="manual" role="status"><span className="sd" /><span id="jh-stext">Waiting on people</span></span>
         </div>
         <div className="stage" role="img" aria-label="Animation: today, two people read old bank systems and scanned documents by hand and pass the case back and forth for 5 days. With Jointly, an AI agent does both jobs, asks a person about one unclear value, and the customer gets online banking in 1 hour 54 minutes.">
@@ -198,7 +200,7 @@ export function HeroStage() {
             <div className="clock" id="jh-clock">Day 1</div>
             <div className="was" id="jh-was">usually 5 days</div>
           </div>
-          <div className="abs phone" id="jh-phone" style={{ left: "78.6%", top: "7%", width: "17%", height: "66%" }}>
+          <div className="abs phone" id="jh-phone" style={{ left: "78.6%", top: "5%", width: "17%", height: "66%" }}>
             <span className="notch" />
             <div className="notif">Jointly Bank · now<b>Your online banking is ready</b></div>
             <div className="co">Creekside General Trading</div>
@@ -217,8 +219,8 @@ export function HeroStage() {
               <span className="lab">Creekside&apos;s signing partners</span>
             </div>
           </div>
-          <div className="abs log" style={{ left: "71%", top: "76.5%", width: "26%" }} aria-live="off">
-            <div className="lt" id="jh-lt">Email thread</div>
+          <div className="abs log" style={{ left: "70%", top: "76%", width: "28%" }}>
+            <div className="h" id="jh-lt">Email thread</div>
             <div id="jh-lines" />
           </div>
         </div>
