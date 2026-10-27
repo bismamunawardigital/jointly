@@ -3,10 +3,10 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowRight } from "lucide-react";
-import { business, otherCases } from "@/data/seed";
+import { business, checker, otherCases } from "@/data/seed";
 import { statusOf, stepStates } from "@/lib/derive";
 import { useStore } from "@/lib/store";
-import { Card, Pill, Tone, cn } from "@/components/ui";
+import { AgentMark, Card, Pill, Tone, cn } from "@/components/ui";
 
 const toneOf: Record<string, Tone> = { "Agent working": "accent", "Needs you": "warn", "Partially live": "ok", Live: "ok", New: "neutral" };
 
@@ -63,6 +63,9 @@ export default function CommandCenter() {
                     {business.name} <ArrowRight className="h-3.5 w-3.5 text-accent" />
                   </Link>
                   <p className="font-mono text-[11px] text-muted">{business.iban}</p>
+                  <p className="mt-1 flex items-center gap-1 text-[11px] text-muted">
+                    Owner <span className="font-medium text-sub">{checker.name}</span> · Helping <AgentMark size={12} className="text-person-agent" /> Agent
+                  </p>
                 </td>
                 <td className="px-4 py-3 text-sub">Joint signatories (3)</td>
                 <td className="px-4 py-3 text-sub">{state.phase === "live" ? "Done" : active?.label ?? "Intake & EFR"}</td>

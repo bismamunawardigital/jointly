@@ -2,7 +2,7 @@
 
 import { Ban, Scale, UserCheck, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { business } from "@/data/seed";
+import { business, checker } from "@/data/seed";
 import { duration, lastTime, statusOf } from "@/lib/derive";
 import { Tab, hasEvent, useStore, jumpState, initialState, allApproved, State } from "@/lib/store";
 import { Pill, cn, AgentMark } from "@/components/ui";
@@ -234,6 +234,11 @@ export function CaseWorkspace() {
             <h1 className="truncate font-display text-lg leading-tight text-ink">{business.name}</h1>
             <Pill tone={st.tone}>{st.label}</Pill>
             <bdi dir="ltr" className="hidden font-mono text-muted xl:inline">{business.iban}</bdi>
+            <span className="hidden items-center gap-1.5 text-muted lg:flex">
+              Owner <span className="font-medium text-ink">{checker.name}</span>
+              <span aria-hidden>·</span>
+              Helping <AgentMark size={14} className="text-person-agent" /> <span className="font-medium text-ink">Agent</span>
+            </span>
             <span className="ml-auto flex items-center gap-4 text-muted">
               {now && (
                 <span>
