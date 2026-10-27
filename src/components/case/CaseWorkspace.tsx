@@ -147,6 +147,7 @@ export function CaseWorkspace() {
         <header className="border-b border-line px-8 pb-0 pt-4">
           <div className="flex items-center gap-3 text-xs">
             <h1 className="truncate font-display text-lg leading-tight text-ink">{business.name}</h1>
+            <button type="button" onClick={() => window.dispatchEvent(new CustomEvent("jointly:intro"))} className="hidden truncate rounded-full border border-line px-2.5 py-0.5 text-[11px] text-sub hover:text-ink 2xl:inline">Scenario: getting Creekside&apos;s 3 partners onto online banking</button>
             <Pill tone={st.tone}>{st.label}</Pill>
             <bdi dir="ltr" className="hidden font-mono text-muted xl:inline">{business.iban}</bdi>
             <span className="ml-auto flex items-center gap-4 text-muted">

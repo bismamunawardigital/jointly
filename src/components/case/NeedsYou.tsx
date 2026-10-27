@@ -167,7 +167,7 @@ export function NeedsYou() {
     );
   } else if (state.phase === "partially_live") {
     sub = "Rashid joins when his EID clears EFR.";
-    actions = <Button variant="ghost" onClick={() => dispatch({ type: "renew" })}>Demo: Rashid renews his EID</Button>;
+    actions = <Button variant="ghost" data-renew onClick={() => dispatch({ type: "renew" })}>Skip ahead: Rashid renews his ID</Button>;
   } else if (state.phase === "live") {
     sub = "Nothing left to do. Every step is in History.";
     actions = <Button onClick={() => setTab("decisions")}>See the decision record</Button>;
