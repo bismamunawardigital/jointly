@@ -1,7 +1,7 @@
 "use client";
 
-import { Check } from "lucide-react";
-import { useEffect } from "react";
+import { Bell, Check, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { business } from "@/data/seed";
 import { duration, lastTime, statusOf } from "@/lib/derive";
 import { Tab, hasEvent, useStore } from "@/lib/store";
@@ -16,6 +16,7 @@ import { ReviewView } from "./ReviewView";
 import { ReleaseView } from "./ReleaseView";
 import { AuditView } from "./AuditView";
 import { AutonomyView } from "./AutonomyView";
+import { DecisionView } from "./DecisionView";
 
 const tabs: { id: Tab; label: string }[] = [
   { id: "run", label: "Agent run" },
@@ -24,6 +25,7 @@ const tabs: { id: Tab; label: string }[] = [
   { id: "simulator", label: "Simulator" },
   { id: "review", label: "Checker review" },
   { id: "release", label: "Release" },
+  { id: "decisions", label: "Decision record" },
   { id: "audit", label: "Audit log" },
   { id: "autonomy", label: "Autonomy map" },
 ];
@@ -54,6 +56,21 @@ export function CaseWorkspace() {
   useEffect(() => {
     if (hydrated && state.phase === "new" && !state.queue.length) dispatch({ type: "start", group: "run" });
   }, [hydrated, state.phase, state.queue.length, dispatch]);
+  const [toast, setToast] = useState<{ text: string; tab: Tab } | null>(null);
+  const prevPhase = useRef(state.phase);
+  useEffect(() => {
+    const was = prevPhase.current;
+    prevPhase.current = state.phase;
+    if (!hydrated || was === state.phase) return;
+    const ask: Partial<Record<string, { text: string; tab: Tab }>> = {
+      in_review: { text: "Plan v1 is ready. 1 thing needs your eye in stage 3.", tab: "review" },
+      re_review: { text: "The agent fixed stage 3. Only 2 stages changed.", tab: "review" },
+      executed: { text: "Set up and read back. Release decision is yours.", tab: "release" },
+    };
+    const t = ask[state.phase];
+    if (t && tab !== t.tab) setToast(t);
+    else setToast(null);
+  }, [state.phase, hydrated, tab]);
   if (!hydrated) return null;
   return (
     <div className="flex h-full">
@@ -125,11 +142,24 @@ export function CaseWorkspace() {
             {tab === "simulator" && <SimulatorView />}
             {tab === "review" && <ReviewView />}
             {tab === "release" && <ReleaseView />}
+            {tab === "decisions" && <DecisionView />}
             {tab === "audit" && <AuditView />}
           </div>
         </div>
       </div>
       <NeedsYou />
+      {toast && (
+        <div role="status" className="fixed left-1/2 top-4 z-50 flex -translate-x-1/2 animate-enter items-center gap-3 rounded-xl border border-line bg-surface px-4 py-2.5 shadow-lg">
+          <Bell className="h-4 w-4 text-warn" />
+          <p className="text-sm">{toast.text}</p>
+          <button className="rounded-md bg-accent px-2.5 py-1 text-xs font-medium text-onaccent hover:bg-accent-hover" onClick={() => { setTab(toast.tab); setToast(null); }}>
+            Open
+          </button>
+          <button aria-label="Dismiss" className="text-muted hover:text-ink" onClick={() => setToast(null)}>
+            <X className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      )}
     </div>
   );
 }

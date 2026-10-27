@@ -49,6 +49,12 @@ const patterns = [
   },
 ];
 
+const heard = [
+  { quote: "you start clicking Approve on autopilot and stop reading the diffs.", who: "Agent user, Hacker News", href: "https://news.ycombinator.com/item?id=48830674", change: "only asks Sara to look at lines the agent read itself. Exact copies fold away." },
+  { quote: "A regulator asked a bank to explain its AI agent's last 100 decisions. The bank showed them a confidence score. The regulator shut it down.", who: "Banking AI lead, LinkedIn", href: "https://www.linkedin.com/posts/johnforrester_a-regulator-asked-a-bank-to-explain-its-ai-activity-7438239662009114624-WaU0", change: "keeps a decision record: rule, quote, approver, time. No confidence scores." },
+  { quote: "The humans around it didn't trust it, didn't know when to escalate, and quietly routed around it.", who: "Ops leader, LinkedIn", href: "https://www.linkedin.com/posts/jeffreytking_our-first-agentic-rollout-failed-in-three-activity-7465363738846638080-lVjb", change: "has Pause and a named maker handover, and pings Sara only when it needs her." },
+];
+
 const grounded = [
   { source: "Vasconcelos et al., CSCW 2023", href: "https://doi.org/10.1145/3579605", finding: "People over-trust AI less when checking is easier than trusting.", where: "the clause quote sits next to every line in review" },
   { source: "Steyvers and Kumar, 2024", href: "https://journals.sagepub.com/doi/full/10.1177/17456916231181102", finding: "Showing how sure the AI is helps people rely on it the right amount.", where: "Exact match vs Agent read this tags" },
@@ -216,6 +222,24 @@ export default function CaseStudy() {
           <div className="mt-8">
             <SpecDrawing />
           </div>
+        </div>
+      </section>
+
+      <section className="border-t border-line bg-panel/50">
+        <div className="mx-auto max-w-5xl px-6 py-16">
+          <h2 className="text-2xl font-semibold tracking-tight">What people using agents told me</h2>
+          <p className="mt-2 max-w-2xl text-sub">I read ops, compliance and agent-user threads before redesigning. Three quotes changed the product.</p>
+          <ul className="mt-8 grid gap-3 md:grid-cols-3">
+            {heard.map((h) => (
+              <li key={h.href} className="flex flex-col rounded-xl border border-line bg-surface p-4">
+                <p className="flex-1 text-sm">&ldquo;{h.quote}&rdquo;</p>
+                <a href={h.href} target="_blank" rel="noreferrer" className="mt-3 text-xs text-accent-ink underline-offset-2 hover:underline">
+                  {h.who}
+                </a>
+                <p className="mt-2 border-t border-line pt-2 text-xs text-sub">So Jointly: {h.change}</p>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 

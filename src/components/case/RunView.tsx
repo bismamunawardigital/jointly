@@ -40,6 +40,13 @@ export function RunView() {
           <li className="rounded-md bg-warn-soft px-2 py-1 text-warn-ink">Finacle and SVS disagree: SVS used</li>
           <li className="rounded-md bg-ok-soft px-2 py-1 text-ok-ink">Mohammed&apos;s login reused</li>
         </ul>
+        <p className="mt-3 text-xs text-muted">What I didn&apos;t do</p>
+        <ul className="mt-1.5 flex flex-wrap gap-2 text-xs text-sub">
+          {!hasEvent(state, "rev-amendment") && <li className="rounded-md border border-warn/40 px-2 py-1">Read SVS letters (searched Mandates only)</li>}
+          <li className="rounded-md border border-line px-2 py-1">Set up USD (mandate is AED only)</li>
+          <li className="rounded-md border border-line px-2 py-1">Give Rashid a login (EFR first)</li>
+          <li className="rounded-md border border-line px-2 py-1">Approve anything myself</li>
+        </ul>
       </li>,
     );
   for (const entry of state.log) {
