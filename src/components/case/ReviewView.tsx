@@ -1,6 +1,7 @@
 "use client";
 
 import { EvidenceGrid } from "./EvidenceGrid";
+import { ReturnThread } from "./ReturnThread";
 import { PaymentWorkflow } from "./PaymentWorkflow";
 import { SigningMap } from "./SigningMap";
 
@@ -456,11 +457,7 @@ export function ReviewView() {
               )
             )}
 
-            {wasReturned && (
-              <p className="mt-3 text-xs text-sub">
-                <span className="font-medium text-ink">Sara&apos;s note:</span> {state.returned!.note}
-              </p>
-            )}
+            {wasReturned && <ReturnThread />}
 
                         {canAct && !returning && (
               <div className="mt-3 flex gap-2">

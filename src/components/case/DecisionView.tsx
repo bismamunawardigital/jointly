@@ -4,6 +4,7 @@ import { FileCheck2, Printer } from "lucide-react";
 import { business, checker } from "@/data/seed";
 import { approvalValid, buildRules, buildStages, releaseEligibility } from "@/lib/rules";
 import { hasEvent, useStore } from "@/lib/store";
+import { ReturnThread } from "./ReturnThread";
 import { BasisTag, Button, Card, Empty, Quote, SourceChip } from "@/components/ui";
 
 export function DecisionView() {
@@ -30,9 +31,8 @@ export function DecisionView() {
       </div>
       {state.returned && (
         <Card className="p-4">
-          <p className="text-xs text-muted">Mon 10:07 · {checker.name} returned stage 3</p>
-          <p className="mt-1 text-sm">&ldquo;{state.returned.note}&rdquo;</p>
-          <p className="mt-1 text-xs text-sub">Reason on screen: the 2023 letter scan was unclear. Fixed in plan v2.</p>
+          <p className="text-xs text-muted">{checker.name} returned stage 3</p>
+          <ReturnThread />
         </Card>
       )}
       {state.confirmed && (
