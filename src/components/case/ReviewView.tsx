@@ -278,6 +278,7 @@ export function ReviewView() {
   useEffect(() => setExpand(!!sessionStorage.getItem("jointly-details")), []);
   const [returning, setReturning] = useState(false);
   const [note, setNote] = useState("");
+  const [reason, setReason] = useState("");
   useEffect(() => {
     const on = () => setReturning(true);
     window.addEventListener("jointly:return", on);
@@ -553,6 +554,11 @@ export function ReviewView() {
             )}
             {canReturn && returning && (
               <div className="mt-4 space-y-2">
+                <div role="group" aria-label="Reason" className="flex flex-wrap gap-1.5">
+                  {["Unclear scan", "Wrong source", "Needs the customer", "Other"].map((r) => (
+                    <button key={r} type="button" aria-pressed={reason === r} onClick={() => setReason(r)} className={cn("rounded-md border px-2 py-1 text-xs transition-colors duration-150", reason === r ? "border-ink bg-ink text-surface" : "border-line text-sub hover:bg-panel")}>{r}</button>
+                  ))}
+                </div>
                 <label className="block text-xs text-muted" htmlFor="return-note">
                   Note for the agent
                 </label>
@@ -560,13 +566,13 @@ export function ReviewView() {
                 <div className="flex gap-2">
                   <Button
                     variant="danger"
-                    disabled={!note.trim()}
+                    disabled={!reason && !note.trim()}
                     onClick={() => {
-                      dispatch({ type: "return", note: note.trim() });
+                      dispatch({ type: "return", note: [reason, note.trim()].filter(Boolean).join(". ") });
                       setReturning(false);
                     }}
                   >
-                    Return stage 3
+                    Return to the agent
                   </Button>
                   <Button variant="ghost" onClick={() => setReturning(false)}>
                     Cancel

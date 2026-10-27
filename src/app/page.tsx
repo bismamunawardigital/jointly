@@ -4,6 +4,7 @@ import { Logo } from "@/components/Shell";
 import { ThemeButton } from "@/components/ThemeToggle";
 import { AgentMark } from "@/components/ui";
 import { HeroFrame } from "@/components/landing/HeroFrame";
+import { MobileReplay } from "@/components/landing/MobileReplay";
 import { Gloss } from "@/components/landing/Gloss";
 import { DaysSwimlane } from "@/components/landing/DaysSwimlane";
 import { MandateToggle } from "@/components/landing/LivePreview";
@@ -205,9 +206,12 @@ const primary = "inline-flex h-11 items-center gap-1.5 rounded-lg bg-accent px-5
 const card = "rounded-card border border-line bg-surface";
 const wrap = "mx-auto max-w-6xl px-6 py-12";
 const Sara = () => (
-  <a href="/demo/case/" data-track="cta" className={primary}>
-    Check it as Sara (5 min) <ArrowRight className="h-4 w-4" />
-  </a>
+  <>
+    <a href="/demo/case/" data-track="cta" className={`${primary} max-[899px]:hidden`}>
+      Check it as Sara (5 min) <ArrowRight className="h-4 w-4" />
+    </a>
+    <MobileReplay className={`${primary} min-[900px]:hidden`} />
+  </>
 );
 
 export default function CaseStudy() {

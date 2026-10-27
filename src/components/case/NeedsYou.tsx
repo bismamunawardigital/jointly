@@ -53,6 +53,7 @@ export function NeedsYou() {
   const done = state.log.filter((e) => e.kind === "agent").length;
   const [scanVal, setScanVal] = useState<number | null>(null);
   const [signing, setSigning] = useState(0);
+  const [handing, setHanding] = useState(false);
   useEffect(() => {
     const on = (e: Event) => setScanVal((e as CustomEvent<number | null>).detail);
     window.addEventListener("jointly:scan", on);
@@ -77,12 +78,21 @@ export function NeedsYou() {
   const handBtn = (
     <details className="relative">
       <summary className="flex cursor-pointer list-none items-center gap-1.5 rounded-lg px-3 py-2 text-sm text-sub hover:bg-panel hover:text-ink">More</summary>
-      <div className="absolute bottom-full right-0 z-30 mb-2 w-52 rounded-lg border border-line bg-surface p-1 shadow-lg">
+      <div className="absolute bottom-full right-0 z-30 mb-2 w-64 rounded-lg border border-line bg-surface p-1 shadow-lg">
         <button type="button" className="block w-full rounded px-3 py-2 text-left text-sm hover:bg-panel" onClick={() => { window.dispatchEvent(new CustomEvent("jointly:return")); go("review", "stage-3", "#return-note"); }}>Return to the agent</button>
         <button type="button" className="block w-full rounded px-3 py-2 text-left text-sm hover:bg-panel" onClick={() => { window.dispatchEvent(new CustomEvent("jointly:return", { detail: "override" })); go("review", "stage-3", "#return-note"); }}>Override with reason</button>
-        <button type="button" className="flex w-full items-center gap-1.5 rounded px-3 py-2 text-left text-sm hover:bg-panel" onClick={() => dispatch({ type: "handover" })}>
-          <Hand className="h-3.5 w-3.5" /> Hand to a maker <Key k="H" />
-        </button>
+        {handing ? (
+          <form className="space-y-2 p-2 text-sm" onSubmit={(e) => { e.preventDefault(); setHanding(false); dispatch({ type: "handover" }); }}>
+            <label className="block text-xs text-muted">Why<input defaultValue="The 2023 letter scan is unclear." className="mt-1 w-full rounded border border-line bg-surface px-2 py-1 text-sm text-ink" /></label>
+            <label className="block text-xs text-muted">Assign to<select className="mt-1 w-full rounded border border-line bg-surface px-2 py-1 text-sm text-ink"><option>CF maker queue</option><option>Omar K., CF Maker</option></select></label>
+            <p className="text-xs text-sub">The case pauses here, and the maker takes it over by hand.</p>
+            <Button variant="primary" type="submit">Hand over</Button>
+          </form>
+        ) : (
+          <button type="button" className="flex w-full items-center gap-1.5 rounded px-3 py-2 text-left text-sm hover:bg-panel" onClick={() => setHanding(true)}>
+            <Hand className="h-3.5 w-3.5" /> Hand to a maker <Key k="H" />
+          </button>
+        )}
       </div>
     </details>
   );
@@ -154,6 +164,7 @@ export function NeedsYou() {
     actions = (
       <>
         {handBtn}
+        <span className="hidden text-xs text-muted xl:inline">You can still change anything before you sign off.</span>
         {signing > 0 ? (
           <span role="status" className="flex items-center gap-1.5 text-sm">
             {[1, 2, 3, 4].map((i) => (
