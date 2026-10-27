@@ -19,8 +19,10 @@ const stats = statsEn;
 const nav: [string, string][] = [
   ["matters", "Why it matters"],
   ["problem", "Problem"],
+  ["system", "The system"],
   ["why", "Why an agent"],
   ["case", "The case"],
+  ["compare", "Compare"],
   ["roles", "Who decides"],
   ["bank", "At a bank"],
   ["about", "About"],
@@ -216,6 +218,59 @@ const faq: [string, string][] = [
   ["Why banking?", "Banks combine old systems with strict oversight, which makes them the hardest place to get agents right. Government and healthcare face the same problems."],
 ];
 
+const mapShowed = [
+  "Most of the delay comes from the case waiting between hand-offs, not from the work itself.",
+  "The same customer details get typed in again at almost every step of the process.",
+  "Only one step really needs reading, which is the free-text mandate in SVS, and rules can handle everything else.",
+];
+
+const shipped: [string, string][] = [
+  ["Before", "Before that, customers filled in paper forms, cases went through 4 review rounds, and PINs arrived by courier."],
+  ["What I designed", "I designed a self-serve flow in the business app, where each signatory registers and then they approve each other's access."],
+  ["What I learnt from it", "Self-serve moved a lot of the work onto the customer. Because signatories approve each other, one expired Emirates ID can stop everyone, and those cases end up as tickets for the operations team."],
+  ["With Jointly", "The agent prepares everything from records the bank already has, and rules check who can go live. Each signatory only verifies their Emirates ID and sets a password, so if one ID has expired, the others still go live."],
+];
+
+const calls: [string, string][] = [
+  ["Finacle", "1 read per person (3 reads)"],
+  ["SVS", "2 documents, read once"],
+  ["EFR", "1 check per person at the start, 1 again before release"],
+  ["AI model", "Only the 2 SVS documents"],
+  ["Digital Banking Admin", "5 write steps, then 1 read-back"],
+];
+
+const cost = [
+  "The agent reads each system once per case and reuses what it has already read.",
+  "It only re-checks things that can change, like whether an ID has expired.",
+  "It uses the AI model for the 2 scanned documents only, and the rules handle everything else, which costs less and gives the same answer every time.",
+  "Each old system has its own small connector with its own retry limit, so if Admin is slow, Finacle reads carry on, and a retry never writes the same change twice.",
+];
+
+const compare: [string, string, string][] = [
+  ["Approvals", "People approve every step, and reported studies say they approve 93 to 97% of prompts.", "Rules pass the exact copies, so Sara only makes 2 decisions."],
+  ["Uncertainty", "Most products show a confidence score.", "Jointly shows clear states: the value matches, it doesn't match, or the agent couldn't read it."],
+  ["Evidence", "Most products link to a whole document.", "Jointly opens the exact part of the scan and shows the rule it was checked against."],
+  ["Checking", "Often another model checks the agent's work.", "The agent prepares the work, and it can never approve it."],
+  ["When old systems fail", "Most products retry and hope it worked.", "Jointly retries and then reads everything back to confirm it."],
+  ["Partial progress", "Usually it's all or nothing.", "2 people go live, and everyone can see why the third one is waiting."],
+];
+
+const oversight: [string, string][] = [
+  ["People must understand the agent's limits.", "A panel lists what the agent can and cannot do."],
+  ["People must watch for automation bias.", "The scan sits zoomed next to the agent's reading, and a supervisor re-checks a sample of accepted readings."],
+  ["People must read the output correctly.", "Every finding shows its rule and its source."],
+  ["People must be able to override the agent.", "Sara can override any finding with a reason, and the override is logged."],
+  ["People must be able to stop it.", "Sara can pause before any write, and nothing is left half-written."],
+];
+
+const compareSources = [
+  "https://gigazine.net/gsc_news/en/20260810-claude-code-auto-mode/",
+  "https://arxiv.org/abs/2502.08554",
+  "https://ojs.aaai.org/index.php/AAAI/article/view/34550",
+  "https://github.blog/news-insights/product-news/github-copilot-meet-the-new-coding-agent/",
+  "https://linear.app/developers/aig",
+];
+
 const h2 = "font-display text-3xl tracking-tight md:text-4xl";
 const primary = "inline-flex h-11 items-center gap-1.5 rounded-lg bg-accent px-5 text-sm font-medium text-onaccent transition-colors hover:bg-accent-hover";
 const card = "rounded-card border border-line bg-surface";
@@ -315,6 +370,39 @@ export default function CaseStudy() {
         </div>
       </section>
 
+      <section id="system">
+        <div className={wrap}>
+          <p className="text-xs font-medium uppercase tracking-wide text-muted">Before the agent</p>
+          <h2 className={`mt-2 ${h2}`}>I learnt how the bank&apos;s systems work before I designed anything.</h2>
+          <p className="mt-3 max-w-3xl text-sub">At a UAE bank, I mapped how one onboarding case moves between the customer, the operations team, 4 old systems and a courier. That map decided what the agent should do, and just as clearly, what it should never touch.</p>
+          <p className="mt-8 text-sm font-semibold">What the map showed me</p>
+          <ul className="mt-3 grid gap-4 md:grid-cols-3">
+            {mapShowed.map((m, i) => (
+              <li key={m} className={`${card} p-5 text-sm text-sub`}>
+                <span className="tnum mb-2 flex h-6 w-6 items-center justify-center rounded-full bg-ink text-xs font-semibold text-canvas">{i + 1}</span>
+                {m}
+              </li>
+            ))}
+          </ul>
+          <p className="mt-12 text-sm font-semibold">What I shipped, and what I&apos;d do differently with an agent</p>
+          <p className="mt-1 max-w-3xl text-sm text-sub">I designed the digital setup for joint signatories in a UAE bank&apos;s new business banking app, and here is how I would approach it with an agent.</p>
+          <ol className="mt-4 grid gap-3 md:grid-cols-4">
+            {shipped.map(([k, v], i) => (
+              <li key={k} className={i === 3 ? "relative rounded-card border-2 border-brand bg-surface p-5" : `relative ${card} p-5`}>
+                {i > 0 && <ArrowRight aria-hidden className="absolute -start-3 top-1/2 hidden h-4 w-4 -translate-y-1/2 bg-canvas text-muted md:block rtl:-scale-x-100" />}
+                <p className="text-sm font-semibold">{k}</p>
+                <p className="mt-1.5 text-[13px] text-sub">{v}</p>
+              </li>
+            ))}
+          </ol>
+          <div className="mt-4 grid gap-3 md:grid-cols-2">
+            <p className="flex gap-3 text-sm text-sub"><UserRound aria-hidden className="h-5 w-5 shrink-0 text-ink" />Customers have much less to do, because they don&apos;t retype what the bank already knows and they don&apos;t wait on each other.</p>
+            <p className="flex gap-3 text-sm text-sub"><ShieldCheck aria-hidden className="h-5 w-5 shrink-0 text-ink" />The operations team gets fewer tickets, because a stuck case is routed with its reason instead of arriving in the queue as a complaint.</p>
+          </div>
+          <p className="mt-3 text-xs text-muted">This is what I would change, and I haven&apos;t measured it yet.</p>
+        </div>
+      </section>
+
       <section id="why" className="band-dark">
         <div className={wrap}>
           <h2 className={h2}>Rules can&apos;t read a scanned letter, which is why this needs an agent.</h2>
@@ -358,10 +446,29 @@ export default function CaseStudy() {
               </li>
             ))}
           </ol>
+          <div className="mt-12 grid gap-6 md:grid-cols-2">
+            <div>
+              <p className="text-sm font-semibold">It&apos;s cheap to run and easy on the bank&apos;s old systems</p>
+              <ul className="mt-3 space-y-2">
+                {cost.map((c) => (
+                  <li key={c} className="flex gap-2.5 text-sm text-sub"><Check aria-hidden className="mt-0.5 h-4 w-4 shrink-0 text-ok" />{c}</li>
+                ))}
+              </ul>
+            </div>
+            <table className={`${card} w-full self-start text-sm`}>
+              <caption className="pb-2 text-start text-xs text-muted">Calls for the Creekside case</caption>
+              <tbody className="divide-y divide-line">
+                {calls.map(([k, v]) => (
+                  <tr key={k}><th scope="row" className="px-4 py-2.5 text-start font-medium">{k}</th><td className="px-4 py-2.5 text-sub">{v}</td></tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="mt-3 text-xs text-muted">This is a scripted case, so these call counts are design targets rather than measurements.</p>
         </div>
       </section>
 
-      <section id="case">
+      <section id="case" className="bg-panel">
         <div className={wrap}>
           <h2 className={h2}>The agent checked every record and only asked Sara about one value.</h2>
           <div className="mt-10">
@@ -379,6 +486,61 @@ export default function CaseStudy() {
             />
           </div>
           <div className="mt-12"><Sara /></div>
+        </div>
+      </section>
+
+      <section id="compare">
+        <div className={wrap}>
+          <h2 className={h2}>I compared Jointly&apos;s design with more than 40 agent products and studies.</h2>
+          <p className="mt-2 text-xs text-muted">This compares design choices, and since Jointly is a prototype, there&apos;s no performance data yet.</p>
+          <div className="mt-8">
+            <Tabs labels={["How it compares", "Oversight rules"]}>
+              {[
+                <div key="c" className="overflow-x-auto">
+                  <table className={`${card} w-full min-w-[640px] text-sm`}>
+                    <thead>
+                      <tr className="border-b border-line text-start text-xs text-muted">
+                        <th className="px-4 py-3 text-start font-medium"><span className="sr-only">Dimension</span></th>
+                        <th className="px-4 py-3 text-start font-medium">What&apos;s common today</th>
+                        <th className="px-4 py-3 text-start font-medium">What Jointly does</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-line">
+                      {compare.map(([d, c, j]) => (
+                        <tr key={d}>
+                          <th scope="row" className="px-4 py-3 text-start font-semibold">{d}</th>
+                          <td className="px-4 py-3 text-sub">{c}</td>
+                          <td className="px-4 py-3 font-medium text-ok-ink">{j}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>,
+                <div key="o">
+                  <p className="font-semibold">It&apos;s built around the rules on human oversight of AI.</p>
+                  <ul className="mt-4 space-y-3">
+                    {oversight.map(([r, h]) => (
+                      <li key={r} className="grid items-center gap-3 md:grid-cols-[1fr_auto_1fr]">
+                        <p className={`${card} px-4 py-3 text-sm text-sub`}>{r}</p>
+                        <ArrowRight aria-hidden className="mx-auto h-4 w-4 rotate-90 text-brand md:rotate-0 rtl:md:-scale-x-100" />
+                        <p className="rounded-card border border-ok/30 bg-ok-soft px-4 py-3 text-sm font-medium text-ok-ink">{h}</p>
+                      </li>
+                    ))}
+                  </ul>
+                  <p className="mt-3 text-xs text-muted">I mapped this to EU AI Act Article 14 and the UAE central bank&apos;s 2026 guidance on human oversight. This is my reading of them, not legal advice.</p>
+                </div>,
+              ]}
+            </Tabs>
+          </div>
+          <p className="mt-6 max-w-3xl text-sm text-sub">I could make these calls because I had mapped the service first, so I knew where a rule was enough, where Sara had to decide, and where only an agent could help.</p>
+          <details className="mt-4 text-sm">
+            <summary className="cursor-pointer text-sub">Sources</summary>
+            <ul className="mt-2 space-y-1">
+              {compareSources.map((u) => (
+                <li key={u}><a href={u} target="_blank" rel="noreferrer" className="break-all text-accent-ink hover:underline">{u.replace(/^https:\/\//, "")}</a></li>
+              ))}
+            </ul>
+          </details>
         </div>
       </section>
 
