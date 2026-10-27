@@ -10,7 +10,7 @@ const config: Config = {
         sans: ["var(--font-sans)", "var(--font-arabic)", "system-ui", "sans-serif"],
         arabic: ["var(--font-arabic)", "var(--font-sans)", "sans-serif"],
         mono: ["var(--font-mono)", "ui-monospace", "monospace"],
-        display: ["var(--font-display)", "Georgia", "serif"],
+        display: ["var(--font-display)", "var(--font-sans)", "system-ui", "sans-serif"],
       },
       colors: {
         canvas: v("canvas"),

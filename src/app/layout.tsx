@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Sans, IBM_Plex_Sans_Arabic, IBM_Plex_Mono, Fraunces } from "next/font/google";
+import { IBM_Plex_Sans, IBM_Plex_Sans_Arabic, IBM_Plex_Mono, Instrument_Sans } from "next/font/google";
 import "./globals.css";
 import { StoreProvider } from "@/lib/store";
 
@@ -13,9 +13,9 @@ const arabic = IBM_Plex_Sans_Arabic({
   weight: ["400", "500", "600"],
   variable: "--font-arabic",
 });
-const display = Fraunces({
+const display = Instrument_Sans({
   subsets: ["latin"],
-  weight: ["400", "500"],
+  weight: ["500", "600"],
   variable: "--font-display",
 });
 const mono = IBM_Plex_Mono({

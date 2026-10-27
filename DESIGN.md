@@ -86,7 +86,7 @@ All colours are CSS variables in `src/app/globals.css`, with a dark set under `[
 
 ## Typography
 
-IBM Plex Sans for UI, IBM Plex Sans Arabic for Arabic, Fraunces for display (its 1 and l stay distinct, which matters for "v1" and amounts). Scale 12 / 14 / 16 / 20 / 28 / 40 / 56 / 72. Product display is 28px, landing display 40 to 72px. Body 14 to 15px, never below 12px. Mono only inside Technical details. Tabular numbers for amounts and times. Sentence case everywhere.
+IBM Plex Sans for UI, IBM Plex Sans Arabic for Arabic, Instrument Sans 500/600 for display (its 1 and l stay distinct, which matters for "v1" and amounts). No serif in the product. Scale 12 / 14 / 16 / 20 / 28 / 40 / 56 / 72. Product display is 28px, landing display 40 to 72px. Body 14 to 15px, never below 12px. Mono only inside Technical details. Tabular numbers for amounts and times. Sentence case everywhere.
 
 Every product screen starts with a small eyebrow (the case name) and one display sentence that says the situation, like "2 of 3 signatories can go live today."
 
