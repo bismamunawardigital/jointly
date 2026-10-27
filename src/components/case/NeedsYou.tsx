@@ -23,7 +23,7 @@ const doing = (step: string) => doingMap[step] ?? "working";
 export const maker = "Omar K., CF Maker";
 
 export function legacyBeat(lastId?: string) {
-  if (lastId === "ex-workflow-fail") return "Digital Banking Admin timed out at step 5 of 5. Nothing was half-written. Retrying.";
+  if (lastId === "ex-workflow-fail") return "Digital Banking Admin timed out on change 5 of 5. Changes 1 to 4 are saved, and change 5 wasn't written. Retry 1 of 3.";
   if (lastId === "ex-workflow" || lastId === "ex-readback") return "Retry worked. Read back from Admin: 0 differences from the approved plan.";
   return null;
 }
@@ -120,7 +120,7 @@ export function NeedsYou() {
     title = beat ?? `Agent is ${doing(next.step)}`;
     sub = beat ? "Legacy system · Digital Banking Admin" : "Nothing needed from you.";
     actions = (
-      <Button variant="ghost" onClick={() => dispatch({ type: "pause" })}>
+      <Button variant="ghost" title="Pausing keeps everything that's done so far, and nothing is left half-written." onClick={() => dispatch({ type: "pause" })}>
         <Pause className="h-3.5 w-3.5" /> Pause <Key k="P" />
       </Button>
     );

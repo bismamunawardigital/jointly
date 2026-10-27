@@ -93,6 +93,8 @@ export function EvidenceGrid() {
   const all = rows.flatMap((r) => r.cells);
   const count = (t: Tone) => new Set(all.filter((c) => c.tone === t).map((c, i) => (t === "warn" ? c.src : i))).size;
   const [peek, setPeek] = useState<string | null>(null);
+  const [filter, setFilter] = useState<"All" | "Needs you" | "Verified" | "Changed by Sara">("All");
+  const shown = (c: { tone: Tone; changed?: boolean }) => filter === "All" || (filter === "Needs you" ? c.tone === "warn" || c.tone === "bad" : filter === "Verified" ? c.tone === "ok" : !!c.changed);
   const [first, setFirst] = useState(false);
   useEffect(() => {
     if (sessionStorage.getItem("jointly-ticked")) return;
@@ -129,6 +131,11 @@ export function EvidenceGrid() {
   return (
     <section aria-label="Evidence grid" className="space-y-3">
       <div className="flex flex-wrap items-center gap-4 text-sm">
+        <span role="group" aria-label="Filter the grid" className="flex gap-1">
+          {(["All", "Needs you", "Verified", "Changed by Sara"] as const).map((f) => (
+            <button key={f} type="button" aria-pressed={filter === f} onClick={() => setFilter(f)} className={cn("rounded-md px-2 py-1 text-xs transition-colors duration-150", filter === f ? "bg-ink text-surface" : "text-sub hover:bg-panel")}>{f}</button>
+          ))}
+        </span>
         <span className="font-medium"><span className="tnum">{count("ok")}</span> of <span className="tnum">{all.filter((x) => x.tone !== "na").length}</span> verified</span>
         <span className="flex items-center gap-1.5">{glyph.ok}<span className="tnum font-medium">{count("ok")}</span> exact matches</span>
         <span className="flex items-center gap-1.5">{glyph.warn}<span className="tnum font-medium">{count("warn")}</span> {count("warn") === 1 ? "needs" : "need"} you</span>
@@ -171,6 +178,7 @@ export function EvidenceGrid() {
                         aria-label={`${row.name}, ${cols[c]}: ${toneWord[cell.tone]}, ${cell.text}`}
                         title="View source"
                         data-anim={first ? cell.tone : undefined}
+                        data-dim={!shown(cell) || undefined}
                         style={{ ["--c" as string]: c } as React.CSSProperties}
                         onClick={() => setPeek(peek === key ? null : key)}
                         onKeyDown={(e) => e.key === "Escape" && setPeek(null)}

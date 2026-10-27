@@ -269,3 +269,5 @@ svg.lucide {
   .draw-line { stroke-dasharray: none; stroke-dashoffset: 0; animation: none; }
   .loop-circle { animation: none; }
 }
+
+[data-dim] { opacity: 0.3; transition: opacity 150ms ease-out; }

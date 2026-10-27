@@ -123,6 +123,7 @@ const unknowns = [
 ];
 
 const gaveUp = [
+  "Rejected: auto-proceed timers. Fine for drafts, never for writes to a bank system.",
   "I kept all 4 sign-offs because bank controls require them, but I turned them into a single click.",
   "I left out confidence scores, because regulators ask which rule fired and a score can't answer that.",
   "I designed for desktop only, because the operations team works on bank laptops.",

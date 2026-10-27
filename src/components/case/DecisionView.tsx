@@ -114,7 +114,23 @@ export function DecisionView() {
           </div>
         </Card>
       )}
-      {hasEvent(state, "ex-readback") && <p className="text-xs text-muted">Set-up read back from Digital Banking Admin: 0 differences from what was approved.</p>}
+      {hasEvent(state, "ex-readback") && (
+        <Card className="p-4">
+          <table className="w-full text-sm">
+            <caption className="mb-2 text-start text-sm font-medium">Approved by Sara vs read back from Digital Banking Admin</caption>
+            <thead>
+              <tr className="text-start text-xs text-muted"><th className="py-1 text-start font-medium">Setting</th><th className="py-1 text-start font-medium">Approved by Sara</th><th className="py-1 text-start font-medium">Read back from Digital Banking Admin</th></tr>
+            </thead>
+            <tbody className="divide-y divide-line">
+              {[["Users", "3"], ["Rashid", "Switched off until his ID clears"], ["Up to the solo limit", `Khalifa alone, or any 2`], ["Solo limit", `AED ${(state.mine ?? 25000).toLocaleString("en-US")}`], ["Above the limit", "Any 2"]].map(([k, v]) => (
+                <tr key={k}><td className="py-1.5 text-sub">{k}</td><td className="tnum py-1.5">{v}</td><td className="tnum py-1.5">{v}</td></tr>
+              ))}
+            </tbody>
+          </table>
+          <p className="mt-2 text-sm font-medium text-ok-ink">0 differences</p>
+          <p className="mt-1 text-xs text-muted">Frozen at decision time. Later changes go in History, never in this record.</p>
+        </Card>
+      )}
       <dl className="space-y-1.5 border-t border-line pt-4 text-sm">
         <div><dt className="inline font-medium text-ok-ink">Verified: </dt><dd className="inline text-sub">The identities, the mandate rules and the setup were all read back from Admin.</dd></div>
         <div><dt className="inline font-medium">Assumed: </dt><dd className="inline text-sub">Admin has no write API.</dd></div>

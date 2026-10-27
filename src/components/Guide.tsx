@@ -19,6 +19,8 @@ const tasks = [
 ];
 const bonus = { label: "Disagree with the agent and see what it does.", hint: "Imagine you think the letter says 10,000. Type 10,000 and see what the agent does.", sel: "#scan-value" };
 const decisions: Record<string, [string, string]> = {
+  noconf: ["Rejected: a confidence %", "Studies show miscalibrated scores raise trust in wrong answers. Check states instead."],
+  notimer: ["Rejected: auto-proceed timers", "Fine for drafts, never for writes to a bank system."],
   match: ["Why the agent matched people by Emirates ID", "Mohammed's name is spelled 3 different ways across the bank's systems, so matching by name would have created duplicate users. The agent matches on the Emirates ID instead, and it reused the login he already had."],
   grey: ["Why the agent's reading is in grey", "Sara only needs to type when she disagrees, which saves her time. A supervisor re-checks a sample of accepted readings, because people tend to accept what they see first."],
   two: ["Why there were only 2 decisions", "The rules passed every stage that was an exact copy of the bank's records, so your attention went only to the value the agent had to read."],
@@ -171,9 +173,9 @@ export function Guide() {
       return;
     }
     if (step === 0) decide("match");
-    if (state.confirmed !== undefined) decide("grey");
+    if (state.confirmed !== undefined) { decide("grey"); decide("noconf"); }
     if (state.log.some((e) => e.id === "signoff")) decide("two");
-    if (hasEvent(state, "ex-readback")) decide("back");
+    if (hasEvent(state, "ex-readback")) { decide("back"); decide("notimer"); }
     if (state.log.some((e) => e.id === "release")) decide("first");
     if (state.phase === "live") decide("record");
   }, [active, mode, step, state, decide]);

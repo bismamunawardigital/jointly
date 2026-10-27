@@ -169,6 +169,7 @@ export function SigningMap({ compact = false, part = "all" }: { compact?: boolea
                   b.label
                 )}
               </p>
+              <p className="text-xs text-muted">{b.id === "A" ? `SVS MAN-2019-0441 cl.2${showGhost || limit !== 10000 ? ", amended by AMD-2023-0107" : ""}` : "SVS MAN-2019-0441 cl.2"}</p>
               <div className="flex flex-wrap gap-1.5">{b.combos.map((c) => token(c, b.id))}</div>
             </div>
           ))}
