@@ -275,7 +275,7 @@ export default function CaseStudy() {
         <p className="mt-4 text-sm text-sub">A typical morning across several cases. The demo opens one of them.</p>
       </section>
 
-      <section id="slow" className="border-y border-line">
+      <section id="slow" className="bg-panel border-y border-line">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className={h2}>The work isn&apos;t hard. It&apos;s slow.</h2>
           <p className="mt-2 text-sub">4 systems, 4 handoffs, 1 courier.</p>
@@ -317,7 +317,7 @@ export default function CaseStudy() {
         </div>
       </section>
 
-      <section id="why" className="border-t border-line">
+      <section id="why" className="band-dark">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className={h2}>Why an agent, and not a better form</h2>
           <ul className="mt-8 space-y-3">
@@ -333,7 +333,7 @@ export default function CaseStudy() {
         </div>
       </section>
 
-      <section id="legacy" className="border-t border-line">
+      <section id="legacy" className="bg-panel border-t border-line">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className={h2}>How it works with 4 legacy systems</h2>
           <ul className="mt-8 grid grid-cols-2 gap-3 md:grid-cols-4">
@@ -378,7 +378,7 @@ export default function CaseStudy() {
         </div>
       </section>
 
-      <section id="grid" className="mx-auto max-w-6xl px-6 py-20">
+      <section id="grid" className="bg-panel mx-auto max-w-6xl px-6 py-20">
         <h2 className={h2}>Every source in one grid</h2>
         <div className="mt-8">
           <LiveGrid />
@@ -394,7 +394,7 @@ export default function CaseStudy() {
         </div>
       </section>
 
-      <section id="moments" className="border-t border-line">
+      <section id="moments" className="bg-panel border-t border-line">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className={h2}>4 moments</h2>
           <div className="mt-10">
@@ -428,7 +428,7 @@ export default function CaseStudy() {
         </div>
       </section>
 
-      <section id="heard" className="border-t border-line">
+      <section id="heard" className="bg-panel border-t border-line">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className={h2}>What I heard, what I changed</h2>
           <div className="mt-10 max-w-2xl rounded-card border border-line bg-surface p-6">
@@ -482,7 +482,7 @@ export default function CaseStudy() {
         </div>
       </section>
 
-      <section id="gaveup" className="border-t border-line">
+      <section id="gaveup" className="bg-panel border-t border-line">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className={h2}>What I gave up</h2>
           <ul className="mt-8 grid gap-4 md:grid-cols-2">
@@ -510,7 +510,7 @@ export default function CaseStudy() {
         </div>
       </section>
 
-      <section id="next" className="border-t border-line">
+      <section id="next" className="bg-panel border-t border-line">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className={h2}>What I&apos;d test next</h2>
           <ul className="mt-8 max-w-2xl space-y-3 rounded-card border border-line bg-surface p-6">
@@ -541,7 +541,7 @@ export default function CaseStudy() {
         </div>
       </section>
 
-      <footer className="border-t border-line bg-panel/50">
+      <footer className="band-dark">
         <div className="mx-auto flex max-w-6xl flex-col items-start gap-6 px-6 py-16 md:flex-row md:items-center md:justify-between">
           <div>
             <p className={h2}>See it for yourself</p>

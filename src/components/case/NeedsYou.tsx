@@ -181,7 +181,7 @@ export function NeedsYou() {
   }
 
   return (
-    <div role="region" aria-label="Decision bar" className={cn("flex h-16 shrink-0 items-center gap-4 border-t px-8", needs ? "border-warn/40 bg-warn-soft/40" : "border-line bg-surface")}>
+    <div role="region" aria-label="Decision bar" className={cn("flex h-16 shrink-0 items-center gap-4 border-t px-8", needs ? "border-line bg-panel" : "border-line bg-panel")}>
       <span className={cn("inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full", needs ? "bg-warn text-white" : "bg-panel text-sub")}>
         {working && !state.paused ? <span className="h-2 w-2 animate-pulse rounded-full bg-brand" /> : <Sparkles className="h-3.5 w-3.5" aria-hidden />}
       </span>
