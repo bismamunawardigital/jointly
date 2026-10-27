@@ -6,6 +6,7 @@ import { Avatar, cn } from "@/components/ui";
 import { Gloss } from "@/components/Gloss";
 import type { PersonId } from "@/data/seed";
 import { hasEvent, useStore } from "@/lib/store";
+import { CountUp } from "@/components/CountUp";
 import { glossary } from "@/content/glossary";
 
 export type Sys = "finacle" | "svs" | "efr" | "admin";
@@ -288,6 +289,7 @@ export function PlanChecklist() {
           {st !== "Waiting" && <span className="text-xs text-muted">Rules: {v}</span>}
         </li>
       ))}
+      {has("ex-readback") && <li className="text-xs text-ok-ink">Read back from Admin: <CountUp from={5} to={0} ms={500} /> differences</li>}
     </ol>
   );
 }

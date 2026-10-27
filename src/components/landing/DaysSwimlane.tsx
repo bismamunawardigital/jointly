@@ -31,12 +31,12 @@ function Lane({ lanes, nodes, edges, pains, loop, empty }: { lanes: string[]; no
       {edges.map(([a, b]) => {
         const A = mid(a), B = mid(b);
         const d = nodes[a].col === nodes[b].col ? `M${A.cx} ${A.cy < B.cy ? A.b : A.t} V${A.cy < B.cy ? B.t : B.b}` : `M${A.r} ${A.cy} H${(A.r + B.l) / 2} V${B.cy} H${B.l - 2}`;
-        return <path key={`${a}-${b}`} d={d} fill="none" stroke="rgb(var(--muted))" strokeWidth="1.5" markerEnd="url(#arr)" />;
+        return <path key={`${a}-${b}`} d={d} fill="none" stroke="rgb(var(--muted))" strokeWidth="1.5" markerEnd="url(#arr)" className="draw-line" />;
       })}
       {loop &&
         [0, 1, 2, 3].map((k) => {
           const A = mid(loop[0]), B = mid(loop[1]);
-          return <path key={k} d={`M${A.cx - 20 + k * 10} ${A.t} C${A.cx - 20 + k * 10} ${A.t - 26 - k * 4}, ${B.cx - 20 + k * 10} ${B.b + 26 + k * 4}, ${B.cx - 20 + k * 10} ${B.b}`} fill="none" stroke="rgb(var(--warn))" strokeWidth="1.25" strokeDasharray="3 3" opacity={1 - k * 0.15} />;
+          return <path key={k} d={`M${A.cx - 20 + k * 10} ${A.t} C${A.cx - 20 + k * 10} ${A.t - 26 - k * 4}, ${B.cx - 20 + k * 10} ${B.b + 26 + k * 4}, ${B.cx - 20 + k * 10} ${B.b}`} fill="none" stroke="rgb(var(--warn))" strokeWidth="1.25" className="loop-circle" strokeDasharray="3 3" opacity={1 - k * 0.15} />;
         })}
       {nodes.map((n, i) => (
         <g key={i}>
@@ -103,7 +103,7 @@ export function DaysSwimlane({ t }: { t: { lanes: string[]; today: string; joint
   return (
     <div>
       <div className="mb-4 hidden w-fit gap-1 rounded-full border border-line p-1 md:flex">{tab("today", t.today)}{tab("jointly", t.jointly)}</div>
-      <div className="hidden overflow-hidden rounded-card border border-line md:block">{view === "today" ? today : jointly}</div>
+      <div key={view} className="fade-in hidden overflow-hidden rounded-card border border-line md:block">{view === "today" ? today : jointly}</div>
       <div className="space-y-6 md:hidden">
         <div><p className="mb-2 text-xs font-medium text-muted">{t.today}</p><div className="overflow-x-auto rounded-card border border-line">{today}</div></div>
         <div><p className="mb-2 text-xs font-medium text-muted">{t.jointly}</p><div className="overflow-x-auto rounded-card border border-line">{jointly}</div></div>

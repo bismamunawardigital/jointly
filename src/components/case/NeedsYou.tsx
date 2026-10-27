@@ -33,7 +33,7 @@ export function LegacyBeat() {
   const beat = legacyBeat(state.log[state.log.length - 1]?.id);
   if (!beat || !state.queue.length) return null;
   return (
-    <p role="status" aria-live="polite" className="flex items-center gap-2 rounded-card border border-line bg-surface px-4 py-3 text-sm">
+    <p role="status" aria-live="polite" className={cn("flex items-center gap-2 rounded-card border border-line bg-surface px-4 py-3 text-sm", state.log[state.log.length - 1]?.id === "ex-workflow-fail" && "amber-pulse")}>
       <span className="rounded-full bg-panel px-2 py-0.5 text-xs text-sub">Legacy system</span>
       {beat}
     </p>
@@ -52,6 +52,7 @@ export function NeedsYou() {
   const failing = policyChecks(version, held).filter((c) => !c.pass).length;
   const done = state.log.filter((e) => e.kind === "agent").length;
   const [scanVal, setScanVal] = useState<number | null>(null);
+  const [signing, setSigning] = useState(0);
   useEffect(() => {
     const on = (e: Event) => setScanVal((e as CustomEvent<number | null>).detail);
     window.addEventListener("jointly:scan", on);
@@ -153,9 +154,36 @@ export function NeedsYou() {
     actions = (
       <>
         {handBtn}
-        <Button variant="primary" disabled={failing > 0} onClick={() => dispatch({ type: "signoff" })}>
-          Sign off plan v{versionOf(state)} · 4 stages <Key k="S" />
-        </Button>
+        {signing > 0 ? (
+          <span role="status" className="flex items-center gap-1.5 text-sm">
+            {[1, 2, 3, 4].map((i) => (
+              <span key={i} className={cn("h-1.5 w-8 rounded-full transition-colors duration-150", i <= signing ? "bg-ok" : "bg-line")} />
+            ))}
+            <span className="tnum ms-2 text-sub">Stage {signing} of 4</span>
+          </span>
+        ) : (
+          <Button
+            variant="primary"
+            disabled={failing > 0}
+            onClick={() => {
+              if (matchMedia("(prefers-reduced-motion: reduce)").matches) return dispatch({ type: "signoff" });
+              let k = 0;
+              const id = setInterval(() => {
+                k++;
+                setSigning(k);
+                if (k === 4) {
+                  clearInterval(id);
+                  setTimeout(() => {
+                    setSigning(0);
+                    dispatch({ type: "signoff" });
+                  }, 150);
+                }
+              }, 150);
+            }}
+          >
+            Sign off plan v{versionOf(state)} · 4 stages <Key k="S" />
+          </Button>
+        )}
       </>
     );
   } else if (state.phase === "executed" || state.phase === "rashid_ready") {

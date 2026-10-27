@@ -260,3 +260,12 @@ svg.lucide {
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
 }
+
+@keyframes draw-long { to { stroke-dashoffset: 0; } }
+@keyframes dash-run { to { stroke-dashoffset: -12; } }
+.draw-line { stroke-dasharray: 600; stroke-dashoffset: 600; animation: draw-long 700ms ease-out forwards; }
+.loop-circle { animation: dash-run 600ms linear 4; }
+@media (prefers-reduced-motion: reduce) {
+  .draw-line { stroke-dasharray: none; stroke-dashoffset: 0; animation: none; }
+  .loop-circle { animation: none; }
+}

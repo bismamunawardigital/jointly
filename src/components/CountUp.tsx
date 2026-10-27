@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 
 export const hm = (n: number) => `${Math.floor(n / 60)}h ${n % 60}m`;
 
-export function CountUp({ to, format = (n) => String(n), ms = 600 }: { to: number; format?: (n: number) => string; ms?: number }) {
+export function CountUp({ to, from = 0, format = (n) => String(n), ms = 600 }: { to: number; from?: number; format?: (n: number) => string; ms?: number }) {
   const ref = useRef<HTMLSpanElement>(null);
   const [n, setN] = useState(to);
   useEffect(() => {
@@ -17,14 +17,14 @@ export function CountUp({ to, format = (n) => String(n), ms = 600 }: { to: numbe
       const t0 = performance.now();
       const step = (t: number) => {
         const k = Math.min(1, (t - t0) / ms);
-        setN(Math.round(to * (1 - Math.pow(1 - k, 3))));
+        setN(Math.round(from + (to - from) * (1 - Math.pow(1 - k, 3))));
         if (k < 1) raf = requestAnimationFrame(step);
       };
-      setN(0);
+      setN(from);
       raf = requestAnimationFrame(step);
     });
     io.observe(el);
     return () => { io.disconnect(); cancelAnimationFrame(raf); };
-  }, [to, ms]);
+  }, [to, from, ms]);
   return <span ref={ref} className="tnum">{format(n)}</span>;
 }
