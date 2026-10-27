@@ -1,7 +1,7 @@
 export const statsEn = [
-  { n: 114, v: "1h 54m", k: "form to first login (was 4 to 5 days)" },
-  { n: 2, v: "2", k: "setup decisions by Sara, not 4 review rounds" },
-  { n: 0, v: "0", k: "approvals by the agent" },
+  { n: 114, v: "1h 54m", k: "It took 1 hour 54 minutes from the customer's form to their first login, compared with 4 to 5 days today." },
+  { n: 2, v: "2", k: "Sara made 2 decisions, where today the case goes through 4 review rounds." },
+  { n: 0, v: "0", k: "The agent approved nothing, because every approval belongs to a person." },
 ];
 
 export const statsAr = [

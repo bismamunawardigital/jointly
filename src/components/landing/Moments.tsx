@@ -69,7 +69,7 @@ const steps = [
   { title: "Releases what's safe, holds the rest", tab: "release", V: Live },
 ];
 
-export function Moments({ titles, see = "See it live", v = en }: { titles?: string[]; see?: string; v?: Labels }) {
+export function Moments({ titles, see = "See it live", v = en, extras }: { titles?: string[]; see?: string; v?: Labels; extras?: React.ReactNode[] }) {
   const [active, setActive] = useState(0);
   const refs = useRef<(HTMLLIElement | null)[]>([]);
   useEffect(() => {
@@ -82,15 +82,15 @@ export function Moments({ titles, see = "See it live", v = en }: { titles?: stri
   }, []);
   const V = steps[active].V;
   return (
-    <div className="grid gap-10 md:grid-cols-2">
+    <div className="grid gap-10 md:grid-cols-2 [&>*]:min-w-0">
       <div className="hidden md:block">
-        <div aria-hidden className="sticky top-24 flex h-[380px] items-center justify-center rounded-card border border-line bg-surface p-8 shadow-sm">
+        <div aria-hidden className="sticky top-24 flex h-[320px] items-center justify-center rounded-card border border-line bg-surface p-8 shadow-sm">
           <div key={active} className="flex w-full animate-enter justify-center">
             <V v={v} />
           </div>
         </div>
       </div>
-      <ol className="space-y-10 md:space-y-0">
+      <ol className="min-w-0 space-y-10 md:space-y-0">
         {steps.map((s, i) => (
           <li
             key={s.title}
@@ -98,10 +98,11 @@ export function Moments({ titles, see = "See it live", v = en }: { titles?: stri
               refs.current[i] = el;
             }}
             data-i={i}
-            className="flex flex-col justify-center md:min-h-[34vh]"
+            className="flex flex-col justify-center md:min-h-[16vh]"
           >
             <p className={cn("tnum text-sm", i === active ? "text-accent-ink" : "text-muted")}>0{i + 1}</p>
             <p className={cn("mt-2 font-display text-2xl leading-snug md:text-3xl", i !== active && "md:text-muted")}>{titles?.[i] ?? s.title}</p>
+            {extras?.[i] && <div className="mt-6 min-w-0 overflow-x-auto">{extras[i]}</div>}
             <div aria-hidden className="mt-4 flex justify-center rounded-card border border-line bg-surface p-6 md:hidden">
               <s.V v={v} />
             </div>
