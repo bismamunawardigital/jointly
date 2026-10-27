@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 import { AlertTriangle, Ban, Check, Inbox, Info, Loader2, UserRound } from "lucide-react";
 import { Group, eventById } from "@/lib/script";
 import { buildRules, policyChecks } from "@/lib/rules";
@@ -23,6 +25,7 @@ const icon = {
 
 export function RunView() {
   const { state, held, version } = useStore();
+  const [all, setAll] = useState(false);
   if (!state.log.length && !state.queue.length)
     return <Empty icon={Inbox} title="Request received" body="The agent is starting. Each step shows what it called, what it found and where it found it." />;
 
@@ -89,7 +92,7 @@ export function RunView() {
             </span>
           </div>
           <p className={cn("mt-0.5 text-sm font-medium", e.status === "block" && "text-bad-ink")}>{title}</p>
-          {detail && <p className="mt-0.5 max-w-2xl text-sm text-sub">{detail}</p>}
+          {detail && (all || e.status === "warn" || e.status === "block") && <p className="mt-0.5 max-w-2xl text-sm text-sub">{detail}</p>}
           {(e.evidence || e.assumption) && (
             <div className="mt-2 flex flex-wrap items-center gap-1">
               <Sources keys={e.evidence} />
@@ -115,8 +118,15 @@ export function RunView() {
     );
   }
   return (
+    <>
+    <div className="mb-3 flex max-w-3xl justify-end">
+      <button onClick={() => setAll((a) => !a)} className="text-xs text-muted underline-offset-2 hover:text-ink hover:underline">
+        {all ? "Show exceptions only" : "Show every detail"}
+      </button>
+    </div>
     <ol className="relative max-w-3xl before:absolute before:bottom-6 before:left-[97.5px] before:top-2 before:w-px before:bg-line" aria-live="polite">
       {rows}
     </ol>
+    </>
   );
 }

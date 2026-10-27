@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { AlertTriangle, Check, FlaskConical, ShieldCheck, Undo2 } from "lucide-react";
-import { checker } from "@/data/seed";
+import { AlertTriangle, Check, FlaskConical, Repeat, ShieldCheck, Undo2 } from "lucide-react";
+import { EvidenceKey, isAgentRead } from "@/data/seed";
 import { approvalValid, buildStages, diffStage } from "@/lib/rules";
 import { hasEvent, useStore } from "@/lib/store";
 import { useTourTarget } from "@/components/Tour";
-import { Button, Card, Empty, Pill, Sources, cn } from "@/components/ui";
+import { BasisTag, Button, Card, Empty, Pill, Proof, cn } from "@/components/ui";
 
 
 function wordDiff(a: string, b: string) {
@@ -32,11 +32,51 @@ function Changed({ before, after }: { before: string; after: string }) {
   );
 }
 
+function coverage(stageId: number, version: 1 | 2) {
+  if (stageId === 1) return { label: "Finacle records", n: 3, of: 3 };
+  if (stageId === 2) return { label: "SVS signatories", n: 3, of: 3 };
+  return { label: "SVS documents read", n: version === 1 ? 1 : 2, of: 2 };
+}
+
+function Coverage({ n, of, label }: { n: number; of: number; label: string }) {
+  const full = n === of;
+  return (
+    <span className={cn("inline-flex items-center gap-1.5 text-[11px]", full ? "text-ok-ink" : "text-warn-ink")} title={`${label}: ${n} of ${of}`}>
+      <span className="flex gap-0.5" aria-hidden>
+        {Array.from({ length: of }, (_, i) => (
+          <span key={i} className={cn("h-1.5 w-3 rounded-full", i < n ? (full ? "bg-ok" : "bg-warn") : "bg-line-strong")} />
+        ))}
+      </span>
+      {label} {n}/{of}
+    </span>
+  );
+}
+
+function ClaimRow({ label, value, sources }: { label: React.ReactNode; value: React.ReactNode; sources: EvidenceKey[] }) {
+  return (
+    <li className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] gap-4 px-3 py-3">
+      <div>
+        <p className="text-xs text-muted">{label}</p>
+        <p className="mt-0.5 text-sm">{value}</p>
+        <div className="mt-1.5">
+          <BasisTag keys={sources} />
+        </div>
+      </div>
+      <div className="space-y-1.5">
+        {sources.map((k) => (
+          <Proof key={k} k={k} />
+        ))}
+      </div>
+    </li>
+  );
+}
+
 export function ReviewView() {
   const { state, dispatch, version, setTab } = useStore();
   const tour = useTourTarget(1);
   const [returning, setReturning] = useState(false);
   const [note, setNote] = useState("");
+  const [checked, setChecked] = useState<Record<number, boolean>>({});
   if (!hasEvent(state, "submit")) return <Empty icon={ShieldCheck} title="Nothing to review yet" body="The agent sends you all 4 stages at once, so you review in one sitting." />;
   const stages = buildStages(version);
   const v1 = buildStages(1);
@@ -44,10 +84,12 @@ export function ReviewView() {
 
   return (
     <div className="max-w-4xl space-y-4" {...tour}>
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-sub">
-          Reviewing as <span className="font-medium text-ink">{checker.name}</span>, {checker.role}. The plan was made by the Access Agent, so you can approve it.
-        </p>
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex flex-wrap items-center gap-2 text-xs text-muted">
+          <BasisTag keys={["finacle-cif"]} /> came from a system record
+          <span className="mx-1 text-line-strong">|</span>
+          <BasisTag keys={["svs-man"]} /> the agent read a document, so compare it with the quote
+        </div>
         <Pill tone="neutral">Plan v{version}</Pill>
       </div>
       {stages.map((s, i) => {
@@ -59,12 +101,17 @@ export function ReviewView() {
         const wasReturned = state.returned?.stageId === s.id;
         const canAct = reviewing && !valid && prevOk;
         const canReturn = canAct && version === 1 && s.id === 3;
+        const needsCheck = s.items.some((it) => it.sources.some(isAgentRead));
+        const cov = coverage(s.id, version);
         return (
           <Card key={s.id} className={cn("p-5", canAct && "border-line-strong", valid && "bg-panel/30")}>
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-xs text-muted">Stage {s.id} of 4</p>
                 <h3 className="mt-0.5 text-base font-semibold">{s.title}</h3>
+                <div className="mt-1.5">
+                  <Coverage {...cov} />
+                </div>
               </div>
               <div className="flex flex-col items-end gap-1">
                 {valid ? (
@@ -85,33 +132,17 @@ export function ReviewView() {
             </div>
 
             {changes.length > 0 && !valid ? (
-              <ul className="mt-4 space-y-2">
+              <ul className="mt-4 divide-y divide-accent/20 rounded-lg border border-accent/30 bg-accent-soft/30">
                 {changes.map((c) => (
-                  <li key={c.key} className="rounded-lg border border-accent/30 bg-accent-soft/40 px-3 py-2.5">
-                    <p className="text-xs text-muted">
-                      <Changed before={c.beforeLabel} after={c.afterLabel} />
-                    </p>
-                    <p className="mt-0.5 text-sm">
-                      <Changed before={c.before} after={c.after} />
-                    </p>
-                    <div className="mt-1.5">
-                      <Sources keys={c.sources} />
-                    </div>
-                  </li>
+                  <ClaimRow key={c.key} label={<Changed before={c.beforeLabel} after={c.afterLabel} />} value={<Changed before={c.before} after={c.after} />} sources={c.sources} />
                 ))}
-                <li className="text-xs text-muted">{s.items.length - changes.length} other line{s.items.length - changes.length === 1 ? "" : "s"} unchanged</li>
+                <li className="px-3 py-2 text-xs text-muted">{s.items.length - changes.length} other line{s.items.length - changes.length === 1 ? "" : "s"} unchanged</li>
               </ul>
             ) : (
               !valid && (
                 <ul className="mt-4 divide-y divide-line rounded-lg border border-line">
                   {s.items.map((it) => (
-                    <li key={it.key} className="flex items-start justify-between gap-4 px-3 py-2.5">
-                      <div>
-                        <p className="text-xs text-muted">{it.label}</p>
-                        <p className="text-sm">{it.value}</p>
-                      </div>
-                      <Sources keys={it.sources} />
-                    </li>
+                    <ClaimRow key={it.key} label={it.label} value={it.value} sources={it.sources} />
                   ))}
                 </ul>
               )
@@ -126,9 +157,25 @@ export function ReviewView() {
                   </p>
                 </div>
               ) : (
-                <p className="mt-3 flex items-center gap-1.5 text-xs text-ok-ink">
-                  <Check className="h-3.5 w-3.5" strokeWidth={3} /> Read every SVS document on this account (2 of 2)
-                </p>
+                <>
+                  <p className="mt-3 flex items-center gap-1.5 text-xs text-ok-ink">
+                    <Check className="h-3.5 w-3.5" strokeWidth={3} /> Read every SVS document on this account (2 of 2)
+                  </p>
+                  <div className="mt-3 flex items-start gap-2.5 rounded-lg border border-line bg-panel/60 px-3 py-2.5">
+                    <Repeat className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium">Make this fix stick?</p>
+                      <p className="mt-0.5 text-xs text-sub">The agent proposes: on every case, read all SVS document types, not just Mandates. A supervisor has to approve it.</p>
+                    </div>
+                    {state.log.some((e) => e.id === "lesson") ? (
+                      <Pill tone="neutral">Sent to supervisor</Pill>
+                    ) : (
+                      <Button size="sm" onClick={() => dispatch({ type: "lesson" })}>
+                        Send to supervisor
+                      </Button>
+                    )}
+                  </div>
+                </>
               )
             )}
 
@@ -138,9 +185,15 @@ export function ReviewView() {
               </p>
             )}
 
+            {canAct && !returning && needsCheck && (
+              <label className="mt-4 flex cursor-pointer items-center gap-2 text-sm text-sub">
+                <input type="checkbox" className="accent-accent" checked={!!checked[s.id]} onChange={(e) => setChecked((c) => ({ ...c, [s.id]: e.target.checked }))} />
+                I compared the highlighted words with the agent&apos;s lines
+              </label>
+            )}
             {canAct && !returning && (
-              <div className="mt-4 flex gap-2">
-                <Button variant="primary" onClick={() => dispatch({ type: "approve", stageId: s.id })}>
+              <div className="mt-3 flex gap-2">
+                <Button variant="primary" disabled={needsCheck && !checked[s.id]} onClick={() => dispatch({ type: "approve", stageId: s.id })}>
                   <Check className="h-3.5 w-3.5" /> Approve stage {s.id}
                 </Button>
                 {s.id === 3 && (

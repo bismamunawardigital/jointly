@@ -205,8 +205,7 @@ export const evidence: Record<EvidenceKey, Evidence> = {
     system: "SVS",
     ref: "SVS-MAN-2019-0441",
     body: mandateText,
-    highlight:
-      "Notwithstanding the above, Khalifa Saeed Al Falasi may sign singly for AED payments up to and including AED 10,000.",
+    highlight: "may sign singly for AED payments up to and including AED 10,000",
   },
   "svs-amd": {
     key: "svs-amd",
@@ -227,6 +226,9 @@ export const evidence: Record<EvidenceKey, Evidence> = {
     note: "Same RCIF, so we link this login instead of creating a second one.",
   },
 };
+
+const agentRead: EvidenceKey[] = ["form-mohammed", "form-khalifa", "form-rashid", "svs-man", "svs-man-c1", "svs-man-c2", "svs-amd"];
+export const isAgentRead = (k: EvidenceKey) => agentRead.includes(k);
 
 export const svsDocTypes = ["Mandate", "Letter", "Board resolution", "Specimen signature"] as const;
 

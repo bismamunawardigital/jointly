@@ -1,9 +1,11 @@
 "use client";
 
+import { useState } from "react";
+import { createPortal } from "react-dom";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { FileText, Info } from "lucide-react";
-import { EvidenceKey, PersonId, evidence, personById } from "@/data/seed";
+import { Check, Eye, FileText, Info } from "lucide-react";
+import { EvidenceKey, PersonId, evidence, isAgentRead, personById } from "@/data/seed";
 import { useStore } from "@/lib/store";
 
 export const cn = (...a: ClassValue[]) => twMerge(clsx(a));
@@ -50,21 +52,89 @@ export function sourceLabel(k: EvidenceKey) {
   return `${sys} ${e.ref.replace("SVS-", "")}`;
 }
 
+export function quoteOf(k: EvidenceKey) {
+  const e = evidence[k];
+  if (!e.highlight || !e.body.includes(e.highlight)) return { pre: "", hit: e.body, post: "" };
+  const [a, b] = e.body.split(e.highlight);
+  const pw = a.trim().split(" ").filter(Boolean);
+  const qw = b.trim().split(" ").filter(Boolean);
+  return {
+    pre: (pw.length > 6 ? "… " : "") + pw.slice(-6).join(" "),
+    hit: e.highlight,
+    post: qw.slice(0, 6).join(" ") + (qw.length > 6 ? " …" : ""),
+  };
+}
+
+export function Quote({ k, className }: { k: EvidenceKey; className?: string }) {
+  const q = quoteOf(k);
+  return (
+    <span className={cn("text-[13px] leading-relaxed text-sub", className)}>
+      &ldquo;{q.pre && `${q.pre} `}
+      <mark className="rounded bg-accent-soft px-0.5 font-medium text-accent-ink">{q.hit}</mark>
+      {q.post && (/^[.,;:]/.test(q.post) ? q.post : ` ${q.post}`)}&rdquo;
+    </span>
+  );
+}
+
+export function BasisTag({ keys }: { keys: EvidenceKey[] }) {
+  const read = keys.some(isAgentRead);
+  return read ? (
+    <span className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-md bg-warn-soft px-1.5 py-0.5 text-[11px] font-medium text-warn-ink" title="The agent read this from a document. Check it against the quote.">
+      <Eye className="h-3 w-3" aria-hidden /> Agent read this
+    </span>
+  ) : (
+    <span className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-md bg-ok-soft px-1.5 py-0.5 text-[11px] font-medium text-ok-ink" title="Copied from a system record. No interpretation.">
+      <Check className="h-3 w-3" strokeWidth={3} aria-hidden /> Exact match
+    </span>
+  );
+}
+
+export function Proof({ k }: { k: EvidenceKey }) {
+  return (
+    <div className="rounded-lg border border-line bg-panel/60 px-3 py-2">
+      <Quote k={k} className="block" />
+      <SourceChip k={k} className="mt-1.5" />
+    </div>
+  );
+}
+
 export function SourceChip({ k, className }: { k: EvidenceKey; className?: string }) {
   const { openEvidence } = useStore();
+  const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
+  const e = evidence[k];
+  const show = (el: HTMLElement) => {
+    const r = el.getBoundingClientRect();
+    setPos({ x: Math.min(r.left, window.innerWidth - 300), y: r.bottom + 6 });
+  };
   return (
-    <button
-      type="button"
-      onClick={() => openEvidence(k)}
-      className={cn(
-        "inline-flex max-w-full items-center gap-1 rounded-md border border-line bg-surface px-1.5 py-0.5 font-mono text-[11px] text-sub transition-colors duration-150 ease-out hover:border-accent/40 hover:text-accent-ink active:scale-[0.97]",
-        className,
-      )}
-      title={`${evidence[k].title} · ${evidence[k].system}`}
-    >
-      <FileText className="h-3 w-3 shrink-0" aria-hidden />
-      <span className="truncate">{sourceLabel(k)}</span>
-    </button>
+    <span className={cn("inline-flex max-w-full", className)}>
+      <button
+        type="button"
+        onClick={() => openEvidence(k)}
+        onMouseEnter={(ev) => show(ev.currentTarget)}
+        onMouseLeave={() => setPos(null)}
+        onFocus={(ev) => show(ev.currentTarget)}
+        onBlur={() => setPos(null)}
+        aria-label={`${e.title}, ${e.system}. Open source`}
+        className="inline-flex max-w-full items-center gap-1 rounded-md border border-line bg-surface px-1.5 py-0.5 font-mono text-[11px] text-sub transition-colors duration-150 ease-out hover:border-accent/40 hover:text-accent-ink active:scale-[0.97]"
+      >
+        <FileText className="h-3 w-3 shrink-0" aria-hidden />
+        <span className="truncate">{sourceLabel(k)}</span>
+      </button>
+      {pos &&
+        createPortal(
+          <span role="tooltip" className="pointer-events-none fixed z-[60] block w-72 animate-enter rounded-lg border border-line bg-surface p-3 text-left shadow-lg" style={{ left: pos.x, top: pos.y }}>
+            <span className="flex items-start justify-between gap-2">
+              <span className="text-[11px] text-muted">
+                {e.system} · {e.title}
+              </span>
+              <BasisTag keys={[k]} />
+            </span>
+            <Quote k={k} className="mt-2 block" />
+          </span>,
+          document.body,
+        )}
+    </span>
   );
 }
 
