@@ -210,31 +210,33 @@ export default function CaseStudy() {
         </div>
       </header>
 
-      <section id="hero" className="mx-auto grid max-w-6xl items-start gap-10 px-6 pb-12 pt-2 md:pt-4">
-        <div className="md:max-w-[519px]">
+      <section id="hero" className="pb-12 pt-0">
+        <div className="mx-auto max-w-6xl px-6">
           <p className="text-[13px] text-muted">Case study · Agentic AI for bank operations · Bisma Munawar, Product Designer</p>
-          <h1 className="mt-3 font-display text-[36px] leading-[1.05] tracking-tight md:text-[50px]">A company with 3 signatories usually waits 5 days to get online banking, and Jointly gets them live before lunch.</h1>
-          <p className="mt-4 max-w-xl text-base text-sub md:text-lg">Jointly is an AI agent that prepares the setup from the bank&apos;s old systems, and a person approves every step.</p>
-          <p className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm">
+          <h1 className="mt-2 font-display leading-[1.05] tracking-tight" style={{ fontSize: "clamp(36px, 3.6vw, 52px)" }}>A company with 3 signatories usually waits 5 days to get online banking, and Jointly gets them live before lunch.</h1>
+          <p className="mt-3 max-w-xl text-base text-sub md:text-lg">Jointly is an AI agent that prepares the setup from the bank&apos;s old systems, and a person approves every step.</p>
+          <p className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm">
             <Gloss term="Joint signatories" def="2 or more people who must approve a company's payments together." />
             <Gloss term="Accounts operations team" def="The bank team that sets up their online banking by hand." />
           </p>
-          <dl className="mt-6 grid grid-cols-3 gap-4 md:gap-6">
-            {stats.map((s) => (
-              <div key={s.k}>
-                <dd className="tnum whitespace-nowrap font-display text-2xl md:text-3xl">{s.v}</dd>
-                <dt className="mt-1 text-xs text-muted">{s.k}</dt>
-              </div>
-            ))}
-          </dl>
-          <div className="mt-6 flex flex-wrap items-center gap-3">
-            <Link href="/demo/case/" className={primary}>
-              Open the demo (5 min) <ArrowRight className="h-4 w-4" />
-            </Link>
+          <div className="mt-4 flex flex-wrap items-end justify-between gap-6">
+            <dl className="grid grid-cols-3 gap-4 md:gap-8">
+              {stats.map((s) => (
+                <div key={s.k} className="max-w-[180px]">
+                  <dd className="tnum whitespace-nowrap font-display text-2xl md:text-3xl">{s.v}</dd>
+                  <dt className="mt-1 text-xs text-muted">{s.k}</dt>
+                </div>
+              ))}
+            </dl>
+            <div className="flex flex-col items-start gap-2 md:items-end">
+              <Link href="/demo/case/" className={primary}>
+                Open the demo (5 min) <ArrowRight className="h-4 w-4" />
+              </Link>
+              <p className="text-[11px] text-muted">Synthetic case. Not measured in a real bank.</p>
+            </div>
           </div>
-          <p className="mt-3 text-[11px] text-muted">Synthetic case. Not measured in a real bank.</p>
         </div>
-        <div className="min-w-0">
+        <div className="mx-auto mt-3 max-w-[1248px] px-6">
           <HeroStage />
         </div>
       </section>
