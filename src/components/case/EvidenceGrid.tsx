@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Gloss } from "@/components/landing/Gloss";
+import { glossary } from "@/content/glossary";
 import { AlertTriangle, Check, X } from "lucide-react";
 import { EvidenceKey, evidence, people } from "@/data/seed";
 import { buildRules, fmt, singleLimit } from "@/lib/rules";
@@ -63,7 +65,7 @@ function FinacleCrop({ id }: { id: string }) {
         </div>
       </div>
       <p className="text-ink">
-        The SVS mandate says <q>{svsName}</q> and the form says <q>{p.name}</q>. The agent matched them by Emirates ID and RCIF, so it doesn&apos;t matter how the name is written.
+        The SVS mandate says <q>{svsName}</q> and the form says <q>{p.name}</q>. The agent matched them by Emirates ID and <Gloss term="RCIF" def={glossary.RCIF} />, so it doesn&apos;t matter how the name is written.
       </p>
     </div>
   );
@@ -194,7 +196,12 @@ export function EvidenceGrid() {
             <tr className="border-b border-line text-left text-[11px] text-muted">
               <th scope="col" className="px-3 py-2.5 font-medium">Who</th>
               {cols.map((c) => (
-                <th key={c} scope="col" className="px-3 py-2.5 font-medium">{c}</th>
+                <th key={c} scope="col" className="px-3 py-2.5 font-medium">
+                  {c === "Finacle" ? <Gloss term="Finacle" def={glossary.Finacle} />
+                    : c === "EFR" ? <Gloss term="EFR" def={glossary.EFR} />
+                    : c === "SVS mandate 2019" ? <><Gloss term="SVS" def={glossary.SVS} align="end" /> <Gloss term="mandate" def={glossary.Mandate} align="end" /> 2019</>
+                    : c}
+                </th>
               ))}
             </tr>
           </thead>

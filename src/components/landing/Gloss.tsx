@@ -2,7 +2,7 @@
 
 import { useId, useState } from "react";
 
-export function Gloss({ term, def }: { term: string; def: string }) {
+export function Gloss({ term, def, align = "start" }: { term: string; def: string; align?: "start" | "end" }) {
   const [open, setOpen] = useState(false);
   const id = useId();
   return (
@@ -19,7 +19,7 @@ export function Gloss({ term, def }: { term: string; def: string }) {
       >
         {term}
       </button>
-      <span role="tooltip" id={id} className={`absolute start-0 top-full z-30 mt-2 w-64 rounded-lg border border-line bg-surface p-3 text-xs leading-relaxed text-sub shadow-lg ${open ? "block" : "hidden"}`}>
+      <span role="tooltip" id={id} className={`absolute ${align === "end" ? "end-0" : "start-0"} top-full z-30 mt-2 w-64 rounded-lg border border-line bg-surface p-3 text-xs leading-relaxed text-sub shadow-lg ${open ? "block" : "hidden"}`}>
         {def}
       </span>
     </span>

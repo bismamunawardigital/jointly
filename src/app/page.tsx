@@ -11,6 +11,7 @@ import { Moments } from "@/components/landing/Moments";
 import { LangSwitch } from "@/components/landing/LangSwitch";
 import { statsEn } from "@/content/stats";
 import { PORTFOLIO_URL } from "@/content/portfolio";
+import { glossary } from "@/content/glossary";
 
 const stats = statsEn;
 
@@ -66,9 +67,9 @@ const sources = [
   { s: "Feng, McDonald and Zhang, 2025", href: "https://arxiv.org/html/2506.12469v1", f: "Autonomy is a design choice." },
 ];
 
-const why: [string, string][] = [
-  ["The mandate is free text in a scanned letter.", "The agent reads it and quotes the line."],
-  ["Finacle and SVS disagree.", "Rules pick the newer source."],
+const why: [React.ReactNode, string][] = [
+  [<>The <Gloss term="mandate" def={glossary.Mandate} /> is free text in a scanned letter.</>, "The agent reads it and quotes the line."],
+  [<><Gloss term="Finacle" def={glossary.Finacle} /> and <Gloss term="SVS" def={glossary.SVS} /> disagree.</>, "Rules pick the newer source."],
   ["Digital Banking Admin has no API.", "The agent writes, reads back and retries."],
 ];
 
@@ -299,7 +300,7 @@ export default function CaseStudy() {
           <h2 className={h2}>Why an agent, and not a better form</h2>
           <ul className="mt-8 space-y-3">
             {why.map(([mess, fix]) => (
-              <li key={mess} className="grid items-center gap-3 md:grid-cols-[1fr_auto_1fr]">
+              <li key={fix} className="grid items-center gap-3 md:grid-cols-[1fr_auto_1fr]">
                 <p className="rounded-card border border-line bg-surface px-5 py-4 text-sm text-sub">{mess}</p>
                 <ArrowRight aria-hidden className="mx-auto h-5 w-5 rotate-90 text-accent md:rotate-0" />
                 <p className="rounded-card border border-ok/30 bg-ok-soft px-5 py-4 text-sm font-medium text-ok-ink">{fix}</p>
@@ -328,7 +329,7 @@ export default function CaseStudy() {
             {systems.map((x) => (
               <li key={x.name} className="rounded-card border border-line bg-surface p-5">
                 <div className="flex items-center justify-between gap-2">
-                  <p className="font-semibold">{x.name}</p>
+                  <p className="font-semibold">{x.name === "EFR" ? <Gloss term="EFR" def={glossary.EFR} /> : x.name}</p>
                   <span className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${x.tag === "Write" ? "bg-accent-soft text-accent-ink" : x.tag === "Check" ? "bg-ok-soft text-ok-ink" : "bg-panel text-sub"}`}>{x.tag}</span>
                 </div>
                 <p className="mt-2 text-sm text-sub">{x.d}</p>
