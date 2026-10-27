@@ -29,8 +29,8 @@ export const moments: Moment[] = [
     notReady: "This opens once the agent sends the plan for review.",
   },
   {
-    title: "Release what's safe, hold the rest",
-    body: "Rashid is held. The rules prove the other two can still sign, so Sara releases them now.",
+    title: "Grant access where it's safe, hold the rest",
+    body: "Rashid is held. The rules prove the other two can still sign, so Sara grants them access now.",
     tab: "release",
     readyWhen: after("executed"),
     notReady: "This opens after Sara approves all 4 stages and the agent sets them up.",
@@ -40,7 +40,7 @@ export const moments: Moment[] = [
     body: "The agent never sees a password. Each person sets their own login.",
     tab: "release",
     readyWhen: after("releasing"),
-    notReady: "This opens after Sara releases Mohammed and Khalifa.",
+    notReady: "This opens after Sara grants access to Mohammed and Khalifa.",
   },
 ];
 

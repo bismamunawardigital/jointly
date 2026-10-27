@@ -195,13 +195,13 @@ function reducer(s: State, a: Action): State {
     }
     case "releaseRashid": {
       if (s.phase !== "rashid_ready") return s;
-      const log = [...s.log, human("release-rashid", "Wed 09:41", "Released Rashid")];
+      const log = [...s.log, human("release-rashid", "Wed 09:41", "Granted access to Rashid")];
       return { ...s, log, phase: "releasing_rashid", queue: groupEvents("rashid"), queueGroup: "rashid" };
     }
     case "sendCleanup":
       return { ...s, cleanupTicket: "sent", log: [...s.log, human("cleanup", "Mon 09:40", "Sent Finacle Mode of Operation cleanup ticket to Data Quality")] };
     case "release": {
-      const log = [...s.log, human("release", "Mon 10:51", "Released Mohammed and Khalifa. Rashid stays held.")];
+      const log = [...s.log, human("release", "Mon 10:51", "Granted access to Mohammed and Khalifa. Rashid stays held.")];
       return { ...s, log, phase: "releasing", queue: groupEvents("release"), queueGroup: "release" };
     }
     case "renew": {
@@ -288,7 +288,7 @@ export function StoreProvider({ children, frozen = false, initial }: { children:
 
   useEffect(() => {
     if (frozen || !hydrated || !state.queue.length || state.paused) return;
-    const hold: Record<string, number> = { "ex-workflow": 2000, "ex-readback": 1000, "ex-eligibility": 2000 };
+    const hold: Record<string, number> = { "ex-workflow-fail": 3000, "ex-workflow": 3000, "ex-readback": 3000, "ex-eligibility": 2000 };
     const t = setTimeout(() => dispatch({ type: "reveal" }), hold[state.queue[0]] ?? (state.queueGroup === "run" ? 1100 : 650));
     return () => clearTimeout(t);
   }, [state.queue, state.queueGroup, state.paused, hydrated, frozen]);

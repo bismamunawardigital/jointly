@@ -56,7 +56,7 @@ export const autonomy: AutonomyLane[] = [
       { text: "Waive EFR" },
       { text: "Match people on a similar name" },
       { text: "Approve its own work" },
-      { text: "Release access the mandate can't support" },
+      { text: "Grant access the mandate can't support" },
       { text: "See, make or send a password" },
     ],
   },

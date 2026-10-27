@@ -259,7 +259,7 @@ export const otherCases: QueueCase[] = [
     id: "gulf-horizon",
     business: "Gulf Horizon Logistics",
     type: "Joint signatories (4)",
-    stage: "Release",
+    stage: "Grant access",
     status: "Live",
     owner: "None",
     age: "1d",

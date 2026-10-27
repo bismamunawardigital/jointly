@@ -51,14 +51,20 @@ export function NeedsYou() {
   const elig = releaseEligibility(rulesFor(version), held);
   const failing = policyChecks(version, held).filter((c) => !c.pass).length;
   const done = state.log.filter((e) => e.kind === "agent").length;
-  const [toast, setToast] = useState<{ text: string; prev: State } | null>(null);
+  const [toast, setToast] = useState<{ text: string; prev: State; kind: "release" | "releaseRashid" } | null>(null);
   useEffect(() => {
     if (!toast) return;
-    const t = setTimeout(() => setToast(null), 10000);
+    const t = setTimeout(() => {
+      if (toast.kind === "release") window.dispatchEvent(new Event("jointly:customer"));
+      setToast(null);
+    }, 10000);
     return () => clearTimeout(t);
   }, [toast]);
+  useEffect(() => {
+    if (["running", "in_review", "revising"].includes(state.phase)) setToast(null);
+  }, [state.phase]);
   const releaseNow = (type: "release" | "releaseRashid", text: string) => {
-    setToast({ text, prev: state });
+    setToast({ text, prev: state, kind: type });
     dispatch({ type });
   };
   const go = (t: Tab, anchor: string, focus?: string) => {
@@ -174,15 +180,15 @@ export function NeedsYou() {
   } else if (state.phase === "executed") {
     sub = elig.summary;
     actions = (
-      <Button variant="primary" disabled={!elig.eligible || failing > 0} onClick={() => releaseNow("release", "Mohammed and Khalifa are being released, and their messages go out in 10 seconds.")}>
-        Release Mohammed and Khalifa
+      <Button variant="primary" disabled={!elig.eligible || failing > 0} onClick={() => releaseNow("release", "Mohammed and Khalifa are getting access, and their messages go out in 10 seconds.")}>
+        Grant access to Mohammed and Khalifa
       </Button>
     );
   } else if (state.phase === "rashid_ready") {
     sub = "Adding him keeps every approval combination valid.";
     actions = (
-      <Button variant="primary" onClick={() => releaseNow("releaseRashid", "Rashid is being released, and his message goes out in 10 seconds.")}>
-        Release Rashid
+      <Button variant="primary" onClick={() => releaseNow("releaseRashid", "Rashid is getting access, and his message goes out in 10 seconds.")}>
+        Grant access to Rashid
       </Button>
     );
   } else if (state.phase === "partially_live") {
@@ -190,7 +196,7 @@ export function NeedsYou() {
     actions = <Button variant="primary" onClick={() => dispatch({ type: "renew" })}>Skip ahead 2 days: Rashid renews his ID</Button>;
   } else if (state.phase === "live") {
     sub = "Nothing left to do. Every step is in History.";
-    actions = <Button variant="primary" onClick={() => setTab("audit")}>Open history</Button>;
+    actions = <Button onClick={() => setTab("audit")}>Open history</Button>;
   }
 
   return (

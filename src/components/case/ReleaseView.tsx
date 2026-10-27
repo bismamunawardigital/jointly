@@ -44,7 +44,7 @@ export function ReleaseView() {
   const released = hasEvent(state, "rel-mohammed");
   const msgs = released ? sent : pending;
   const firstLogin = hasEvent(state, "rel-mohammed-login") ? mins(eventById("rel-mohammed-login").time) - mins(eventById("intake-forms").time) : 0;
-  const sentence = state.phase === "rashid_ready" ? "Rashid's EID is renewed. Release Rashid?" : released ? "Mohammed and Khalifa are live. Rashid joins after his EID." : "Mohammed and Khalifa can approve together. They can go live today.";
+  const sentence = state.phase === "rashid_ready" ? "Rashid's EID is renewed. Grant him access?" : released ? "Mohammed and Khalifa are live. Rashid joins after his EID." : "Mohammed and Khalifa can approve together. They can go live today.";
 
   return (
     <div className="max-w-5xl space-y-5">
@@ -73,7 +73,7 @@ export function ReleaseView() {
                 <p className="font-display text-xl leading-snug">{sentence}</p>
                 {held.includes("rashid") && (
                   <div className="mt-2">
-                    <AssumptionChip>partial release, validate with bank</AssumptionChip>
+                    <AssumptionChip>access for 2 of 3 partners, validate with bank</AssumptionChip>
                   </div>
                 )}
               </div>
@@ -142,7 +142,7 @@ export function ReleaseView() {
                     {m.channel} to {m.to}
                   </p>
                   <p className="mt-1 max-w-[90%] rounded-2xl rounded-tl-sm bg-surface px-3 py-2 text-sm shadow-sm">{m.text}</p>
-                  <p className="mt-1 text-[11px] text-sub">{m.approval === "auto" ? "Pre-approved template, sent automatically" : "Approved by Sara M. with the release"}</p>
+                  <p className="mt-1 text-[11px] text-sub">{m.approval === "auto" ? "Pre-approved template, sent automatically" : "Approved by Sara M. when she granted access"}</p>
                   <details className="mt-1">
                     <summary className="cursor-pointer text-[11px] text-muted">Technical details</summary>
                     <p className="mt-1 font-mono text-[11px] text-muted">template {m.template}</p>

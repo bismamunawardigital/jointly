@@ -19,12 +19,63 @@ const glyph: Record<Tone, React.ReactNode> = {
   held: <span className="h-3 w-3 shrink-0 rounded-full border border-dashed border-held" aria-hidden />,
   na: <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-line-strong" aria-hidden />,
 };
+const checkedBy = [
+  "Rules: the Emirates ID on the form must match Finacle.",
+  "Rules: people are matched by Emirates ID, not by name.",
+  "EFR: the ID must be valid and the face must match it.",
+  "Rules: each person gets one login, and existing ones are reused.",
+  "Rules: each mandate clause becomes a payment rule.",
+  "Sara confirms the value, then rules apply it.",
+  "Rules: the setup must match the mandate exactly.",
+];
+
+function Outlined({ text, needle }: { text: string; needle?: string }) {
+  const i = needle ? text.indexOf(needle) : -1;
+  if (!needle || i < 0) return <>{text}</>;
+  return (
+    <>
+      {text.slice(0, i)}
+      <mark className="rounded bg-transparent px-0.5 text-ink outline outline-2 outline-accent">{needle}</mark>
+      {text.slice(i + needle.length)}
+    </>
+  );
+}
+
+function FinacleCrop({ id }: { id: string }) {
+  const p = people.find((x) => x.id === id)!;
+  const cifName = evidence[`cif-${id}` as EvidenceKey].body.split(",")[0].replace(/^\d+ /, "");
+  const svsName = new RegExp(`([^.]*) \\(RCIF ${p.rcif}\\)`).exec(evidence["svs-signatories"].body)?.[1].trim() ?? p.name;
+  const f = (k: string, v: string, mark?: boolean) => (
+    <div className="grid grid-cols-[92px_1fr] items-center gap-2">
+      <span className="text-[10px] font-semibold text-[#1f2d3d]">{k}</span>
+      <span className={cn("border border-[#9aa7b4] bg-white px-1.5 py-0.5 font-mono text-[10px] text-black", mark && "outline outline-2 outline-offset-1 outline-accent")}>{v}</span>
+    </div>
+  );
+  return (
+    <div className="space-y-2">
+      <div className="overflow-hidden rounded border border-[#9aa7b4] bg-[#eef1f5]">
+        <div className="bg-gradient-to-b from-[#5a7184] to-[#3e5568] px-2 py-1 text-[10px] font-semibold text-white">Inquire on Customer</div>
+        <div className="space-y-1 p-2">
+          {f("CIF ID", p.rcif)}
+          {f("Customer Name", cifName)}
+          {f("Emirates ID", `•••• ${p.eidLast4}`, true)}
+          {f("Mobile", `•••• ${p.mobileLast4 ?? ""}`)}
+        </div>
+      </div>
+      <p className="text-ink">
+        The SVS mandate says <q>{svsName}</q> and the form says <q>{p.name}</q>. The agent matched them by Emirates ID and RCIF, so the spelling doesn&apos;t matter.
+      </p>
+    </div>
+  );
+}
+
 const toneWord: Record<Tone, string> = { ok: "Exact match", warn: "Needs you", bad: "Blocked", held: "Held", na: "Not applicable" };
 
 export function EvidenceGrid() {
   const { state, version, held, openEvidence, setTab } = useStore();
   const [active, setActive] = useState<string | null>(null);
   const [diff, setDiff] = useState(false);
+  const [pinned, setPinned] = useState<string | null>(null);
   const limit = singleLimit(buildRules(version))!;
   const v2 = version === 2;
   const renewed = hasEvent(state, "ren-kyc");
@@ -55,7 +106,7 @@ export function EvidenceGrid() {
             : { tone: "warn", text: "25,000? Unclear scan", src: "svs-amd", why: "The amount on the 2023 letter is smudged. Type what you read in stage 3." }
           : na,
         isHeld
-          ? { tone: "held", text: "Created, switched off", why: "Set up now, switched on only after EFR passes and Sara releases him." }
+          ? { tone: "held", text: "Created, switched off", why: "Set up now, switched on only after EFR passes and Sara grants him access." }
           : { tone: "ok", text: p.id === "khalifa" ? `Solo to ${fmt(limit)}` : p.digitalUser.existing ? "Link existing login" : "New login", changed: p.id === "khalifa" && v2 },
       ],
     };
@@ -77,11 +128,14 @@ export function EvidenceGrid() {
 
   const all = rows.flatMap((r) => r.cells);
   const count = (t: Tone) => new Set(all.filter((c) => c.tone === t).map((c, i) => (t === "warn" ? c.src : i))).size;
-  const act = (c: CellData) => {
-    if (c.tone === "warn") {
-      setTab("review");
-      setTimeout(() => document.getElementById("stage-3")?.scrollIntoView({ behavior: "smooth", block: "center" }), 50);
-    } else if (c.src) openEvidence(c.src);
+  const toLetter = () => {
+    setPinned(null);
+    setTab("review");
+    setTimeout(() => document.getElementById("stage-3")?.scrollIntoView({ behavior: "smooth", block: "center" }), 50);
+  };
+  const act = (c: CellData, key?: string) => {
+    if (c.tone === "na") return;
+    if (key) setPinned((p) => (p === key ? null : key));
   };
   const onKey = (e: React.KeyboardEvent<HTMLTableElement>) => {
     const el = e.target as HTMLElement;
@@ -92,9 +146,10 @@ export function EvidenceGrid() {
     const m = move[e.key];
     if (e.key === "Enter") {
       e.preventDefault();
-      act(rows[r].cells[c]);
+      act(rows[r].cells[c], `${r}-${c}`);
       return;
     }
+    if (e.key === "Escape") setPinned(null);
     if (!m) return;
     e.preventDefault();
     e.stopPropagation();
@@ -142,7 +197,8 @@ export function EvidenceGrid() {
                         data-c={c}
                         tabIndex={r === 0 && c === 0 ? 0 : -1}
                         aria-label={`${row.name}, ${cols[c]}: ${toneWord[cell.tone]}, ${cell.text}`}
-                        onClick={() => act(cell)}
+                        onClick={() => act(cell, key)}
+                        aria-expanded={pinned === key}
                         onMouseEnter={() => setActive(key)}
                         onMouseLeave={() => setActive(null)}
                         onFocus={() => setActive(key)}
@@ -160,7 +216,37 @@ export function EvidenceGrid() {
                         {glyph[cell.tone]}
                         <span className={/^(EID|RCIF) /.test(cell.text) ? "min-w-0 whitespace-nowrap font-mono text-[11px]" : "min-w-0"}>{cell.text}</span>
                       </button>
-                      {active === key && tip && (
+                      {pinned === key && (
+                        <div role="dialog" aria-label={`Source for ${row.name}, ${cols[c]}`} className="absolute left-2 top-full z-30 mt-1 w-80 rounded-lg border border-line bg-surface p-3 text-xs text-sub shadow-lg">
+                          <div className="mb-2 flex items-center justify-between gap-2">
+                            <span className="font-medium text-ink">{cell.src ? evidence[cell.src].system : cols[c]}</span>
+                            <button type="button" aria-label="Close" onClick={() => setPinned(null)} className="rounded p-0.5 text-muted hover:text-ink"><X className="h-3.5 w-3.5" /></button>
+                          </div>
+                          {cell.src && <p className="mb-1 font-mono text-[11px] text-muted">{evidence[cell.src].ref} · {evidence[cell.src].title}</p>}
+                          {c === 1 && row.id !== "mandate" ? <FinacleCrop id={row.id} /> : (
+                          <p className="rounded-md bg-panel p-2 leading-relaxed text-ink">
+                            {cell.src ? (
+                              <Outlined
+                                text={evidence[cell.src].body}
+                                needle={[cell.text.replace(/^(EID …|RCIF |Login )/, ""), evidence[cell.src].highlight].find((n) => n && evidence[cell.src!].body.includes(n))}
+                              />
+                            ) : (
+                              <Outlined text={cell.why ?? cell.text} needle={cell.why ? undefined : cell.text} />
+                            )}
+                          </p>
+                          )}
+                          <p className="mt-2">{checkedBy[c]}</p>
+                          <div className="mt-2 flex items-center justify-between gap-2 text-[11px] text-muted">
+                            <span>Synthetic record</span>
+                            {cell.tone === "warn" ? (
+                              <button type="button" onClick={toLetter} className="font-medium text-accent-ink hover:underline">Go to the letter check</button>
+                            ) : cell.src ? (
+                              <button type="button" onClick={() => { setPinned(null); openEvidence(cell.src!); }} className="font-medium text-accent-ink hover:underline">Open the full source</button>
+                            ) : null}
+                          </div>
+                        </div>
+                      )}
+                      {active === key && pinned !== key && tip && (
                         <div role="tooltip" className="absolute left-2 top-full z-20 mt-1 w-64 rounded-lg border border-line bg-surface p-3 text-xs text-sub shadow-lg">
                           {cell.src && <p className="mb-1 font-mono text-[11px] text-muted">{evidence[cell.src].ref}</p>}
                           {tip}

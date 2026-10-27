@@ -73,13 +73,13 @@ export function ProgressView() {
       : partLive
         ? [{ tone: "ok", lead: "2 of 3 live", text: rashidHeld ? "Mohammed and Khalifa can sign. Rashid joins after his EID." : "Mohammed and Khalifa can sign. Rashid is next.", who: "agent", people: ["mohammed", "khalifa"] }]
         : has("ex-readback")
-          ? [{ tone: "wait", lead: "Release", text: "is Sara's call.", who: "sara" }]
+          ? [{ tone: "wait", lead: "Granting access", text: "is Sara's call.", who: "sara" }]
           : [],
   };
 
   const reached = checkpoints.map((c) => has(c.done));
   const activeIdx = state.phase === "new" ? -1 : reached.findIndex((r) => !r);
-  const headline = state.phase === "live" ? "All 3 live" : partLive ? "2 of 3 live" : ["in_review", "re_review"].includes(state.phase) ? "Plan ready for your review" : state.phase === "executed" ? "Set up. Release is your call" : "Setting up Creekside General Trading";
+  const headline = state.phase === "live" ? "All 3 live" : partLive ? "2 of 3 live" : ["in_review", "re_review"].includes(state.phase) ? "Plan ready for your review" : state.phase === "executed" ? "Set up. Granting access is your call" : "Setting up Creekside General Trading";
   const working = state.queue.length && !state.paused ? eventById(state.queue[0]).step : null;
 
   return (

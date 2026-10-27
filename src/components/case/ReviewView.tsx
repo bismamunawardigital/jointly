@@ -270,7 +270,7 @@ export function ReviewView() {
   const judgement = version === 1 && !approvalValid(state.approvals[3], stages[2]);
   const byPhase: Partial<Record<string, string>> = {
     executing: "Signed off. The agent is setting it up.",
-    executed: "Set up and checked. Release is your call.",
+    executed: "Set up and checked. Granting access is your call.",
     partially_live: "2 of 3 signatories are live. Rashid is waiting for his EID.",
     rashid_ready: "2 of 3 signatories are live. Rashid's EID is renewed.",
     live: "Creekside is live. All 3 signatories, 1h 54m from form to first login.",
@@ -335,7 +335,7 @@ export function ReviewView() {
           </span>
           <div>
             <p className="font-display text-lg">Approved. Nice one.</p>
-            <p className="text-sm text-sub">Agent is setting this up in Digital Banking Admin. You&apos;ll be asked to release access.</p>
+            <p className="text-sm text-sub">Agent is setting this up in Digital Banking Admin. You&apos;ll be asked to grant access.</p>
           </div>
         </Card>
       )}

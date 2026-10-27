@@ -66,7 +66,7 @@ const steps = [
   { title: "Matches people by ID, never by name", tab: "evidence", V: Identity },
   { title: "Catches the expired ID before any work starts", tab: "run", V: Hold },
   { title: "Reads a blurry 2023 letter, and asks Sara to confirm", tab: "review", V: Scan },
-  { title: "Releases what's safe, holds the rest", tab: "release", V: Live },
+  { title: "Grants access where it's safe, holds the rest", tab: "release", V: Live },
 ];
 
 export function Moments({ titles, see = "See it live", v = en }: { titles?: string[]; see?: string; v?: Labels }) {

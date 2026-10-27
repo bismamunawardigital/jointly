@@ -1,11 +1,13 @@
 "use client";
 
 import { Ban, Scale, UserCheck, X } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { business } from "@/data/seed";
 import { duration, lastTime, statusOf } from "@/lib/derive";
 import { Tab, hasEvent, useStore, jumpState, initialState, allApproved, State } from "@/lib/store";
 import { Pill, cn, AgentMark } from "@/components/ui";
+import { ScenarioCard, scenarioSeen } from "./ScenarioCard";
+import { SourceCards, SourceSummary, TimeSkip, timeSkip, CustomerPhone, Finale, AutoplayControls } from "./Tour23";
 import { eventById } from "@/lib/script";
 import { LegacyBeat, NeedsYou } from "./NeedsYou";
 import { ReplayRun } from "./ReplayRun";
@@ -23,7 +25,7 @@ import { CommandPalette } from "@/components/CommandPalette";
 
 type Group = { id: "review" | "setup" | "history"; label: string; sections: { id: Tab; label: string }[] };
 const groups: Group[] = [
-  { id: "review", label: "Review", sections: [{ id: "review", label: "Checker review" }, { id: "release", label: "Release" }, { id: "run", label: "Agent progress" }] },
+  { id: "review", label: "Review", sections: [{ id: "review", label: "Checker review" }, { id: "release", label: "Grant access" }, { id: "run", label: "Agent progress" }] },
   { id: "setup", label: "Setup", sections: [{ id: "map", label: "Signing map" }, { id: "evidence", label: "Identity" }, { id: "plan", label: "Users and roles" }, { id: "simulator", label: "Simulator" }] },
   { id: "history", label: "History", sections: [{ id: "audit", label: "Timeline" }, { id: "decisions", label: "Decision record" }] },
 ];
@@ -41,14 +43,77 @@ function NotYet() {
   return <p className="rounded-xl border border-dashed border-line px-4 py-3 text-sm text-muted">This part fills in as the case moves.</p>;
 }
 
+function GuideText({ g, extra }: { g: Guide; extra?: React.ReactNode }) {
+  const [open, setOpen] = useState(false);
+  useEffect(() => setOpen(false), [g.t]);
+  return (
+    <div className="min-w-0">
+      <p>
+        {g.t}
+        {g.why && (
+          <button type="button" aria-expanded={open} onClick={() => setOpen((o) => !o)} className="ml-2 text-xs text-sub underline underline-offset-2 hover:text-ink">
+            Why?
+          </button>
+        )}
+        {extra}
+      </p>
+      {open && g.why && <p className="mt-1 text-xs text-sub">{g.why}</p>}
+    </div>
+  );
+}
+
 export function CaseWorkspace() {
   const { state, dispatch, tab, setTab, hydrated } = useStore();
   const [progressOpen, setProgressOpen] = useState(false);
   const agentWorking = state.queue.length > 0 && !state.paused;
   const letterAsk = !agentWorking && hasEvent(state, "submit") && state.phase === "in_review" && state.confirmed === undefined && !state.copy;
   const wasRun = useRef(false);
+  const [auto, setAuto] = useState<"off" | "on" | "paused">("off");
+  const [phone, setPhone] = useState<"none" | "open" | "seen">("none");
+  const closePhone = useCallback(() => setPhone("seen"), []);
   useEffect(() => {
-    if (!hydrated || sessionStorage.getItem("jointly-opened")) return;
+    const on = () => { setPhone("open"); timeSkip("Later that afternoon"); };
+    window.addEventListener("jointly:customer", on);
+    return () => window.removeEventListener("jointly:customer", on);
+  }, []);
+  useEffect(() => {
+    if (["running", "in_review", "re_review", "revising", "executing", "executed"].includes(state.phase)) setPhone("none");
+  }, [state.phase]);
+  const clockPhase = useRef(state.phase);
+  useEffect(() => {
+    const was = clockPhase.current;
+    clockPhase.current = state.phase;
+    if (state.phase === "revising" && was === "in_review") timeSkip("1 hour later");
+    if (state.phase === "renewing" && was === "partially_live") timeSkip("2 days later");
+  }, [state.phase]);
+  const startRun = () => {
+    sessionStorage.setItem("jointly-opened", "1");
+    setPhone("none");
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) dispatch({ type: "hydrate", state: { ...initialState, tourOn: true } });
+    else {
+      dispatch({ type: "watchRun" });
+      dispatch({ type: "tour", on: true });
+      dispatch({ type: "start", group: "run" });
+    }
+    setTab("review");
+  };
+  useEffect(() => {
+    if (auto !== "on" || state.queue.length || phone === "open") return;
+    let next: (() => void) | null = null;
+    const p = state.phase;
+    if ((p === "in_review" || p === "re_review") && allApproved(state)) next = () => dispatch({ type: "signoff" });
+    else if (p === "in_review" && hasEvent(state, "submit") && state.confirmed === undefined && !state.copy) next = () => dispatch({ type: "confirm", value: 25000 });
+    else if (p === "executed") next = () => dispatch({ type: "release" });
+    else if (p === "partially_live" && phone === "none") next = () => window.dispatchEvent(new Event("jointly:customer"));
+    else if (p === "partially_live") next = () => dispatch({ type: "renew" });
+    else if (p === "rashid_ready") next = () => dispatch({ type: "releaseRashid" });
+    else if (p === "live") next = () => setAuto("off");
+    if (!next) return;
+    const t = setTimeout(next, 4500);
+    return () => clearTimeout(t);
+  }, [auto, state, phone, dispatch]);
+  useEffect(() => {
+    if (!hydrated || sessionStorage.getItem("jointly-opened") || !scenarioSeen()) return;
     sessionStorage.setItem("jointly-opened", "1");
     if (window.location.search.includes("moment") || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     if (state.phase !== "in_review" || state.confirmed !== undefined || state.copy) return;
@@ -200,7 +265,14 @@ export function CaseWorkspace() {
         </header>
         {state.tourOn && (
           <div role="status" aria-label="Guide" className="flex items-center justify-between gap-3 border-b border-line bg-panel px-8 py-2 text-sm text-ink">
-            <p>{guideLine(state, agentWorking)}</p>
+            <GuideText
+      key={phone}
+      g={phone === "open" ? { t: "This is what Khalifa sees on his phone." } : guideLine(state, agentWorking)}
+      extra={phone === "seen" && state.phase !== "live" ? (
+        <button type="button" onClick={() => setPhone("open")} className="ml-3 text-xs text-sub underline underline-offset-2 hover:text-ink">What the customer saw</button>
+      ) : undefined}
+    />
+    {auto !== "off" && <AutoplayControls paused={auto === "paused"} onToggle={() => setAuto(auto === "paused" ? "on" : "paused")} onStop={() => setAuto("off")} />}
             <button type="button" aria-label="Hide guide" onClick={() => dispatch({ type: "tour", on: false })} className="rounded p-1 text-muted hover:text-ink">
               <X className="h-4 w-4" />
             </button>
@@ -225,11 +297,21 @@ export function CaseWorkspace() {
         )}
         <div className="min-h-0 flex-1 overflow-y-auto px-8 pb-12">
           <div key={group.id}>
-            {group.id === "review" && (
+            {group.id === "review" && state.phase === "live" && (
+              <Finale onDisagree={() => { setAuto("off"); setPhone("none"); dispatch({ type: "hydrate", state: { ...initialState, tourOn: true } }); }} />
+            )}
+            {group.id === "review" && state.phase !== "live" && (
               <div className="grid gap-8 pt-6 xl:grid-cols-[minmax(0,1fr)_380px]">
               <div className="min-w-0 max-w-[1280px] space-y-10">
                 <LegacyBeat />
-                {hasEvent(state, "submit") ? <ReviewView /> : !agentWorking && <NotYet />}
+                {hasEvent(state, "submit") ? (
+                  <>
+                    {state.phase === "in_review" && state.confirmed === undefined && <SourceSummary />}
+                    <ReviewView />
+                  </>
+                ) : agentWorking && state.queueGroup === "run" ? (
+                  <SourceCards read={state.log.filter((e) => e.kind === "agent").length} />
+                ) : !agentWorking && <NotYet />}
                 {hasEvent(state, "ex-readback") && (
                   <section id="sec-release" aria-label="Release" className="scroll-mt-6">
                     <ReleaseView />
@@ -294,6 +376,9 @@ export function CaseWorkspace() {
         <NeedsYou />
       </div>
       <CommandPalette tabs={paletteTabs} />
+      <ScenarioCard onStart={() => { setAuto("off"); startRun(); }} onWatch={() => { startRun(); setAuto("on"); }} />
+      <TimeSkip />
+      {phone === "open" && <CustomerPhone onClose={closePhone} />}
       {progressOpen && (
         <div className="fixed inset-0 z-50 flex justify-end" role="dialog" aria-modal="true" aria-label="Agent progress">
           <button aria-label="Close" className="absolute inset-0 bg-ink/30" onClick={() => { setProgressOpen(false); if (tab === "run") setTab("review"); }} />
@@ -340,28 +425,34 @@ export function CaseWorkspace() {
   );
 }
 
-function guideLine(s: State, working: boolean): string {
-  if (s.copy === "requested") return "Your reading is different, so the case waits for a clean copy from the branch.";
-  if (s.copy === "received" && s.confirmed === undefined) return "Check the clean copy from the branch, then confirm the value.";
-  if (working && s.queueGroup === "run") return "Watch the agent read the forms and the bank's systems on the right.";
-  if (working) return "The agent is working. Watch its steps on the right.";
+type Guide = { t: string; why?: string };
+function guideLine(s: State, working: boolean): Guide {
+  if (s.copy === "requested") return { t: "Your reading is different, so the case waits for a clean copy from the branch." };
+  if (s.copy === "received" && s.confirmed === undefined) return { t: "Check the clean copy from the branch, then confirm the value." };
+  if (working && s.queueGroup === "run") return { t: "The agent is reading the bank's systems and the company's documents, so there's nothing for you to do yet." };
   switch (s.phase) {
     case "in_review":
     case "re_review":
-      return allApproved(s) ? "Everything checks out. Sign off the plan." : "Check the agent's reading on the letter, then confirm it.";
+      if (working) return { t: "The agent is reading the bank's systems and the company's documents, so there's nothing for you to do yet." };
+      return allApproved(s)
+        ? { t: "Everything else matched the bank's records, so you only need to sign off.", why: "Rules passed every stage that was an exact copy, so Sara makes 2 decisions instead of 4 review rounds." }
+        : { t: "The agent couldn't read one number, so it's asking you. Press Enter if 25,000 matches the scan.", why: "People tend to accept what they see first, so a supervisor re-checks a sample of accepted readings." };
     case "revising":
-      return "The agent is updating the plan with your value.";
+      return { t: "Everything else matched the bank's records, so you only need to sign off.", why: "Rules passed every stage that was an exact copy, so Sara makes 2 decisions instead of 4 review rounds." };
     case "executing":
-      return "The agent is setting things up. Nothing needed from you.";
+      return { t: "The bank's admin system timed out, so the agent retried and checked every change.", why: "Old bank systems fail, so nobody gets access until the agent has read back what it wrote." };
     case "executed":
     case "releasing":
-      return "Release Mohammed and Khalifa now. Rashid waits for his new ID.";
+      return { t: "Two partners can have access now, and Rashid will follow when his ID is renewed.", why: "Rules confirmed Mohammed and Khalifa can approve payments together, so they don't wait for Rashid." };
     case "partially_live":
+      return { t: "Mohammed and Khalifa have access, and Rashid will follow when his ID is renewed." };
     case "renewing":
-      return "When Rashid's ID is renewed, release him too.";
+    case "rashid_ready":
+    case "releasing_rashid":
+      return { t: "Rashid renewed his ID, so you can grant him access too." };
     case "live":
-      return "Everyone is live. Reset the demo to try it again.";
+      return { t: "That's the whole case. Try disagreeing with the agent to see the other path." };
     default:
-      return "Watch the agent read the forms and the bank's systems on the right.";
+      return { t: "The agent is reading the bank's systems and the company's documents, so there's nothing for you to do yet." };
   }
 }

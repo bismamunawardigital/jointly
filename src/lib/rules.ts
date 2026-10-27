@@ -202,7 +202,7 @@ export function releaseEligibility(rules: Rule[], held: PersonId[]): Eligibility
   const summary = eligible
     ? held.length === 0
       ? "All 3 signatories are ready."
-      : `${names(best!.groups[0])} can still form a valid approval. Eligible for partial release.`
+      : `${names(best!.groups[0])} can still form a valid approval. Access for 2 of 3 partners is possible.`
     : "Hold all: the ready signatories can't form any valid approval combination.";
   return { eligible, ready, held, combos, summary };
 }

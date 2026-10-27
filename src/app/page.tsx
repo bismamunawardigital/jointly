@@ -33,20 +33,20 @@ const swim = {
 };
 
 
-const learned = ["Check SVS letters", "Reuse existing logins", "Re-check EFR before release"];
+const learned = ["Check SVS letters", "Reuse existing logins", "Re-check EFR before granting access"];
 
 const gaveUp: { d: string; why: string }[] = [
   { d: "Kept 4 sign-offs, as one action", why: "Bank controls require it. Fewer clicks, same record." },
   { d: "No confidence scores", why: "Regulators ask which rule fired, not how sure the model was." },
   { d: "Desktop only", why: "The customer fulfilment operations team works on bank laptops. Mobile would be a different product." },
-  { d: "Partial release is a hypothesis", why: "No public evidence yet. First thing to test with a bank." },
+  { d: "Access for 2 of 3 partners is a hypothesis", why: "No public evidence yet. First thing to test with a bank." },
 ];
 
 
 const lanes: { icon: React.ReactNode; title: string; items: string[]; never?: boolean }[] = [
   { icon: <AgentMark size={40} className="text-person-agent" />, title: "Agent does", items: ["Reads every record", "Builds the plan", "Sets it up after approval"] },
   { icon: <ShieldCheck className="h-10 w-10 text-accent" />, title: "Rules decide", items: ["Who can sign", "Up to what amount", "Who can go live"] },
-  { icon: <UserRound className="h-10 w-10 text-ink" />, title: "A person approves", items: ["Unclear values", "The plan sign-off", "Every release"] },
+  { icon: <UserRound className="h-10 w-10 text-ink" />, title: "A person approves", items: ["Unclear values", "The plan sign-off", "Every access grant"] },
   { icon: <Ban className="h-10 w-10 text-bad" />, title: "Never allowed", items: ["Approve its own work", "Send passwords", "Match people by name"], never: true },
 ];
 
@@ -113,7 +113,7 @@ const principles: { title: string; why: string; mini: React.ReactNode }[] = [
     ),
   },
   {
-    title: "Release what's safe",
+    title: "Grant access where it's safe",
     why: "2 people go live today, instead of 3 waiting on 1 ID.",
     mini: (
       <div className="flex items-center gap-3">

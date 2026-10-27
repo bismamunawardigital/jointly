@@ -65,8 +65,8 @@ export function Shell({ children }: { children: React.ReactNode }) {
             })}
           </nav>
           <div className="mt-auto space-y-3 border-t border-line px-4 py-4">
-            <button onClick={() => dispatch({ type: "tour", on: true, step: 0 })} className="flex items-center gap-2 text-sm text-sub hover:text-ink">
-              <Compass className="h-3.5 w-3.5" /> Show guide
+            <button onClick={() => { dispatch({ type: "tour", on: true, step: 0 }); window.dispatchEvent(new Event("jointly:scenario")); }} className="flex items-center gap-2 text-sm text-sub hover:text-ink">
+              <Compass className="h-3.5 w-3.5" /> Restart guide
             </button>
             <ThemeSwitch />
             <DensitySwitch />

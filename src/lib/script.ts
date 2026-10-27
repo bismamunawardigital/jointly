@@ -39,7 +39,7 @@ export const steps: { id: StepId; label: string }[] = [
   { id: "policy", label: "Policy check" },
   { id: "review", label: "Review" },
   { id: "execute", label: "Execute" },
-  { id: "release", label: "Release" },
+  { id: "release", label: "Grant access" },
 ];
 
 export const script: AgentEvent[] = [
@@ -208,20 +208,20 @@ export const script: AgentEvent[] = [
   {
     id: "ex-eligibility", group: "execute", step: "release", time: "Mon 10:47", actor: "Release Agent",
     call: "release.checkEligibility", system: "Jointly", status: "warn",
-    title: "Mohammed + Khalifa can satisfy \"any two\". Partial release is possible",
-    detail: "Rashid is still held. A person must decide to release.",
-    assumption: "Partial release is a bank policy to validate",
+    title: "Mohammed + Khalifa can satisfy \"any two\". Access for 2 of 3 partners is possible",
+    detail: "Rashid is still held. A person must decide to grant access.",
+    assumption: "Access for 2 of 3 partners is a bank policy to validate",
   },
 
   {
     id: "rel-mohammed", group: "release", step: "release", time: "Mon 10:52", actor: "Messaging",
     call: "notify.send(template=T-REL-01)", system: "SMS gateway", status: "ok",
-    title: "Sent Mohammed the SMS Sara approved with the release",
+    title: "Sent Mohammed the SMS Sara approved when she granted access",
   },
   {
     id: "rel-khalifa-link", group: "release", step: "release", time: "Mon 10:53", actor: "Messaging",
     call: "activation.send(template=T-ACT-01)", system: "SMS gateway", status: "ok",
-    title: "Sent Khalifa the activation link Sara approved with the release",
+    title: "Sent Khalifa the activation link Sara approved when she granted access",
     detail: "He verifies his EID with a face check and sets his own credentials. No password is created, seen or sent by the agent.",
     assumption: "Digital activation, subject to bank security approval",
   },
@@ -250,7 +250,7 @@ export const script: AgentEvent[] = [
     id: "ren-eligibility", group: "renew", step: "release", time: "Wed 09:40", actor: "Release Agent",
     call: "release.checkEligibility", system: "Jointly", status: "ok",
     title: "Adding Rashid keeps every approval combination valid",
-    detail: "Releasing him is Sara's call. I won't switch him on until she says so.",
+    detail: "Granting him access is Sara's call. I won't switch him on until she says so.",
   },
   {
     id: "ren-enable", group: "rashid", step: "execute", time: "Wed 09:41", actor: "Executor Agent",
