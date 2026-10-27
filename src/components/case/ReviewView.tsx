@@ -1,5 +1,6 @@
 "use client";
 
+import { EvidenceGrid } from "./EvidenceGrid";
 import { PaymentWorkflow } from "./PaymentWorkflow";
 import { SigningMap } from "./SigningMap";
 
@@ -276,6 +277,7 @@ export function ReviewView() {
     <div className="max-w-4xl space-y-4" {...tour}>
       <h2 className="font-display text-2xl">{headline}</h2>
       {failing.length > 0 && <FailBanner n={failing.length} />}
+      <EvidenceGrid />
       {reviewing && allApproved(state) && (
         <Card className="flex flex-wrap items-center gap-4 border-line-strong p-4">
           <div className="min-w-0 flex-1">
