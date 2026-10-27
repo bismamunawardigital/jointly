@@ -17,7 +17,6 @@ const inbox: { who: ("mohammed" | "khalifa" | "rashid")[]; line: string; time: s
   { who: ["rashid"], line: "Release Rashid, his ID is renewed · Creekside", time: "30 s" },
 ];
 
-const callouts = ["4 maker-checker rounds", "Free-text mandate in SVS", "Courier PINs"];
 const learned = ["Check SVS letters", "Reuse existing logins", "Re-check EFR before release"];
 
 const gaveUp: { d: string; why: string }[] = [
@@ -227,26 +226,6 @@ export default function CaseStudy() {
         </div>
       </section>
 
-      <section id="maps" className="mx-auto max-w-6xl px-6 py-20">
-        <h2 className={h2}>The real before and after</h2>
-        <div className="mt-8 grid gap-4 md:grid-cols-2">
-          {["Current state", "Future state"].map((t) => (
-            <div key={t} className="flex aspect-[4/3] flex-col items-center justify-center rounded-card border-2 border-dashed border-line bg-surface p-6 text-center">
-              <p className="text-sm font-medium">{t} map</p>
-              <p className="mt-1 text-xs text-muted">Coming soon. Real service map, bank names removed.</p>
-            </div>
-          ))}
-        </div>
-        <ol className="mt-6 flex flex-wrap gap-3">
-          {callouts.map((c, i) => (
-            <li key={c} className="flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1.5 text-sm">
-              <span className="tnum inline-flex h-5 w-5 items-center justify-center rounded-full bg-brand text-[11px] font-semibold text-white">{i + 1}</span>
-              {c}
-            </li>
-          ))}
-        </ol>
-        <p className="mt-4 text-sm text-sub">Mapped from interviews with the CF team and 3 journeys: single, joint and non-signatory.</p>
-      </section>
 
       <section id="shadow" className="border-t border-line bg-panel/50">
         <div className="mx-auto max-w-6xl px-6 py-20">
@@ -359,7 +338,7 @@ export default function CaseStudy() {
       <section id="heard" className="border-t border-line bg-panel/50">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className={h2}>What I heard, what I changed</h2>
-          <ul className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <ul className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {heard.map((h) => (
               <li key={h.href} className="flex flex-col rounded-card border border-line bg-surface p-6">
                 <p className="font-display text-lg leading-snug">&ldquo;{h.q}&rdquo;</p>
@@ -370,12 +349,6 @@ export default function CaseStudy() {
                 <p className="text-sm font-medium">{h.d}</p>
               </li>
             ))}
-            {/* TODO(Bisma): replace with a real quote from your own CF interviews. */}
-            <li className="flex flex-col rounded-card border-2 border-dashed border-warn/50 bg-surface p-6">
-              <span className="w-fit rounded-full bg-warn-soft px-2 py-0.5 text-[11px] font-medium text-warn-ink">TODO</span>
-              <p className="mt-3 font-display text-lg leading-snug text-muted">[Quote from CF interview]</p>
-              <p className="mt-2 text-xs text-muted">CF team interview</p>
-            </li>
           </ul>
           <details className="mt-6 text-sm">
             <summary className="cursor-pointer text-sub">Sources</summary>

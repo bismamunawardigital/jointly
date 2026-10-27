@@ -25,11 +25,6 @@ const days: { day: string; icons: { I: LucideIcon; label: string }[] }[] = [
   { day: "اليوم 5", icons: [{ I: Truck, label: "مندوب التوصيل" }] },
 ];
 
-const callouts: React.ReactNode[] = [
-  <><B>4</B> جولات بين المُدخِل والمُدقِّق</>,
-  <>تفويض بنص حر في <B>SVS</B></>,
-  "أرقام سرية عبر مندوب التوصيل",
-];
 const learned: React.ReactNode[] = [<>مراجعة خطابات <B>SVS</B></>, "إعادة استخدام حسابات الدخول الحالية", <>إعادة فحص <B>EFR</B> قبل التفعيل</>];
 
 const lanes: { icon: React.ReactNode; title: string; items: string[]; never?: boolean }[] = [
@@ -166,26 +161,6 @@ export default function CaseStudyAr() {
         </div>
       </section>
 
-      <section id="maps" className="mx-auto max-w-6xl px-6 py-20">
-        <h2 className={h2}>قبل وبعد، من الواقع</h2>
-        <div className="mt-8 grid gap-4 md:grid-cols-2">
-          {["خريطة الوضع الحالي", "خريطة الوضع المستقبلي"].map((t) => (
-            <div key={t} className="flex aspect-[4/3] flex-col items-center justify-center rounded-card border-2 border-dashed border-line bg-surface p-6 text-center">
-              <p className="text-sm font-medium">{t}</p>
-              <p className="mt-1 text-xs text-muted">قريبًا. خريطة خدمة حقيقية، بدون أسماء البنوك.</p>
-            </div>
-          ))}
-        </div>
-        <ol className="mt-6 flex flex-wrap gap-3">
-          {callouts.map((c, i) => (
-            <li key={i} className="flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1.5 text-sm">
-              <span className="tnum inline-flex h-5 w-5 items-center justify-center rounded-full bg-brand text-[11px] font-semibold text-white">{i + 1}</span>
-              {c}
-            </li>
-          ))}
-        </ol>
-        <p className="mt-4 text-sm text-sub">رُسمت من مقابلات مع فريق خدمة العملاء و<B>3</B> رحلات: مفوّض منفرد، ومشترك، وغير مفوّض.</p>
-      </section>
 
       <section id="shadow" className="border-t border-line bg-panel/50">
         <div className="mx-auto max-w-6xl px-6 py-20">
@@ -289,7 +264,7 @@ export default function CaseStudyAr() {
       <section id="heard" className="border-t border-line bg-panel/50">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h2 className={h2}>ماذا سمعت، وماذا غيّرت</h2>
-          <ul className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <ul className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {heard.map((h) => (
               <li key={h.href} className="flex flex-col rounded-card border border-line bg-surface p-6">
                 <p lang="en" dir="ltr" className="font-sans text-lg leading-snug">&ldquo;{h.q}&rdquo;</p>
@@ -298,12 +273,6 @@ export default function CaseStudyAr() {
                 <p className="text-sm font-medium">{h.d}</p>
               </li>
             ))}
-            {/* TODO(Bisma): replace with a real quote from your own CF interviews. */}
-            <li className="flex flex-col rounded-card border-2 border-dashed border-warn/50 bg-surface p-6">
-              <span className="w-fit rounded-full bg-warn-soft px-2 py-0.5 text-[11px] font-medium text-warn-ink">TODO</span>
-              <p className="mt-3 text-lg leading-snug text-muted">[اقتباس من مقابلة مع فريق خدمة العملاء]</p>
-              <p className="mt-2 text-xs text-muted">مقابلة مع فريق خدمة العملاء</p>
-            </li>
           </ul>
         </div>
       </section>
