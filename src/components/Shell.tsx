@@ -35,7 +35,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-8 text-center lg:hidden">
         <Monitor className="h-6 w-6 text-muted" />
         <Logo />
-        <p className="max-w-xs text-sm text-sub">Jointly is a desktop workbench for operations teams. Open it on a laptop to try the demo.</p>
+        <p className="max-w-xs text-sm text-sub">Jointly is a desktop workbench for accounts operations teams. Open it on a laptop to try the demo.</p>
         <Link href="/" className="text-sm font-medium text-accent">
           Read the case study
         </Link>
