@@ -252,6 +252,7 @@ export interface QueueCase {
   owner: string;
   age: string;
   clickable: boolean;
+  agentDoing: string;
 }
 
 export const otherCases: QueueCase[] = [
@@ -264,6 +265,7 @@ export const otherCases: QueueCase[] = [
     owner: "None",
     age: "1d",
     clickable: false,
+    agentDoing: "Granted access to all 4. Nothing left to do.",
   },
   {
     id: "saffron-bay",
@@ -274,6 +276,7 @@ export const otherCases: QueueCase[] = [
     owner: "Agent",
     age: "3h",
     clickable: false,
+    agentDoing: "Matching the new user to Finacle by Emirates ID",
   },
   {
     id: "al-reem",
@@ -284,6 +287,7 @@ export const otherCases: QueueCase[] = [
     owner: "Agent",
     age: "25m",
     clickable: false,
+    agentDoing: "Reading the signed form and the trade licence",
   },
 ];
 
