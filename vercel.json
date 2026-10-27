@@ -1,0 +1,8 @@
+{
+  "headers": [
+    { "source": "/opengraph-image", "headers": [{ "key": "Content-Type", "value": "image/png" }] },
+    { "source": "/twitter-image", "headers": [{ "key": "Content-Type", "value": "image/png" }] },
+    { "source": "/ar/opengraph-image", "headers": [{ "key": "Content-Type", "value": "image/png" }] },
+    { "source": "/ar/twitter-image", "headers": [{ "key": "Content-Type", "value": "image/png" }] }
+  ]
+}
