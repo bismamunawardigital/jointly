@@ -17,7 +17,7 @@ function Cell({ label, children }: { label: string; children: React.ReactNode })
 
 export function EvidenceView() {
   const { state, dispatch } = useStore();
-  const tour = useTourTarget(0);
+  const tour = useTourTarget(-1);
   if (!hasEvent(state, "id-svs"))
     return <Empty icon={FileSearch} title="Evidence is still being gathered" body="Once the agent has read Finacle and SVS, you'll see how it matched each person and what the mandate says." />;
   const renewed = hasEvent(state, "ren-kyc");

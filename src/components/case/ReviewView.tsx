@@ -230,7 +230,7 @@ export function FailBanner({ n }: { n: number }) {
 export function ReviewView() {
   const { state, dispatch, version, held, setTab } = useStore();
   const failing = policyChecks(version, held).filter((c) => !c.pass);
-  const tour = useTourTarget(1);
+  const tour = { ...useTourTarget(0), ...useTourTarget(1) };
   const [expand, setExpand] = useState(false);
   const [returning, setReturning] = useState(false);
   const [note, setNote] = useState("");
@@ -288,7 +288,7 @@ export function ReviewView() {
   const headline = byPhase[state.phase] ?? (!open ? "All 4 stages pass. Sign off when ready." : judgement ? "1 thing needs your judgement" : `Nothing needs your judgement: ${open} stage${open === 1 ? "" : "s"} ready to approve`);
 
   return (
-    <div className="space-y-4" {...tour}>
+    <div className="space-y-4">
       <h2 className="font-display text-2xl">{headline}</h2>
       {state.phase === "live" && !expand && (
         <Card className="flex flex-wrap items-center gap-5 p-5">
@@ -307,7 +307,9 @@ export function ReviewView() {
       )}
       {(state.phase !== "live" || expand) && (<>
       {failing.length > 0 && <FailBanner n={failing.length} />}
-      <EvidenceGrid />
+      <div {...tour}>
+        <EvidenceGrid />
+      </div>
       {reviewing && allApproved(state) && (
         <Card className="flex flex-wrap items-center gap-4 border-line-strong p-4">
           <div className="min-w-0 flex-1">

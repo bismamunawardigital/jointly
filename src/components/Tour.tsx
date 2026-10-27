@@ -19,9 +19,9 @@ const after = (p: Phase) => order.slice(order.indexOf(p));
 
 export const moments: Moment[] = [
   {
-    title: "Match on IDs, not names",
-    body: "The agent matches people on EID and RCIF, never on names, and spots Rashid's expired EID.",
-    tab: "evidence",
+    title: "The agent did the legwork",
+    body: "Sara only checks what it had to read. Here, that's 1 amber value from a blurry letter.",
+    tab: "review",
     readyWhen: after("in_review"),
     notReady: "The agent is still gathering evidence. Show me opens the live run.",
   },
@@ -69,6 +69,15 @@ function TourCard() {
   const { state, dispatch, setTab, hydrated } = useStore();
   const router = useRouter();
   const path = usePathname();
+  const [box, setBox] = useState<{ top: number; left: number } | null>(null);
+  const [blocked, setBlocked] = useState(false);
+  useEffect(() => {
+    const deep = /[?&](moment|view|tab)=/.test(window.location.search);
+    if (deep) {
+      localStorage.setItem("jointly-tour-seen", "1");
+      dispatch({ type: "tour", on: false });
+    }
+  }, [dispatch]);
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Escape" || !state.tourOn) return;
@@ -78,7 +87,22 @@ function TourCard() {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [state.tourOn, dispatch]);
-  if (!hydrated || !state.tourOn) return null;
+  useEffect(() => {
+    const place = () => {
+      setBlocked(!!document.querySelector('[aria-modal="true"]'));
+      const t = document.querySelector<HTMLElement>('[data-tour-active="true"]');
+      if (!t) return setBox(null);
+      const r = t.getBoundingClientRect();
+      const W = 400, H = 220, M = 16;
+      const left = Math.min(Math.max(M, r.left), window.innerWidth - W - M);
+      const top = r.bottom + H + M < window.innerHeight ? r.bottom + M : r.top - H - M > 0 ? r.top - H - M : window.innerHeight - H - M;
+      setBox({ top, left });
+    };
+    place();
+    const id = window.setInterval(place, 400);
+    return () => window.clearInterval(id);
+  }, [state.tourStep, path]);
+  if (!hydrated || !state.tourOn || blocked || !path.startsWith("/demo/case")) return null;
   const end = () => {
     localStorage.setItem("jointly-tour-seen", "1");
     dispatch({ type: "tour", on: false });
@@ -91,27 +115,37 @@ function TourCard() {
     if (!path.startsWith("/demo/case")) router.push("/demo/case/");
   };
   return (
-    <div className="fixed bottom-6 left-1/2 z-50 hidden w-[420px] -translate-x-1/2 animate-enter rounded-card border border-line bg-surface p-5 shadow-lg lg:block" role="dialog" aria-label="Guided tour">
-      <div className="flex items-center justify-between">
-        <p className="text-xs font-medium text-brand">Moment {i + 1} of 4</p>
-        <button onClick={end} className="rounded p-0.5 text-muted hover:bg-panel hover:text-ink" aria-label="Skip tour">
-          <X className="h-3.5 w-3.5" />
-        </button>
+    <>
+      {!box && <div className="fixed inset-0 z-40 bg-ink/30" aria-hidden />}
+      <div
+        className={box ? "fixed z-50 w-[400px] rounded-card border border-line bg-surface p-5 shadow-lg" : "fixed bottom-24 left-1/2 z-50 w-[400px] -translate-x-1/2 rounded-card border border-line bg-surface p-5 shadow-lg"}
+        style={box ?? undefined}
+        role="dialog"
+        aria-label="Guided tour"
+      >
+        <div className="flex items-center justify-between">
+          <p className="text-xs font-medium text-brand">Moment {i + 1} of 4</p>
+          <button type="button" onClick={(e) => { e.stopPropagation(); end(); }} className="rounded p-1 text-muted hover:bg-panel hover:text-ink" aria-label="Close tour">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+        <h3 className="mt-1 font-display text-xl leading-tight">{m.title}</h3>
+        <p className="mt-1.5 text-sm text-sub">{m.body}</p>
+        {!ready && <p className="mt-2 text-xs text-muted">{m.notReady}</p>}
+        <div className="mt-4 flex items-center gap-2">
+          {i > 0 && (
+            <Button size="sm" variant="primary" onClick={show}>
+              Show me
+            </Button>
+          )}
+          <Button size="sm" variant={i === 0 ? "primary" : "ghost"} onClick={i === 3 ? end : () => dispatch({ type: "tour", step: i + 1 })}>
+            {i === 3 ? "Done" : "Next"}
+          </Button>
+          <Button size="sm" variant="ghost" className="ml-auto" onClick={end}>
+            Skip
+          </Button>
+        </div>
       </div>
-      <h3 className="mt-1 font-display text-xl leading-tight">{m.title}</h3>
-      <p className="mt-1.5 text-sm text-sub">{m.body}</p>
-      {!ready && <p className="mt-2 text-xs text-muted">{m.notReady}</p>}
-      <div className="mt-4 flex items-center gap-2">
-        <Button size="sm" variant="primary" onClick={show}>
-          Show me
-        </Button>
-        <Button size="sm" variant="ghost" onClick={i === 3 ? end : () => dispatch({ type: "tour", step: i + 1 })}>
-          {i === 3 ? "Done" : "Next"}
-        </Button>
-        <Button size="sm" variant="ghost" className="ml-auto" onClick={end}>
-          Skip
-        </Button>
-      </div>
-    </div>
+    </>
   );
 }

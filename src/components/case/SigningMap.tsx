@@ -8,7 +8,7 @@ import { hasEvent, useStore } from "@/lib/store";
 import { Avatar, cn } from "@/components/ui";
 
 const pos = (n: number) => {
-  const v = n <= 10_000 ? (n / 10_000) * 30 : n <= 25_000 ? 30 + ((n - 10_000) / 15_000) * 20 : 50 + (Math.min(n - 25_000, 25_000) / 25_000) * 50;
+  const v = n <= 10_000 ? (n / 10_000) * 40 : n <= 25_000 ? 40 + ((n - 10_000) / 15_000) * 20 : 60 + (Math.min(n - 25_000, 25_000) / 25_000) * 40;
   return `${v}%`;
 };
 type Combo = { key: string; ids: PersonId[] };
@@ -80,8 +80,7 @@ export function SigningMap({ compact = false, part = "all" }: { compact?: boolea
         onFocus={() => setHover({ combo: c.key })}
         onBlur={() => setHover(null)}
         className={cn(
-          "inline-flex items-center rounded-full border bg-surface px-1.5 py-1 transition-[opacity,box-shadow] duration-150",
-          !compact && b !== band && "opacity-80",
+          "relative z-20 inline-flex items-center rounded-full border bg-surface px-1.5 py-1 transition-[opacity,box-shadow] duration-150",
           lit ? "border-ok ring-2 ring-ok/30" : "border-line",
           h && "border-dashed border-held opacity-70",
           dimCombo(c) && "opacity-35",
@@ -153,15 +152,15 @@ export function SigningMap({ compact = false, part = "all" }: { compact?: boolea
 
       {showLadder && (
       <>
-      <div className={cn("relative", showPeople && "mt-8")}>
+      <div className="relative mt-10">
         <div className="flex min-h-[112px] overflow-hidden rounded-xl border border-line">
           {bands.map((b) => (
             <div
               key={b.id}
-              className={cn("flex flex-col gap-2 p-3 transition-[width] duration-700 ease-out", b.id === "A" ? "border-r border-dashed border-line-strong bg-brand-soft/40" : "flex-1 bg-panel/50")}
+              className={cn("flex flex-col gap-2 p-3 transition-[width] duration-700 ease-out", b.id === "A" ? "border-r border-dashed border-line-strong bg-surface" : "flex-1 bg-panel/50")}
               style={b.id === "A" ? { width: pos(edge) } : undefined}
             >
-              <p className="text-[11px] font-medium text-muted">{b.label}</p>
+              <p className="text-[11px] font-medium text-sub">{b.label}</p>
               <div className="flex flex-wrap gap-1.5">{b.combos.map((c) => token(c, b.id))}</div>
             </div>
           ))}
@@ -180,7 +179,7 @@ export function SigningMap({ compact = false, part = "all" }: { compact?: boolea
           onMouseLeave={() => setTip(false)}
           onFocus={() => setTip(true)}
           onBlur={() => setTip(false)}
-          className="absolute -top-3 -translate-x-1/2 rounded-full border border-line bg-surface px-2 py-0.5 text-[11px] font-medium transition-[left] duration-700 ease-out"
+          className="absolute -top-8 -translate-x-1/2 rounded-full border border-line bg-surface px-2 py-0.5 text-[11px] font-medium transition-[left] duration-700 ease-out"
           style={{ left: pos(edge) }}
         >
           AED {fmt(limit)}
