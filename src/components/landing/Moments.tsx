@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, Check } from "lucide-react";
 import { Avatar, cn } from "@/components/ui";
+import { HeroScene } from "./HeroScene";
 
 function Identity() {
   return (
@@ -52,19 +53,8 @@ function Scan() {
 
 function Live() {
   return (
-    <div className="flex flex-col items-center gap-4">
-      <div className="flex items-center gap-5">
-        <span className="flex rounded-full p-1 ring-2 ring-ok/40">
-          <Avatar id="mohammed" size={52} />
-          <span className="-ml-3">
-            <Avatar id="khalifa" size={52} />
-          </span>
-        </span>
-        <Avatar id="rashid" size={52} held />
-      </div>
-      <span className="inline-flex items-center gap-2 rounded-full border border-ok/30 bg-ok-soft px-4 py-1.5 text-sm font-semibold text-ok-ink">
-        <span className="h-2 w-2 rounded-full bg-ok" /> 2 of 3 live
-      </span>
+    <div className="w-full max-w-md">
+      <HeroScene />
     </div>
   );
 }

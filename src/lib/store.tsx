@@ -232,30 +232,30 @@ export type Tab = "run" | "map" | "evidence" | "plan" | "simulator" | "review" |
 
 const StoreContext = createContext<Ctx | null>(null);
 
-export function StoreProvider({ children }: { children: React.ReactNode }) {
+export function StoreProvider({ children, frozen = false }: { children: React.ReactNode; frozen?: boolean }) {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [hydrated, setHydrated] = useState(false);
   const [evidenceOpen, setEvidenceOpen] = useState<EvidenceKey | null>(null);
   const [tab, setTab] = useState<Tab>("review");
 
   useEffect(() => {
-    try {
+    if (!frozen) try {
       const raw = localStorage.getItem(KEY);
       if (raw) dispatch({ type: "hydrate", state: { ...initialState, ...JSON.parse(raw) } });
     } catch {}
     setHydrated(true);
-  }, []);
+  }, [frozen]);
 
   useEffect(() => {
-    if (hydrated) localStorage.setItem(KEY, JSON.stringify(state));
-  }, [state, hydrated]);
+    if (hydrated && !frozen) localStorage.setItem(KEY, JSON.stringify(state));
+  }, [state, hydrated, frozen]);
 
   useEffect(() => {
-    if (!hydrated || !state.queue.length || state.paused) return;
+    if (frozen || !hydrated || !state.queue.length || state.paused) return;
     const hold: Record<string, number> = { "ex-workflow": 2000, "ex-readback": 1000, "ex-eligibility": 2000 };
     const t = setTimeout(() => dispatch({ type: "reveal" }), hold[state.queue[0]] ?? 650);
     return () => clearTimeout(t);
-  }, [state.queue, state.paused, hydrated]);
+  }, [state.queue, state.paused, hydrated, frozen]);
 
   const openEvidence = useCallback((k: EvidenceKey | null) => setEvidenceOpen(k), []);
   const version = versionOf(state);

@@ -4,12 +4,33 @@ import type { LucideIcon } from "lucide-react";
 import { Logo } from "@/components/Shell";
 import { ThemeButton } from "@/components/ThemeToggle";
 import { AgentMark, Avatar } from "@/components/ui";
-import { HeroScene } from "@/components/landing/HeroScene";
+import { HeroFrame } from "@/components/landing/HeroFrame";
+import { Gloss } from "@/components/landing/Gloss";
+import { DaysSwimlane } from "@/components/landing/DaysSwimlane";
 import { Moments } from "@/components/landing/Moments";
 import { LangSwitch } from "@/components/landing/LangSwitch";
 import { statsEn } from "@/content/stats";
 
 const stats = statsEn;
+
+const in30: [string, string][] = [
+  ["Problem", "4 to 5 days of manual setup and courier PINs"],
+  ["User", "Sara, a CF checker at a UAE bank"],
+  ["What I built", "An agent that prepares, rules that check, a screen Sara approves on"],
+  ["Outcome", "Under 2 hours, 2 setup decisions (synthetic case, not measured)"],
+  ["My role", "Research, service design, product design, prototype built with Devin"],
+];
+
+const swim = {
+  lanes: ["Customer", "CF maker", "CF checker", "Systems", "Courier"],
+  today: "Today",
+  jointly: "With Jointly",
+  pains: ["4 maker-checker rounds", "Free-text instructions in SVS", "Courier PINs"],
+  todayNodes: ["Signs forms", "Reads Finacle|and SVS", "SVS free text", "Sets up|a stage", "Reviews|returns it", "PIN mailer|printed", "Courier|delivers", "First login|day 5"],
+  jointlyNodes: ["Signs forms", "Agent prepares|4 systems", "Sara checks|1 thing", "Signs off", "Agent sets up|Admin", "SMS activation|first login"],
+  empty: "No step needed",
+  caption: "Illustrative and simplified. Redrawn for this case study, not the bank's internal map.",
+};
 
 const inbox: { who: ("mohammed" | "khalifa" | "rashid")[]; line: string; time: string }[] = [
   { who: ["khalifa"], line: "Confirm a value on a blurry letter · Creekside", time: "2 min" },
@@ -26,12 +47,12 @@ const gaveUp: { d: string; why: string }[] = [
   { d: "Partial release is a hypothesis", why: "No public evidence yet. First thing to test with a bank." },
 ];
 
-const days: { day: string; icons: { I: LucideIcon; label: string }[] }[] = [
-  { day: "Day 1", icons: [{ I: FileText, label: "Paper form" }] },
-  { day: "Day 2", icons: [{ I: Search, label: "Checking records" }] },
-  { day: "Day 3", icons: [{ I: Undo2, label: "Returned" }, { I: Undo2, label: "Returned" }, { I: Undo2, label: "Returned" }] },
-  { day: "Day 4", icons: [{ I: Printer, label: "Printing PINs" }] },
-  { day: "Day 5", icons: [{ I: Truck, label: "Courier" }] },
+const days: { day: string; label: string; icons: LucideIcon[] }[] = [
+  { day: "Day 1", label: "Forms arrive", icons: [FileText] },
+  { day: "Day 2", label: "Maker reads Finacle and SVS", icons: [Search] },
+  { day: "Day 3", label: "4 maker-checker rounds", icons: [Undo2, Undo2, Undo2, Undo2] },
+  { day: "Day 4", label: "PIN mailers printed", icons: [Printer] },
+  { day: "Day 5", label: "Courier delivers", icons: [Truck] },
 ];
 
 const lanes: { icon: React.ReactNode; title: string; items: string[]; never?: boolean }[] = [
@@ -150,26 +171,45 @@ export default function CaseStudy() {
         </div>
       </header>
 
-      <section id="hero" className="mx-auto grid max-w-6xl items-center gap-10 px-6 pb-20 pt-4 md:grid-cols-2 md:pt-8">
+      <section id="hero" className="mx-auto grid max-w-6xl items-start gap-10 px-6 pb-12 pt-2 md:grid-cols-[1fr_1.05fr] md:pt-4">
         <div>
-          <h1 className="font-display text-[40px] leading-[1.05] tracking-tight md:text-[64px]">Sara sets up 3 signatories before lunch. The agent can&apos;t sign anything.</h1>
-          <p className="mt-5 max-w-xl text-lg text-sub">An agent for bank operations that works across Finacle, SVS and EFR, and stops when it isn&apos;t sure.</p>
-          <dl className="mt-8 grid grid-cols-3 gap-4 md:gap-6">
+          <p className="text-[13px] text-muted">Case study · Agentic AI for bank operations · Bisma Munawar, Product Designer</p>
+          <h1 className="mt-3 font-display text-[36px] leading-[1.05] tracking-tight md:text-[50px]">Sara sets up 3 signatories before lunch. The agent can&apos;t sign anything.</h1>
+          <p className="mt-4 max-w-xl text-base text-sub md:text-lg">An AI agent does a bank&apos;s back-office setup across 4 legacy systems. A person still approves every decision that moves money.</p>
+          <p className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm">
+            <Gloss term="Joint signatories" def="2 or more people who must approve a company's payments together." />
+            <Gloss term="Customer Fulfillment (CF)" def="The bank team that sets up their online banking by hand." />
+          </p>
+          <dl className="mt-6 grid grid-cols-3 gap-4 md:gap-6">
             {stats.map((s) => (
               <div key={s.k}>
-                <dd className="tnum whitespace-nowrap font-display text-2xl md:text-4xl">{s.v}</dd>
+                <dd className="tnum whitespace-nowrap font-display text-2xl md:text-3xl">{s.v}</dd>
                 <dt className="mt-1 text-xs text-muted">{s.k}</dt>
               </div>
             ))}
           </dl>
-          <div className="mt-8 flex flex-wrap items-center gap-3">
+          <div className="mt-6 flex flex-wrap items-center gap-3">
             <Link href="/demo/case/" className={primary}>
               Open the demo (5 min) <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
           <p className="mt-3 text-[11px] text-muted">Synthetic case. Not measured in a real bank.</p>
         </div>
-        <HeroScene />
+        <HeroFrame callouts={["The agent pulled every record from Finacle, SVS and EFR", "Green = copied exactly. Amber = the agent had to read a document", "Sara only decides the amber one. Then she signs off."]} />
+      </section>
+
+      <section id="in30" aria-label="In 30 seconds" className="border-y border-line">
+        <div className="mx-auto max-w-6xl px-6 py-8">
+          <p className="text-xs font-medium uppercase tracking-wide text-muted">In 30 seconds</p>
+          <dl className="mt-4 grid gap-5 md:grid-cols-5">
+            {in30.map(([k, v]) => (
+              <div key={k}>
+                <dt className="text-xs font-semibold text-ink">{k}</dt>
+                <dd className="mt-1 text-sm text-sub">{v}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
       </section>
 
       <section id="inbox" className="mx-auto max-w-6xl px-6 pb-20">
@@ -206,15 +246,16 @@ export default function CaseStudy() {
               <div key={d.day}>
                 <p className="text-xs text-muted">{d.day}</p>
                 <div className="mt-2 flex h-8 items-center gap-1">
-                  {d.icons.map(({ I, label }, i) => (
-                    <I key={i} aria-label={label} className="h-5 w-5 text-sub md:h-6 md:w-6" />
+                  {d.icons.map((I, i) => (
+                    <I key={i} aria-hidden className="h-4 w-4 text-sub md:h-6 md:w-6" />
                   ))}
                 </div>
+                <p className="mt-1 text-[11px] leading-snug text-sub md:text-xs">{d.label}</p>
               </div>
             ))}
           </div>
           <div className="mt-3 h-2 overflow-hidden rounded-full bg-line">
-            <div className="crawl h-full rounded-full bg-warn" />
+            <div className="crawl h-full rounded-full bg-warn max-md:[animation:none]" />
           </div>
           <p className="mt-8 text-xs font-medium uppercase tracking-wide text-muted">With Jointly</p>
           <div className="mt-3 flex items-center gap-3">
@@ -226,6 +267,16 @@ export default function CaseStudy() {
         </div>
       </section>
 
+
+      <section id="days" className="border-t border-line">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <h2 className={h2}>Where the days go</h2>
+          <p className="mt-2 text-sub">5 lanes, 4 return loops, 1 courier.</p>
+          <div className="mt-8">
+            <DaysSwimlane t={swim} />
+          </div>
+        </div>
+      </section>
 
       <section id="shadow" className="border-t border-line">
         <div className="mx-auto max-w-6xl px-6 py-20">
