@@ -1,16 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { Check, Eye, FileText, Info } from "lucide-react";
+import { Check, Eye, FileText, Info, Sparkles } from "lucide-react";
 import { EvidenceKey, PersonId, evidence, isAgentRead, personById } from "@/data/seed";
 import { useStore } from "@/lib/store";
 
 export const cn = (...a: ClassValue[]) => twMerge(clsx(a));
 
-export type Tone = "ok" | "warn" | "bad" | "neutral" | "accent";
+export type Tone = "ok" | "warn" | "bad" | "neutral" | "accent" | "held";
 
 const tones: Record<Tone, string> = {
   ok: "bg-ok-soft text-ok-ink",
@@ -18,6 +18,7 @@ const tones: Record<Tone, string> = {
   bad: "bg-bad-soft text-bad-ink",
   neutral: "bg-panel text-sub",
   accent: "bg-accent-soft text-accent-ink",
+  held: "bg-held-soft text-held",
 };
 const dots: Record<Tone, string> = {
   ok: "bg-ok",
@@ -25,6 +26,7 @@ const dots: Record<Tone, string> = {
   bad: "bg-bad",
   neutral: "bg-muted",
   accent: "bg-accent",
+  held: "bg-held",
 };
 
 export function Pill({ tone = "neutral", children, className, dot = true }: { tone?: Tone; children: React.ReactNode; className?: string; dot?: boolean }) {
@@ -160,8 +162,8 @@ export function AssumptionChip({ children }: { children: React.ReactNode }) {
 
 type BtnVariant = "primary" | "secondary" | "ghost" | "danger";
 const btn: Record<BtnVariant, string> = {
-  primary: "bg-accent text-onaccent hover:bg-accent-hover disabled:bg-accent/40",
-  secondary: "border border-line bg-surface text-ink hover:bg-panel disabled:text-muted",
+  primary: "bg-accent text-onaccent shadow-sm hover:bg-accent-hover disabled:bg-accent/40 disabled:shadow-none",
+  secondary: "border border-line-strong bg-surface text-ink hover:bg-panel disabled:text-muted",
   ghost: "text-sub hover:bg-panel hover:text-ink disabled:text-muted",
   danger: "border border-bad/30 bg-surface text-bad-ink hover:bg-bad-soft disabled:opacity-50",
 };
@@ -177,7 +179,7 @@ export function Button({
       type="button"
       {...props}
       className={cn(
-        "inline-flex items-center justify-center gap-1.5 rounded-lg font-medium transition-[background-color,color,transform] duration-150 ease-out active:scale-[0.97] disabled:cursor-not-allowed disabled:active:scale-100",
+        "inline-flex items-center justify-center gap-1.5 rounded-xl font-medium transition-[background-color,color,transform] duration-150 ease-out active:scale-[0.97] disabled:cursor-not-allowed disabled:active:scale-100",
         size === "sm" ? "h-7 px-2.5 text-xs" : "h-9 px-3.5 text-sm",
         btn[variant],
         className,
@@ -186,22 +188,87 @@ export function Button({
   );
 }
 
+export const personVar = (id: PersonId | "sara" | "agent") => `--p-${id}`;
+
 export function Avatar({ id, size = 28, held = false }: { id: PersonId; size?: number; held?: boolean }) {
   const p = personById(id);
+  const c = `var(${personVar(id)})`;
   return (
     <span
-      className={cn("inline-flex shrink-0 items-center justify-center rounded-full text-[11px] font-semibold text-ink", held && "opacity-50 grayscale")}
-      style={{ width: size, height: size, background: p.tint }}
-      title={p.name}
+      className={cn("inline-flex shrink-0 items-center justify-center rounded-full font-semibold", held && "border-dashed")}
+      style={{
+        width: size,
+        height: size,
+        fontSize: Math.max(10, Math.round(size * 0.38)),
+        borderWidth: size >= 32 ? 2 : 1.5,
+        borderColor: held ? "rgb(var(--held))" : `rgb(${c})`,
+        background: held ? "rgb(var(--held-soft))" : `rgb(${c} / 0.12)`,
+        color: held ? "rgb(var(--held))" : `color-mix(in srgb, rgb(${c}) 62%, rgb(var(--ink)))`,
+      }}
+      title={held ? `${p.name} (held)` : p.name}
     >
       {p.initials}
     </span>
   );
 }
 
+export function AgentMark({ size = 28 }: { size?: number }) {
+  return (
+    <span
+      className="inline-flex shrink-0 items-center justify-center rounded-full border border-person-agent/40 bg-person-agent/10 text-person-agent"
+      style={{ width: size, height: size }}
+      title="Agent"
+    >
+      <Sparkles style={{ width: size * 0.5, height: size * 0.5 }} aria-hidden />
+    </span>
+  );
+}
+
+export function ScreenHead({ eyebrow, title, aside }: { eyebrow: React.ReactNode; title: React.ReactNode; aside?: React.ReactNode }) {
+  return (
+    <div className="flex items-start justify-between gap-6">
+      <div className="min-w-0">
+        <p className="text-xs font-medium text-muted">{eyebrow}</p>
+        <h1 className="mt-1 font-display text-[28px] leading-tight text-ink">{title}</h1>
+      </div>
+      {aside}
+    </div>
+  );
+}
+
+export function Tween({ value, ms = 400, prefix = "" }: { value: number; ms?: number; prefix?: string }) {
+  const [shown, setShown] = useState(value);
+  const from = useRef(value);
+  useEffect(() => {
+    const start = from.current;
+    if (start === value || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      from.current = value;
+      setShown(value);
+      return;
+    }
+    const t0 = performance.now();
+    let raf = 0;
+    const tick = (t: number) => {
+      const k = Math.min(1, (t - t0) / ms);
+      const e = 1 - Math.pow(1 - k, 3);
+      setShown(Math.round(start + (value - start) * e));
+      if (k < 1) raf = requestAnimationFrame(tick);
+      else from.current = value;
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [value, ms]);
+  return (
+    <span className="tnum">
+      {prefix}
+      {shown.toLocaleString("en-US")}
+    </span>
+  );
+}
+
 export function Card({ className, children, ...rest }: React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div {...rest} className={cn("rounded-xl border border-line bg-surface", className)}>
+    <div {...rest} className={cn("rounded-card border border-line bg-surface", className)}>
       {children}
     </div>
   );

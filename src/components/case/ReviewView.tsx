@@ -1,12 +1,15 @@
 "use client";
 
+import { PaymentWorkflow } from "./PaymentWorkflow";
+import { SigningMap } from "./SigningMap";
+
 import { useEffect, useState } from "react";
-import { AlertTriangle, Check, ChevronRight, FlaskConical, Lightbulb, Repeat, ShieldCheck, Undo2, X } from "lucide-react";
+import { AlertTriangle, Check, ChevronRight, Repeat, ShieldCheck, Undo2 } from "lucide-react";
 import { EvidenceKey, isAgentRead } from "@/data/seed";
-import { approvalValid, buildStages, diffStage } from "@/lib/rules";
+import { approvalValid, buildStages, diffStage, fmt } from "@/lib/rules";
 import { hasEvent, useStore } from "@/lib/store";
 import { useTourTarget } from "@/components/Tour";
-import { BasisTag, Button, Card, Empty, Pill, Proof, cn } from "@/components/ui";
+import { Avatar, BasisTag, Button, Card, Empty, Pill, Proof, Tween, cn } from "@/components/ui";
 
 
 function wordDiff(a: string, b: string) {
@@ -18,9 +21,29 @@ function wordDiff(a: string, b: string) {
   return { pre: x.slice(0, p).join(" "), del: x.slice(p, x.length - q).join(" "), ins: y.slice(p, y.length - q).join(" "), post: x.slice(x.length - q).join(" ") };
 }
 
+function TweenFrom({ from, to }: { from: number; to: number }) {
+  const [v, setV] = useState(from);
+  useEffect(() => setV(to), [to]);
+  return <Tween value={v} prefix="AED " />;
+}
+
 function Changed({ before, after }: { before: string; after: string }) {
   if (before === after) return <>{after}</>;
   const d = wordDiff(before, after);
+  const num = (x: string) => /^AED [\d,]+$/.test(x) ? Number(x.slice(4).replace(/,/g, "")) : NaN;
+  const nb = num(d.del), na = num(d.ins);
+  if (!isNaN(nb) && !isNaN(na)) {
+    return (
+      <>
+        {d.pre && `${d.pre} `}
+        <del className="rounded bg-bad-soft px-0.5 text-bad-ink">{d.del}</del>{" "}
+        <ins className="rounded bg-ok-soft px-0.5 font-medium text-ok-ink no-underline">
+          <TweenFrom from={nb} to={na} />
+        </ins>
+        {d.post && ` ${d.post}`}
+      </>
+    );
+  }
   return (
     <>
       {d.pre && `${d.pre} `}
@@ -35,7 +58,7 @@ function Changed({ before, after }: { before: string; after: string }) {
 function coverage(stageId: number, version: 1 | 2) {
   if (stageId === 1) return { label: "Finacle records", n: 3, of: 3 };
   if (stageId === 2) return { label: "SVS signatories", n: 3, of: 3 };
-  return { label: "SVS documents read", n: version === 1 ? 1 : 2, of: 2 };
+  return { label: "SVS documents confirmed", n: version === 1 ? 1 : 2, of: 2 };
 }
 
 function Coverage({ n, of, label }: { n: number; of: number; label: string }) {
@@ -71,18 +94,59 @@ function ClaimRow({ label, value, sources }: { label: React.ReactNode; value: Re
   );
 }
 
+function ScanCheck({ canAct, onConfirm, onReturn }: { canAct: boolean; onConfirm: (v: number) => void; onReturn: (v: number) => void }) {
+  const [value, setValue] = useState("");
+  const n = Number(value.replace(/[^0-9.]/g, ""));
+  const mismatch = value.trim() !== "" && n > 0 && n !== 25000;
+  return (
+    <div className="mt-4 rounded-lg border border-warn/30 bg-warn-soft/40 p-3">
+      <p className="flex items-center gap-1.5 text-sm font-medium text-warn-ink">
+        <AlertTriangle className="h-4 w-4 shrink-0" /> A 2023 letter may change Khalifa&apos;s limit. The scan is unclear.
+      </p>
+      <div className="mt-3 grid grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] gap-4">
+        <figure>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/scans/svs-amd-2023.png" alt="Scan of the 2023 amendment letter. The amount is blurred." className="w-full rounded-md border border-line" />
+          <figcaption className="mt-1 text-[11px] text-muted">2023 amendment letter · scan from SVS</figcaption>
+        </figure>
+        <div className="space-y-3 text-sm">
+          <div>
+            <p className="text-xs text-muted">The agent read</p>
+            <p className="mt-0.5 font-medium">
+              AED 25,000 <span className="text-xs font-normal text-warn-ink">not certain</span>
+            </p>
+            <p className="mt-1 text-xs text-sub">Plan v1 keeps AED 10,000 until you confirm.</p>
+          </div>
+          {canAct && (
+            <div>
+              <label htmlFor="scan-value" className="text-xs text-muted">
+                The letter says Khalifa&apos;s limit is
+              </label>
+              <div className="mt-1 flex items-center gap-2">
+                <span className="text-xs text-muted">AED</span>
+                <input id="scan-value" inputMode="numeric" value={value} onChange={(e) => setValue(e.target.value)} placeholder="25,000" className="h-9 w-32 rounded-lg border border-line bg-surface px-2.5 text-sm outline-none focus:border-accent" />
+              </div>
+              {mismatch && <p className="mt-1 text-xs text-warn-ink">That&apos;s not what the agent read. This sends the stage back with your value.</p>}
+              <Button variant="primary" className="mt-2" disabled={!(n > 0)} onClick={() => (n === 25000 ? onConfirm(n) : onReturn(n))}>
+                <Check className="h-3.5 w-3.5" /> {mismatch ? "Send back with my value" : "Confirm and update the plan"}
+              </Button>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+type Status = "approved" | "needs" | "changed" | "waiting";
+const ring: Record<Status, string> = { approved: "border-ok bg-ok text-onaccent", needs: "border-warn", changed: "border-accent", waiting: "border-line" };
+const statusLabel: Record<Status, string> = { approved: "Approved", needs: "Needs you", changed: "Changed", waiting: "Waiting" };
+
 export function ReviewView() {
-  const { state, dispatch, version, setTab } = useStore();
+  const { state, dispatch, version } = useStore();
   const tour = useTourTarget(1);
   const [returning, setReturning] = useState(false);
   const [note, setNote] = useState("");
-  const [checked, setChecked] = useState<Record<number, boolean>>({});
-  const [hint, setHint] = useState(false);
-  useEffect(() => {
-    try {
-      setHint(localStorage.getItem("jointly-hint") !== "off");
-    } catch {}
-  }, []);
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const el = e.target as HTMLElement;
@@ -90,49 +154,59 @@ export function ReviewView() {
       if (state.phase !== "in_review" && state.phase !== "re_review") return;
       const list = buildStages(version);
       const next = list.find((st, n) => !approvalValid(state.approvals[st.id], st) && list.slice(0, n).every((p) => approvalValid(state.approvals[p.id], p)));
-      if (!next) return;
-      const needs = next.items.some((it) => it.sources.some(isAgentRead));
-      if (needs && !checked[next.id]) return;
+      if (!next || (next.id === 3 && version === 1)) return;
       dispatch({ type: "approve", stageId: next.id });
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [state, version, checked, dispatch]);
+  }, [state, version, dispatch]);
   if (!hasEvent(state, "submit")) return <Empty icon={ShieldCheck} title="Nothing to review yet" body="The agent sends you all 4 stages at once, so you review in one sitting." />;
   const stages = buildStages(version);
   const v1 = buildStages(1);
   const reviewing = state.phase === "in_review" || state.phase === "re_review";
+  const status: Status[] = stages.map((s, i) => {
+    const ok = approvalValid(state.approvals[s.id], s);
+    const prevOk = stages.slice(0, i).every((p) => approvalValid(state.approvals[p.id], p));
+    const changed = version === 2 && diffStage(v1[i], s).length > 0;
+    return ok ? "approved" : changed ? "changed" : reviewing && prevOk ? "needs" : "waiting";
+  });
+  const open = status.filter((x) => x !== "approved").length;
+  const judgement = version === 1 && !approvalValid(state.approvals[3], stages[2]);
+  const headline = !open ? "All 4 stages approved" : judgement ? "1 thing needs your judgement" : `Nothing needs your judgement: ${open} stage${open === 1 ? "" : "s"} ready to approve`;
 
   return (
     <div className="max-w-4xl space-y-4" {...tour}>
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex flex-wrap items-center gap-2 text-xs text-muted">
-          <BasisTag keys={["finacle-cif"]} /> came from a system record
-          <span className="mx-1 text-line-strong">|</span>
-          <BasisTag keys={["svs-man"]} /> the agent read a document, so compare it with the quote
-        </div>
+      <h2 className="font-display text-2xl">{headline}</h2>
+      <div className="grid grid-cols-4 gap-2">
+        {stages.map((s, i) => (
+          <a key={s.id} href={`#stage-${s.id}`} className="flex items-center gap-2.5 rounded-card border border-line bg-surface px-3 py-2.5 hover:border-line-strong">
+            <span className={cn("flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2", ring[status[i]])}>
+              {status[i] === "approved" && <Check className="h-3 w-3" strokeWidth={3} />}
+            </span>
+            <span className="min-w-0">
+              <span className="block text-sm font-medium">{s.short}</span>
+              <span className="block text-[11px] text-muted">{statusLabel[status[i]]}</span>
+            </span>
+          </a>
+        ))}
+      </div>
+      {!open && (state.phase === "executing" || state.phase === "executed") && (
+        <Card className="flex animate-enter items-center gap-4 p-5">
+          <span className="flex">
+            <Avatar id="mohammed" size={36} />
+            <span className="ring-link -ml-2" style={{ "--ring-from": "10px" } as React.CSSProperties}>
+              <Avatar id="khalifa" size={36} />
+            </span>
+          </span>
+          <div>
+            <p className="font-display text-lg">Approved. Nice one.</p>
+            <p className="text-sm text-sub">Agent is setting this up in Digital Banking Admin. You&apos;ll be asked to release access.</p>
+          </div>
+        </Card>
+      )}
+      <div className="flex justify-end">
         <Pill tone="neutral">Plan v{version}</Pill>
       </div>
-      {hint && (
-        <div className="flex items-start gap-2.5 rounded-lg border border-accent/30 bg-accent-soft/40 px-3 py-2.5 text-sm">
-          <Lightbulb className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
-          <p className="flex-1 text-sub">
-            <span className="font-medium text-ink">Where I&apos;m reliable:</span> anything copied from Finacle, EFR or Admin. <span className="font-medium text-ink">Where to check me:</span> what I read from SVS documents, especially letters and amendments.
-          </p>
-          <button
-            aria-label="Dismiss"
-            className="rounded p-0.5 text-muted hover:text-ink"
-            onClick={() => {
-              setHint(false);
-              try {
-                localStorage.setItem("jointly-hint", "off");
-              } catch {}
-            }}
-          >
-            <X className="h-3.5 w-3.5" />
-          </button>
-        </div>
-      )}
       {stages.map((s, i) => {
         const approval = state.approvals[s.id];
         const valid = approvalValid(approval, s);
@@ -142,12 +216,11 @@ export function ReviewView() {
         const wasReturned = state.returned?.stageId === s.id;
         const canAct = reviewing && !valid && prevOk;
         const canReturn = canAct && version === 1 && s.id === 3;
-        const needsCheck = s.items.some((it) => it.sources.some(isAgentRead));
         const cov = coverage(s.id, version);
         const readItems = s.items.filter((it) => it.sources.some(isAgentRead));
         const exactItems = s.items.filter((it) => !it.sources.some(isAgentRead));
         return (
-          <Card key={s.id} className={cn("p-5", canAct && "border-line-strong", valid && "bg-panel/30")}>
+          <Card key={s.id} id={`stage-${s.id}`} className={cn("p-5", canAct && "border-line-strong", valid && "bg-panel/30")}>
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-xs text-muted">Stage {s.id} of 4</p>
@@ -174,7 +247,19 @@ export function ReviewView() {
               </div>
             </div>
 
-            {changes.length > 0 && !valid ? (
+            {s.id === 2 && !valid ? (
+              <div className="mt-4">
+                <SigningMap part="people" />
+              </div>
+            ) : s.id === 3 && !valid ? (
+              <div className="mt-4">
+                <SigningMap compact />
+              </div>
+            ) : s.id === 4 && !valid ? (
+              <div className="mt-4">
+                <PaymentWorkflow diff={version === 2} />
+              </div>
+            ) : changes.length > 0 && !valid ? (
               <ul className="mt-4 divide-y divide-accent/20 rounded-lg border border-accent/30 bg-accent-soft/30">
                 {changes.map((c) => (
                   <ClaimRow key={c.key} label={<Changed before={c.beforeLabel} after={c.afterLabel} />} value={<Changed before={c.before} after={c.after} />} sources={c.sources} />
@@ -195,8 +280,8 @@ export function ReviewView() {
                           <span className="flex h-4 w-4 items-center justify-center rounded-full bg-ok text-onaccent">
                             <Check className="h-2.5 w-2.5" strokeWidth={3} />
                           </span>
-                          <span className="font-medium">{exactItems.length} line{exactItems.length === 1 ? "" : "s"} copied exactly from system records</span>
-                          <span className="text-xs text-muted">Nothing to interpret. Open to see them.</span>
+                          <span className="font-medium">{exactItems.length} line{exactItems.length === 1 ? "" : "s"} copied exactly from Finacle and Digital Banking</span>
+                          
                         </summary>
                         <ul className="divide-y divide-line border-t border-line">
                           {exactItems.map((it) => (
@@ -212,22 +297,17 @@ export function ReviewView() {
 
             {s.id === 3 && !valid && (
               version === 1 ? (
-                <div className="mt-3 flex gap-2.5 rounded-lg border border-warn/30 bg-warn-soft px-3 py-2.5 text-sm text-warn-ink">
-                  <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
-                  <p>
-                    <span className="font-medium">The agent didn&apos;t read everything.</span> It searched SVS for Mandates only. 1 Letter on this account, filed 01-Mar-2023, was not read, so these rules may be out of date.
-                  </p>
-                </div>
+                <ScanCheck canAct={canAct && !returning} onConfirm={(v) => dispatch({ type: "confirm", value: v })} onReturn={(v) => dispatch({ type: "return", note: `Sara reads AED ${fmt(v)} on the scan, not AED 25,000. Get a clean copy from the branch.` })} />
               ) : (
                 <>
                   <p className="mt-3 flex items-center gap-1.5 text-xs text-ok-ink">
-                    <Check className="h-3.5 w-3.5" strokeWidth={3} /> Read every SVS document on this account (2 of 2)
+                    <Check className="h-3.5 w-3.5" strokeWidth={3} /> 2023 letter checked by you: AED 25,000
                   </p>
                   <div className="mt-3 flex items-start gap-2.5 rounded-lg border border-line bg-panel/60 px-3 py-2.5">
                     <Repeat className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-medium">Make this fix stick?</p>
-                      <p className="mt-0.5 text-xs text-sub">The agent proposes: on every case, read all SVS document types, not just Mandates. A supervisor has to approve it.</p>
+                      <p className="mt-0.5 text-xs text-sub">The agent proposes: when a scan is unclear, ask the branch for a clean copy before building the plan. A supervisor has to approve it.</p>
                     </div>
                     {state.log.some((e) => e.id === "lesson") ? (
                       <Pill tone="neutral">Sent to supervisor</Pill>
@@ -247,25 +327,16 @@ export function ReviewView() {
               </p>
             )}
 
-            {canAct && !returning && needsCheck && (
-              <label className="mt-4 flex cursor-pointer items-center gap-2 text-sm text-sub">
-                <input type="checkbox" className="accent-accent" checked={!!checked[s.id]} onChange={(e) => setChecked((c) => ({ ...c, [s.id]: e.target.checked }))} />
-                I compared the highlighted words with the agent&apos;s lines
-              </label>
-            )}
-            {canAct && !returning && (
+                        {canAct && !returning && (
               <div className="mt-3 flex gap-2">
-                <Button variant="primary" disabled={needsCheck && !checked[s.id]} onClick={() => dispatch({ type: "approve", stageId: s.id })}>
-                  <Check className="h-3.5 w-3.5" /> Approve stage {s.id} · {s.items.length} line{s.items.length === 1 ? "" : "s"}
-                  <kbd className="ml-1 rounded border border-onaccent/40 px-1 text-[10px] font-normal opacity-80">A</kbd>
-                </Button>
-                {s.id === 3 && (
-                  <Button variant="ghost" onClick={() => setTab("simulator")}>
-                    <FlaskConical className="h-3.5 w-3.5" /> Test a payment
+                {!(s.id === 3 && version === 1) && (
+                  <Button variant="primary" onClick={() => dispatch({ type: "approve", stageId: s.id })}>
+                    <Check className="h-3.5 w-3.5" /> Approve stage {s.id} · {s.items.length} line{s.items.length === 1 ? "" : "s"}
+                    <kbd className="ml-1 rounded border border-onaccent/40 px-1 text-[10px] font-normal opacity-80">A</kbd>
                   </Button>
                 )}
-                {canReturn && (
-                  <Button variant="danger" onClick={() => setReturning(true)}>
+                                {canReturn && (
+                  <Button variant="ghost" onClick={() => setReturning(true)}>
                     <Undo2 className="h-3.5 w-3.5" /> Return to agent
                   </Button>
                 )}

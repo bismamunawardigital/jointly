@@ -3,11 +3,13 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Search } from "lucide-react";
 import { EvidenceKey, evidence } from "@/data/seed";
+import { useRouter } from "next/navigation";
 import { Tab, useStore } from "@/lib/store";
 import { cn, sourceLabel } from "@/components/ui";
 
 export function CommandPalette({ tabs }: { tabs: { id: Tab; label: string }[] }) {
-  const { setTab, openEvidence } = useStore();
+  const { setTab, openEvidence, dispatch } = useStore();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
   const [i, setI] = useState(0);
@@ -20,8 +22,13 @@ export function CommandPalette({ tabs }: { tabs: { id: Tab; label: string }[] })
       }
       if (e.key === "Escape") setOpen(false);
     };
+    const onOpen = () => setOpen(true);
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    window.addEventListener("jointly:palette", onOpen);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("jointly:palette", onOpen);
+    };
   }, []);
   useEffect(() => {
     if (open) {
@@ -32,12 +39,17 @@ export function CommandPalette({ tabs }: { tabs: { id: Tab; label: string }[] })
   }, [open]);
   const items = useMemo(() => {
     const all = [
-      ...tabs.map((t) => ({ kind: "Go to", label: t.label, run: () => setTab(t.id) })),
-      ...(Object.keys(evidence) as EvidenceKey[]).map((k) => ({ kind: "Source", label: `${evidence[k].title} · ${sourceLabel(k)}`, run: () => openEvidence(k) })),
+      ...tabs.map((t) => ({ kind: "Go to", label: t.label, text: t.label, run: () => setTab(t.id) })),
+      { kind: "Go to", label: "Command center", text: "Command center queue", run: () => router.push("/demo/") },
+      { kind: "Action", label: "Reset demo", text: "Reset demo restart", run: () => { dispatch({ type: "reset" }); setTab("run"); } },
+      ...(Object.keys(evidence) as EvidenceKey[]).map((k) => {
+        const label = `${evidence[k].title} · ${sourceLabel(k)}`;
+        return { kind: "Source", label, text: `${label} ${evidence[k].body}`, run: () => openEvidence(k) };
+      }),
     ];
     const s = q.trim().toLowerCase();
-    return (s ? all.filter((x) => x.label.toLowerCase().includes(s)) : all).slice(0, 9);
-  }, [q, tabs, setTab, openEvidence]);
+    return (s ? all.filter((x) => x.text.toLowerCase().includes(s)) : all).slice(0, 12);
+  }, [q, tabs, setTab, openEvidence, dispatch, router]);
   if (!open) return null;
   const go = (n: number) => {
     items[n]?.run();
@@ -60,7 +72,7 @@ export function CommandPalette({ tabs }: { tabs: { id: Tab; label: string }[] })
               if (e.key === "ArrowUp") { e.preventDefault(); setI((x) => Math.max(x - 1, 0)); }
               if (e.key === "Enter") go(i);
             }}
-            placeholder="Jump to a tab or a source"
+            placeholder="Jump to a tab, a source or an action"
             aria-label="Search"
             role="combobox"
             aria-expanded="true"

@@ -6,6 +6,15 @@ import { useTourTarget } from "@/components/Tour";
 import { hasEvent, useStore } from "@/lib/store";
 import { Avatar, Button, Card, Empty, Pill, SectionTitle, SourceChip, cn } from "@/components/ui";
 
+function Cell({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="min-w-0">
+      <p className="mb-1 text-[11px] font-medium text-muted">{label}</p>
+      {children}
+    </div>
+  );
+}
+
 export function EvidenceView() {
   const { state, dispatch } = useStore();
   const tour = useTourTarget(0);
@@ -19,76 +28,62 @@ export function EvidenceView() {
     <div className="max-w-5xl space-y-8">
       <section {...tour}>
         <SectionTitle aside={<p className="text-xs text-muted">Names are shown, never used to match</p>}>Who is who</SectionTitle>
-        <Card className="overflow-hidden">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-line bg-panel/60 text-left text-xs text-muted">
-                <th className="px-4 py-2.5 font-medium">Form</th>
-                <th className="px-4 py-2.5 font-medium">Finacle</th>
-                <th className="px-4 py-2.5 font-medium">SVS</th>
-                <th className="px-4 py-2.5 font-medium">Matched on</th>
-                <th className="px-4 py-2.5 font-medium">EFR</th>
-                <th className="px-4 py-2.5 font-medium">Digital login</th>
-              </tr>
-            </thead>
-            <tbody>
-              {people.map((p) => {
-                const expired = !p.eidValid && !renewed;
-                return (
-                  <tr key={p.id} className="border-b border-line align-top last:border-0">
-                    <td className="px-4 py-3 text-xs">
-                      <div className="mb-1 flex items-center gap-2">
-                        <Avatar id={p.id} size={22} held={expired} />
-                        <span className="text-sm font-medium text-ink">{p.name.split(" ")[0]}</span>
-                      </div>
-                      <p className="text-sub">{p.formName}</p>
-                      <SourceChip k={`form-${p.id}` as EvidenceKey} className="mt-1" />
-                    </td>
-                    <td className="px-4 py-3 text-xs">
-                      <p className="font-mono text-sub">{p.finacleName}</p>
-                      <SourceChip k={p.id === "mohammed" ? "finacle-cif" : (`cif-${p.id}` as EvidenceKey)} className="mt-1" />
-                    </td>
-                    <td className="px-4 py-3 text-xs">
-                      <p className="text-sub">{p.svsName}</p>
-                      <SourceChip k="svs-signatories" className="mt-1 max-w-[150px]" />
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex flex-col gap-1 whitespace-nowrap text-xs">
-                        <span className="inline-flex items-center gap-1 text-ok-ink">
-                          <Check className="h-3 w-3" strokeWidth={3} /> EID …{p.eidLast4}
-                        </span>
-                        <span className="inline-flex items-center gap-1 text-ok-ink">
-                          <Check className="h-3 w-3" strokeWidth={3} /> RCIF {p.rcif}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3">
-                      {expired ? (
-                        <div className="space-y-1">
-                          <Pill tone="bad">EID expired</Pill>
-                          <p className="text-xs text-muted">Expired {p.eidExpiry}</p>
-                          <SourceChip k="eid-rashid" />
-                        </div>
-                      ) : (
-                        <Pill tone="ok">{p.id === "rashid" ? "Renewed" : "Valid"}</Pill>
-                      )}
-                    </td>
-                    <td className="px-4 py-3 text-xs">
-                      {p.digitalUser.existing ? (
-                        <div className="space-y-1">
-                          <p className="font-medium text-ink">Has one: {p.digitalUser.userId}</p>
-                          <p className="text-muted">Link it, don&apos;t recreate</p>
-                          <SourceChip k="admin-user-mohammed" />
-                        </div>
-                      ) : (
-                        <span className="text-muted">New user needed</span>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+        <Card className="divide-y divide-line">
+          {people.map((p) => {
+            const expired = !p.eidValid && !renewed;
+            return (
+              <div key={p.id} className="grid grid-cols-3 gap-x-6 gap-y-4 px-5 py-4 text-xs">
+                <Cell label="Form">
+                  <div className="mb-1 flex items-center gap-2">
+                    <Avatar id={p.id} size={22} held={expired} />
+                    <span className="text-sm font-medium text-ink">{p.name.split(" ")[0]}</span>
+                  </div>
+                  <p className="text-sub">{p.formName}</p>
+                  <SourceChip k={`form-${p.id}` as EvidenceKey} className="mt-1" />
+                </Cell>
+                <Cell label="Finacle">
+                  <p className="text-sub">{p.finacleName}</p>
+                  <SourceChip k={`cif-${p.id}` as EvidenceKey} className="mt-1" />
+                </Cell>
+                <Cell label="SVS">
+                  <p className="text-sub">{p.svsName}</p>
+                  <SourceChip k="svs-signatories" className="mt-1" />
+                </Cell>
+                <Cell label="Matched on">
+                  <div className="flex flex-wrap gap-x-3 gap-y-1">
+                    <span className="inline-flex items-center gap-1 text-ok-ink">
+                      <Check className="h-3 w-3" strokeWidth={3} /> EID …{p.eidLast4}
+                    </span>
+                    <span className="inline-flex items-center gap-1 text-ok-ink">
+                      <Check className="h-3 w-3" strokeWidth={3} /> RCIF {p.rcif}
+                    </span>
+                  </div>
+                </Cell>
+                <Cell label="EFR">
+                  {expired ? (
+                    <div className="space-y-1">
+                      <Pill tone="bad">EID expired</Pill>
+                      <p className="text-muted">Expired {p.eidExpiry}</p>
+                      <SourceChip k="eid-rashid" />
+                    </div>
+                  ) : (
+                    <Pill tone="ok">{p.id === "rashid" ? "Renewed" : "Valid"}</Pill>
+                  )}
+                </Cell>
+                <Cell label="Digital login">
+                  {p.digitalUser.existing ? (
+                    <div className="space-y-1">
+                      <p className="font-medium text-ink">Has one: {p.digitalUser.userId}</p>
+                      <p className="text-muted">Link it, don&apos;t recreate</p>
+                      <SourceChip k="admin-user-mohammed" />
+                    </div>
+                  ) : (
+                    <span className="text-muted">New user needed</span>
+                  )}
+                </Cell>
+              </div>
+            );
+          })}
         </Card>
         {!renewed && (
           <p className="mt-3 text-xs text-sub">
@@ -156,7 +151,7 @@ export function EvidenceView() {
               </p>
               <ul className="mt-3 flex flex-wrap gap-1.5">
                 {svsDocTypes.map((t) => {
-                  const done = searchedAll || t === "Mandate";
+                  const done = true;
                   return (
                     <li key={t} className={cn("inline-flex items-center gap-1 rounded-md border px-2 py-1 text-xs", done ? "border-ok/30 bg-ok-soft text-ok-ink" : "border-dashed border-line text-muted")}>
                       {done ? <Check className="h-3 w-3" strokeWidth={3} /> : <X className="h-3 w-3" />}
@@ -167,8 +162,8 @@ export function EvidenceView() {
               </ul>
               <p className="mt-3 text-xs text-sub">
                 {searchedAll
-                  ? `Found ${evidence["svs-amd"].ref}, filed as a Letter. The agent now searches every type.`
-                  : "Shown so a checker can see what the agent did not look at."}
+                  ? `Used ${evidence["svs-amd"].ref} after Sara checked the scan.`
+                  : "Found a 2023 Letter. The scan is unclear, so Sara checks it in review."}
               </p>
             </Card>
             <Card className="p-4">
@@ -176,7 +171,7 @@ export function EvidenceView() {
                 <p className="text-xs text-muted">Finacle cleanup ticket</p>
                 <Pill tone={state.cleanupTicket === "sent" ? "ok" : "neutral"}>{state.cleanupTicket === "sent" ? "Sent" : "Draft"}</Pill>
               </div>
-              <p className="mt-3 text-sm">Update Mode of Operation on AE07…0123 456 to reflect the SVS mandate and the 2023 amendment.</p>
+              <p className="mt-3 text-sm">Update Mode of Operation on AE07…0123 456 to reflect the SVS mandate{hasEvent(state, "rev-plan") ? " and the 2023 amendment" : ""}.</p>
               <p className="mt-1 text-xs text-muted">To Data Quality team. Doesn&apos;t block this case.</p>
               {state.cleanupTicket === "draft" && (
                 <Button size="sm" className="mt-3" onClick={() => dispatch({ type: "sendCleanup" })}>

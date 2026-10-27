@@ -2,18 +2,18 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Bell, Eye } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { business, otherCases } from "@/data/seed";
 import { statusOf, stepStates } from "@/lib/derive";
 import { useStore } from "@/lib/store";
-import { Card, Pill, Tone } from "@/components/ui";
+import { Card, Pill, Tone, cn } from "@/components/ui";
 
 const toneOf: Record<string, Tone> = { "Agent working": "accent", "Needs you": "warn", "Partially live": "ok", Live: "ok", New: "neutral" };
 
 export default function CommandCenter() {
   const { state } = useStore();
   const router = useRouter();
-  const st = statusOf[state.phase];
+  const st = state.paused && state.queue.length ? { label: state.handedOver ? "With a maker" : "Paused", tone: "warn" as const } : statusOf[state.phase];
   const active = stepStates(state).find((s) => s.state === "active");
   const needsYou = otherCases.filter((c) => c.status === "Needs you").length + (st.label === "Needs you" ? 1 : 0);
   const stats = [
@@ -25,8 +25,10 @@ export default function CommandCenter() {
   return (
     <div className="h-full overflow-y-auto">
       <div className="mx-auto max-w-5xl px-10 py-10">
-        <p className="text-sm text-muted">Customer Fulfillment · Business onboarding</p>
-        <h1 className="mt-1 text-2xl font-semibold tracking-tight">Command center</h1>
+        <p className="text-xs font-medium text-muted">Command center · Customer Fulfillment</p>
+        <h1 className="mt-1 font-display text-[28px] leading-tight text-ink">
+          {needsYou === 1 ? "1 case needs you today." : needsYou > 1 ? `${needsYou} cases need you today.` : "Nothing needs you right now."}
+        </h1>
         <div className="mt-8 grid grid-cols-4 gap-px overflow-hidden rounded-xl border border-line bg-line">
           {stats.map((s) => (
             <div key={s.label} className="bg-surface px-5 py-4">
@@ -37,43 +39,6 @@ export default function CommandCenter() {
           ))}
         </div>
 
-        {needsYou > 0 && (
-          <>
-            <h2 className="mb-3 mt-10 flex items-center gap-2 text-sm font-semibold">
-              <Bell className="h-4 w-4 text-warn" /> Needs you now
-            </h2>
-            <div className="space-y-2">
-              {st.label === "Needs you" && (
-                <Link href="/demo/case/" className="flex items-center justify-between rounded-xl border border-warn/40 bg-warn-soft/40 px-4 py-3 hover:bg-warn-soft/70">
-                  <span className="text-sm">
-                    <span className="font-medium">{business.name}</span>
-                    <span className="text-sub"> · {state.phase === "executed" ? "Release decision" : state.phase === "re_review" ? "2 changed stages to review" : "Plan v1 to review, stage 3 has a gap"}</span>
-                  </span>
-                  <ArrowRight className="h-4 w-4 text-warn-ink" />
-                </Link>
-              )}
-              {otherCases.filter((c) => c.status === "Needs you").map((c) => (
-                <div key={c.id} className="flex items-center justify-between rounded-xl border border-line bg-surface px-4 py-3 text-sm">
-                  <span>
-                    <span className="font-medium text-sub">{c.business}</span>
-                    <span className="text-muted"> · {c.type}, {c.stage.toLowerCase()}</span>
-                  </span>
-                  <span className="text-xs text-muted">{c.age}</span>
-                </div>
-              ))}
-            </div>
-            <p className="mt-2 text-xs text-muted">The agent only lands things here when it needs a person. Everything else runs in the queue below.</p>
-          </>
-        )}
-
-        <div className="mt-8 flex items-start gap-3 rounded-xl border border-dashed border-line bg-surface px-4 py-3">
-          <Eye className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
-          <div className="text-sm">
-            <p className="font-medium">Shadow mode, last 30 days</p>
-            <p className="mt-0.5 text-sub">The agent watched 12 maker cases without acting and found 3 steps that aren&apos;t in the SOP: checking SVS letters, reusing existing logins and re-checking EFR before release. All 3 are now part of its plan.</p>
-            <p className="mt-1 text-xs text-muted">Illustrative. How a new agent learns the real work before it is allowed to act.</p>
-          </div>
-        </div>
 
         <h2 className="mb-3 mt-10 text-sm font-semibold">Queue</h2>
         <Card className="overflow-hidden">
@@ -91,7 +56,7 @@ export default function CommandCenter() {
             <tbody>
               <tr
                 onClick={() => router.push("/demo/case/")}
-                className="cursor-pointer border-b border-line bg-accent-soft/30 transition-colors hover:bg-accent-soft/60"
+                className={cn("cursor-pointer border-b border-line transition-colors", st.label === "Needs you" ? "bg-warn-soft/50 hover:bg-warn-soft/80" : "bg-accent-soft/30 hover:bg-accent-soft/60")}
               >
                 <td className="px-4 py-3">
                   <Link href="/demo/case/" className="flex items-center gap-1.5 font-medium text-ink">
@@ -107,8 +72,8 @@ export default function CommandCenter() {
                 <td className="px-4 py-3 text-sub">{st.label === "Needs you" ? "Sara M." : st.tone === "accent" ? "Agent" : state.phase === "partially_live" ? "Rashid, EID renewal" : state.phase === "new" ? "Agent" : "None"}</td>
                 <td className="tnum px-4 py-3 text-right text-sub">Today</td>
               </tr>
-              {otherCases.map((c) => (
-                <tr key={c.id} className="border-b border-line last:border-0">
+              {[...otherCases].sort((x, y) => Number(y.status === "Needs you") - Number(x.status === "Needs you")).map((c) => (
+                <tr key={c.id} className={cn("border-b border-line last:border-0", c.status === "Needs you" && "bg-warn-soft/30")}>
                   <td className="px-4 py-3 font-medium text-sub">{c.business}</td>
                   <td className="px-4 py-3 text-muted">{c.type}</td>
                   <td className="px-4 py-3 text-muted">{c.stage}</td>

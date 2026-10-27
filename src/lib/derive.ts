@@ -3,6 +3,22 @@ import { Tone } from "@/components/ui";
 import { StepId, eventById, steps } from "./script";
 import { Phase, State, hasEvent } from "./store";
 
+export const headlineOf: Record<Phase, string> = {
+  new: "A new access request just came in.",
+  running: "The agent is setting up 3 signatories.",
+  in_review: "Plan v1 is ready. 1 value needs your eye.",
+  revising: "The agent is updating stages 3 and 4.",
+  re_review: "2 stages changed. Check the difference.",
+  executing: "The agent is setting it up in Finacle and Admin.",
+  executed: "Set up and checked. Release is your call.",
+  releasing: "Releasing Mohammed and Khalifa.",
+  partially_live: "2 of 3 signatories are live.",
+  renewing: "Rashid renewed his EID. Checking him again.",
+  rashid_ready: "Rashid is ready. Release him?",
+  releasing_rashid: "Switching Rashid on.",
+  live: "All 3 signatories are live.",
+};
+
 export const statusOf: Record<Phase, { label: string; tone: Tone }> = {
   new: { label: "New", tone: "neutral" },
   running: { label: "Agent working", tone: "accent" },
@@ -14,6 +30,8 @@ export const statusOf: Record<Phase, { label: string; tone: Tone }> = {
   releasing: { label: "Releasing", tone: "accent" },
   partially_live: { label: "Partially live", tone: "ok" },
   renewing: { label: "Agent working", tone: "accent" },
+  rashid_ready: { label: "Needs you", tone: "warn" },
+  releasing_rashid: { label: "Releasing", tone: "accent" },
   live: { label: "Live", tone: "ok" },
 };
 
@@ -25,6 +43,8 @@ const phaseStep: Partial<Record<Phase, StepId>> = {
   releasing: "release",
   partially_live: "release",
   renewing: "release",
+  rashid_ready: "release",
+  releasing_rashid: "release",
 };
 
 export type StepState = "todo" | "active" | "done";
@@ -80,7 +100,9 @@ export function progressFor(s: State, id: PersonId): Track[] {
       { label: "First login", done: hasEvent(s, "rel-khalifa-login"), time: t("rel-khalifa-login") },
     ];
   return [
-    { label: "Configured", done: hasEvent(s, "ren-enable"), time: t("ren-enable"), note: hasEvent(s, "ex-users") && !hasEvent(s, "ren-enable") ? "Created, switched off" : undefined },
+    hasEvent(s, "ren-enable")
+      ? { label: "Switched on", done: true, time: t("ren-enable") }
+      : { label: "Created (switched off)", done: hasEvent(s, "ex-users"), time: t("ex-users") },
     { label: "Credentials claimed", done: hasEvent(s, "ren-login"), time: t("ren-login"), note: hasEvent(s, "ren-link") ? "Link sent " + eventById("ren-link").time : undefined },
     { label: "First login", done: hasEvent(s, "ren-login"), time: t("ren-login") },
   ];

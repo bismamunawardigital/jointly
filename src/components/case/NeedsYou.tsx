@@ -1,11 +1,22 @@
 "use client";
 
-import { Bot, Hand, Loader2, Pause, Play, ShieldCheck, UserRound } from "lucide-react";
-import { checker } from "@/data/seed";
+import { Hand, Loader2, Pause, Play } from "lucide-react";
 import { releaseEligibility } from "@/lib/rules";
 import { eventById } from "@/lib/script";
 import { rulesFor, useStore } from "@/lib/store";
 import { Button, Pill } from "@/components/ui";
+
+const doingMap: Record<string, string> = {
+  intake: "reading the forms",
+  identity: "confirming the people",
+  mandate: "reading the mandate",
+  plan: "building the plan",
+  policy: "testing the plan",
+  review: "sending the plan to you",
+  execute: "setting it up in Digital Banking Admin",
+  release: "switching people on",
+};
+const doing = (step: string) => doingMap[step] ?? "working";
 
 export function NeedsYou() {
   const { state, dispatch, setTab, version, held } = useStore();
@@ -24,7 +35,7 @@ export function NeedsYou() {
           <dt className="text-muted">Done</dt>
           <dd className="text-sub">{done} agent steps, all saved</dd>
           <dt className="text-muted">Left</dt>
-          <dd className="text-sub">{state.queue.length} steps, starting <span className="font-mono">{next.call}</span></dd>
+          <dd className="text-sub">{state.queue.length} steps, starting with {doing(next.step)}</dd>
           <dt className="text-muted">Half-done</dt>
           <dd className="text-sub">Nothing</dd>
         </dl>
@@ -38,7 +49,7 @@ export function NeedsYou() {
       <div>
         <p className="flex items-center gap-1.5 text-sm font-medium"><Pause className="h-4 w-4 text-warn" /> Agent paused</p>
         <p className="mt-1 text-sm text-sub">Stopped between steps. Nothing is half-written.</p>
-        <p className="mt-2 text-xs text-muted">{done} done · {state.queue.length} left · next <span className="font-mono">{next.call}</span></p>
+        <p className="mt-2 text-xs text-muted">{done} done · {state.queue.length} left · next: {doing(next.step)}</p>
         <div className="mt-4 space-y-2">
           <Button variant="primary" className="w-full" onClick={() => dispatch({ type: "resume" })}>
             <Play className="h-3.5 w-3.5" /> Resume
@@ -55,8 +66,7 @@ export function NeedsYou() {
         <div className="flex items-start gap-2.5">
           <Loader2 className="mt-0.5 h-4 w-4 animate-spin text-accent" />
           <div>
-            <p className="text-sm font-medium">{next.actor} is working</p>
-            <p className="mt-0.5 font-mono text-[11px] text-muted">{next.call}</p>
+            <p className="text-sm font-medium">Agent is {doing(next.step)}</p>
           </div>
         </div>
         <p className="mt-2 text-sm text-sub">Nothing needed from you.</p>
@@ -75,7 +85,7 @@ export function NeedsYou() {
     body = (
       <>
         <p className="text-sm font-medium">Review plan v1</p>
-        <p className="mt-3 rounded-lg bg-warn-soft px-3 py-2 text-xs text-warn-ink">Stage 3: 1 SVS letter not read.</p>
+        <p className="mt-3 rounded-lg bg-warn-soft px-3 py-2 text-xs text-warn-ink">Stage 3: check a value on a blurry 2023 letter.</p>
         <Button variant="primary" className="mt-4 w-full" onClick={() => setTab("review")}>
           Open checker review
         </Button>
@@ -114,6 +124,16 @@ export function NeedsYou() {
         </div>
       </>
     );
+  } else if (state.phase === "rashid_ready") {
+    body = (
+      <>
+        <p className="text-sm font-medium">Rashid&apos;s EID is renewed. Release Rashid?</p>
+        <p className="mt-1 text-sm text-sub">Adding him keeps every approval combination valid.</p>
+        <Button variant="primary" className="mt-4 w-full" onClick={() => setTab("release")}>
+          Open release decision
+        </Button>
+      </>
+    );
   } else if (state.phase === "live") {
     body = (
       <>
@@ -135,43 +155,6 @@ export function NeedsYou() {
         </div>
         <div className="mt-3">{body}</div>
       </div>
-      <details open={["new", "running"].includes(state.phase)} className="min-h-0 overflow-y-auto px-5 py-4 pb-64">
-        <summary className="cursor-pointer text-xs font-medium text-muted">Who does what</summary>
-        <ul className="mt-3 space-y-3 text-sm">
-          <li className="flex gap-2.5">
-            <Bot className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
-            <div>
-              <p className="font-medium">Maker: Access Agent</p>
-              <p className="text-xs text-muted">System user. Gathers, drafts, executes. Can&apos;t approve.</p>
-            </div>
-          </li>
-          <li className="flex gap-2.5">
-            <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-ok" />
-            <div>
-              <p className="font-medium">Rules engine</p>
-              <p className="text-xs text-muted">Deterministic checks. No AI.</p>
-            </div>
-          </li>
-          <li className="flex gap-2.5">
-            <UserRound className="mt-0.5 h-4 w-4 shrink-0 text-ink" />
-            <div>
-              <p className="font-medium">
-                Checker: {checker.name}
-              </p>
-              <p className="text-xs text-muted">{checker.role}. Approves every stage and the release.</p>
-            </div>
-          </li>
-        </ul>
-        <div className="mt-5 rounded-lg border border-line bg-surface p-3">
-          <p className="text-xs font-medium text-ink">The agent never</p>
-          <ul className="mt-1.5 space-y-1 text-xs text-sub">
-            <li>Waives EFR</li>
-            <li>Matches people by name</li>
-            <li>Approves its own work</li>
-            <li>Sees or sends a password</li>
-          </ul>
-        </div>
-      </details>
     </aside>
   );
 }

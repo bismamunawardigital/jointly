@@ -1,21 +1,27 @@
 "use client";
 
 import { useState } from "react";
-import { Bot, ScrollText, ShieldCheck, UserRound } from "lucide-react";
+import { Download, ScrollText, ShieldCheck, UserRound } from "lucide-react";
 import { eventById } from "@/lib/script";
 import { useStore } from "@/lib/store";
-import { Card, Empty, Sources, cn } from "@/components/ui";
+import { AgentMark, Card, Empty, Sources, cn } from "@/components/ui";
 
 type Lane = "agent" | "rules" | "person";
-const lanes: { id: Lane; label: string; icon: React.ComponentType<{ className?: string }>; tone: string }[] = [
-  { id: "agent", label: "Agent", icon: Bot, tone: "text-accent-ink bg-accent-soft" },
-  { id: "rules", label: "Rules", icon: ShieldCheck, tone: "text-ok-ink bg-ok-soft" },
-  { id: "person", label: "People", icon: UserRound, tone: "text-ink bg-panel" },
+const lanes: { id: Lane; label: string; filter: string }[] = [
+  { id: "person", label: "Sara", filter: "Decisions" },
+  { id: "agent", label: "Agent", filter: "Agent" },
+  { id: "rules", label: "Rules", filter: "Rules" },
 ];
+const mark: Record<Lane, React.ReactNode> = {
+  agent: <AgentMark size={20} />,
+  rules: <span className="flex h-5 w-5 items-center justify-center rounded-full bg-ok-soft text-ok-ink"><ShieldCheck className="h-3 w-3" /></span>,
+  person: <span className="flex h-5 w-5 items-center justify-center rounded-full border border-ink"><UserRound className="h-3 w-3" /></span>,
+};
 
 export function AuditView() {
   const { state } = useStore();
   const [show, setShow] = useState<Lane | "all">("all");
+  const [tech, setTech] = useState(false);
   if (!state.log.length) return <Empty icon={ScrollText} title="No activity yet" body="Every agent call, rules check and human decision will be recorded here." />;
   const rows = state.log.map((entry) => {
     if (entry.kind === "human") return { key: entry.id, time: entry.time, lane: "person" as Lane, who: entry.by, what: entry.text, call: "Human decision", sources: undefined };
@@ -26,12 +32,18 @@ export function AuditView() {
   const visible = rows.filter((r) => show === "all" || r.lane === show);
   return (
     <div className="space-y-3">
-      <div className="flex gap-1.5" role="group" aria-label="Filter by who acted">
-        {[{ id: "all" as const, label: `All ${rows.length}` }, ...lanes.map((l) => ({ id: l.id, label: `${l.label} ${rows.filter((r) => r.lane === l.id).length}` }))].map((f) => (
-          <button key={f.id} aria-pressed={show === f.id} onClick={() => setShow(f.id)} className={cn("rounded-lg border px-2.5 py-1 text-xs", show === f.id ? "border-ink font-medium text-ink" : "border-line text-muted hover:text-ink")}>
+      <div className="flex items-center gap-1.5" role="group" aria-label="Filter by who acted">
+        {[{ id: "all" as const, label: "All" }, ...lanes.map((l) => ({ id: l.id, label: l.filter }))].map((f) => (
+          <button key={f.id} aria-pressed={show === f.id} onClick={() => setShow(f.id)} className={cn("rounded-full border px-3 py-1 text-xs", show === f.id ? "border-ink font-medium text-ink" : "border-line text-muted hover:text-ink")}>
             {f.label}
           </button>
         ))}
+        <button onClick={() => setTech((t) => !t)} aria-pressed={tech} className="ml-auto text-xs text-muted underline-offset-2 hover:text-ink hover:underline">
+          {tech ? "Hide technical details" : "Show technical details"}
+        </button>
+        <button onClick={() => window.print()} className="ml-3 inline-flex items-center gap-1.5 rounded-xl border border-line px-2.5 py-1 text-xs text-sub hover:text-ink">
+          <Download className="h-3.5 w-3.5" /> Export audit PDF
+        </button>
       </div>
       <Card className="overflow-hidden">
         <table className="w-full text-sm">
@@ -50,15 +62,15 @@ export function AuditView() {
                 <tr key={r.key} className={cn("border-b border-line align-top last:border-0", r.lane === "person" && "bg-panel/40")}>
                   <td className="tnum px-4 py-2.5 text-xs text-sub">{r.time}</td>
                   <td className="px-4 py-2.5">
-                    <span className={cn("inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-xs font-medium", l.tone)}>
-                      <l.icon className="h-3 w-3" /> {r.who}
+                    <span className="inline-flex items-center gap-1.5 text-xs font-medium">
+                      {mark[r.lane]} {tech ? r.who : l.label}
                     </span>
                   </td>
                   <td className="px-4 py-2.5">
                     {r.what}
-                    <p className="mt-0.5 font-mono text-[11px] text-muted">{r.call}</p>
+                    {tech && <p className="mt-0.5 font-mono text-[11px] text-muted">{r.call}</p>}
                   </td>
-                  <td className="px-4 py-2.5">{r.sources ? <Sources keys={r.sources} /> : <span className="text-xs text-muted">None needed</span>}</td>
+                  <td className="px-4 py-2.5">{tech && r.sources ? <Sources keys={r.sources} /> : <span className="whitespace-nowrap text-xs text-muted">{r.sources ? `${r.sources.length} source${r.sources.length > 1 ? "s" : ""}` : "None needed"}</span>}</td>
                 </tr>
               );
             })}

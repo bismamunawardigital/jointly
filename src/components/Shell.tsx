@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookOpen, Briefcase, LayoutGrid, Monitor, RotateCcw } from "lucide-react";
+import { BookOpen, Briefcase, LayoutGrid, Monitor, Compass, RotateCcw } from "lucide-react";
 import { business, checker } from "@/data/seed";
 import { useStore } from "@/lib/store";
 import { cn } from "./ui";
@@ -14,7 +14,7 @@ export function Logo({ className }: { className?: string }) {
   return (
     <span className={cn("inline-flex items-center gap-2 font-semibold tracking-tight text-ink", className)}>
       <svg width="20" height="14" viewBox="0 0 20 14" aria-hidden>
-        <circle cx="7" cy="7" r="6" fill="none" stroke="rgb(var(--accent))" strokeWidth="2" />
+        <circle cx="7" cy="7" r="6" fill="none" stroke="rgb(var(--brand))" strokeWidth="2" />
         <circle cx="13" cy="7" r="6" fill="none" stroke="currentColor" strokeWidth="2" />
       </svg>
       Jointly
@@ -30,7 +30,7 @@ const nav = [
 
 export function Shell({ children }: { children: React.ReactNode }) {
   const path = usePathname();
-  const { state, dispatch, setTab } = useStore();
+  const { dispatch, setTab } = useStore();
   return (
     <>
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-8 text-center lg:hidden">
@@ -66,17 +66,9 @@ export function Shell({ children }: { children: React.ReactNode }) {
             })}
           </nav>
           <div className="mt-auto space-y-3 border-t border-line px-4 py-4">
-            <label className="flex cursor-pointer items-center justify-between text-sm text-sub">
-              Guided tour
-              <button
-                role="switch"
-                aria-checked={state.tourOn}
-                onClick={() => dispatch({ type: "tour", on: !state.tourOn })}
-                className={cn("relative h-5 w-9 rounded-full transition-colors duration-150", state.tourOn ? "bg-accent" : "bg-line-strong")}
-              >
-                <span className={cn("absolute left-0 top-0.5 h-4 w-4 rounded-full bg-surface shadow-sm transition-transform duration-200 ease-out", state.tourOn ? "translate-x-[18px]" : "translate-x-0.5")} />
-              </button>
-            </label>
+            <button onClick={() => dispatch({ type: "tour", on: true, step: 0 })} className="flex items-center gap-2 text-sm text-sub hover:text-ink">
+              <Compass className="h-3.5 w-3.5" /> Replay tour
+            </button>
             <ThemeSwitch />
             <DensitySwitch />
             <button
