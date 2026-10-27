@@ -17,6 +17,12 @@ export function DecisionView() {
   const released = state.log.some((e) => e.id === "release");
   return (
     <div className="max-w-4xl space-y-4">
+      <dl aria-label="Agent and rules" className="grid grid-cols-2 gap-3 rounded-card bg-panel p-4 text-sm md:grid-cols-4">
+        {[["Agent", "v1.4"], ["Rule set", "2026.10"], ["Owner", "Head of Operations"], ["Last validated", "20 Oct 2026"]].map(([k, v]) => (
+          <div key={k}><dt className="text-xs text-muted">{k}</dt><dd className="tnum font-medium">{v}</dd></div>
+        ))}
+        <p className="col-span-full text-xs text-muted">All synthetic.</p>
+      </dl>
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-sm font-medium">Why this case was set up this way</p>
@@ -109,6 +115,12 @@ export function DecisionView() {
         </Card>
       )}
       {hasEvent(state, "ex-readback") && <p className="text-xs text-muted">Set-up read back from Digital Banking Admin: 0 differences from what was approved.</p>}
+      <dl className="space-y-1.5 border-t border-line pt-4 text-sm">
+        <div><dt className="inline font-medium text-ok-ink">Verified: </dt><dd className="inline text-sub">The identities, the mandate rules and the setup were all read back from Admin.</dd></div>
+        <div><dt className="inline font-medium">Assumed: </dt><dd className="inline text-sub">Admin has no write API.</dd></div>
+        <div><dt className="inline font-medium text-muted">Not checked: </dt><dd className="inline text-sub">Sanctions screening isn&apos;t covered here, because Compliance does it separately.</dd></div>
+        <p className="pt-2 text-xs text-muted">1 in 20 cleanly approved cases goes to a supervisor for a second look.</p>
+      </dl>
     </div>
   );
 }

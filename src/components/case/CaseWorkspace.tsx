@@ -311,6 +311,7 @@ export function CaseWorkspace() {
                 </ul>
               </div>
             </div>
+            <p className="mt-4 text-sm text-sub">If a case hits 3 rule exceptions, it goes to a senior checker.</p>
             <p className="mt-4 rounded-lg bg-panel p-3 text-xs text-sub">Autonomy level: Approver. The agent only involves Sara for risky or unclear items.</p>
           </div>
         </div>

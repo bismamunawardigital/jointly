@@ -30,7 +30,8 @@ const nav = [
 
 export function Shell({ children }: { children: React.ReactNode }) {
   const path = usePathname();
-  const { dispatch, setTab } = useStore();
+  const { dispatch, setTab, state } = useStore();
+  const needsSara = state.phase === "in_review" || state.phase === "re_review";
   return (
     <>
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-8 text-center lg:hidden">
@@ -61,6 +62,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
                 >
                   <Icon className="h-4 w-4 shrink-0" />
                   <span className="truncate">{label}</span>
+                  {label === "Queue" && needsSara && <span aria-label="1 case needs you" className="tick-in ms-auto rounded-full bg-warn-soft px-1.5 text-xs font-medium text-warn-ink">1</span>}
                 </Link>
               );
             })}

@@ -33,7 +33,7 @@ export function LegacyBeat() {
   const beat = legacyBeat(state.log[state.log.length - 1]?.id);
   if (!beat || !state.queue.length) return null;
   return (
-    <p role="status" className="flex items-center gap-2 rounded-card border border-line bg-surface px-4 py-3 text-sm">
+    <p role="status" aria-live="polite" className="flex items-center gap-2 rounded-card border border-line bg-surface px-4 py-3 text-sm">
       <span className="rounded-full bg-panel px-2 py-0.5 text-xs text-sub">Legacy system</span>
       {beat}
     </p>

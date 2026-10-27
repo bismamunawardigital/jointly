@@ -5,7 +5,7 @@ import { ChevronRight, Database, FileSignature, FileText, ListChecks, ScanFace, 
 import { Avatar, cn } from "@/components/ui";
 import { Gloss } from "@/components/Gloss";
 import type { PersonId } from "@/data/seed";
-import { useStore } from "@/lib/store";
+import { hasEvent, useStore } from "@/lib/store";
 import { glossary } from "@/content/glossary";
 
 export type Sys = "finacle" | "svs" | "efr" | "admin";
@@ -149,7 +149,11 @@ export function PeekMock({ col, person }: { col: number; person: string }) {
         <div className="rounded-md border border-line p-3 text-xs">
           <p>Name: {names[person as PersonId]}</p>
           <p className="tnum mt-1">Emirates ID: 784-XXXX-XXXXXXX-<Hi>{eid[person]?.slice(-1)}</Hi> ending <Hi>{eid[person]}</Hi></p>
-          <div className="mt-2 h-10 rounded border border-dashed border-line-strong p-1 text-muted">Signature</div>
+          <div className="mt-2 grid grid-cols-2 gap-2">
+            <div className="h-12 rounded border border-dashed border-line-strong p-1 text-muted">Signature on the form</div>
+            <div className="h-12 rounded border border-dashed border-line-strong p-1 text-muted">Specimen from SVS</div>
+          </div>
+          <p className="mt-1 font-medium text-ok-ink">Matches specimen</p>
         </div>
       </div>
     );
@@ -247,6 +251,7 @@ export function FocusSources() {
 export function ChecksBlock() {
   return (
     <div className="space-y-2 border-b border-line pb-4">
+      <PlanChecklist />
       {(["mohammed", "khalifa", "rashid"] as const).map((p) => (
         <div key={p} className="flex items-center gap-2">
           <Avatar id={p} size={28} />
@@ -255,5 +260,34 @@ export function ChecksBlock() {
       ))}
       <NotChecked />
     </div>
+  );
+}
+
+type StepState = "Waiting" | "Working" | "Done" | "Skipped" | "Failed";
+const stepCls: Record<StepState, string> = { Waiting: "text-muted", Working: "text-accent-ink", Done: "text-ok-ink", Skipped: "text-sub", Failed: "text-bad-ink" };
+
+export function PlanChecklist() {
+  const { state } = useStore();
+  const has = (id: string) => hasEvent(state, id);
+  const written = has("ex-workflow");
+  const failed = has("ex-workflow-fail");
+  const steps: [string, StepState, string, string?][] = [
+    ["Read the forms", has("intake-forms") ? "Done" : "Working", "Pass"],
+    ["Match people by Emirates ID", has("id-digital") ? "Done" : "Waiting", "Pass"],
+    ["Check Rashid's access", has("kyc-check") ? "Skipped" : "Waiting", "Warn", "His Emirates ID expired, so his access waits."],
+    ["Read the mandate", has("mandate-conflict") ? "Done" : "Waiting", "Warn"],
+    ["Write to Digital Banking Admin", written ? "Done" : failed ? "Failed" : "Waiting", failed && !written ? "Fail" : "Pass", failed ? "Admin timed out. Attempt 1 of 3." : undefined],
+    ["Read back from Admin", has("ex-readback") ? "Done" : "Waiting", "Pass"],
+  ];
+  return (
+    <ol aria-label="Plan checklist" className="mb-3 space-y-1 text-sm">
+      {steps.map(([t, st, v, why]) => (
+        <li key={t} className="flex flex-wrap items-baseline gap-x-2">
+          <span className={cn("w-16 shrink-0 text-xs font-medium", stepCls[st])}>{st}</span>
+          <span className="min-w-0 flex-1">{t}{why && <span className="block text-xs text-sub">{why}</span>}</span>
+          {st !== "Waiting" && <span className="text-xs text-muted">Rules: {v}</span>}
+        </li>
+      ))}
+    </ol>
   );
 }

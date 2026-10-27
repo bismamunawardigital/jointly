@@ -110,7 +110,7 @@ const heard = [
 const phases: { p: string; dur: string; goal: string; d: string; tag: string }[] = [
   { p: "Phase 0", dur: "4 weeks", goal: "Agree the rules", d: "We pick one case type and write the mandate rules together with Operations, Compliance and Ops Risk, using read-only access. This phase is done when Compliance signs off the rules.", tag: "Accountability" },
   { p: "Phase 1", dur: "8 weeks", goal: "Shadow mode", d: "The agent makes its plan while makers still do the work, and we compare the two. This phase is done when the agent's plan matches the maker's on most cases and every difference has a clear reason.", tag: "Model risk" },
-  { p: "Phase 2", dur: "8 weeks", goal: "The agent prepares, people approve", d: "The agent becomes the maker for exact copies, and checkers still approve everything. One in every 20 clean approvals goes to a supervisor for a second look. This phase is done when there are no unapproved writes and corrections fall each week.", tag: "Audit" },
+  { p: "Phase 2", dur: "8 weeks", goal: "The agent prepares, people approve", d: "The agent becomes the maker for exact copies, and checkers still approve everything. One in every 20 clean approvals goes to a supervisor for a second look. This phase is done when there are no unapproved writes and corrections fall each week. 1 in 20 cleanly approved cases goes to a supervisor for a second look.", tag: "Audit" },
   { p: "Phase 3", dur: "Ongoing", goal: "Scale", d: "We pilot partial release with one customer group, then add mixed mandates and mandate changes.", tag: "Old systems at scale" },
 ];
 
@@ -435,6 +435,7 @@ export default function CaseStudy() {
           <p className={eyebrow}>05 · Who decides</p>
           <h2 className={`mt-2 ${h2}`}>Sara makes the decisions, and the agent can&apos;t approve anything.</h2>
           <p className="mt-3 text-lg font-medium">The agent is a maker that can never be its own checker.</p>
+          <p className="mt-1 text-sub">If a case hits 3 rule exceptions, it goes to a senior checker.</p>
           <p className="mt-2 text-sub">The agent prepares the work, but it can never be the one who checks it.</p>
           <div className="mt-10 grid gap-4 sm:grid-cols-2 md:grid-cols-4">
             {lanes.map((l) => (
@@ -490,7 +491,7 @@ export default function CaseStudy() {
                       </li>
                     ))}
                   </ul>
-                  <p className="mt-3 text-xs text-muted">I mapped this to EU AI Act Article 14 and the UAE central bank&apos;s 2026 guidance on human oversight. This is my reading of them, not legal advice.</p>
+                  <p className="mt-3 text-xs text-muted">I mapped this to <a className="underline" href="https://artificialintelligenceact.eu/article/14/" target="_blank" rel="noreferrer">EU AI Act Article 14</a> and the <a className="underline" href="https://www.wam.ae/en/article/byvw3l2-cbuae-issues-guidance-note-protect-consumers-and" target="_blank" rel="noreferrer">UAE central bank&apos;s 2026 guidance</a> on human oversight. This is my reading of them, not legal advice.</p>
                 </div>,
               ]}
             </Tabs>
