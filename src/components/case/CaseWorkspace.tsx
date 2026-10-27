@@ -160,12 +160,7 @@ export function CaseWorkspace() {
             {tab === "evidence" && <EvidenceView />}
             {tab === "plan" && <PlanView />}
             {tab === "simulator" && <SimulatorView />}
-            {tab === "review" && (
-              <>
-                <div className="mb-6 max-w-4xl"><SigningMap compact /></div>
-                <ReviewView />
-              </>
-            )}
+            {tab === "review" && <ReviewView />}
             {tab === "release" && <ReleaseView />}
             {tab === "decisions" && <DecisionView />}
             {tab === "audit" && <AuditView />}

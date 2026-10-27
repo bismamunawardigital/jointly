@@ -20,7 +20,7 @@ function Badge({ children }: { children: React.ReactNode }) {
   return <span className="rounded-full border border-line bg-surface px-2 py-0.5 text-[11px] text-sub">{children}</span>;
 }
 
-export function SigningMap({ compact = false }: { compact?: boolean }) {
+export function SigningMap({ compact = false, part = "all" }: { compact?: boolean; part?: "all" | "people" }) {
   const { state, version, held } = useStore();
   const rules = buildRules(version);
   const limit = singleLimit(rules) ?? 25_000;
@@ -34,6 +34,9 @@ export function SigningMap({ compact = false }: { compact?: boolean }) {
   const [initiator, setInitiator] = useState<PersonId>("mohammed");
   const [tip, setTip] = useState(false);
   const descId = useId();
+  const showPeople = part === "people" || !compact;
+  const showLadder = part !== "people";
+  const showTester = !compact && part !== "people";
   if (!hasEvent(state, "plan-build")) return null;
 
   const isHeld = (c: Combo) => c.ids.some((i) => held.includes(i));
@@ -98,7 +101,7 @@ export function SigningMap({ compact = false }: { compact?: boolean }) {
       <p id={descId} className="sr-only">
         {desc} {sentence}
       </p>
-      {!compact && (
+      {showPeople && (
       <div className="flex flex-col items-center">
         <div className="flex items-center gap-2 rounded-full border border-line bg-panel px-3 py-1.5 text-sm font-medium">
           <Building2 className="h-4 w-4 text-muted" aria-hidden /> {business.name}
@@ -147,7 +150,9 @@ export function SigningMap({ compact = false }: { compact?: boolean }) {
       </div>
       )}
 
-      <div className={cn("relative", !compact && "mt-8")}>
+      {showLadder && (
+      <>
+      <div className={cn("relative", showPeople && "mt-8")}>
         <div className="flex min-h-[112px] overflow-hidden rounded-xl border border-line">
           {bands.map((b) => (
             <div
@@ -196,8 +201,10 @@ export function SigningMap({ compact = false }: { compact?: boolean }) {
       </div>
 
       <p className={cn("mt-4 font-display leading-snug", compact ? "text-lg" : "text-xl")}>{sentence}</p>
+      </>
+      )}
 
-      {!compact && (
+      {showTester && (
         <>
           <div className="mt-5 flex items-center gap-5 rounded-xl bg-panel/60 px-4 py-3">
             <span className="text-xs font-medium text-muted">Test a payment</span>
