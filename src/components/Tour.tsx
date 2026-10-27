@@ -54,9 +54,7 @@ export function useTourTarget(n: number) {
 }
 
 export function Tour() {
-  const { state, dispatch, setTab, hydrated } = useStore();
-  const router = useRouter();
-  const path = usePathname();
+  const { state, dispatch, hydrated } = useStore();
   const [checked, setChecked] = useState(false);
   useEffect(() => {
     if (!hydrated || checked) return;
@@ -64,6 +62,23 @@ export function Tour() {
     if (localStorage.getItem("jointly-tour-seen") && state.tourOn && state.tourStep === 0) dispatch({ type: "tour", on: false });
   }, [hydrated, checked, state.tourOn, state.tourStep, dispatch]);
   if (!hydrated || !state.tourOn || !checked) return null;
+  return <TourCard />;
+}
+
+function TourCard() {
+  const { state, dispatch, setTab, hydrated } = useStore();
+  const router = useRouter();
+  const path = usePathname();
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape" || !state.tourOn) return;
+      localStorage.setItem("jointly-tour-seen", "1");
+      dispatch({ type: "tour", on: false });
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [state.tourOn, dispatch]);
+  if (!hydrated || !state.tourOn) return null;
   const end = () => {
     localStorage.setItem("jointly-tour-seen", "1");
     dispatch({ type: "tour", on: false });
