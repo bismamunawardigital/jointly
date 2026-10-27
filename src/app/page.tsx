@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowRight, Ban, Check, FileText, Inbox, Lock, Mail, ShieldCheck, UserRound } from "lucide-react";
 import { Logo } from "@/components/Shell";
 import { ThemeButton } from "@/components/ThemeToggle";
-import { AgentMark, Avatar } from "@/components/ui";
+import { AgentMark } from "@/components/ui";
 import { HeroStage } from "@/components/landing/HeroStage";
 import { Gloss } from "@/components/landing/Gloss";
 import { DaysSwimlane } from "@/components/landing/DaysSwimlane";
@@ -10,6 +10,7 @@ import { LiveGrid, MandateToggle } from "@/components/landing/LivePreview";
 import { Moments } from "@/components/landing/Moments";
 import { LangSwitch } from "@/components/landing/LangSwitch";
 import { statsEn } from "@/content/stats";
+import { PORTFOLIO_URL } from "@/content/portfolio";
 
 const stats = statsEn;
 
@@ -50,85 +51,6 @@ const lanes: { icon: React.ReactNode; title: string; items: string[]; never?: bo
   { icon: <Ban className="h-10 w-10 text-bad" />, title: "Never allowed", items: ["Approve its own work", "Send passwords", "Match people by name"], never: true },
 ];
 
-const chip = "rounded-full border border-line bg-canvas px-2 py-0.5 text-[11px]";
-const principles: { title: string; why: string; mini: React.ReactNode }[] = [
-  {
-    title: "Match on IDs, never names",
-    why: "Names are spelled 3 ways across systems. IDs aren't.",
-    mini: (
-      <div className="flex items-center gap-2">
-        <span className={`${chip} text-muted line-through`}>Mohd</span>
-        <ArrowRight className="h-3 w-3 text-muted" />
-        <span className={`${chip} font-medium`}>EID 3391</span>
-      </div>
-    ),
-  },
-  {
-    title: "Every claim has a source",
-    why: "Sara checks the source, not the agent's word.",
-    mini: (
-      <div className="flex items-center gap-2">
-        <span className="h-2 w-24 rounded bg-ink/20" />
-        <span className="flex h-8 w-6 items-center justify-center rounded border border-line bg-canvas">
-          <FileText className="h-3 w-3 text-muted" />
-        </span>
-      </div>
-    ),
-  },
-  {
-    title: "Show what it isn't sure about",
-    why: "Sara's attention goes to the 1 value that needs it.",
-    mini: (
-      <div className="flex items-center gap-2">
-        <span className="h-8 w-16 rounded bg-ink/15 blur-[2px]" />
-        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-warn-soft text-xs font-semibold text-warn-ink">?</span>
-      </div>
-    ),
-  },
-  {
-    title: "Approval stays with the content",
-    why: "If the plan changes, the old approval doesn't carry over.",
-    mini: (
-      <div className="flex gap-1.5">
-        {[1, 2].map((n) => (
-          <span key={n} className="flex h-6 w-6 items-center justify-center rounded-full bg-ok text-onaccent">
-            <Check className="h-3 w-3" strokeWidth={3} />
-          </span>
-        ))}
-        {[3, 4].map((n) => (
-          <span key={n} className="h-6 w-6 rounded-full border-2 border-accent" />
-        ))}
-      </div>
-    ),
-  },
-  {
-    title: "Rules live in code",
-    why: "The same input gives the same answer, and audit can replay it.",
-    mini: (
-      <div className="flex items-center gap-2">
-        <ShieldCheck className="h-6 w-6 text-accent" />
-        <span className={`${chip} text-ok-ink`}>yes</span>
-        <span className={`${chip} text-bad-ink`}>no</span>
-      </div>
-    ),
-  },
-  {
-    title: "Grant access where it's safe",
-    why: "2 people go live today, instead of 3 waiting on 1 ID.",
-    mini: (
-      <div className="flex items-center gap-3">
-        <span className="flex">
-          <Avatar id="mohammed" size={28} />
-          <span className="-ml-2">
-            <Avatar id="khalifa" size={28} />
-          </span>
-        </span>
-        <Avatar id="rashid" size={28} held />
-      </div>
-    ),
-  },
-];
-
 const heard = [
   { q: "you start clicking Approve on autopilot and stop reading the diffs.", who: "Agent user, Hacker News", href: "https://news.ycombinator.com/item?id=48830674", d: "Exact copies fold away." },
   { q: "The bank showed them a confidence score. The regulator shut it down.", who: "Banking AI lead, LinkedIn", href: "https://www.linkedin.com/posts/johnforrester_a-regulator-asked-a-bank-to-explain-its-ai-activity-7438239662009114624-WaU0", d: "Rules, not scores." },
@@ -161,6 +83,47 @@ const adminRun: [string, string, "warn" | "plain" | "ok"][] = [
   ["10:45", "Timed out. Nothing half-written.", "warn"],
   ["10:45", "Retried.", "plain"],
   ["10:46", "Read back: 0 differences from the approved plan.", "ok"],
+];
+
+const impact: [string, string, string][] = [
+  ["1 in 5", "More than 1 in 5 dollars that banks earn comes from small and mid-sized businesses.", "https://www.mckinsey.com/featured-insights/week-in-charts/the-digital-edge-in-small-business-banking"],
+  ["41 days", "In a US and UK survey, a business took 41 days on average to open a bank account.", "https://fintech.global/?p=33634"],
+  ["87%", "87% of corporate treasurers say they have given up on a bank application.", "https://www.retailbankerinternational.com/news/87-percent-of-corporate-treasurers-abandon-banking-applications"],
+];
+
+const fixes: [string, string][] = [
+  ["New onboarding apps", "make the front end faster, but the back office still retypes everything."],
+  ["Process bots", "work with fixed fields, but they break on free text."],
+  ["Replacing the core system", "fixes it, but it takes years."],
+  ["Hiring more staff", "works until the volume grows."],
+  ["Jointly", "puts an agent on top of the systems banks already have."],
+];
+
+const costLines = [
+  "The agent reads each system once per case and reuses what it read.",
+  "It uses the AI model only for the scanned letters, and rules handle everything else, which costs less and gives the same answer every time.",
+  "Each old system has its own small connector, so a slow admin screen never blocks the others, and a retry never writes twice.",
+];
+
+const compare: [string, string][] = [
+  ["People approve every step, and studies report they approve 93 to 97% of prompts.", "Rules pass exact copies, so a person makes 2 decisions."],
+  ["A confidence score.", "Clear states: matches, doesn't match, or couldn't read."],
+  ["A link to a whole document.", "The exact part of the scan and the rule that checked it."],
+  ["Retry and hope.", "Retry, then read everything back."],
+];
+
+const phases: [string, string, string][] = [
+  ["4 weeks", "Agree the rules", "Write the mandate rules with Operations, Compliance and Ops Risk, using read-only access."],
+  ["8 weeks", "Shadow mode", "The agent plans while people still do the work, and we compare the two."],
+  ["8 weeks", "The agent prepares, people approve", "The agent sets up exact copies, and a supervisor re-checks 1 in 20 approvals."],
+  ["Ongoing", "Scale", "Then mixed mandates and mandate changes."],
+];
+
+const learnt = [
+  "I had to understand the current systems first, because I couldn't design the agent until I knew how a case moves between Finacle, SVS, EFR and Admin.",
+  "Banks want agents, but they have to audit every decision, so every decision in Jointly lands in a record an auditor can read.",
+  "Old systems are slow and costly to call, so the agent reads each one once and reuses what it read.",
+  "Most of the waiting happens between people, so Jointly removes hand-offs while keeping every check.",
 ];
 
 const measures = [
@@ -262,6 +225,18 @@ export default function CaseStudy() {
               </div>
             ))}
           </dl>
+          <ul aria-label="Why it matters" className="mt-6 grid gap-5 border-t border-line pt-6 md:grid-cols-3">
+            {impact.map(([n, t, href]) => (
+              <li key={n} className="flex gap-4">
+                <span className="tnum shrink-0 text-2xl font-semibold text-ink">{n}</span>
+                <p className="text-sm text-sub">
+                  {t}{" "}
+                  <a href={href} target="_blank" rel="noreferrer" className="text-xs text-muted underline underline-offset-2 hover:text-ink">Source</a>
+                </p>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-3 text-xs text-muted">Industry figures, not from any one bank.</p>
         </div>
       </section>
 
@@ -331,6 +306,18 @@ export default function CaseStudy() {
               </li>
             ))}
           </ul>
+          <p className="mt-12 text-sm font-semibold text-ink">How banks try to fix it</p>
+          <ul className="mt-3 divide-y divide-line overflow-hidden rounded-card border border-line bg-surface">
+            {fixes.map(([who, what], i) => {
+              const ours = i === fixes.length - 1;
+              return (
+                <li key={who} className={`flex items-center gap-3 px-5 py-3 text-sm ${ours ? "bg-ok-soft text-ok-ink" : "text-sub"}`}>
+                  {ours ? <Check aria-hidden className="h-4 w-4 shrink-0" /> : <Ban aria-hidden className="h-4 w-4 shrink-0 text-muted" />}
+                  <span><span className="font-medium text-ink">{who}</span> {what}</span>
+                </li>
+              );
+            })}
+          </ul>
         </div>
       </section>
 
@@ -358,6 +345,15 @@ export default function CaseStudy() {
               </li>
             ))}
           </ol>
+          <ul className="mt-8 grid gap-3 md:grid-cols-3">
+            {costLines.map((t) => (
+              <li key={t} className="flex gap-2 text-sm text-sub">
+                <Check aria-hidden className="mt-0.5 h-4 w-4 shrink-0 text-ok" />
+                {t}
+              </li>
+            ))}
+          </ul>
+          <p className="mt-3 text-xs text-muted">Design targets from a scripted case, not measurements.</p>
           <p className="mt-4 text-xs text-muted">Synthetic systems and data, modelled on common core-banking setups.</p>
         </div>
       </section>
@@ -421,6 +417,23 @@ export default function CaseStudy() {
               </div>
             ))}
           </div>
+          <table className="mt-8 w-full overflow-hidden rounded-card border border-line text-left text-sm">
+            <thead className="bg-panel text-xs text-muted">
+              <tr>
+                <th scope="col" className="px-5 py-2.5 font-medium">What&apos;s common today</th>
+                <th scope="col" className="px-5 py-2.5 font-medium">What Jointly does</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-line bg-surface">
+              {compare.map(([a, b]) => (
+                <tr key={a}>
+                  <td className="px-5 py-3 text-sub">{a}</td>
+                  <td className="px-5 py-3 font-medium text-ink"><Check aria-hidden className="me-2 inline h-4 w-4 text-ok" />{b}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <p className="mt-3 text-xs text-muted">A comparison of design choices with 40+ agent products and studies. Jointly is a prototype, so there&apos;s no performance data yet.</p>
           <p className="mt-8 text-sm text-sub">
             Every case ends with a decision record an examiner can read.{" "}
             <Link href="/demo/case/?view=record" className="text-accent-ink underline underline-offset-2">See Creekside&apos;s</Link>
@@ -467,17 +480,28 @@ export default function CaseStudy() {
         </div>
       </section>
 
-      <section id="patterns" className="border-t border-line">
+      <section id="about" className="border-t border-line">
         <div className="mx-auto max-w-6xl px-6 py-20">
-          <h2 className={h2}>6 patterns I&apos;d reuse</h2>
-          <div className="mt-10 grid gap-4 sm:grid-cols-2 md:grid-cols-3">
-            {principles.map((p) => (
-              <div key={p.title} className="rounded-card border border-line bg-surface p-6">
-                <div aria-hidden className="flex h-12 items-center">{p.mini}</div>
-                <p className="mt-4 font-semibold">{p.title}</p>
-              </div>
-            ))}
+          <h2 className={h2}>About me</h2>
+          <div className="mt-8 grid gap-10 md:grid-cols-2">
+            <p className="text-sub">
+              I&apos;m Bisma, a product designer based in Abu Dhabi. I learnt service design at a UAE bank by mapping how business customers get onboarded across people and old systems, and I designed the digital setup for joint signatories in the bank&apos;s new business app. Jointly is how I would do it differently, with an agent doing the reading so that customers fill in less and the operations team gets fewer tickets.
+            </p>
+            <div>
+              <p className="text-sm font-semibold text-ink">What I learnt</p>
+              <ol className="mt-3 space-y-3">
+                {learnt.map((t, i) => (
+                  <li key={t} className="flex gap-3 text-sm text-sub">
+                    <span className="tnum shrink-0 font-semibold text-accent-ink">{i + 1}</span>
+                    {t}
+                  </li>
+                ))}
+              </ol>
+            </div>
           </div>
+          <p className="mt-10 text-sm text-sub">
+            <span className="font-medium text-ink">Who did what:</span> I did the research, the service design and the product design, and Devin wrote the code from my specs.
+          </p>
         </div>
       </section>
 
@@ -496,15 +520,24 @@ export default function CaseStudy() {
 
       <section id="measure" className="border-t border-line">
         <div className="mx-auto max-w-6xl px-6 py-20">
-          <h2 className={h2}>How I&apos;d know it works</h2>
-          <ul className="mt-8 grid gap-3 sm:grid-cols-2 md:grid-cols-4">
-            {measures.map((m) => (
-              <li key={m} className="rounded-card border border-line bg-surface p-5">
-                <span className="rounded-full border border-line px-2 py-0.5 text-[11px] text-muted">Plan, not results</span>
-                <p className="mt-3 text-sm font-medium">{m}</p>
+          <h2 className={h2}>If I built this at a real bank, I would start in shadow mode.</h2>
+          <p className="mt-4 max-w-2xl text-sub">Banks are careful with agents because of audit, model risk, access to old systems and accountability, so each phase answers one of these.</p>
+          <ol className="mt-10 grid gap-6 md:grid-cols-4">
+            {phases.map(([when, title, d], i) => (
+              <li key={title} className="relative">
+                <div className="flex items-center gap-3">
+                  <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-accent-soft text-sm font-semibold text-accent-ink">{i + 1}</span>
+                  {i < phases.length - 1 && <span aria-hidden className="hidden h-px flex-1 bg-line-strong md:block" />}
+                </div>
+                <p className="mt-4 text-xs font-medium text-muted">{when}</p>
+                <p className="mt-1 font-semibold">{title}</p>
+                <p className="mt-2 text-sm text-sub">{d}</p>
               </li>
             ))}
-          </ul>
+          </ol>
+          <p className="mt-10 text-sm text-sub">
+            <span className="text-muted">What I&apos;d measure, a plan and not results:</span> {measures.join(" · ")}
+          </p>
         </div>
       </section>
 
@@ -547,6 +580,14 @@ export default function CaseStudy() {
               <a href="mailto:bismamunawardigital@gmail.com" className="underline-offset-2 hover:underline">
                 Email
               </a>
+              {PORTFOLIO_URL && (
+                <>
+                  {" · "}
+                  <a href={PORTFOLIO_URL} target="_blank" rel="noreferrer" className="underline-offset-2 hover:underline">
+                    Back to Bisma&apos;s portfolio
+                  </a>
+                </>
+              )}
             </p>
             <p className="mt-1 text-xs text-muted">All people, accounts and bank systems are synthetic.</p>
           </div>

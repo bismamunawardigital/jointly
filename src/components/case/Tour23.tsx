@@ -5,7 +5,8 @@ import { Check, CreditCard, MessageSquare, ScanFace, KeyRound } from "lucide-rea
 import { useEffect, useState } from "react";
 import { Button, cn } from "@/components/ui";
 
-export const PORTFOLIO_URL = "https://sunsetbisma.com";
+export { PORTFOLIO_URL } from "@/content/portfolio";
+import { PORTFOLIO_URL } from "@/content/portfolio";
 
 function Doc({ blur, n = 1 }: { blur?: boolean; n?: number }) {
   return (
