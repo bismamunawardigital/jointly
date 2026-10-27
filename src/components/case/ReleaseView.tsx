@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Check, Lock, MessageSquare, Rocket, ScanFace, Smartphone, Truck, TriangleAlert } from "lucide-react";
+import { Check, Rocket, TriangleAlert } from "lucide-react";
 import { firstName, people } from "@/data/seed";
 import { releaseEligibility } from "@/lib/rules";
 import { customerMessages } from "@/lib/script";
@@ -13,7 +13,6 @@ import { AssumptionChip, Avatar, Button, Card, Empty, Pill, SectionTitle, Source
 export function ReleaseView() {
   const { state, dispatch, version, held } = useStore();
   const tour3 = useTourTarget(2);
-  const tour4 = useTourTarget(3);
   const [confirming, setConfirming] = useState(false);
   const [confirmingR, setConfirmingR] = useState(false);
   if (!hasEvent(state, "ex-readback"))
@@ -157,35 +156,6 @@ export function ReleaseView() {
         </div>
       </section>
 
-      <section {...tour4}>
-        <SectionTitle aside={<AssumptionChip>digital activation, subject to bank security approval</AssumptionChip>}>How credentials reach people</SectionTitle>
-        <div className="grid grid-cols-2 gap-4">
-          <Card className="p-5">
-            <div className="flex items-center justify-between">
-              <p className="text-sm font-semibold">Before</p>
-              <Pill tone="neutral">Today</Pill>
-            </div>
-            <ol className="mt-4 space-y-3 text-sm text-sub">
-              <li className="flex gap-2.5"><Lock className="h-4 w-4 shrink-0 text-muted" /> Bank prints a PIN mailer per user</li>
-              <li className="flex gap-2.5"><Truck className="h-4 w-4 shrink-0 text-muted" /> Courier delivers it to each signatory</li>
-              <li className="flex gap-2.5"><Smartphone className="h-4 w-4 shrink-0 text-muted" /> User logs in and changes the password</li>
-            </ol>
-            <p className="mt-4 text-xs text-muted">Usually days, even after setup is done.</p>
-          </Card>
-          <Card className="border-accent/40 p-5">
-            <div className="flex items-center justify-between">
-              <p className="text-sm font-semibold">After</p>
-              <Pill tone="accent">Proposed</Pill>
-            </div>
-            <ol className="mt-4 space-y-3 text-sm">
-              <li className="flex gap-2.5"><MessageSquare className="h-4 w-4 shrink-0 text-accent" /> Secure link by SMS to the mobile on file</li>
-              <li className="flex gap-2.5"><ScanFace className="h-4 w-4 shrink-0 text-accent" /> Person verifies their own EID with a face check</li>
-              <li className="flex gap-2.5"><Lock className="h-4 w-4 shrink-0 text-accent" /> They set their own login. No password is made, seen or sent by the agent</li>
-            </ol>
-            <p className="mt-4 text-xs text-muted">Mohammed skips this. He already has a login, so his is just linked.</p>
-          </Card>
-        </div>
-      </section>
 
       {sent.length > 0 && (
         <section>

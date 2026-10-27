@@ -124,7 +124,9 @@ h1, h2, h3 {
 }
 
 [data-tour-active="true"] {
-  box-shadow: 0 0 0 2px rgb(var(--surface)), 0 0 0 4px rgb(var(--brand));
+  box-shadow: 0 0 0 2px rgb(var(--surface)), 0 0 0 4px rgb(var(--brand)), 0 0 0 9999px rgb(var(--ink) / 0.28);
+  position: relative;
+  z-index: 30;
   border-radius: 8px;
   transition: box-shadow 200ms cubic-bezier(0.23, 1, 0.32, 1);
 }

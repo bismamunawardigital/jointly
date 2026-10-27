@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AlertTriangle, Check, ChevronRight, FlaskConical, Lightbulb, Repeat, ShieldCheck, Undo2, X } from "lucide-react";
+import { AlertTriangle, Check, ChevronRight, FlaskConical, Repeat, ShieldCheck, Undo2 } from "lucide-react";
 import { EvidenceKey, isAgentRead } from "@/data/seed";
 import { approvalValid, buildStages, diffStage } from "@/lib/rules";
 import { hasEvent, useStore } from "@/lib/store";
@@ -141,13 +141,7 @@ export function ReviewView() {
   const [returning, setReturning] = useState(false);
   const [note, setNote] = useState("");
   const [checked, setChecked] = useState<Record<number, boolean>>({});
-  const [hint, setHint] = useState(false);
   useEffect(() => setChecked({}), [version]);
-  useEffect(() => {
-    try {
-      setHint(localStorage.getItem("jointly-hint") !== "off");
-    } catch {}
-  }, []);
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const el = e.target as HTMLElement;
@@ -170,34 +164,9 @@ export function ReviewView() {
 
   return (
     <div className="max-w-4xl space-y-4" {...tour}>
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex flex-wrap items-center gap-2 text-xs text-muted">
-          <BasisTag keys={["finacle-cif"]} /> came from a system record
-          <span className="mx-1 text-line-strong">|</span>
-          <BasisTag keys={["svs-man"]} /> the agent read a document, so compare it with the quote
-        </div>
+      <div className="flex justify-end">
         <Pill tone="neutral">Plan v{version}</Pill>
       </div>
-      {hint && (
-        <div className="flex items-start gap-2.5 rounded-lg border border-accent/30 bg-accent-soft/40 px-3 py-2.5 text-sm">
-          <Lightbulb className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
-          <p className="flex-1 text-sub">
-            <span className="font-medium text-ink">Where I&apos;m reliable:</span> anything copied from Finacle, EFR or Admin. <span className="font-medium text-ink">Where to check me:</span> what I read from SVS documents, especially letters and amendments.
-          </p>
-          <button
-            aria-label="Dismiss"
-            className="rounded p-0.5 text-muted hover:text-ink"
-            onClick={() => {
-              setHint(false);
-              try {
-                localStorage.setItem("jointly-hint", "off");
-              } catch {}
-            }}
-          >
-            <X className="h-3.5 w-3.5" />
-          </button>
-        </div>
-      )}
       {stages.map((s, i) => {
         const approval = state.approvals[s.id];
         const valid = approvalValid(approval, s);

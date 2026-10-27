@@ -1,7 +1,6 @@
 "use client";
 
-import { Bot, Hand, Loader2, Pause, Play, ShieldCheck, UserRound } from "lucide-react";
-import { checker } from "@/data/seed";
+import { Hand, Loader2, Pause, Play } from "lucide-react";
 import { releaseEligibility } from "@/lib/rules";
 import { eventById } from "@/lib/script";
 import { rulesFor, useStore } from "@/lib/store";
@@ -145,43 +144,6 @@ export function NeedsYou() {
         </div>
         <div className="mt-3">{body}</div>
       </div>
-      <details open={["new", "running"].includes(state.phase)} className="min-h-0 overflow-y-auto px-5 py-4 pb-64">
-        <summary className="cursor-pointer text-xs font-medium text-muted">Who does what</summary>
-        <ul className="mt-3 space-y-3 text-sm">
-          <li className="flex gap-2.5">
-            <Bot className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
-            <div>
-              <p className="font-medium">Maker: Access Agent</p>
-              <p className="text-xs text-muted">System user. Gathers, drafts, executes. Can&apos;t approve.</p>
-            </div>
-          </li>
-          <li className="flex gap-2.5">
-            <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-ok" />
-            <div>
-              <p className="font-medium">Rules engine</p>
-              <p className="text-xs text-muted">Deterministic checks. No AI.</p>
-            </div>
-          </li>
-          <li className="flex gap-2.5">
-            <UserRound className="mt-0.5 h-4 w-4 shrink-0 text-ink" />
-            <div>
-              <p className="font-medium">
-                Checker: {checker.name}
-              </p>
-              <p className="text-xs text-muted">{checker.role}. Approves every stage and the release.</p>
-            </div>
-          </li>
-        </ul>
-        <div className="mt-5 rounded-lg border border-line bg-surface p-3">
-          <p className="text-xs font-medium text-ink">The agent never</p>
-          <ul className="mt-1.5 space-y-1 text-xs text-sub">
-            <li>Waives EFR</li>
-            <li>Matches people by name</li>
-            <li>Approves its own work</li>
-            <li>Sees or sends a password</li>
-          </ul>
-        </div>
-      </details>
     </aside>
   );
 }
