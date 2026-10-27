@@ -2,13 +2,13 @@
 
 import { useState } from "react";
 import { createPortal } from "react-dom";
-import { Check, MessageSquare, Rocket, TriangleAlert, X } from "lucide-react";
+import { Check, MessageSquare, Rocket, X } from "lucide-react";
 import { PersonId, business, firstName, people } from "@/data/seed";
-import { policyChecks, releaseEligibility } from "@/lib/rules";
+import { policyChecks } from "@/lib/rules";
 import { FailBanner } from "./ReviewView";
 import { customerMessages, eventById } from "@/lib/script";
 import { progressFor } from "@/lib/derive";
-import { hasEvent, rulesFor, useStore } from "@/lib/store";
+import { hasEvent, useStore } from "@/lib/store";
 import { useTourTarget } from "@/components/Tour";
 import { AssumptionChip, Avatar, Button, Card, Empty, Pill, cn } from "@/components/ui";
 
@@ -31,23 +31,12 @@ function Rings({ ids, size = 40 }: { ids: PersonId[]; size?: number }) {
   );
 }
 
-function Undo({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="inline-flex items-center gap-1 rounded-md bg-bad-soft px-1.5 py-0.5 text-[11px] font-medium text-bad-ink">
-      <TriangleAlert className="h-3 w-3" /> {children}
-    </span>
-  );
-}
-
 export function ReleaseView() {
-  const { state, dispatch, version, held } = useStore();
+  const { state, version, held } = useStore();
   const tour3 = useTourTarget(2);
-  const [confirming, setConfirming] = useState(false);
-  const [confirmingR, setConfirmingR] = useState(false);
   const [preview, setPreview] = useState(false);
   if (!hasEvent(state, "ex-readback"))
     return <Empty icon={Rocket} title="Not set up yet" body="After Sara approves all 4 stages, the agent sets them up, checks them and works out who can go live." />;
-  const elig = releaseEligibility(rulesFor(version), held);
   const failing = policyChecks(version, held).filter((c) => !c.pass).length;
   const sent = customerMessages.filter((m) => hasEvent(state, m.afterEvent));
   const pending = customerMessages.filter((m) => m.afterEvent.startsWith("rel-"));
@@ -91,31 +80,9 @@ export function ReleaseView() {
             </div>
             {state.phase === "executed" && (
               <div className="mt-5 flex flex-wrap items-center gap-3 border-t border-line pt-4">
-                {confirming ? (
-                  <>
-                    <Undo>Can&apos;t be undone</Undo>
-                    <span className="text-sm text-sub">Sends {pending.length} messages ·</span>
-                    <button onClick={() => setPreview(true)} className="text-sm text-accent-ink underline-offset-2 hover:underline">
-                      Preview
-                    </button>
-                    <span className="flex-1" />
-                    <Button variant="ghost" onClick={() => setConfirming(false)}>
-                      Cancel
-                    </Button>
-                    <Button variant="primary" onClick={() => dispatch({ type: "release" })}>
-                      Yes, release them
-                    </Button>
-                  </>
-                ) : (
-                  <>
-                    <Button variant="primary" data-release-main disabled={!elig.eligible || failing > 0} onClick={() => setConfirming(true)}>
-                      Release Mohammed and Khalifa
-                    </Button>
-                    <Button variant="ghost" onClick={() => setPreview(true)}>
-                      <MessageSquare className="h-3.5 w-3.5" /> Preview {pending.length} messages
-                    </Button>
-                  </>
-                )}
+                <Button variant="ghost" onClick={() => setPreview(true)}>
+                  <MessageSquare className="h-3.5 w-3.5" /> Preview {pending.length} messages
+                </Button>
               </div>
             )}
           </Card>
@@ -145,29 +112,6 @@ export function ReleaseView() {
                   </li>
                 ))}
               </ol>
-              {rashidDecision && (
-                <div className="mt-4 border-t border-line pt-3">
-                  {confirmingR ? (
-                    <div className="space-y-2">
-                      <p className="text-xs text-sub">
-                        <Undo>Can&apos;t be undone</Undo> Switches him on and texts him the link.
-                      </p>
-                      <div className="flex gap-2">
-                        <Button variant="primary" size="sm" onClick={() => dispatch({ type: "releaseRashid" })}>
-                          Yes, release Rashid
-                        </Button>
-                        <Button variant="ghost" size="sm" onClick={() => setConfirmingR(false)}>
-                          Cancel
-                        </Button>
-                      </div>
-                    </div>
-                  ) : (
-                    <Button variant="primary" size="sm" data-release-rashid onClick={() => setConfirmingR(true)}>
-                      Release Rashid
-                    </Button>
-                  )}
-                </div>
-              )}
             </Card>
           );
         })}

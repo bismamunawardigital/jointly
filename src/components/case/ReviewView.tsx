@@ -147,17 +147,26 @@ function CleanLetter() {
 }
 
 function ScanCheck({ canAct, onConfirm, onReturn }: { canAct: boolean; onConfirm: (v: number) => void; onReturn: (v: number) => void }) {
-  const { state, dispatch } = useStore();
+  const { state } = useStore();
   const clean = state.copy === "received";
   const waiting = state.copy === "requested";
   const [value, setValue] = useState("");
-  const [checked, setChecked] = useState<number | null>(null);
   const n = Number(value.replace(/[^0-9.]/g, ""));
-  const match = checked === 25000;
-  const check = (x: number | null) => {
-    setChecked(x);
-    window.dispatchEvent(new CustomEvent("jointly:scan", { detail: x === 25000 }));
+  const submit = () => {
+    const v = value.trim() ? n : clean ? 0 : 25000;
+    if (!(v > 0)) return;
+    if (v === 25000) onConfirm(v);
+    else onReturn(v);
   };
+  useEffect(() => {
+    const on = (e: Event) => {
+      if (!canAct || waiting || (clean && !value.trim())) return;
+      (e as CustomEvent<{ handled: boolean }>).detail.handled = true;
+      submit();
+    };
+    window.addEventListener("jointly:accept-scan", on);
+    return () => window.removeEventListener("jointly:accept-scan", on);
+  });
   return (
     <div className="mt-4 rounded-lg border border-warn/40 bg-surface p-4">
       <p className="flex items-center gap-1.5 text-sm font-medium text-warn-ink">
@@ -170,63 +179,26 @@ function ScanCheck({ canAct, onConfirm, onReturn }: { canAct: boolean; onConfirm
         </figure>
         <div className="min-w-[220px] flex-1 space-y-3 text-sm">
           {waiting && (
-            <div className="space-y-3">
-              <p className="text-warn-ink">You read <span className="tnum font-medium">AED {fmt(state.disagreed ?? 0)}</span>, so the agent asked the branch for a clean copy. The case waits, and the agent&apos;s reading isn&apos;t used.</p>
-              <Button variant="ghost" className="border border-dashed border-line" onClick={() => dispatch({ type: "cleanCopy" })}>
-                Skip ahead: the branch sends a clean copy
-              </Button>
-            </div>
+            <p className="text-warn-ink">You read <span className="tnum font-medium">AED {fmt(state.disagreed ?? 0)}</span>, so the agent asked the branch for a clean copy. The case waits, and the agent&apos;s reading isn&apos;t used.</p>
           )}
-          {!waiting && canAct && checked === null && (
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                if (n > 0) check(n);
-              }}
-            >
+          {!waiting && canAct && (
+            <form onSubmit={(e) => { e.preventDefault(); submit(); }}>
               <label htmlFor="scan-value" className="text-xs text-muted">
-                The letter says Khalifa&apos;s limit is
+                {clean ? "The clean copy says Khalifa's limit is" : "The agent read"}
               </label>
               <div className="mt-1 flex items-center gap-2">
                 <span className="text-xs text-muted">AED</span>
-                <input id="scan-value" inputMode="numeric" autoComplete="off" value={value} onChange={(e) => setValue(e.target.value)} className="tnum h-9 w-32 rounded-lg border border-line bg-surface px-2.5 text-sm outline-none focus:border-accent" />
+                <input id="scan-value" inputMode="numeric" autoComplete="off" placeholder={clean ? "" : "25,000"} value={value} onChange={(e) => setValue(e.target.value)} className="tnum h-9 w-32 rounded-lg border border-line bg-surface px-2.5 text-sm outline-none placeholder:text-muted focus:border-accent" />
               </div>
-              <p className="mt-1 text-xs text-sub">{clean ? "Type what the clean copy says." : <>Type what you read. You&apos;ll see the agent&apos;s reading after.</>}</p>
-              <Button type="submit" variant="primary" className="mt-2" disabled={!(n > 0)}>
-                Check
-              </Button>
             </form>
           )}
-          {!waiting && !clean && (checked !== null || !canAct) && (
+          {!canAct && !waiting && (
             <div>
               <p className="text-xs text-muted">The agent read</p>
-              <p className="tnum mt-0.5 font-medium">
-                AED 25,000 <span className="text-xs font-normal text-warn-ink">not certain</span>
-              </p>
+              <p className="tnum mt-0.5 font-medium">AED 25,000 <span className="text-xs font-normal text-warn-ink">not certain</span></p>
+              <p className="mt-2 text-xs text-sub">Plan v1 keeps AED 10,000 until Sara confirms.</p>
             </div>
           )}
-          {!waiting && canAct && checked !== null && (
-            <div className={cn("rounded-lg border p-3", match ? "border-ok/40 bg-ok-soft" : "border-warn/40 bg-surface")}>
-              {match ? (
-                <p className="flex items-center gap-1.5 font-medium text-ok-ink">
-                  <Check className="h-4 w-4" /> {clean ? "You read 25,000, the same as the clean copy" : "You and the agent both read 25,000"}
-                </p>
-              ) : (
-                <p className="text-warn-ink">
-                  You read <span className="tnum font-medium">AED {fmt(checked)}</span>. {clean ? "The clean copy shows AED 25,000." : "The agent read AED 25,000."}
-                </p>
-              )}
-              <div className="mt-2 flex flex-wrap gap-2">
-                <Button variant="primary" data-confirm-scan onClick={() => (match ? onConfirm(checked) : onReturn(checked))}>
-                  {match ? "Confirm and update the plan" : "Send back with my value"}
-                </Button>
-                <Button variant="ghost" onClick={() => check(null)}>
-                  Change my reading
-                </Button>
-              </div>
-            </div>
-          )}
-          {!canAct && <p className="text-xs text-sub">Plan v1 keeps AED 10,000 until Sara confirms.</p>}
         </div>
       </div>
     </div>
@@ -338,9 +310,6 @@ export function ReviewView() {
             </p>
             <p className="mt-0.5 text-xs text-sub">2 decisions in this case: the letter value, then this sign-off.</p>
           </div>
-          <Button variant="primary" disabled={failing.length > 0} onClick={() => dispatch({ type: "signoff" })}>
-            Sign off plan v{version} · 4 stages <kbd className="ml-1 rounded border border-white/40 px-1 text-[11px]">S</kbd>
-          </Button>
         </Card>
       )}
       <div className="grid grid-cols-4 gap-2">
@@ -496,7 +465,7 @@ export function ReviewView() {
                         {canAct && !returning && (
               <div className="mt-3 flex gap-2">
                 {!(s.id === 3 && version === 1) && (
-                  <Button variant="primary" onClick={() => dispatch({ type: "approve", stageId: s.id })}>
+                  <Button onClick={() => dispatch({ type: "approve", stageId: s.id })}>
                     <Check className="h-3.5 w-3.5" /> Approve stage {s.id} · {s.items.length} line{s.items.length === 1 ? "" : "s"}
                     <kbd className="ml-1 rounded border border-onaccent/40 px-1 text-[10px] font-normal opacity-80">A</kbd>
                   </Button>

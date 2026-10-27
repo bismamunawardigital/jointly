@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { policyChecks, releaseEligibility } from "@/lib/rules";
 import { eventById } from "@/lib/script";
 import { headlineOf } from "@/lib/derive";
-import { Tab, rulesFor, useStore } from "@/lib/store";
+import { Tab, rulesFor, useStore, State } from "@/lib/store";
 import { Button, cn, AgentMark } from "@/components/ui";
 
 const doingMap: Record<string, string> = {
@@ -51,15 +51,16 @@ export function NeedsYou() {
   const elig = releaseEligibility(rulesFor(version), held);
   const failing = policyChecks(version, held).filter((c) => !c.pass).length;
   const done = state.log.filter((e) => e.kind === "agent").length;
-  const [scanOk, setScanOk] = useState(false);
+  const [toast, setToast] = useState<{ text: string; prev: State } | null>(null);
   useEffect(() => {
-    const on = (e: Event) => setScanOk(!!(e as CustomEvent<boolean>).detail);
-    window.addEventListener("jointly:scan", on);
-    return () => window.removeEventListener("jointly:scan", on);
-  }, []);
-  useEffect(() => {
-    if (state.phase !== "in_review") setScanOk(false);
-  }, [state.phase]);
+    if (!toast) return;
+    const t = setTimeout(() => setToast(null), 10000);
+    return () => clearTimeout(t);
+  }, [toast]);
+  const releaseNow = (type: "release" | "releaseRashid", text: string) => {
+    setToast({ text, prev: state });
+    dispatch({ type });
+  };
   const go = (t: Tab, anchor: string, focus?: string) => {
     setTab(t);
     setTimeout(() => {
@@ -74,9 +75,22 @@ export function NeedsYou() {
     }, 80);
   };
   const handBtn = (
-    <Button variant="ghost" onClick={() => dispatch({ type: "handover" })}>
-      <Hand className="h-3.5 w-3.5" /> Hand to a maker <Key k="H" />
-    </Button>
+    <details className="relative">
+      <summary className="flex h-9 cursor-pointer list-none items-center rounded-xl border border-line px-3 text-sm text-sub hover:text-ink [&::-webkit-details-marker]:hidden">More</summary>
+      <div className="absolute bottom-full right-0 z-50 mb-2 w-60 rounded-xl border border-line bg-surface p-1 shadow-lg">
+        <button
+          type="button"
+          onClick={(e) => {
+            const d = e.currentTarget.closest("details");
+            if (d) d.open = false;
+            dispatch({ type: "handover" });
+          }}
+          className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm hover:bg-panel"
+        >
+          <Hand className="h-3.5 w-3.5" /> Hand to a colleague <Key k="H" />
+        </button>
+      </div>
+    </details>
   );
 
   let title = headlineOf[state.phase];
@@ -120,41 +134,63 @@ export function NeedsYou() {
     sub = "Access request in at 09:12. The agent is starting.";
   } else if (state.phase === "in_review") {
     sub = "Stages 1 and 2 passed by rule. Stage 3: check a value on a blurry 2023 letter.";
-    if (scanOk) {
-      title = "Your reading matches the agent's";
-      sub = "Confirm it and the agent updates the plan to v2.";
+    if (state.copy === "requested") {
+      title = "Waiting for a clean copy from the branch";
+      sub = "Your reading differs, so the agent's value isn't used.";
+      actions = (
+        <>
+          {handBtn}
+          <Button variant="primary" onClick={() => dispatch({ type: "cleanCopy" })}>Skip ahead: the branch sends a clean copy</Button>
+        </>
+      );
+    } else {
+      const clean = state.copy === "received";
+      actions = (
+        <>
+          {handBtn}
+          <Button
+            variant="primary"
+            onClick={() => {
+              const d = { handled: false };
+              window.dispatchEvent(new CustomEvent("jointly:accept-scan", { detail: d }));
+              if (!d.handled) go("review", "stage-3", "#scan-value");
+            }}
+          >
+            {clean ? "Check the clean copy" : "Confirm AED 25,000"} {!clean && <Key k="Enter" />}
+          </Button>
+        </>
+      );
     }
-    actions = (
-      <>
-        {handBtn}
-        {scanOk ? (
-          <Button variant="primary" onClick={() => dispatch({ type: "confirm", value: 25000 })}>Confirm and update the plan</Button>
-        ) : (
-          <Button variant="primary" onClick={() => go("review", "stage-3", "#scan-value")}>Check the letter</Button>
-        )}
-      </>
-    );
   } else if (state.phase === "re_review") {
     sub = failing ? `${failing} check failed. Sign-off is blocked.` : "Your letter value is in. Stages 1, 2 and 4 passed by rule.";
     actions = (
       <>
         {handBtn}
         <Button variant="primary" disabled={failing > 0} onClick={() => dispatch({ type: "signoff" })}>
-          Sign off plan v2 · 4 stages <Key k="S" />
+          Sign off <Key k="S" />
         </Button>
       </>
     );
-  } else if (state.phase === "executed" || state.phase === "rashid_ready") {
-    sub = state.phase === "executed" ? elig.summary : "Adding him keeps every approval combination valid.";
+  } else if (state.phase === "executed") {
+    sub = elig.summary;
     actions = (
-      <Button variant="primary" onClick={() => go("release", "sec-release", state.phase === "rashid_ready" ? "[data-release-rashid]" : "[data-release-main]")}>Go to release</Button>
+      <Button variant="primary" disabled={!elig.eligible || failing > 0} onClick={() => releaseNow("release", "Mohammed and Khalifa are being released, and their messages go out in 10 seconds.")}>
+        Release Mohammed and Khalifa
+      </Button>
+    );
+  } else if (state.phase === "rashid_ready") {
+    sub = "Adding him keeps every approval combination valid.";
+    actions = (
+      <Button variant="primary" onClick={() => releaseNow("releaseRashid", "Rashid is being released, and his message goes out in 10 seconds.")}>
+        Release Rashid
+      </Button>
     );
   } else if (state.phase === "partially_live") {
     sub = "Rashid joins when his EID clears EFR.";
-    actions = <Button variant="ghost" onClick={() => dispatch({ type: "renew" })}>Demo: Rashid renews his EID</Button>;
+    actions = <Button variant="primary" onClick={() => dispatch({ type: "renew" })}>Skip ahead 2 days: Rashid renews his ID</Button>;
   } else if (state.phase === "live") {
     sub = "Nothing left to do. Every step is in History.";
-    actions = <Button onClick={() => setTab("audit")}>Open history</Button>;
+    actions = <Button variant="primary" onClick={() => setTab("audit")}>Open history</Button>;
   }
 
   return (
@@ -167,6 +203,12 @@ export function NeedsYou() {
         {sub && <p className="truncate text-xs text-sub">{sub}</p>}
       </div>
       <div className="flex shrink-0 items-center gap-2">{actions}</div>
+      {toast && (
+        <div role="status" className="fixed bottom-20 right-8 z-50 flex items-center gap-3 rounded-xl border border-line bg-surface px-4 py-3 text-sm shadow-lg">
+          {toast.text}
+          <Button size="sm" onClick={() => { dispatch({ type: "hydrate", state: toast.prev }); setToast(null); }}>Undo</Button>
+        </div>
+      )}
     </div>
   );
 }
