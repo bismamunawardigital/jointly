@@ -1,0 +1,253 @@
+/* Hero agent stage. Ported from jointly-hero-directions.html. The legacy systems keep their own colours in both themes. */
+.jas {
+  --bg: #ffffff;
+  --surface: #f5f7f4;
+  --window: #ffffff;
+  --ink: #0f1d17;
+  --muted: #5a665f;
+  --faint: #8b958f;
+  --line: #e3e7e2;
+  --emerald: #0e5a44;
+  --emerald-soft: #e4f1ea;
+  --emerald-bright: #1f8a66;
+  --amber: #9a5f0c;
+  --amber-bright: #c98a1c;
+  --amber-soft: #fbefd6;
+  --person: #b5651d;
+  --gold: #a8853a;
+  --shadow: 0 1px 2px rgba(15,29,23,.06), 0 14px 40px -14px rgba(15,29,23,.28);
+  --shadow-up: 0 2px 4px rgba(15,29,23,.08), 0 24px 60px -16px rgba(15,29,23,.38);
+  
+  --fin-bar: #1d3557; --fin-body: #e8edf3; --fin-cell: #ffffff; --fin-ink: #14213d; --fin-key: #50607a;
+  --paper: #fbf8f0; --paper-ink: #2b2925; --paper-rule: #d9d3c4; --pen: #1f3a7a; --stamp: #5b77b8;
+  --viewer: #e9e9e7; --viewer-ink: #3a3a38;
+  --efr-bar: #0f5132; --efr-body: #f4f7f5; --efr-ink: #1b2a22;
+  --display: var(--font-newsreader), "Iowan Old Style", Georgia, serif;
+  --body: var(--font-geist-sans), "Helvetica Neue", Arial, sans-serif;
+  --mono: var(--font-mono), ui-monospace, Menlo, monospace;
+  --hand: var(--font-caveat), "Bradley Hand", cursive;
+  color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.5;
+}
+[data-theme="dark"] .jas {
+  --bg: #0b100e; --surface: #141b17; --window: #121916; --ink: #ecf1ee; --muted: #9ba7a0; --faint: #6d7973;
+  --line: #253029; --emerald: #5cc79c; --emerald-soft: #15291f; --emerald-bright: #4fbf92;
+  --amber: #e5a94c; --amber-bright: #e5a94c; --amber-soft: #2f2412; --person: #e09a55; --gold: #d4b26a;
+  --shadow: 0 1px 2px rgba(0,0,0,.4), 0 16px 40px -12px rgba(0,0,0,.7);
+  --shadow-up: 0 2px 4px rgba(0,0,0,.5), 0 26px 60px -14px rgba(0,0,0,.85);
+  color-scheme: dark;
+}
+.jas *, .jas *::before, .jas *::after { box-sizing: border-box; }
+.jas button { font: inherit; }
+.jas .ctl:focus-visible { outline: 2px solid var(--emerald-bright); outline-offset: 2px; }
+.jas .stage { position: relative; width: 100%; aspect-ratio: 1000 / 560; }
+.jas .canvas { position: absolute; left: 0; top: 0; width: 1000px; height: 560px; transform: scale(var(--s, 1)); transform-origin: 0 0; }
+.jas .controls { display: flex; gap: 8px; justify-content: center; }
+.jas .ctl { font: inherit; font-size: 13px; color: var(--muted); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px; cursor: pointer; }
+.jas .mark { width: 14px; height: 14px; flex: none; }
+.jas .task { position: absolute; left: 0; top: 0; width: 1000px; height: 88px; border: 1px solid var(--line); border-radius: 14px; background: var(--window); box-shadow: var(--shadow);
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto auto; align-items: center; column-gap: 16px; row-gap: 8px; padding: 10px 16px; }
+.jas .task .who { display: flex; align-items: center; gap: 8px; color: var(--emerald); font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; white-space: nowrap; }
+.jas .task .who .mark { width: 18px; height: 18px; }
+.jas .task .goal { font-family: var(--display); font-size: 19px; white-space: nowrap; min-width: 0; }
+.jas .task .goal .done-t { display: none; color: var(--emerald); }
+.jas .canvas.live .task .goal .todo-t { display: none; }
+.jas .canvas.live .task .goal .done-t { display: inline; }
+.jas .steps { display: flex; gap: 6px; grid-column: 1 / -1; grid-row: 2; }
+.jas .step { font-size: 11.5px; color: var(--faint); border: 1px solid var(--line); border-radius: 999px; padding: 3px 9px 3px 7px; display: flex; align-items: center; gap: 5px; white-space: nowrap; transition: all .35s; }
+.jas .step i { width: 7px; height: 7px; border-radius: 50%; border: 1.5px solid currentColor; transition: all .35s; }
+.jas .step.active { color: var(--ink); border-color: var(--emerald-bright); }
+.jas .step.active i { border-color: var(--emerald-bright); border-top-color: transparent; animation: jas-spin .8s linear infinite; }
+.jas .step.person.active { border-color: var(--person); }
+.jas .step.person.active i { border-color: var(--person); border-top-color: transparent; }
+.jas .step.done { color: var(--emerald); border-color: transparent; background: var(--emerald-soft); }
+.jas .step.done i { background: var(--emerald-bright); border-color: var(--emerald-bright); }
+@keyframes jas-spin { to { transform: rotate(360deg); } }
+.jas .meter { display: grid; text-align: right; font-size: 11px; color: var(--muted); line-height: 1.25; padding-left: 14px; border-left: 1px solid var(--line); white-space: nowrap; }
+.jas .meter b { font-size: 15px; color: var(--ink); font-weight: 500; font-variant-numeric: tabular-nums; }
+.jas .sys { position: absolute; border-radius: 10px; overflow: hidden; box-shadow: var(--shadow); transition: transform .5s cubic-bezier(.2,.8,.2,1), box-shadow .5s, opacity .6s, filter .6s; }
+.jas .sys.active { transform: translateY(-4px); box-shadow: var(--shadow-up); z-index: 4; }
+.jas .sys::after { content: "Read ✓"; position: absolute; top: 5px; right: 6px; z-index: 2; font: 600 9px/1 var(--body); color: #fff; background: var(--emerald-bright); border-radius: 999px; padding: 4px 8px; opacity: 0; transform: scale(.8); transition: opacity .35s, transform .35s cubic-bezier(.2,1.4,.4,1); }
+.jas .sys.read::after { opacity: 1; transform: none; }
+.jas .fin::after { right: auto; left: 6px; }
+.jas .svs::after { right: 58px; }
+.jas .bar { height: 26px; display: flex; align-items: center; gap: 6px; padding: 0 10px; font-size: 10.5px; letter-spacing: .02em; }
+.jas .bar i { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,.35); }
+.jas .bar span { margin-left: 6px; }
+.jas .bar em { margin-left: auto; font-style: normal; opacity: .7; }
+.jas .fin { left: 0; top: 106px; width: 400px; background: #fff; color: #000; font-family: Tahoma, Arial, sans-serif; border: 1px solid #9fb2c8; border-radius: 4px; }
+.jas .f-strip { background: linear-gradient(#f4f8fc, #dfe8f3); color: #2a5aa0; font-size: 8.5px; text-align: center; padding: 2px 0; border-bottom: 1px solid #b9c9dc; }
+.jas .f-user { display: flex; gap: 18px; font-size: 8.5px; color: #24477a; padding: 3px 8px; background: #eef3f9; border-bottom: 1px solid #c8d5e5; }
+.jas .f-user b { font-weight: 700; }
+.jas .f-sel { border: 1px solid #7f9db9; background: #fff; padding: 0 4px; color: #000; }
+.jas .f-brand { display: flex; align-items: center; justify-content: space-between; padding: 4px 8px; background: linear-gradient(#fff, #f1f1f1); }
+.jas .f-logo { display: flex; align-items: center; gap: 3px; font-family: Arial, sans-serif; font-weight: 700; font-size: 17px; letter-spacing: -.02em; color: #1a1a1a; }
+.jas .f-logo i { width: 10px; height: 15px; background: #d71920; transform: skewX(-14deg); }
+.jas .f-menu { display: flex; gap: 2px; }
+.jas .f-menu span { font-size: 8.5px; font-weight: 700; color: #24477a; border-left: 1px solid #b9c9dc; padding: 1px 6px; }
+.jas .f-band { display: flex; justify-content: space-between; align-items: center; background: linear-gradient(#5d7fa8, #3e5f8a); color: #fff; font-size: 8.5px; padding: 3px 8px; }
+.jas .f-band b { letter-spacing: .04em; }
+.jas .f-title { font-size: 11px; font-weight: 700; padding: 7px 8px 4px; }
+.jas .f-form { margin: 0 8px; border: 1px solid #9fb2c8; padding: 7px 6px; display: grid; grid-template-columns: 70px 112px 70px 112px; gap: 5px 7px; align-items: center; }
+.jas .f-form label { font-size: 8.5px; font-weight: 700; white-space: nowrap; }
+.jas .f-in { height: 15px; border: 1px solid #7f9db9; background: #fff; font-size: 8.5px; padding: 0 3px; display: flex; align-items: center; justify-content: space-between; white-space: nowrap; overflow: hidden; }
+.jas .f-in.sm { width: 60px; display: inline-flex; vertical-align: middle; margin-left: 3px; }
+.jas .f-in q { width: 7px; height: 7px; border: 1.5px solid #2a6fd0; border-radius: 50%; flex: none; quotes: none; }
+.jas .f-in q::before, .jas .f-in q::after { content: none; }
+.jas .f-btns { display: flex; gap: 4px; padding: 6px 8px 8px; }
+.jas .f-btns span { font-size: 8.5px; border: 1px solid #707070; background: linear-gradient(#fafafa, #dcdcdc); padding: 1px 7px; border-radius: 2px; }
+.jas .form { left: 312px; top: 128px; width: 290px; background: var(--viewer); color: var(--viewer-ink); }
+.jas .form .bar { background: #d6d6d3; color: #4a4a47; }
+.jas .form .bar i { background: #b5b5b1; }
+.jas .sheet { margin: 8px 12px 12px; background: var(--paper); color: var(--paper-ink); padding: 12px 14px 10px; box-shadow: 0 1px 3px rgba(0,0,0,.18); transform: rotate(-.6deg); }
+.jas .sheet .lab { font-size: 8.5px; text-transform: uppercase; letter-spacing: .06em; color: #7d776a; }
+.jas .sheet .box { border-bottom: 1px solid var(--paper-rule); height: 30px; margin-bottom: 8px; display: flex; align-items: flex-end; padding-bottom: 2px; }
+.jas .hand { font-family: var(--hand); color: var(--pen); font-size: 21px; line-height: 1; }
+.jas .sheet .sig path { fill: none; stroke: var(--pen); stroke-width: 1.4; stroke-linecap: round; }
+.jas .svs { left: 0; top: 340px; width: 400px; background: #fff; color: #1f2a33; font-family: "Segoe UI", Tahoma, Arial, sans-serif; border: 1px solid #c9d2d8; }
+.jas .svs .bar { background: #2f3b45; color: #e6ebef; }
+.jas .svs .bar i { background: rgba(255,255,255,.3); }
+.jas .s-main { padding: 9px 10px 10px; display: grid; gap: 7px; }
+.jas .s-lab { font-size: 8px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #6b7883; }
+.jas .s-sigs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.jas .s-tile { border: 1px solid #e3e8ec; border-radius: 6px; padding: 5px; display: grid; gap: 4px; }
+.jas .s-tile .scan-img { width: 100%; height: 30px; }
+.jas .s-tile b { font-size: 8.5px; font-weight: 700; letter-spacing: .01em; display: block; white-space: nowrap; }
+.jas .s-tile small { display: block; font-size: 8px; color: #6b7883; }
+.jas .scan-img { display: block; background: #f4f2ec; border: 1px solid #e8e4d9; border-radius: 3px; }
+.jas .scan-img path { fill: none; stroke: var(--pen); stroke-width: 1.3; stroke-linecap: round; }
+.jas .rmk { display: grid; grid-template-columns: 20px 1fr; gap: 7px; align-items: center; border-left: 2px solid #dde3e8; padding: 2px 0 2px 7px; }
+.jas .rmk .oi { width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; font-size: 7.5px; font-weight: 700; color: #fff; }
+.jas .rmk .oi.a { background: #7a8794; }
+.jas .rmk .oi.b { background: #1b7f86; }
+.jas .rmk small { display: block; font-size: 8px; color: #6b7883; }
+.jas .rmk p { margin: 0; font-size: 10px; line-height: 1.4; }
+.jas .hl.old { text-decoration: line-through; color: #8a8f99; background: none; box-shadow: none; }
+.jas .efr { left: 352px; top: 330px; width: 268px; background: var(--efr-body); color: var(--efr-ink); }
+.jas .efr .bar { background: var(--efr-bar); color: #e2f1e8; }
+.jas .eid { position: relative; margin: 8px 10px 6px; height: 146px; border-radius: 9px; overflow: hidden; color: #1d2433; font-family: Arial, sans-serif;
+  background: radial-gradient(circle at 70% 40%, rgba(240,205,190,.55), transparent 55%), repeating-radial-gradient(circle at 30% 120%, rgba(120,140,170,.07) 0 2px, transparent 2px 5px), linear-gradient(120deg, #eef1f6, #e4e9f1 60%, #efe6e4);
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.06); }
+.jas .ar { font-family: var(--font-arabic), "Geeza Pro", Tahoma, sans-serif; direction: rtl; unicode-bidi: isolate; }
+.jas .eid-top { display: flex; justify-content: space-between; padding: 8px 10px 0; }
+.jas .eid-top b { font-size: 9.5px; letter-spacing: .01em; display: block; }
+.jas .eid-top small { font-size: 7.5px; color: #4a5468; display: block; }
+.jas .eid-top .ar { font-size: 9px; font-weight: 500; text-align: right; }
+.jas .eid-mid { display: flex; gap: 10px; padding: 8px 10px; }
+.jas .eid-ph { width: 50px; height: 62px; flex: none; border-radius: 5px; background: #dfe4ec; }
+.jas .eid-f { display: grid; gap: 4px; min-width: 0; }
+.jas .eid-f small { display: block; font-size: 7px; color: #5a6478; }
+.jas .eid-f b { font-size: 9.5px; font-weight: 700; letter-spacing: .01em; white-space: nowrap; }
+.jas .eid-wm { position: absolute; right: 8px; bottom: 6px; font-size: 9px; font-weight: 700; letter-spacing: .2em; color: rgba(29,36,51,.28); border: 1px solid rgba(29,36,51,.22); padding: 0 5px; border-radius: 2px; }
+.jas .efr-st { margin: 0 10px 9px; font-size: 10.5px; padding: 5px 8px; border-radius: 6px; background: #fff; border: 1px solid #dbe5df; color: #7b8a81; display: flex; align-items: center; gap: 6px; }
+.jas .efr-st.ok { color: #0f6b46; }
+.jas .efr-st.bad { color: #a8620a; font-weight: 600; background: #fff7e8; border-color: #f0d9a8; }
+.jas .hl { border-radius: 3px; transition: box-shadow .35s, background .35s; }
+.jas .hl.on { background: rgba(31,138,102,.14); box-shadow: 0 0 0 2px rgba(31,138,102,.9); }
+.jas .hl.warn { background: rgba(201,138,28,.16); box-shadow: 0 0 0 2px rgba(201,138,28,.95); }
+.jas .links { position: absolute; left: 0; top: 0; width: 1000px; height: 560px; z-index: 6; pointer-events: none; overflow: visible; }
+.jas .links path { fill: none; stroke: var(--emerald-bright); stroke-width: 1.6; stroke-linecap: round; }
+.jas .badge { position: absolute; z-index: 7; font-size: 11.5px; font-weight: 500; color: var(--emerald); background: var(--window); border: 1px solid var(--emerald-bright); border-radius: 999px; padding: 3px 10px; white-space: nowrap; box-shadow: var(--shadow); opacity: 0; transform: translateY(4px); transition: all .4s; }
+.jas .badge.on { opacity: 1; transform: none; }
+.jas .out { position: absolute; left: 640px; top: 106px; width: 360px; min-height: 454px; border: 1px solid var(--line); border-radius: 14px; background: var(--window); box-shadow: var(--shadow); padding: 16px 18px; display: grid; align-content: start; gap: 12px; }
+.jas .out h4 { font-family: var(--display); font-weight: 400; font-size: 20px; margin: 0; letter-spacing: -.01em; }
+.jas .out .sec { font-size: 10.5px; letter-spacing: .07em; text-transform: uppercase; color: var(--faint); margin-bottom: 6px; }
+.jas .ppl { display: grid; gap: 6px; }
+.jas .pr { display: grid; grid-template-columns: 24px 1fr auto; gap: 9px; align-items: center; font-size: 12.5px; line-height: 1.3; }
+.jas .pr small { display: block; color: var(--muted); font-size: 11px; }
+.jas .av { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; font-size: 10px; font-weight: 600; background: var(--surface); color: var(--faint); border: 1px solid var(--line); transition: all .4s; }
+.jas .pr .res { font-size: 11px; color: var(--faint); white-space: nowrap; transition: color .4s; }
+.jas .pr .skel { display: block; height: 7px; width: 110px; border-radius: 4px; background: var(--surface); margin-top: 3px; }
+.jas .pr .real { display: none; }
+.jas .pr.filled .skel { display: none; }
+.jas .pr.filled .real { display: block; animation: jas-rise .45s ease-out; }
+.jas .pr.filled .av { background: var(--emerald-soft); color: var(--emerald); border-color: transparent; }
+.jas .pr.filled .res { color: var(--emerald); }
+.jas .pr.warn .av { background: var(--amber-soft); color: var(--amber); }
+.jas .pr.warn .res { color: var(--amber); }
+.jas .rule { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; display: grid; grid-template-columns: 92px 1fr; gap: 12px; align-items: center; min-height: 86px; }
+.jas .rule svg { width: 92px; height: 56px; }
+.jas .rule .txt { font-size: 12.5px; line-height: 1.4; }
+.jas .rule .txt small { display: block; color: var(--muted); font-size: 11px; margin-top: 3px; }
+.jas .rule .amt { border-radius: 3px; padding: 0 2px; transition: all .4s; }
+.jas .rule.ask .amt { background: var(--amber-soft); color: var(--amber); }
+.jas .rule.ok .amt { background: var(--emerald-soft); color: var(--emerald); }
+.jas .rule .txt .askline { display: none; color: var(--amber); }
+.jas .rule.ask .txt .askline { display: block; }
+.jas .rule .txt .okline { display: none; color: var(--emerald); }
+.jas .rule.ok .txt .okline { display: block; }
+.jas .rule .map, .jas .rule .txt { opacity: .15; transition: opacity .5s; }
+.jas .rule.filled .map, .jas .rule.filled .txt { opacity: 1; }
+.jas .map circle { fill: var(--surface); stroke: var(--line); }
+.jas .map text { font-size: 9px; font-weight: 600; fill: var(--muted); font-family: var(--body); }
+.jas .map .arc { fill: none; stroke: var(--emerald-bright); stroke-width: 1.6; stroke-dasharray: 80; stroke-dashoffset: 80; transition: stroke-dashoffset .9s .2s; }
+.jas .rule.filled .map .arc { stroke-dashoffset: 0; }
+.jas .map .r-dash { fill: none; stroke: var(--faint); stroke-width: 1.2; stroke-dasharray: 3 3; }
+.jas .confirm { display: none; justify-self: start; font: inherit; font-size: 11.5px; font-weight: 500; color: #fff; background: var(--person); border: 0; border-radius: 999px; padding: 4px 12px; margin-top: 6px; }
+.jas .rule.ask .confirm { display: inline-block; }
+.jas .rule.pressed .confirm { transform: scale(.94); }
+.jas .setup { border-top: 1px solid var(--line); padding-top: 12px; display: grid; gap: 7px; font-size: 12.5px; opacity: .35; transition: opacity .5s; }
+.jas .setup.on { opacity: 1; }
+.jas .track { height: 6px; border-radius: 3px; background: var(--surface); overflow: hidden; }
+.jas .track b { display: block; height: 100%; width: 0; background: var(--emerald-bright); transition: width 1.8s cubic-bezier(.4,0,.2,1); }
+.jas .setup small { display: block; color: var(--muted); font-size: 11px; }
+.jas .setup .rb { display: none; color: var(--emerald); font-weight: 500; }
+.jas .setup.read .rb { display: block; animation: jas-rise .45s ease-out; }
+@keyframes jas-rise { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+.jas .cursor { position: absolute; left: 0; top: 0; display: flex; align-items: flex-start; gap: 2px; z-index: 9; pointer-events: none;
+  transition: left .8s cubic-bezier(.6,0,.2,1), top .8s cubic-bezier(.6,0,.2,1), opacity .4s; }
+.jas .cursor svg.arrow { width: 15px; height: 17px; filter: drop-shadow(0 1px 1px rgba(0,0,0,.25)); }
+.jas .cursor .tag { margin-top: 13px; display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 500; color: #fff; background: var(--emerald-bright); padding: 3px 10px 3px 7px; border-radius: 999px; white-space: nowrap; box-shadow: var(--shadow); }
+.jas .cursor .tag .mark { width: 12px; height: 12px; }
+.jas .cursor .tag .doing { font-weight: 400; opacity: .92; }
+.jas .cursor.person .tag { background: var(--person); }
+.jas .cursor.off { opacity: 0; }
+.jas .phone { position: absolute; left: 424px; top: 160px; overflow: hidden; width: 152px; height: 284px; z-index: 8; border-radius: 28px; background: var(--window); border: 6px solid #0f1d17;
+  box-shadow: var(--shadow-up); padding: 22px 12px 14px; display: grid; align-content: center; justify-items: start; gap: 10px;
+  opacity: 0; transform: translateY(40px) scale(.96); transition: opacity .7s, transform .9s cubic-bezier(.2,.8,.2,1); }
+.jas .phone.on { opacity: 1; transform: scale(1.12); }
+.jas .out { transition: opacity .6s, transform .7s cubic-bezier(.2,.8,.2,1); }
+.jas .canvas.end .sys, .jas .canvas.end .out { opacity: 0; transform: translateY(12px) scale(.96); }
+.jas .canvas.end .form { transition-delay: .06s; }
+.jas .canvas.end .svs { transition-delay: .12s; }
+.jas .canvas.end .efr { transition-delay: .18s; }
+.jas .canvas.end .out { transition-delay: .24s; }
+.jas .end-l, .jas .end-r { position: absolute; top: 236px; width: 300px; z-index: 7; display: grid; gap: 10px; opacity: 0; transform: translateY(10px); transition: opacity .8s, transform .9s cubic-bezier(.2,.8,.2,1); }
+.jas .end-l { left: 30px; width: 350px; justify-items: end; text-align: right; transition-delay: .9s; }
+.jas .end-l .end-big { font-size: 42px; text-wrap: balance; }
+.jas .end-r { left: 640px; justify-items: start; transition-delay: 1.15s; }
+.jas .canvas.end .end-l, .jas .canvas.end .end-r { opacity: 1; transform: none; }
+.jas .end-eyebrow { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.jas .end-big { font-family: var(--display); font-size: 48px; line-height: 1; letter-spacing: -.03em; }
+.jas .end-r .end-big { color: var(--emerald); }
+.jas .end-l p, .jas .end-r p { margin: 0; font-size: 13.5px; line-height: 1.45; color: var(--muted); max-width: 30ch; }
+.jas .end-r s { color: var(--faint); }
+.jas .gold { display: block; height: 1px; width: 0; background: var(--gold); transition: width 1.1s 1.6s ease-out; }
+.jas .canvas.end .gold { width: 120px; }
+.jas .phone::before { content: ""; position: absolute; top: 6px; left: 50%; width: 44px; height: 5px; margin-left: -22px; border-radius: 4px; background: #0f1d17; }
+.jas .ph-tick { width: 46px; height: 46px; border-radius: 50%; background: var(--emerald-soft); display: grid; place-items: center; transform: scale(.6); transition: transform .6s .5s cubic-bezier(.2,1.5,.4,1); }
+.jas .phone.on .ph-tick { transform: none; }
+.jas .ph-tick svg { width: 26px; height: 26px; }
+.jas .ph-tick { position: relative; }
+.jas .ph-tick::after { content: ""; position: absolute; inset: 0; border-radius: 50%; border: 2px solid var(--emerald-bright); opacity: 0; }
+.jas .phone.on .ph-tick::after { animation: jas-ripple 1.6s .9s ease-out 1; }
+@keyframes jas-ripple { from { transform: scale(1); opacity: .7; } to { transform: scale(2.3); opacity: 0; } }
+.jas .ph-glow { position: absolute; left: 360px; top: 162px; width: 280px; height: 280px; z-index: 7; pointer-events: none; border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--emerald-bright) 30%, transparent), transparent 65%); opacity: 0; transform: scale(.6); transition: opacity 1.2s, transform 1.4s cubic-bezier(.2,.8,.2,1); }
+.jas .canvas.live .ph-glow { opacity: 1; transform: none; }
+.jas .task { transition: background .7s, border-color .7s; }
+.jas .canvas.live .task { background: var(--emerald-soft); border-color: var(--emerald-bright); }
+.jas .task { z-index: 7; }
+.jas .ph-tick path { fill: none; stroke: var(--emerald); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 20; stroke-dashoffset: 20; transition: stroke-dashoffset .5s .9s ease-out; }
+.jas .phone.on .ph-tick path { stroke-dashoffset: 0; }
+.jas .ph-hello { font-family: var(--display); font-size: 19px; line-height: 1.1; }
+.jas .ph-msg { font-size: 11px; line-height: 1.4; color: var(--ink); }
+.jas .ph-card { border: 1px solid var(--line); border-radius: 10px; padding: 8px; font-size: 9.5px; line-height: 1.35; }
+.jas .ph-card small { color: var(--muted); display: block; }
+.jas .ph-partners { display: flex; gap: 4px; align-items: center; font-size: 8.5px; color: var(--muted); }
+.jas .ph-partners .av { width: 18px; height: 18px; font-size: 8px; background: var(--emerald-soft); color: var(--emerald); border: 0; }
+.jas .ph-partners .av.wait { background: transparent; border: 1px dashed var(--faint); color: var(--faint); }
+.jas .paused .step i, .jas .paused .scan { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) {
+  .jas *, .jas *::before, .jas *::after { transition-duration: 0s !important; animation-duration: 0s !important; animation-iteration-count: 1 !important; }
+}
+.jas .cursor.flip .tag { position: absolute; right: 6px; top: 0; }

@@ -3,15 +3,13 @@ import { ArrowRight, Ban, Check, FileText, Inbox, Lock, Mail, ShieldCheck, UserR
 import { Logo } from "@/components/Shell";
 import { ThemeButton } from "@/components/ThemeToggle";
 import { AgentMark } from "@/components/ui";
-import { HeroStage } from "@/components/landing/HeroStage";
+import { HeroAgentStage } from "@/components/landing/HeroAgentStage";
 import { Gloss } from "@/components/landing/Gloss";
 import { DaysRace } from "@/components/landing/DaysRace";
 import { DaysSwimlane } from "@/components/landing/DaysSwimlane";
-import { HeroScroll } from "@/components/landing/HeroScroll";
 import { LiveGrid, MandateToggle } from "@/components/landing/LivePreview";
 import { Moments } from "@/components/landing/Moments";
 import { LangSwitch } from "@/components/landing/LangSwitch";
-import { statsEn } from "@/content/stats";
 import { PORTFOLIO_URL } from "@/content/portfolio";
 import { glossary } from "@/content/glossary";
 
@@ -33,9 +31,7 @@ const swim = {
   },
 };
 
-const stats = statsEn;
 
-const points = ["Reads Finacle, SVS and EFR for you", "Asks a person when it isn't sure", "Never approves its own work"];
 
 const in30: [string, string][] = [
   ["Problem", "5 days of manual setup"],
@@ -207,32 +203,7 @@ export default function CaseStudy() {
         </div>
       </header>
 
-      <HeroScroll
-        intro={
-          <div>
-            <p className="text-[13px] text-muted">Case study · Agentic AI for bank operations · Bisma Munawar, Product Designer</p>
-            <h1 className="mt-3 font-display leading-[1.02] tracking-tight" style={{ fontSize: "clamp(44px, 4.6vw, 68px)" }}>Live before lunch, not in 5 days.</h1>
-            <p className="mt-5 max-w-md text-base text-sub md:text-lg">Jointly is an AI agent that sets up online banking for companies with joint signatories. It reads the bank&apos;s old systems, and a person approves every step.</p>
-            <p className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm">
-              <Gloss term="Joint signatories" def="2 or more people who must approve a company's payments together." />
-              <Gloss term="Customer fulfilment operations team" def="The bank team that sets up their online banking by hand." />
-            </p>
-            <div className="mt-8 flex flex-wrap items-center gap-4">
-              <Link href="/demo/case/" className={primary}>
-                Open the demo (5 min) <ArrowRight className="h-4 w-4" />
-              </Link>
-              <p className="text-[11px] text-muted">Synthetic case. Not measured in a real bank.</p>
-            </div>
-          </div>
-        }
-        points={points.map((pt, i) => (
-          <div key={pt}>
-            <p className="text-lg font-medium leading-snug">{pt}</p>
-            <p className="mt-1 text-sm text-sub"><span className="tnum font-semibold text-ink">{stats[i].v}</span> {stats[i].k}</p>
-          </div>
-        ))}
-        stage={<div className="jh-fit"><HeroStage /></div>}
-      />
+      <HeroAgentStage />
 
       <section id="in30" data-theme="dark" aria-label="In 30 seconds" className="bg-canvas text-ink">
         <div className="mx-auto max-w-6xl px-6 py-14">
