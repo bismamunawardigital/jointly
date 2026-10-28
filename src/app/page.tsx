@@ -6,6 +6,7 @@ import { AgentMark } from "@/components/ui";
 import { HeroStage } from "@/components/landing/HeroStage";
 import { Gloss } from "@/components/landing/Gloss";
 import { DaysRace } from "@/components/landing/DaysRace";
+import { DaysSwimlane } from "@/components/landing/DaysSwimlane";
 import { HeroScroll } from "@/components/landing/HeroScroll";
 import { LiveGrid, MandateToggle } from "@/components/landing/LivePreview";
 import { Moments } from "@/components/landing/Moments";
@@ -13,6 +14,17 @@ import { LangSwitch } from "@/components/landing/LangSwitch";
 import { statsEn } from "@/content/stats";
 import { PORTFOLIO_URL } from "@/content/portfolio";
 import { glossary } from "@/content/glossary";
+
+const swim = {
+  lanes: ["Customer", "Person who sets it up", "Person who checks it", "Systems", "Courier"],
+  today: "Today",
+  jointly: "With Jointly",
+  pains: ["4 rounds of checking", "Free-text instructions in SVS", "PINs sent by post"],
+  todayNodes: ["Signs forms", "Reads Finacle|and SVS", "SVS free text", "Sets up|a stage", "Reviews|returns it", "PIN mailer|printed", "Courier|delivers", "First login|day 5"],
+  jointlyNodes: ["Signs forms", "Agent prepares|4 systems", "Sara checks|1 thing", "Signs off", "Agent sets up|Admin", "SMS activation|first login"],
+  empty: "No step needed",
+  caption: "Illustrative and simplified. Redrawn for this case study, not the bank's internal map.",
+};
 
 const stats = statsEn;
 
@@ -249,6 +261,18 @@ export default function CaseStudy() {
           </div>
           <div className="mt-14">
             <DaysRace />
+          </div>
+        </div>
+      </section>
+
+      <section id="days" className="border-t border-line bg-surface">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <div className="grid gap-4 md:grid-cols-2">
+            <h2 className={h2}>Where the days go</h2>
+            <p className="text-lg text-sub md:pt-2">5 lanes, 4 return loops, 1 courier.</p>
+          </div>
+          <div className="mt-10">
+            <DaysSwimlane t={swim} />
           </div>
         </div>
       </section>
