@@ -9,7 +9,7 @@ const x = (c: number) => LW + 8 + c * CW;
 const y = (l: number) => l * LH + (LH - NH) / 2;
 const stroke: Record<Tone, string> = { plain: "rgb(var(--line-strong))", warn: "rgb(var(--warn))", ok: "rgb(var(--ok))" };
 
-function Lane({ lanes, nodes, edges, pains, loop, empty }: { lanes: string[]; nodes: N[]; edges: [number, number][]; pains: { n: number; at: [number, number] }[]; loop?: [number, number]; empty?: { lane: number; text: string }[] }) {
+function Lane({ lanes, nodes, edges, pains, loop, empty, swapped }: { lanes: string[]; nodes: N[]; edges: [number, number][]; pains: { n: number; at: [number, number] }[]; loop?: [number, number]; empty?: { lane: number; text: string }[]; swapped?: { lane: number; was: string } }) {
   const H = lanes.length * LH;
   const mid = (i: number) => ({ l: x(nodes[i].col), r: x(nodes[i].col) + NW, cy: y(nodes[i].lane) + NH / 2, cx: x(nodes[i].col) + NW / 2, t: y(nodes[i].lane), b: y(nodes[i].lane) + NH });
   return (
@@ -22,7 +22,15 @@ function Lane({ lanes, nodes, edges, pains, loop, empty }: { lanes: string[]; no
       {lanes.map((l, i) => (
         <g key={l}>
           <rect x="0" y={i * LH} width="1000" height={LH} fill={i % 2 ? "rgb(var(--panel))" : "rgb(var(--surface))"} />
-          <text x="12" y={i * LH + LH / 2 + 4} fontSize="12" fontWeight="600" fill="rgb(var(--sub))">{l}</text>
+          {swapped?.lane === i ? (
+            <>
+              <rect x="0" y={i * LH} width="4" height={LH} fill="rgb(var(--ok))" />
+              <text x="12" y={i * LH + LH / 2 - 2} fontSize="12" fontWeight="700" fill="rgb(var(--ok-ink))">{l}</text>
+              <text x="12" y={i * LH + LH / 2 + 13} fontSize="10" fill="rgb(var(--muted))" textDecoration="line-through">{swapped.was}</text>
+            </>
+          ) : (
+            <text x="12" y={i * LH + LH / 2 + 4} fontSize="12" fontWeight="600" fill="rgb(var(--sub))">{l}</text>
+          )}
         </g>
       ))}
       {empty?.map((e) => (
@@ -58,7 +66,9 @@ function Lane({ lanes, nodes, edges, pains, loop, empty }: { lanes: string[]; no
   );
 }
 
-export function DaysSwimlane({ t }: { t: { lanes: string[]; today: string; jointly: string; pains: string[]; todayNodes: string[]; jointlyNodes: string[]; empty: string; caption: string } }) {
+type T = { lanes: string[]; today: string; jointly: string; pains: string[]; todayNodes: string[]; jointlyNodes: string[]; empty: string; caption: string; stacked?: { jointlyLanes: string[]; was: string; systemsNote: string; todayTotal: string; jointlyTotal: string } };
+
+export function DaysSwimlane({ t }: { t: T }) {
   const [view, setView] = useState<"today" | "jointly">("today");
   const tn = t.todayNodes, jn = t.jointlyNodes;
   const today = (
@@ -95,6 +105,49 @@ export function DaysSwimlane({ t }: { t: { lanes: string[]; today: string; joint
       empty={[{ lane: 1, text: t.empty }, { lane: 4, text: t.empty }]}
     />
   );
+  const st = t.stacked;
+  if (st) {
+    const agentLane = (
+      <Lane
+        lanes={st.jointlyLanes}
+        nodes={[
+          { lane: 0, col: 0, text: jn[0] },
+          { lane: 1, col: 1, text: jn[1], tone: "ok" },
+          { lane: 2, col: 3, text: jn[2], tone: "warn" },
+          { lane: 2, col: 4, text: jn[3] },
+          { lane: 1, col: 5, text: jn[4], tone: "ok" },
+          { lane: 0, col: 6, text: jn[5], tone: "ok" },
+        ]}
+        edges={[[0, 1], [1, 2], [2, 3], [3, 4], [4, 5]]}
+        pains={[]}
+        empty={[{ lane: 3, text: st.systemsNote }, { lane: 4, text: t.empty }]}
+        swapped={{ lane: 1, was: st.was }}
+      />
+    );
+    const head = (label: string, total: string, cls: string) => (
+      <div className="mb-3 flex items-baseline justify-between">
+        <p className="text-xs font-medium uppercase tracking-wide text-muted">{label}</p>
+        <p className={`tnum font-display text-xl font-semibold ${cls}`}>{total}</p>
+      </div>
+    );
+    return (
+      <div>
+        {head(t.today, st.todayTotal, "text-warn")}
+        <div className="overflow-x-auto rounded-card border border-line">{today}</div>
+        <ol className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm text-sub">
+          {t.pains.map((p, i) => (
+            <li key={p} className="flex items-center gap-2">
+              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-warn text-[11px] font-bold text-white">{i + 1}</span>
+              {p}
+            </li>
+          ))}
+        </ol>
+        <div className="mt-12">{head(t.jointly, st.jointlyTotal, "text-ok-ink")}</div>
+        <div className="overflow-x-auto rounded-card border border-ok/40">{agentLane}</div>
+        <p className="mt-3 text-xs text-muted">{t.caption}</p>
+      </div>
+    );
+  }
   const tab = (v: "today" | "jointly", label: string) => (
     <button type="button" aria-pressed={view === v} onClick={() => setView(v)} className={`rounded-full px-3 py-1 text-xs ${view === v ? "bg-ink text-canvas" : "text-sub hover:text-ink"}`}>
       {label}

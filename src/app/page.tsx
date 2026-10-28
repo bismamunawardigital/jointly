@@ -16,14 +16,21 @@ import { PORTFOLIO_URL } from "@/content/portfolio";
 import { glossary } from "@/content/glossary";
 
 const swim = {
-  lanes: ["Customer", "Person who sets it up", "Person who checks it", "Systems", "Courier"],
+  lanes: ["Customer", "Maker", "Checker", "Systems", "Courier"],
   today: "Today",
   jointly: "With Jointly",
-  pains: ["4 rounds of checking", "Free-text instructions in SVS", "PINs sent by post"],
+  pains: ["4 maker-checker rounds", "Free-text instructions in SVS", "PINs sent by post"],
   todayNodes: ["Signs forms", "Reads Finacle|and SVS", "SVS free text", "Sets up|a stage", "Reviews|returns it", "PIN mailer|printed", "Courier|delivers", "First login|day 5"],
   jointlyNodes: ["Signs forms", "Agent prepares|4 systems", "Sara checks|1 thing", "Signs off", "Agent sets up|Admin", "SMS activation|first login"],
   empty: "No step needed",
   caption: "Illustrative and simplified. Redrawn for this case study, not the bank's internal map.",
+  stacked: {
+    jointlyLanes: ["Customer", "Agent", "Checker (Sara)", "Systems", "Courier"],
+    was: "was Maker",
+    systemsNote: "The agent reads and sets up here. Nothing changes until Sara approves.",
+    todayTotal: "5 days",
+    jointlyTotal: "1h 54m",
+  },
 };
 
 const stats = statsEn;
@@ -269,7 +276,7 @@ export default function CaseStudy() {
         <div className="mx-auto max-w-6xl px-6 py-20">
           <div className="grid gap-4 md:grid-cols-2">
             <h2 className={h2}>Where the days go</h2>
-            <p className="text-lg text-sub md:pt-2">5 lanes, 4 return loops, 1 courier.</p>
+            <p className="text-lg text-sub md:pt-2">Same lanes, same checks. The agent takes the maker&apos;s seat, and the checker still decides.</p>
           </div>
           <div className="mt-10">
             <DaysSwimlane t={swim} />
