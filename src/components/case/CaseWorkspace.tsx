@@ -1,13 +1,16 @@
 "use client";
 
-import { Ban, Bot, Scale, UserCheck, X } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-import { business } from "@/data/seed";
-import { duration, headlineOf, lastTime, statusOf } from "@/lib/derive";
-import { Tab, hasEvent, useStore } from "@/lib/store";
-import { Pill, cn } from "@/components/ui";
+import { Ban, Scale, UserCheck, X } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { business, checker } from "@/data/seed";
+import { duration, lastTime, statusOf } from "@/lib/derive";
+import { Tab, hasEvent, useStore, jumpState, initialState, allApproved, State } from "@/lib/store";
+import { Pill, cn, AgentMark } from "@/components/ui";
+import { ScenarioCard, scenarioSeen } from "./ScenarioCard";
+import { SourceCards, SourceSummary, TimeSkip, timeSkip, CustomerPhone, Finale, AutoplayControls } from "./Tour23";
 import { eventById } from "@/lib/script";
-import { NeedsYou } from "./NeedsYou";
+import { LegacyBeat, NeedsYou } from "./NeedsYou";
+import { ReplayRun } from "./ReplayRun";
 import { ProgressView } from "./ProgressView";
 import { SigningMap } from "./SigningMap";
 import { PaymentWorkflow } from "./PaymentWorkflow";
@@ -22,36 +25,188 @@ import { CommandPalette } from "@/components/CommandPalette";
 
 type Group = { id: "review" | "setup" | "history"; label: string; sections: { id: Tab; label: string }[] };
 const groups: Group[] = [
-  { id: "review", label: "Review", sections: [{ id: "review", label: "Checker review" }, { id: "release", label: "Release" }] },
+  { id: "review", label: "Review", sections: [{ id: "review", label: "Checker review" }, { id: "release", label: "Grant access" }, { id: "run", label: "Agent progress" }] },
   { id: "setup", label: "Setup", sections: [{ id: "map", label: "Signing map" }, { id: "evidence", label: "Identity" }, { id: "plan", label: "Users and roles" }, { id: "simulator", label: "Simulator" }] },
-  { id: "history", label: "History", sections: [{ id: "run", label: "Progress" }, { id: "audit", label: "Timeline" }, { id: "decisions", label: "Decision record" }] },
+  { id: "history", label: "History", sections: [{ id: "audit", label: "Timeline" }, { id: "decisions", label: "Decision record" }] },
 ];
 const groupOf = (t: Tab) => groups.find((g) => g.sections.some((x) => x.id === t)) ?? groups[2];
 const how = [
-  { icon: Bot, title: "The agent does it alone", line: "Reads, matches and drafts. Every step is logged with its source." },
+  { icon: AgentMark, title: "The agent does it alone", line: "Reads, matches and drafts. Every step is logged with its source." },
   { icon: Scale, title: "Rules decide", line: "Who can sign and up to what amount. Code, not a model." },
   { icon: UserCheck, title: "Sara approves", line: "Anything that changes who can move money." },
   { icon: Ban, title: "Never allowed", line: "Waiving EFR, approving its own work, seeing a password." },
 ];
-const paletteTabs = groups.map((g) => ({ id: g.sections[0].id, label: g.label }));
+const paletteTabs = groups.flatMap((g) => g.sections.map((x) => ({ id: x.id, label: `${g.label} › ${x.label}` })));
+const firstOf = (t: Tab) => groups.some((g) => g.sections[0].id === t);
+
+function NotYet() {
+  return <p className="rounded-xl border border-dashed border-line px-4 py-3 text-sm text-muted">This part fills in as the case moves.</p>;
+}
+
+function GuideText({ g, extra }: { g: Guide; extra?: React.ReactNode }) {
+  const [open, setOpen] = useState(false);
+  useEffect(() => setOpen(false), [g.t]);
+  return (
+    <div className="min-w-0">
+      <p>
+        {g.t}
+        {g.why && (
+          <button type="button" aria-expanded={open} onClick={() => setOpen((o) => !o)} className="ml-2 text-xs text-sub underline underline-offset-2 hover:text-ink">
+            Why?
+          </button>
+        )}
+        {extra}
+      </p>
+      {open && g.why && <p className="mt-1 text-xs text-sub">{g.why}</p>}
+    </div>
+  );
+}
 
 export function CaseWorkspace() {
   const { state, dispatch, tab, setTab, hydrated } = useStore();
+  const [progressOpen, setProgressOpen] = useState(false);
+  const agentWorking = state.queue.length > 0 && !state.paused;
+  const letterAsk = !agentWorking && hasEvent(state, "submit") && state.phase === "in_review" && state.confirmed === undefined && !state.copy;
+  const wasRun = useRef(false);
+  const [auto, setAuto] = useState<"off" | "on" | "paused">("off");
+  const [phone, setPhone] = useState<"none" | "open" | "seen">("none");
+  const closePhone = useCallback(() => setPhone("seen"), []);
+  useEffect(() => {
+    const on = () => { setPhone("open"); timeSkip("Later that afternoon"); };
+    window.addEventListener("jointly:customer", on);
+    return () => window.removeEventListener("jointly:customer", on);
+  }, []);
+  useEffect(() => {
+    if (["running", "in_review", "re_review", "revising", "executing", "executed"].includes(state.phase)) setPhone("none");
+  }, [state.phase]);
+  const clockPhase = useRef(state.phase);
+  useEffect(() => {
+    const was = clockPhase.current;
+    clockPhase.current = state.phase;
+    if (state.phase === "revising" && was === "in_review") timeSkip("1 hour later");
+    if (state.phase === "renewing" && was === "partially_live") timeSkip("2 days later");
+  }, [state.phase]);
+  const startRun = () => {
+    sessionStorage.setItem("jointly-opened", "1");
+    setPhone("none");
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) dispatch({ type: "hydrate", state: { ...initialState, tourOn: true } });
+    else {
+      dispatch({ type: "watchRun" });
+      dispatch({ type: "tour", on: true });
+      dispatch({ type: "start", group: "run" });
+    }
+    setTab("review");
+  };
+  useEffect(() => {
+    if (auto !== "on" || state.queue.length || phone === "open") return;
+    let next: (() => void) | null = null;
+    const p = state.phase;
+    if ((p === "in_review" || p === "re_review") && allApproved(state)) next = () => dispatch({ type: "signoff" });
+    else if (p === "in_review" && hasEvent(state, "submit") && state.confirmed === undefined && !state.copy) next = () => dispatch({ type: "confirm", value: 25000 });
+    else if (p === "executed") next = () => dispatch({ type: "release" });
+    else if (p === "partially_live" && phone === "none") next = () => window.dispatchEvent(new Event("jointly:customer"));
+    else if (p === "partially_live") next = () => dispatch({ type: "renew" });
+    else if (p === "rashid_ready") next = () => dispatch({ type: "releaseRashid" });
+    else if (p === "live") next = () => setAuto("off");
+    if (!next) return;
+    const t = setTimeout(next, 4500);
+    return () => clearTimeout(t);
+  }, [auto, state, phone, dispatch]);
+  useEffect(() => {
+    if (!hydrated || sessionStorage.getItem("jointly-opened") || !scenarioSeen()) return;
+    sessionStorage.setItem("jointly-opened", "1");
+    if (window.location.search.includes("moment") || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (state.phase !== "in_review" || state.confirmed !== undefined || state.copy) return;
+    dispatch({ type: "watchRun" });
+    dispatch({ type: "start", group: "run" });
+  }, [hydrated]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (state.queueGroup === "run") wasRun.current = true;
+    else if (wasRun.current && !state.queue.length) {
+      wasRun.current = false;
+      setTimeout(() => {
+        document.getElementById("stage-3")?.scrollIntoView({ behavior: "smooth", block: "center" });
+        document.getElementById("scan-value")?.focus({ preventScroll: true });
+      }, 300);
+    }
+  }, [state.queueGroup, state.queue.length]);
+  const reviewing = state.phase === "in_review" || state.phase === "re_review";
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const el = e.target as HTMLElement;
+      if (e.ctrlKey || e.metaKey || e.altKey || ["INPUT", "TEXTAREA", "SELECT"].includes(el.tagName)) return;
+      const k = e.key.toLowerCase();
+      if (k === "p") {
+        if (state.paused || state.handedOver) dispatch({ type: "resume" });
+        else if (state.queue.length) dispatch({ type: "pause" });
+      } else if (k === "h" && !state.handedOver && (reviewing || state.queue.length)) {
+        dispatch({ type: "handover" });
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [state.paused, state.handedOver, state.queue.length, reviewing, dispatch]);
+  useEffect(() => {
+    if (!hydrated) return;
+    if (tab === "run") {
+      setProgressOpen(true);
+      return;
+    }
+    if (firstOf(tab)) return;
+    const t = setTimeout(() => document.getElementById(`sec-${tab}`)?.scrollIntoView({ behavior: "smooth", block: "start" }), 60);
+    return () => clearTimeout(t);
+  }, [tab, hydrated]);
   const readyAt: Partial<Record<Tab, string>> = { map: "plan-build", evidence: "id-digital", plan: "plan-build", simulator: "plan-build", review: "submit", release: "ex-readback" };
-  const notStarted = !!readyAt[tab] && !hasEvent(state, readyAt[tab]!);
-  const st = state.paused && state.queue.length ? { label: state.handedOver ? "With a maker" : "Paused", tone: "warn" as const } : statusOf[state.phase];
+  const notYet = (t: Tab) => !!readyAt[t] && !hasEvent(state, readyAt[t]!);
+  const st = state.handedOver ? { label: "With a maker", tone: "warn" as const } : state.paused && state.queue.length ? { label: "Paused", tone: "warn" as const } : statusOf[state.phase];
   const now = lastTime(state);
   const firstLogin = hasEvent(state, "rel-mohammed-login");
-  const bankDone = hasEvent(state, "ex-readback");
   const reviewDot = state.phase === "in_review" || state.phase === "re_review";
   const releaseDot = state.phase === "executed" || state.phase === "partially_live" || state.phase === "rashid_ready";
   const [mac, setMac] = useState(false);
   useEffect(() => setMac(/Mac|iPhone|iPad/.test(navigator.userAgent)), []);
+  const [jumped, setJumped] = useState(false);
+  const skipPhase = useRef(false);
   useEffect(() => {
     if (!hydrated) return;
-    const want = new URLSearchParams(window.location.search).get("tab");
+    const q = new URLSearchParams(window.location.search);
+    const want = q.get("tab");
+    const moment = q.get("moment");
+    const view = q.get("view");
+    const spot = (sel: string, focus?: string) =>
+      setTimeout(() => {
+        const el = document.querySelector<HTMLElement>(sel);
+        if (!el) return;
+        const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        el.scrollIntoView({ behavior: still ? "auto" : "smooth", block: sel.startsWith("#sec-") ? "start" : "center" });
+        el.classList.add("flash");
+        setTimeout(() => el.classList.remove("flash"), 1500);
+        if (focus) document.querySelector<HTMLElement>(focus)?.focus({ preventScroll: true });
+      }, 300);
+    if (moment || view) {
+      setJumped(true);
+      const next = moment === "4" ? jumpState("executed") : view === "record" ? jumpState("live") : initialState;
+      skipPhase.current = next.phase !== prevPhase.current;
+      dispatch({ type: "hydrate", state: next });
+      if (moment === "4") {
+        setTab("release");
+        spot("#sec-release");
+      } else if (view === "record") {
+        setTab("decisions");
+        spot("#sec-decisions");
+      } else if (view === "map") {
+        setTab("map");
+        spot("#sec-map");
+      } else {
+        setTab("review");
+        if (moment === "1") spot('tr[data-row="mohammed"]');
+        if (moment === "2") spot('tr[data-row="rashid"] [data-c="2"]');
+        if (moment === "3") spot("#stage-3", "#scan-value");
+      }
+      return;
+    }
     if (want && groups.some((g) => g.sections.some((x) => x.id === want))) setTab(want as Tab);
-  }, [hydrated, setTab]);
+  }, [hydrated, setTab, dispatch]);
   useEffect(() => {
     if (hydrated && state.phase === "new" && !state.queue.length) dispatch({ type: "start", group: "run" });
   }, [hydrated, state.phase, state.queue.length, dispatch]);
@@ -61,6 +216,10 @@ export function CaseWorkspace() {
     const was = prevPhase.current;
     prevPhase.current = state.phase;
     if (!hydrated || was === state.phase) return;
+    if (skipPhase.current) {
+      skipPhase.current = false;
+      return;
+    }
     const go: Partial<Record<string, Tab>> = { in_review: "review", re_review: "review", executed: "release", rashid_ready: "release" };
     const t = go[state.phase];
     if (t) setTab(t);
@@ -70,45 +229,31 @@ export function CaseWorkspace() {
   return (
     <div className="flex h-full">
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="border-b border-line px-8 pb-0 pt-6">
-          <div className="flex items-start justify-between gap-6">
-            <div>
-              <div className="flex items-center gap-2.5">
-                <p className="text-xs font-medium text-muted">{business.name}</p>
-                <Pill tone={st.tone}>{st.label}</Pill>
-              </div>
-              <h1 className="mt-1 font-display text-[28px] leading-tight text-ink">{headlineOf[state.phase]}</h1>
-              <p className="mt-1 text-sm text-sub">
-                Joint signatories (3) · <bdi dir="ltr" className="font-mono text-xs">{business.iban}</bdi> · {business.accountType}
-              </p>
-              <p className="mt-0.5 text-xs text-muted">
-                {business.address} · Trade licence {business.licence}
-              </p>
-            </div>
-            <div className="text-right text-xs text-muted">
-              <p>
-                Form received <span className="tnum text-sub">{business.submittedAt}</span>
-              </p>
+        <header className="border-b border-line px-8 pb-0 pt-4">
+          <div className="flex items-center gap-3 text-xs">
+            <h1 className="truncate font-display text-lg leading-tight text-ink">{business.name}</h1>
+            <Pill tone={st.tone}>{st.label}</Pill>
+            <bdi dir="ltr" className="hidden font-mono text-muted xl:inline">{business.iban}</bdi>
+            <span className="hidden items-center gap-1.5 text-muted lg:flex">
+              Owner <span className="font-medium text-ink">{checker.name}</span>
+              <span aria-hidden>·</span>
+              Helping <AgentMark size={14} className="text-person-agent" /> <span className="font-medium text-ink">Agent</span>
+            </span>
+            <span className="ml-auto flex items-center gap-4 text-muted">
               {now && (
-                <p className="mt-0.5">
+                <span>
                   {firstLogin ? "Form to first login " : "Elapsed "}
                   <span className="tnum font-medium text-ink">{duration(business.submittedAt, firstLogin ? eventById("rel-mohammed-login").time : now)}</span>
-                </p>
+                </span>
               )}
-              {bankDone && (
-                <p className="mt-0.5">
-                  Bank-side work <span className="tnum font-medium text-ink">{duration(business.submittedAt, eventById("ex-readback").time)}</span>
-                </p>
-              )}
-            </div>
+              <button type="button" onClick={() => setProgressOpen(true)} className="hover:text-ink hover:underline">Agent progress</button>
+              <button type="button" onClick={() => setHowOpen(true)} className="hover:text-ink hover:underline">How it works</button>
+              <button type="button" onClick={() => window.dispatchEvent(new Event("jointly:palette"))} className="hover:text-ink">
+                <kbd className="rounded border border-line px-1">{mac ? "⌘K" : "Ctrl K"}</kbd>
+              </button>
+            </span>
           </div>
-          <button type="button" onClick={() => window.dispatchEvent(new Event("jointly:palette"))} className="mt-2 text-[11px] text-muted hover:text-ink">
-            <kbd className="rounded border border-line px-1">{mac ? "⌘K" : "Ctrl K"}</kbd> to jump anywhere
-          </button>
-          <button type="button" onClick={() => setHowOpen(true)} className="ml-4 mt-2 text-[11px] text-muted underline-offset-2 hover:text-ink hover:underline">
-            How this agent works
-          </button>
-          <nav aria-label="Case steps" className="-mb-px mt-5 flex gap-5 overflow-x-auto whitespace-nowrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" role="tablist">
+          <nav aria-label="Case steps" className="-mb-px mt-3 flex gap-5 overflow-x-auto whitespace-nowrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" role="tablist">
             {groups.map((g) => (
               <button
                 key={g.id}
@@ -123,52 +268,138 @@ export function CaseWorkspace() {
             ))}
           </nav>
         </header>
-        <div className="min-h-0 flex-1 overflow-y-auto px-8 py-6 pb-40">
-          <div role="tablist" aria-label={`${group.label} sections`} className="mb-6 inline-flex gap-1 rounded-full border border-line bg-surface p-1">
-            {group.sections.map((x) => (
-              <button
-                key={x.id}
-                role="tab"
-                aria-selected={tab === x.id}
-                onClick={() => setTab(x.id)}
-                className={cn("rounded-full px-3 py-1 text-xs font-medium transition-colors duration-150", tab === x.id ? "bg-ink text-canvas" : "text-sub hover:text-ink")}
-              >
-                {x.label}
-              </button>
-            ))}
+        {state.tourOn && (
+          <div role="status" aria-label="Guide" className="flex items-center justify-between gap-3 border-b border-line bg-panel px-8 py-2 text-sm text-ink">
+            <GuideText
+      key={phone}
+      g={phone === "open" ? { t: "This is what Khalifa sees on his phone." } : guideLine(state, agentWorking)}
+      extra={phone === "seen" && state.phase !== "live" ? (
+        <button type="button" onClick={() => setPhone("open")} className="ml-3 text-xs text-sub underline underline-offset-2 hover:text-ink">What the customer saw</button>
+      ) : undefined}
+    />
+    {auto !== "off" && <AutoplayControls paused={auto === "paused"} onToggle={() => setAuto(auto === "paused" ? "on" : "paused")} onStop={() => setAuto("off")} />}
+            <button type="button" aria-label="Hide guide" onClick={() => dispatch({ type: "tour", on: false })} className="rounded p-1 text-muted hover:text-ink">
+              <X className="h-4 w-4" />
+            </button>
           </div>
-          <div key={tab} className="animate-enter">
-            {notStarted && (
-              <div className="mb-6 rounded-xl border border-accent/30 bg-accent-soft/40 px-4 py-3">
-                <p className="text-sm text-sub">
-                  <span className="font-medium text-ink">This part of the case hasn&apos;t happened yet.</span> It fills in as the case moves.
-                </p>
-              </div>
+        )}
+        {jumped && (
+          <div role="status" className="flex items-center gap-3 border-b border-line bg-panel px-8 py-2 text-xs text-sub">
+            You jumped ahead. Reset demo to start from the beginning.
+            <button
+              type="button"
+              onClick={() => {
+                setJumped(false);
+                window.history.replaceState(null, "", window.location.pathname);
+                dispatch({ type: "reset" });
+                setTab("review");
+              }}
+              className="rounded-md border border-line bg-surface px-2.5 py-1 font-medium text-ink hover:bg-canvas"
+            >
+              Reset
+            </button>
+          </div>
+        )}
+        <div className="min-h-0 flex-1 overflow-y-auto px-8 pb-12">
+          <div key={group.id}>
+            {group.id === "review" && state.phase === "live" && (
+              <Finale onDisagree={() => { setAuto("off"); setPhone("none"); dispatch({ type: "hydrate", state: { ...initialState, tourOn: true } }); }} />
             )}
-            {tab === "run" && <ProgressView />}
-            {tab === "map" && (
-              <div className="max-w-4xl space-y-8">
-                <SigningMap />
-                {hasEvent(state, "plan-build") && (
-                  <div>
-                    <h3 className="mb-3 text-sm font-semibold">How a payment gets approved</h3>
-                    <PaymentWorkflow />
-                  </div>
+            {group.id === "review" && state.phase !== "live" && (
+              <div className="grid gap-8 pt-6 xl:grid-cols-[minmax(0,1fr)_380px]">
+              <div className="min-w-0 max-w-[1280px] space-y-10">
+                <LegacyBeat />
+                {hasEvent(state, "submit") ? (
+                  <>
+                    {state.phase === "in_review" && state.confirmed === undefined && <SourceSummary />}
+                    <ReviewView />
+                  </>
+                ) : agentWorking && state.queueGroup === "run" ? (
+                  <SourceCards read={state.log.filter((e) => e.kind === "agent").length} />
+                ) : !agentWorking && <NotYet />}
+                {hasEvent(state, "ex-readback") && (
+                  <section id="sec-release" aria-label="Release" className="scroll-mt-6">
+                    <ReleaseView />
+                  </section>
                 )}
               </div>
+              <aside aria-label="Agent progress" className="space-y-4 xl:sticky xl:top-6 xl:max-h-[calc(100vh-200px)] xl:self-start xl:overflow-y-auto">
+                <div className="flex items-center justify-between">
+                  <h2 className="font-display text-lg">Agent progress</h2>
+                  {agentWorking && state.queueGroup === "run" && (
+                    <button type="button" onClick={() => dispatch({ type: "hydrate", state: { ...initialState, tourOn: state.tourOn } })} className="text-sm font-medium text-accent-ink hover:underline">Skip</button>
+                  )}
+                </div>
+                {letterAsk && <p role="status" className="rounded-lg border border-warn/40 bg-warn-soft p-3 text-sm text-warn-ink">I couldn&apos;t read the last digits of the limit on this 2023 letter, so please check it against the scan.</p>}
+                <ProgressView />
+              </aside>
+              </div>
             )}
-            {tab === "evidence" && <EvidenceView />}
-            {tab === "plan" && <PlanView />}
-            {tab === "simulator" && <SimulatorView />}
-            {tab === "review" && <ReviewView />}
-            {tab === "release" && <ReleaseView />}
-            {tab === "decisions" && <DecisionView />}
-            {tab === "audit" && <AuditView />}
+            {group.id === "setup" && (
+              <>
+                <nav aria-label="Setup sections" className="sticky top-0 z-10 -mx-8 mb-6 flex gap-4 border-b border-line bg-canvas/95 px-8 py-2.5 text-xs backdrop-blur">
+                  {groups[1].sections.map((x) => (
+                    <a key={x.id} href={`#sec-${x.id}`} className="text-sub hover:text-ink">{x.label}</a>
+                  ))}
+                </nav>
+                <div className="max-w-4xl space-y-12">
+              <section id="sec-map" aria-label="Signing map" className="scroll-mt-14">
+                <h2 className="mb-3 text-sm font-semibold text-sub">Signing map</h2>
+                {notYet("map") ? <NotYet /> : (
+                    <div className="space-y-8">
+                      <SigningMap />
+                      <div>
+                        <h3 className="mb-3 text-sm font-semibold">How a payment gets approved</h3>
+                        <PaymentWorkflow />
+                      </div>
+                    </div>
+                  )}
+              </section>
+              <section id="sec-evidence" aria-label="Identity" className="scroll-mt-14">
+                <h2 className="mb-3 text-sm font-semibold text-sub">Identity</h2>
+                {notYet("evidence") ? <NotYet /> : <EvidenceView />}
+              </section>
+              <section id="sec-plan" aria-label="Users and roles" className="scroll-mt-14">
+                <h2 className="mb-3 text-sm font-semibold text-sub">Users and roles</h2>
+                {notYet("plan") ? <NotYet /> : <PlanView />}
+              </section>
+              <section id="sec-simulator" aria-label="Simulator" className="scroll-mt-14">
+                <h2 className="mb-3 text-sm font-semibold text-sub">Simulator</h2>
+                {notYet("simulator") ? <NotYet /> : <SimulatorView />}
+              </section>
+                </div>
+              </>
+            )}
+            {group.id === "history" && (
+              <div className="max-w-4xl space-y-12 pt-6">
+                <section id="sec-audit" aria-label="Timeline"><AuditView /></section>
+                <section id="sec-decisions" aria-label="Decision record" className="scroll-mt-6"><DecisionView /></section>
+              </div>
+            )}
           </div>
         </div>
+        <NeedsYou />
       </div>
-      <NeedsYou />
       <CommandPalette tabs={paletteTabs} />
+      <ScenarioCard onStart={() => { setAuto("off"); startRun(); }} onWatch={() => { startRun(); setAuto("on"); }} />
+      <TimeSkip />
+      {phone === "open" && <CustomerPhone onClose={closePhone} />}
+      {progressOpen && (
+        <div className="fixed inset-0 z-50 flex justify-end" role="dialog" aria-modal="true" aria-label="Agent progress">
+          <button aria-label="Close" className="absolute inset-0 bg-ink/30" onClick={() => { setProgressOpen(false); if (tab === "run") setTab("review"); }} />
+          <div className="relative h-full w-[560px] max-w-full animate-enter overflow-y-auto border-l border-line bg-surface p-6 shadow-lg">
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="font-display text-xl">Agent progress</h2>
+              <button aria-label="Close agent progress" onClick={() => { setProgressOpen(false); if (tab === "run") setTab("review"); }} className="rounded p-1 text-muted hover:bg-panel hover:text-ink">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <ReplayRun onDone={() => { setProgressOpen(false); setTab("review"); }} />
+            <LegacyBeat />
+            <ProgressView />
+          </div>
+        </div>
+      )}
       {howOpen && (
         <div className="fixed inset-0 z-50 flex justify-end" role="dialog" aria-modal="true" aria-label="How this agent works">
           <button aria-label="Close" className="absolute inset-0 bg-ink/30" onClick={() => setHowOpen(false)} />
@@ -197,4 +428,36 @@ export function CaseWorkspace() {
       )}
     </div>
   );
+}
+
+type Guide = { t: string; why?: string };
+function guideLine(s: State, working: boolean): Guide {
+  if (s.copy === "requested") return { t: "Your reading is different, so the case waits for a clean copy from the branch." };
+  if (s.copy === "received" && s.confirmed === undefined) return { t: "Check the clean copy from the branch, then confirm the value." };
+  if (working && s.queueGroup === "run") return { t: "The agent is reading the bank's systems and the company's documents, so there's nothing for you to do yet." };
+  switch (s.phase) {
+    case "in_review":
+    case "re_review":
+      if (working) return { t: "The agent is reading the bank's systems and the company's documents, so there's nothing for you to do yet." };
+      return allApproved(s)
+        ? { t: "Everything else matched the bank's records, so you only need to sign off.", why: "Rules passed every stage that was an exact copy, so Sara makes 2 decisions instead of 4 review rounds." }
+        : { t: "The agent couldn't read one number, so it's asking you. Press Enter if 25,000 matches the scan.", why: "People tend to accept what they see first, so a supervisor re-checks a sample of accepted readings." };
+    case "revising":
+      return { t: "Everything else matched the bank's records, so you only need to sign off.", why: "Rules passed every stage that was an exact copy, so Sara makes 2 decisions instead of 4 review rounds." };
+    case "executing":
+      return { t: "The bank's admin system timed out, so the agent retried and checked every change.", why: "Old bank systems fail, so nobody gets access until the agent has read back what it wrote." };
+    case "executed":
+    case "releasing":
+      return { t: "Two partners can have access now, and Rashid will follow when his ID is renewed.", why: "Rules confirmed Mohammed and Khalifa can approve payments together, so they don't wait for Rashid." };
+    case "partially_live":
+      return { t: "Mohammed and Khalifa have access, and Rashid will follow when his ID is renewed." };
+    case "renewing":
+    case "rashid_ready":
+    case "releasing_rashid":
+      return { t: "Rashid renewed his ID, so you can grant him access too." };
+    case "live":
+      return { t: "That's the whole case. Try disagreeing with the agent to see the other path." };
+    default:
+      return { t: "The agent is reading the bank's systems and the company's documents, so there's nothing for you to do yet." };
+  }
 }

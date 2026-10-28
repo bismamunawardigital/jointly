@@ -17,7 +17,7 @@ function Cell({ label, children }: { label: string; children: React.ReactNode })
 
 export function EvidenceView() {
   const { state, dispatch } = useStore();
-  const tour = useTourTarget(0);
+  const tour = useTourTarget(-1);
   if (!hasEvent(state, "id-svs"))
     return <Empty icon={FileSearch} title="Evidence is still being gathered" body="Once the agent has read Finacle and SVS, you'll see how it matched each person and what the mandate says." />;
   const renewed = hasEvent(state, "ren-kyc");
@@ -171,7 +171,10 @@ export function EvidenceView() {
                 <p className="text-xs text-muted">Finacle cleanup ticket</p>
                 <Pill tone={state.cleanupTicket === "sent" ? "ok" : "neutral"}>{state.cleanupTicket === "sent" ? "Sent" : "Draft"}</Pill>
               </div>
-              <p className="mt-3 text-sm">Update Mode of Operation on AE07…0123 456 to reflect the SVS mandate{hasEvent(state, "rev-plan") ? " and the 2023 amendment" : ""}.</p>
+              <ul className="mt-3 list-disc space-y-1 pl-4 text-sm">
+                <li>Update Mode of Operation on AE07…0123 456 to reflect the SVS mandate{hasEvent(state, "rev-plan") ? " and the 2023 amendment" : ""}.</li>
+                {hasEvent(state, "id-dedup") && <li>Merge Khalifa&apos;s older RCIF 087316 into 100587. Same Emirates ID.</li>}
+              </ul>
               <p className="mt-1 text-xs text-muted">To Data Quality team. Doesn&apos;t block this case.</p>
               {state.cleanupTicket === "draft" && (
                 <Button size="sm" className="mt-3" onClick={() => dispatch({ type: "sendCleanup" })}>

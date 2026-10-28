@@ -8,14 +8,14 @@ export const headlineOf: Record<Phase, string> = {
   running: "The agent is setting up 3 signatories.",
   in_review: "Plan v1 is ready. 1 value needs your eye.",
   revising: "The agent is updating stages 3 and 4.",
-  re_review: "2 stages changed. Check the difference.",
+  re_review: "Plan v2 passes every check. Sign it off.",
   executing: "The agent is setting it up in Finacle and Admin.",
-  executed: "Set up and checked. Release is your call.",
-  releasing: "Releasing Mohammed and Khalifa.",
+  executed: "Set up and checked. Granting access is your call.",
+  releasing: "Granting access to Mohammed and Khalifa.",
   partially_live: "2 of 3 signatories are live.",
   renewing: "Rashid renewed his EID. Checking him again.",
-  rashid_ready: "Rashid is ready. Release him?",
-  releasing_rashid: "Switching Rashid on.",
+  rashid_ready: "Rashid is ready. Grant him access?",
+  releasing_rashid: "Granting Rashid access.",
   live: "All 3 signatories are live.",
 };
 
@@ -27,11 +27,11 @@ export const statusOf: Record<Phase, { label: string; tone: Tone }> = {
   re_review: { label: "Needs you", tone: "warn" },
   executing: { label: "Agent executing", tone: "accent" },
   executed: { label: "Needs you", tone: "warn" },
-  releasing: { label: "Releasing", tone: "accent" },
+  releasing: { label: "Granting access", tone: "accent" },
   partially_live: { label: "Partially live", tone: "ok" },
   renewing: { label: "Agent working", tone: "accent" },
   rashid_ready: { label: "Needs you", tone: "warn" },
-  releasing_rashid: { label: "Releasing", tone: "accent" },
+  releasing_rashid: { label: "Granting access", tone: "accent" },
   live: { label: "Live", tone: "ok" },
 };
 

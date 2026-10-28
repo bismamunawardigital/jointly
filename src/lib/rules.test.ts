@@ -27,6 +27,8 @@ describe("boundary tests and policy", () => {
     for (const v of [1, 2] as const) {
       expect(boundaryTests(buildRules(v), ["rashid"]).every((t) => t.pass)).toBe(true);
       expect(policyChecks(v, ["rashid"]).every((c) => c.pass)).toBe(true);
+      expect(boundaryTests(buildRules(v), []).every((t) => t.pass)).toBe(true);
+      expect(policyChecks(v, []).every((c) => c.pass)).toBe(true);
     }
   });
 });

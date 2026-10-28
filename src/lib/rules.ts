@@ -102,6 +102,8 @@ export function evaluate(tx: Tx, rules: Rule[], held: PersonId[] = []): Evaluati
   return { outcome: "blocked", reason: "No rule in the mandate allows this combination." };
 }
 
+export const outcomeLabel: Record<Outcome, string> = { allowed: "Allowed", blocked: "Blocked", held: "Held", not_covered: "Not covered" };
+
 export interface BoundaryTest {
   id: string;
   label: string;
@@ -140,9 +142,9 @@ export function boundaryTests(rules: Rule[], held: PersonId[]): BoundaryTest[] {
     },
     {
       id: "held",
-      label: "Any amount by Rashid",
+      label: held.includes("rashid") ? "Any amount by Rashid (on hold)" : "AED 5,000 by Rashid + Khalifa",
       tx: { initiator: "rashid", approvers: ["khalifa"], amount: 5_000, currency: "AED" },
-      expected: "held",
+      expected: held.includes("rashid") ? "held" : "allowed",
     },
     {
       id: "usd",
@@ -200,7 +202,7 @@ export function releaseEligibility(rules: Rule[], held: PersonId[]): Eligibility
   const summary = eligible
     ? held.length === 0
       ? "All 3 signatories are ready."
-      : `${names(best!.groups[0])} can still form a valid approval. Eligible for partial release.`
+      : `${names(best!.groups[0])} can still form a valid approval. Access for 2 of 3 partners is possible.`
     : "Hold all: the ready signatories can't form any valid approval combination.";
   return { eligible, ready, held, combos, summary };
 }

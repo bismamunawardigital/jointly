@@ -1,10 +1,6 @@
 "use client";
 
-import { usePathname, useRouter } from "next/navigation";
-import { X } from "lucide-react";
-import { useEffect, useState } from "react";
-import { Phase, Tab, useStore } from "@/lib/store";
-import { Button } from "./ui";
+import { Phase, Tab } from "@/lib/store";
 
 interface Moment {
   title: string;
@@ -19,9 +15,9 @@ const after = (p: Phase) => order.slice(order.indexOf(p));
 
 export const moments: Moment[] = [
   {
-    title: "Match on IDs, not names",
-    body: "The agent matches people on EID and RCIF, never on names, and spots Rashid's expired EID.",
-    tab: "evidence",
+    title: "The agent did the legwork",
+    body: "Sara only checks what it had to read. Here, that's 1 amber value from a blurry letter.",
+    tab: "review",
     readyWhen: after("in_review"),
     notReady: "The agent is still gathering evidence. Show me opens the live run.",
   },
@@ -33,8 +29,8 @@ export const moments: Moment[] = [
     notReady: "This opens once the agent sends the plan for review.",
   },
   {
-    title: "Release what's safe, hold the rest",
-    body: "Rashid is held. The rules prove the other two can still sign, so Sara releases them now.",
+    title: "Grant access where it's safe, hold the rest",
+    body: "Rashid is held. The rules prove the other two can still sign, so Sara grants them access now.",
     tab: "release",
     readyWhen: after("executed"),
     notReady: "This opens after Sara approves all 4 stages and the agent sets them up.",
@@ -44,59 +40,12 @@ export const moments: Moment[] = [
     body: "The agent never sees a password. Each person sets their own login.",
     tab: "release",
     readyWhen: after("releasing"),
-    notReady: "This opens after Sara releases Mohammed and Khalifa.",
+    notReady: "This opens after Sara grants access to Mohammed and Khalifa.",
   },
 ];
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function useTourTarget(n: number) {
-  const { state } = useStore();
-  return state.tourOn && state.tourStep === n ? { "data-tour-active": "true" } : {};
+  return {};
 }
 
-export function Tour() {
-  const { state, dispatch, setTab, hydrated } = useStore();
-  const router = useRouter();
-  const path = usePathname();
-  const [checked, setChecked] = useState(false);
-  useEffect(() => {
-    if (!hydrated || checked) return;
-    setChecked(true);
-    if (localStorage.getItem("jointly-tour-seen") && state.tourOn && state.tourStep === 0) dispatch({ type: "tour", on: false });
-  }, [hydrated, checked, state.tourOn, state.tourStep, dispatch]);
-  if (!hydrated || !state.tourOn || !checked) return null;
-  const end = () => {
-    localStorage.setItem("jointly-tour-seen", "1");
-    dispatch({ type: "tour", on: false });
-  };
-  const i = state.tourStep;
-  const m = moments[i];
-  const ready = m.readyWhen.includes(state.phase);
-  const show = () => {
-    setTab(ready ? m.tab : "run");
-    if (!path.startsWith("/demo/case")) router.push("/demo/case/");
-  };
-  return (
-    <div className="fixed bottom-6 left-1/2 z-50 hidden w-[420px] -translate-x-1/2 animate-enter rounded-card border border-line bg-surface p-5 shadow-lg lg:block" role="dialog" aria-label="Guided tour">
-      <div className="flex items-center justify-between">
-        <p className="text-xs font-medium text-brand">Moment {i + 1} of 4</p>
-        <button onClick={end} className="rounded p-0.5 text-muted hover:bg-panel hover:text-ink" aria-label="Skip tour">
-          <X className="h-3.5 w-3.5" />
-        </button>
-      </div>
-      <h3 className="mt-1 font-display text-xl leading-tight">{m.title}</h3>
-      <p className="mt-1.5 text-sm text-sub">{m.body}</p>
-      {!ready && <p className="mt-2 text-xs text-muted">{m.notReady}</p>}
-      <div className="mt-4 flex items-center gap-2">
-        <Button size="sm" variant="primary" onClick={show}>
-          Show me
-        </Button>
-        <Button size="sm" variant="ghost" onClick={i === 3 ? end : () => dispatch({ type: "tour", step: i + 1 })}>
-          {i === 3 ? "Done" : "Next"}
-        </Button>
-        <Button size="sm" variant="ghost" className="ml-auto" onClick={end}>
-          Skip
-        </Button>
-      </div>
-    </div>
-  );
-}

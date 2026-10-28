@@ -41,6 +41,8 @@ export interface State {
   approvals: Partial<Record<1 | 2 | 3 | 4, Approval>>;
   returned?: { stageId: 3; note: string };
   confirmed?: number;
+  disagreed?: number;
+  copy?: "requested" | "received";
   cleanupTicket: "draft" | "sent";
   tourOn: boolean;
   tourStep: number;
@@ -48,7 +50,7 @@ export interface State {
   handedOver?: boolean;
 }
 
-export const initialState: State = {
+const blankState: State = {
   phase: "new",
   log: [],
   queue: [],
@@ -58,9 +60,19 @@ export const initialState: State = {
   tourStep: 0,
 };
 
+const approvalTimes: Record<number, string> = { 1: "Mon 10:04", 2: "Mon 10:05", 3: "Mon 10:38", 4: "Mon 10:40" };
+
+export const initialState: State = autoVerify({
+  ...blankState,
+  phase: "in_review",
+  log: groupEvents("run").map((id) => ({ id, kind: "agent" as const })),
+});
+
 type Action =
   | { type: "start"; group: Group }
   | { type: "reveal" }
+  | { type: "disagree"; value: number }
+  | { type: "cleanCopy" }
   | { type: "approve"; stageId: 1 | 2 | 3 | 4 }
   | { type: "return"; note: string }
   | { type: "confirm"; value: number }
@@ -74,6 +86,9 @@ type Action =
   | { type: "lesson" }
   | { type: "tour"; on?: boolean; step?: number }
   | { type: "reset" }
+  | { type: "watchRun" }
+  | { type: "signoff" }
+  | { type: "sendBack" }
   | { type: "hydrate"; state: State };
 
 const groupPhase: Record<Group, { running: Phase; done: Phase }> = {
@@ -87,10 +102,13 @@ const groupPhase: Record<Group, { running: Phase; done: Phase }> = {
 
 const tourStepFor: Partial<Record<Phase, number>> = { re_review: 1, executed: 2, partially_live: 3 };
 
-const approvalTimes: Record<number, string> = { 1: "Mon 10:04", 2: "Mon 10:05", 3: "Mon 10:38", 4: "Mon 10:40" };
 
-export const versionOf = (s: State): Version => (hasEvent(s, "rev-plan") ? 2 : 1);
-export const hasEvent = (s: State, id: string) => s.log.some((e) => e.kind === "agent" && e.id === id);
+export function versionOf(s: State): Version {
+  return hasEvent(s, "rev-plan") ? 2 : 1;
+}
+export function hasEvent(s: State, id: string) {
+  return s.log.some((e) => e.kind === "agent" && e.id === id);
+}
 export const rashidRenewed = (s: State) => hasEvent(s, "ren-kyc");
 
 function human(id: string, time: string, text: string, by = checker.name): HumanEntry {
@@ -102,12 +120,32 @@ function nowOf(s: State) {
   return last ? eventById(last.id).time : "Mon 09:12";
 }
 
+function autoVerify(s: State): State {
+  if (s.phase !== "in_review" && s.phase !== "re_review") return s;
+  const version = versionOf(s);
+  const approvals = { ...s.approvals };
+  const log = [...s.log];
+  for (const st of buildStages(version)) {
+    if (approvalValid(approvals[st.id], st)) continue;
+    const bySara = st.id === 3;
+    if (bySara && !(version === 2 && s.confirmed !== undefined)) break;
+    const by = bySara ? checker.name : "Rules";
+    approvals[st.id] = { stageId: st.id, by, at: approvalTimes[st.id], hash: stageHash(st) };
+    log.push(human(`verify-${st.id}-v${version}`, approvalTimes[st.id], bySara ? "Approved stage 3 by confirming the 2023 letter value" : `Verified by rule: stage ${st.id}, ${st.title}`, by));
+  }
+  return { ...s, approvals, log };
+}
+
+export const allApproved = (s: State) => buildStages(versionOf(s)).every((st) => approvalValid(s.approvals[st.id], st));
+
 function reducer(s: State, a: Action): State {
   switch (a.type) {
     case "hydrate":
       return a.state;
     case "reset":
       return { ...initialState, tourOn: s.tourOn };
+    case "watchRun":
+      return { ...blankState, tourOn: s.tourOn, tourStep: s.tourStep };
     case "start": {
       if (s.queue.length) return s;
       return { ...s, phase: groupPhase[a.group].running, queue: groupEvents(a.group), queueGroup: a.group };
@@ -119,7 +157,7 @@ function reducer(s: State, a: Action): State {
       if (rest.length) return { ...s, log, queue: rest };
       const done = groupPhase[s.queueGroup!].done;
       const tourStep = Math.max(s.tourStep, tourStepFor[done] ?? 0);
-      return { ...s, log, queue: [], queueGroup: undefined, phase: done, tourStep };
+      return autoVerify({ ...s, log, queue: [], queueGroup: undefined, phase: done, tourStep });
     }
     case "approve": {
       if (s.phase !== "in_review" && s.phase !== "re_review") return s;
@@ -129,30 +167,41 @@ function reducer(s: State, a: Action): State {
         [a.stageId]: { stageId: a.stageId, by: checker.name, at: approvalTimes[a.stageId], hash: stageHash(stage) },
       };
       const log = [...s.log, human(`approve-${a.stageId}`, approvalTimes[a.stageId], `Approved stage ${a.stageId}: ${stage.title}`)];
-      const next = { ...s, approvals, log };
-      const stages = buildStages(versionOf(s));
-      if (stages.every((st) => approvalValid(approvals[st.id], st))) {
-        return { ...next, phase: "executing", queue: groupEvents("execute"), queueGroup: "execute" };
-      }
-      return next;
+      return autoVerify({ ...s, approvals, log });
+    }
+    case "signoff": {
+      if ((s.phase !== "in_review" && s.phase !== "re_review") || !allApproved(s)) return s;
+      const log = [...s.log, human("signoff", "Mon 10:40", `Signed off plan v${versionOf(s)} · 4 stages`)];
+      return { ...s, log, phase: "executing", queue: groupEvents("execute"), queueGroup: "execute" };
+    }
+    case "disagree": {
+      const log = [...s.log, human(`disagree-${s.log.length}`, "Mon 10:07", `Read AED ${a.value.toLocaleString("en-US")} on the scan, not the agent's AED 25,000. Asked the branch for a clean copy, and the case waits.`)];
+      return { ...s, log, disagreed: a.value, copy: "requested" };
+    }
+    case "cleanCopy": {
+      if (s.copy !== "requested") return s;
+      const log = [...s.log, human("clean-copy", "Mon 10:31", "Demo control: the branch sent a clean copy of the 2023 letter", "Demo")];
+      return { ...s, log, copy: "received" };
     }
     case "return": {
       const log = [...s.log, human("return-3", "Mon 10:07", `Returned stage 3: ${a.note}`)];
+      if (s.confirmed === undefined) return { ...s, log: [...log, human(`wait-${s.log.length}`, "Mon 10:07", "Asked the branch for a clean copy of the 2023 letter, and the case waits", "Agent")], returned: { stageId: 3, note: a.note }, copy: "requested" };
       return { ...s, log, returned: { stageId: 3, note: a.note }, phase: "revising", queue: groupEvents("revise"), queueGroup: "revise" };
     }
     case "confirm": {
+      if (s.copy === "requested") return s;
       const log = [...s.log, human("confirm-3", "Mon 10:07", `Checked the 2023 letter scan: AED ${a.value.toLocaleString("en-US")}`)];
       return { ...s, log, confirmed: a.value, phase: "revising", queue: groupEvents("revise"), queueGroup: "revise" };
     }
     case "releaseRashid": {
       if (s.phase !== "rashid_ready") return s;
-      const log = [...s.log, human("release-rashid", "Wed 09:41", "Released Rashid")];
+      const log = [...s.log, human("release-rashid", "Wed 09:41", "Granted access to Rashid")];
       return { ...s, log, phase: "releasing_rashid", queue: groupEvents("rashid"), queueGroup: "rashid" };
     }
     case "sendCleanup":
       return { ...s, cleanupTicket: "sent", log: [...s.log, human("cleanup", "Mon 09:40", "Sent Finacle Mode of Operation cleanup ticket to Data Quality")] };
     case "release": {
-      const log = [...s.log, human("release", "Mon 10:51", "Released Mohammed and Khalifa. Rashid stays held.")];
+      const log = [...s.log, human("release", "Mon 10:51", "Granted access to Mohammed and Khalifa. Rashid stays held.")];
       return { ...s, log, phase: "releasing", queue: groupEvents("release"), queueGroup: "release" };
     }
     case "renew": {
@@ -163,8 +212,16 @@ function reducer(s: State, a: Action): State {
       return s.queue.length ? { ...s, paused: true, log: [...s.log, human(`pause-${s.log.length}`, nowOf(s), "Paused the agent between steps")] } : s;
     case "resume":
       return { ...s, paused: false, handedOver: false, log: [...s.log, human(`resume-${s.log.length}`, nowOf(s), s.handedOver ? "Took the case back from the maker and resumed the agent" : "Resumed the agent")] };
-    case "handover":
-      return { ...s, handedOver: true, log: [...s.log, human(`handover-${s.log.length}`, nowOf(s), `Handed to a maker: ${s.queue.length} step${s.queue.length === 1 ? "" : "s"} left, nothing half-written`)] };
+    case "handover": {
+      const reviewing = s.phase === "in_review" || s.phase === "re_review";
+      if (s.handedOver || (!s.queue.length && !reviewing)) return s;
+      const text = s.queue.length
+        ? `Handed to Omar K., maker: ${s.queue.length} step${s.queue.length === 1 ? "" : "s"} left, nothing half-written`
+        : "Handed to Omar K., maker. Note: please check the 2023 letter against the branch copy";
+      return { ...s, paused: s.queue.length ? true : s.paused, handedOver: true, log: [...s.log, human(`handover-${s.log.length}`, nowOf(s), text)] };
+    }
+    case "sendBack":
+      return s.handedOver ? { ...s, handedOver: false, log: [...s.log, human(`sendback-${s.log.length}`, nowOf(s), "Sent it back: the branch copy is just as blurry. The value needs the checker.", "Omar K.")] } : s;
     case "lesson":
       return s.log.some((e) => e.id === "lesson") ? s : { ...s, log: [...s.log, human("lesson", "Mon 10:39", "Sent a lasting change to the supervisor: ask the branch for a clean copy when a scan is unclear")] };
     case "tour":
@@ -172,7 +229,7 @@ function reducer(s: State, a: Action): State {
   }
 }
 
-const KEY = "jointly-demo-v3";
+const KEY = "jointly-demo-v6";
 
 interface Ctx {
   state: State;
@@ -190,29 +247,51 @@ export type Tab = "run" | "map" | "evidence" | "plan" | "simulator" | "review" |
 
 const StoreContext = createContext<Ctx | null>(null);
 
-export function StoreProvider({ children }: { children: React.ReactNode }) {
-  const [state, dispatch] = useReducer(reducer, initialState);
+export function previewState(v: 1 | 2): State {
+  if (v === 1) return initialState;
+  return autoVerify({ ...initialState, confirmed: 25000, log: [...initialState.log, ...groupEvents("revise").map((id) => ({ id, kind: "agent" as const }))] });
+}
+
+export function jumpState(to: "executed" | "live"): State {
+  const run = (s: State, a: Parameters<typeof reducer>[1]) => {
+    let n = reducer(s, a);
+    while (n.queue.length) n = reducer(n, { type: "reveal" });
+    return n;
+  };
+  let s = run(initialState, { type: "confirm", value: 25000 });
+  s = run(s, { type: "signoff" });
+  if (to === "live") {
+    s = run(s, { type: "release" });
+    s = run(s, { type: "renew" });
+    s = run(s, { type: "releaseRashid" });
+  }
+  return s;
+}
+
+export function StoreProvider({ children, frozen = false, initial }: { children: React.ReactNode; frozen?: boolean; initial?: State }) {
+  const [state, dispatch] = useReducer(reducer, initial ?? initialState);
   const [hydrated, setHydrated] = useState(false);
   const [evidenceOpen, setEvidenceOpen] = useState<EvidenceKey | null>(null);
-  const [tab, setTab] = useState<Tab>("run");
+  const [tab, setTab] = useState<Tab>("review");
 
   useEffect(() => {
-    try {
+    if (!frozen) try {
       const raw = localStorage.getItem(KEY);
       if (raw) dispatch({ type: "hydrate", state: { ...initialState, ...JSON.parse(raw) } });
     } catch {}
     setHydrated(true);
-  }, []);
+  }, [frozen]);
 
   useEffect(() => {
-    if (hydrated) localStorage.setItem(KEY, JSON.stringify(state));
-  }, [state, hydrated]);
+    if (hydrated && !frozen) localStorage.setItem(KEY, JSON.stringify(state));
+  }, [state, hydrated, frozen]);
 
   useEffect(() => {
-    if (!hydrated || !state.queue.length || state.paused) return;
-    const t = setTimeout(() => dispatch({ type: "reveal" }), 650);
+    if (frozen || !hydrated || !state.queue.length || state.paused) return;
+    const hold: Record<string, number> = { "ex-workflow-fail": 3000, "ex-workflow": 3000, "ex-readback": 3000, "ex-eligibility": 2000 };
+    const t = setTimeout(() => dispatch({ type: "reveal" }), hold[state.queue[0]] ?? (state.queueGroup === "run" ? 1100 : 650));
     return () => clearTimeout(t);
-  }, [state.queue, state.paused, hydrated]);
+  }, [state.queue, state.queueGroup, state.paused, hydrated, frozen]);
 
   const openEvidence = useCallback((k: EvidenceKey | null) => setEvidenceOpen(k), []);
   const version = versionOf(state);

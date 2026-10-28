@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { Check, Eye, FileText, Info, Sparkles } from "lucide-react";
+import { Check, Eye, FileText, Info } from "lucide-react";
 import { EvidenceKey, PersonId, evidence, isAgentRead, personById } from "@/data/seed";
 import { useStore } from "@/lib/store";
 
@@ -195,6 +195,7 @@ export function Avatar({ id, size = 28, held = false }: { id: PersonId; size?: n
   const c = `var(${personVar(id)})`;
   return (
     <span
+      aria-hidden="true"
       className={cn("inline-flex shrink-0 items-center justify-center rounded-full font-semibold", held && "border-dashed")}
       style={{
         width: size,
@@ -212,15 +213,17 @@ export function Avatar({ id, size = 28, held = false }: { id: PersonId; size?: n
   );
 }
 
-export function AgentMark({ size = 28 }: { size?: number }) {
+export function AgentMark({ size = 24, className, style, title }: { size?: number; className?: string; style?: React.CSSProperties; title?: string }) {
   return (
-    <span
-      className="inline-flex shrink-0 items-center justify-center rounded-full border border-person-agent/40 bg-person-agent/10 text-person-agent"
-      style={{ width: size, height: size }}
-      title="Agent"
-    >
-      <Sparkles style={{ width: size * 0.5, height: size * 0.5 }} aria-hidden />
-    </span>
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={cn("shrink-0", className)} style={style} role={title ? "img" : undefined} aria-label={title} aria-hidden={title ? undefined : true}>
+      <line x1="5" y1="6" x2="12" y2="12" stroke="currentColor" strokeWidth="1.5" />
+      <line x1="5" y1="18" x2="12" y2="12" stroke="currentColor" strokeWidth="1.5" />
+      <line x1="12" y1="12" x2="20" y2="12" stroke="currentColor" strokeWidth="1.5" />
+      <circle cx="5" cy="6" r="2.5" fill="currentColor" />
+      <circle cx="5" cy="18" r="2.5" fill="currentColor" />
+      <circle cx="12" cy="12" r="3" fill="currentColor" />
+      <circle cx="20" cy="12" r="2.5" stroke="currentColor" strokeWidth="1.5" />
+    </svg>
   );
 }
 

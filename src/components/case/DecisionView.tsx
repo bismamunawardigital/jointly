@@ -4,6 +4,7 @@ import { FileCheck2, Printer } from "lucide-react";
 import { business, checker } from "@/data/seed";
 import { approvalValid, buildRules, buildStages, releaseEligibility } from "@/lib/rules";
 import { hasEvent, useStore } from "@/lib/store";
+import { ReturnThread } from "./ReturnThread";
 import { BasisTag, Button, Card, Empty, Quote, SourceChip } from "@/components/ui";
 
 export function DecisionView() {
@@ -11,7 +12,7 @@ export function DecisionView() {
   const stages = buildStages(version);
   const approved = stages.filter((s) => approvalValid(state.approvals[s.id], s));
   if (!approved.length && !state.returned)
-    return <Empty icon={FileCheck2} title="No decisions yet" body="Every approval, return and release lands here with the rule, the source and who signed off." />;
+    return <Empty icon={FileCheck2} title="No decisions yet" body="Every approval, return and access grant lands here with the rule, the source and who signed off." />;
   const first = releaseEligibility(buildRules(version), ["rashid"]);
   const rashidReleased = state.log.some((e) => e.id === "release-rashid");
   const released = state.log.some((e) => e.id === "release");
@@ -30,9 +31,8 @@ export function DecisionView() {
       </div>
       {state.returned && (
         <Card className="p-4">
-          <p className="text-xs text-muted">Mon 10:07 · {checker.name} returned stage 3</p>
-          <p className="mt-1 text-sm">&ldquo;{state.returned.note}&rdquo;</p>
-          <p className="mt-1 text-xs text-sub">Reason on screen: the 2023 letter scan was unclear. Fixed in plan v2.</p>
+          <p className="text-xs text-muted">{checker.name} returned stage 3</p>
+          <ReturnThread />
         </Card>
       )}
       {state.confirmed && (
@@ -84,7 +84,7 @@ export function DecisionView() {
       {released && (
         <Card className="p-4">
           <p className="text-xs text-muted">Mon 10:51 · {checker.name}</p>
-          <p className="mt-1 text-sm font-medium">Released Mohammed and Khalifa</p>
+          <p className="mt-1 text-sm font-medium">Granted access to Mohammed and Khalifa</p>
           <p className="mt-0.5 text-sm text-sub">{first.summary}</p>
           <div className="mt-1.5 flex gap-1">
             <SourceChip k="svs-man-c1" />
@@ -95,7 +95,7 @@ export function DecisionView() {
       {rashidReleased && (
         <Card className="p-4">
           <p className="text-xs text-muted">Wed 09:41 · {checker.name}</p>
-          <p className="mt-1 text-sm font-medium">Released Rashid</p>
+          <p className="mt-1 text-sm font-medium">Granted access to Rashid</p>
           <p className="mt-0.5 text-sm text-sub">His EID is renewed. Adding him keeps every approval combination valid. Future payments only.</p>
           <div className="mt-1.5 flex gap-1">
             <SourceChip k="eid-rashid" />

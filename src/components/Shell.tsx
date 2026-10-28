@@ -7,23 +7,22 @@ import { business, checker } from "@/data/seed";
 import { useStore } from "@/lib/store";
 import { cn } from "./ui";
 import { EvidenceDrawer } from "./EvidenceDrawer";
-import { Tour } from "./Tour";
 import { DensitySwitch, ThemeSwitch } from "./ThemeToggle";
 
-export function Logo({ className }: { className?: string }) {
+export function Logo({ className, href = "/" }: { className?: string; href?: string }) {
   return (
-    <span className={cn("inline-flex items-center gap-2 font-semibold tracking-tight text-ink", className)}>
+    <Link href={href} aria-label="Jointly home" className={cn("inline-flex items-center gap-2 font-semibold tracking-tight text-ink", className)}>
       <svg width="20" height="14" viewBox="0 0 20 14" aria-hidden>
         <circle cx="7" cy="7" r="6" fill="none" stroke="rgb(var(--brand))" strokeWidth="2" />
         <circle cx="13" cy="7" r="6" fill="none" stroke="currentColor" strokeWidth="2" />
       </svg>
       Jointly
-    </span>
+    </Link>
   );
 }
 
 const nav = [
-  { href: "/demo/", label: "Command center", icon: LayoutGrid },
+  { href: "/demo/", label: "Queue", icon: LayoutGrid },
   { href: "/demo/case/", label: business.name, icon: Briefcase },
   { href: "/", label: "Case study", icon: BookOpen },
 ];
@@ -36,7 +35,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-8 text-center lg:hidden">
         <Monitor className="h-6 w-6 text-muted" />
         <Logo />
-        <p className="max-w-xs text-sm text-sub">Jointly is a desktop workbench for operations teams. Open it on a laptop to try the demo.</p>
+        <p className="max-w-xs text-sm text-sub">Jointly is a desktop workbench for customer fulfilment operations teams. Open it on a laptop to try the demo.</p>
         <Link href="/" className="text-sm font-medium text-accent">
           Read the case study
         </Link>
@@ -45,7 +44,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
         <aside className="flex w-[232px] shrink-0 flex-col border-r border-line bg-panel/70">
           <div className="px-5 pb-6 pt-5">
             <Logo />
-            <p className="mt-1 text-xs text-muted">joint signatories live in hours</p>
+            <p className="mt-1 text-xs text-muted">Customer fulfilment workbench</p>
           </div>
           <nav className="flex flex-col gap-0.5 px-3">
             {nav.map(({ href, label, icon: Icon }) => {
@@ -66,8 +65,8 @@ export function Shell({ children }: { children: React.ReactNode }) {
             })}
           </nav>
           <div className="mt-auto space-y-3 border-t border-line px-4 py-4">
-            <button onClick={() => dispatch({ type: "tour", on: true, step: 0 })} className="flex items-center gap-2 text-sm text-sub hover:text-ink">
-              <Compass className="h-3.5 w-3.5" /> Replay tour
+            <button onClick={() => { dispatch({ type: "tour", on: true, step: 0 }); window.dispatchEvent(new Event("jointly:scenario")); }} className="flex items-center gap-2 text-sm text-sub hover:text-ink">
+              <Compass className="h-3.5 w-3.5" /> Restart guide
             </button>
             <ThemeSwitch />
             <DensitySwitch />
@@ -93,7 +92,6 @@ export function Shell({ children }: { children: React.ReactNode }) {
         <main className="min-w-0 flex-1 overflow-hidden">{children}</main>
       </div>
       <EvidenceDrawer />
-      <Tour />
     </>
   );
 }

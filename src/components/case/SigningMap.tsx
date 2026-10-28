@@ -3,12 +3,12 @@
 import { useEffect, useId, useState } from "react";
 import { Building2, Check, KeyRound, X } from "lucide-react";
 import { PersonId, business, firstName, people } from "@/data/seed";
-import { boundaryTests, buildRules, evaluate, fmt, singleLimit } from "@/lib/rules";
+import { boundaryTests, buildRules, evaluate, fmt, outcomeLabel, singleLimit } from "@/lib/rules";
 import { hasEvent, useStore } from "@/lib/store";
 import { Avatar, cn } from "@/components/ui";
 
 const pos = (n: number) => {
-  const v = n <= 10_000 ? (n / 10_000) * 30 : n <= 25_000 ? 30 + ((n - 10_000) / 15_000) * 20 : 50 + (Math.min(n - 25_000, 25_000) / 25_000) * 50;
+  const v = n <= 10_000 ? (n / 10_000) * 40 : n <= 25_000 ? 40 + ((n - 10_000) / 15_000) * 20 : 60 + (Math.min(n - 25_000, 25_000) / 25_000) * 40;
   return `${v}%`;
 };
 type Combo = { key: string; ids: PersonId[] };
@@ -63,6 +63,7 @@ export function SigningMap({ compact = false, part = "all" }: { compact?: boolea
   const desc = bands.map((b) => `${b.label}: ${b.combos.map((c) => `${names(c.ids)}${c.ids.length === 1 ? " alone" : " together"}${isHeld(c) ? " (not available until Rashid's EID clears)" : ""}`).join(", ")}.`).join(" ");
   const tests = boundaryTests(rules, held);
   const fromLetter = version === 2;
+  const showGhost = fromLetter && !hasEvent(state, "rel-mohammed");
 
   const token = (c: Combo, b: string) => {
     const h = isHeld(c);
@@ -79,16 +80,15 @@ export function SigningMap({ compact = false, part = "all" }: { compact?: boolea
         onFocus={() => setHover({ combo: c.key })}
         onBlur={() => setHover(null)}
         className={cn(
-          "inline-flex items-center rounded-full border bg-surface px-1.5 py-1 transition-[opacity,box-shadow] duration-150",
-          !compact && b !== band && "opacity-60",
+          "relative z-20 inline-flex items-center rounded-full border bg-surface px-1.5 py-1 transition-[opacity,box-shadow] duration-150",
           lit ? "border-ok ring-2 ring-ok/30" : "border-line",
-          h && "border-dashed border-held opacity-40",
-          dimCombo(c) && "opacity-20",
+          h && "border-dashed border-held opacity-70",
+          dimCombo(c) && "opacity-35",
         )}
       >
         {c.ids.map((id, i) => (
           <span key={id} className={cn(i > 0 && "ring-link -ml-1.5")} style={{ "--ring-from": "8px" } as React.CSSProperties}>
-            <Avatar id={id} size={28} held={held.includes(id)} />
+            <Avatar id={id} size={32} held={held.includes(id)} />
           </span>
         ))}
         {c.ids.length === 1 && <span className="ml-1.5 pr-1 text-[11px] text-sub">alone</span>}
@@ -141,7 +141,7 @@ export function SigningMap({ compact = false, part = "all" }: { compact?: boolea
                 ) : (
                   <Badge>Joint signer</Badge>
                 )}
-                {p.id === "khalifa" && fromLetter && <span className="text-[11px] text-muted line-through">was 10,000</span>}
+                {p.id === "khalifa" && showGhost && <span className="text-[11px] text-muted line-through">was 10,000</span>}
                 {h && <span className="rounded-full bg-held-soft px-2 py-0.5 text-[11px] font-medium text-held">On hold · EID expired</span>}
               </button>
             );
@@ -152,20 +152,20 @@ export function SigningMap({ compact = false, part = "all" }: { compact?: boolea
 
       {showLadder && (
       <>
-      <div className={cn("relative", showPeople && "mt-8")}>
+      <div className="relative mt-10">
         <div className="flex min-h-[112px] overflow-hidden rounded-xl border border-line">
           {bands.map((b) => (
             <div
               key={b.id}
-              className={cn("flex flex-col gap-2 p-3 transition-[width] duration-700 ease-out", b.id === "A" ? "border-r border-dashed border-line-strong bg-brand-soft/40" : "flex-1 bg-panel/50")}
+              className={cn("flex flex-col gap-2 p-3 transition-[width] duration-700 ease-out", b.id === "A" ? "border-r border-dashed border-line-strong bg-surface" : "flex-1 bg-panel/50")}
               style={b.id === "A" ? { width: pos(edge) } : undefined}
             >
-              <p className="text-[11px] font-medium text-muted">{b.label}</p>
+              <p className="text-[11px] font-medium text-sub">{b.label}</p>
               <div className="flex flex-wrap gap-1.5">{b.combos.map((c) => token(c, b.id))}</div>
             </div>
           ))}
         </div>
-        {fromLetter && (
+        {showGhost && (
           <span className="pointer-events-none absolute inset-y-0 border-l border-dashed border-muted/50" style={{ left: pos(10_000) }} aria-hidden>
             <span className="absolute -bottom-5 -translate-x-1/2 whitespace-nowrap text-[11px] text-muted">was 10,000</span>
           </span>
@@ -179,7 +179,7 @@ export function SigningMap({ compact = false, part = "all" }: { compact?: boolea
           onMouseLeave={() => setTip(false)}
           onFocus={() => setTip(true)}
           onBlur={() => setTip(false)}
-          className="absolute -top-3 -translate-x-1/2 rounded-full border border-line bg-surface px-2 py-0.5 text-[11px] font-medium transition-[left] duration-700 ease-out"
+          className="absolute -top-8 -translate-x-1/2 rounded-full border border-line bg-surface px-2 py-0.5 text-[11px] font-medium transition-[left] duration-700 ease-out"
           style={{ left: pos(edge) }}
         >
           AED {fmt(limit)}
@@ -189,7 +189,7 @@ export function SigningMap({ compact = false, part = "all" }: { compact?: boolea
             <p className="text-xs font-medium">Source: {fromLetter ? "2023 amendment letter" : "2019 mandate"}</p>
             {fromLetter && (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src="/scans/svs-amd-2023.png" alt="2023 amendment letter" className="mt-2 h-16 w-full rounded border border-line object-cover" />
+              <img src="/scans/svs-amd-2023.png" width={1100} height={380} loading="lazy" decoding="async" alt="2023 amendment letter" className="mt-2 h-16 w-full rounded border border-line object-cover" />
             )}
             {!fromLetter && hasEvent(state, "mandate-letter") && <p className="mt-1 text-xs text-sub">A 2023 letter may change this. Sara checks it.</p>}
           </div>
@@ -229,7 +229,7 @@ export function SigningMap({ compact = false, part = "all" }: { compact?: boolea
             <ul className="mt-2 space-y-1 text-sm">
               {tests.map((t) => (
                 <li key={t.id} className="flex items-center gap-2">
-                  {t.pass ? <Check className="h-3.5 w-3.5 text-ok" /> : <X className="h-3.5 w-3.5 text-bad" />} {t.label}
+                  {t.pass ? <Check className="h-3.5 w-3.5 text-ok" /> : <X className="h-3.5 w-3.5 text-bad" />} {t.label} → {outcomeLabel[t.expected]}
                 </li>
               ))}
             </ul>

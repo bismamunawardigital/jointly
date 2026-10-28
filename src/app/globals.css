@@ -5,17 +5,17 @@
 :root,
 [data-theme="light"] {
   color-scheme: light;
-  --canvas: 250 247 242;
+  --canvas: 246 247 249;
   --surface: 255 255 255;
-  --panel: 244 240 232;
-  --line: 233 227 216;
-  --line-strong: 214 206 192;
+  --panel: 238 241 245;
+  --line: 227 231 237;
+  --line-strong: 203 210 220;
   --ink: 15 27 45;
   --sub: 64 74 92;
-  --muted: 94 102 116;
+  --muted: 91 102 118;
   --onaccent: 255 255 255;
   --brand: 200 137 43;
-  --brand-soft: 248 236 214;
+  --brand-soft: 238 241 245;
   --accent: 31 58 138;
   --accent-hover: 24 45 108;
   --accent-soft: 234 238 250;
@@ -30,7 +30,7 @@
   --bad-soft: 251 233 231;
   --bad-ink: 140 26 18;
   --held: 107 114 128;
-  --held-soft: 240 240 242;
+  --held-soft: 247 248 250;
   --p-mohammed: 14 124 134;
   --p-khalifa: 79 70 229;
   --p-rashid: 217 83 79;
@@ -41,21 +41,21 @@
 
 [data-theme="dark"] {
   color-scheme: dark;
-  --canvas: 14 20 32;
-  --surface: 21 29 43;
-  --panel: 27 37 54;
-  --line: 36 48 68;
-  --line-strong: 52 66 90;
-  --ink: 238 234 226;
-  --sub: 186 190 198;
-  --muted: 140 148 162;
+  --canvas: 11 18 32;
+  --surface: 18 26 43;
+  --panel: 14 22 38;
+  --line: 34 48 74;
+  --line-strong: 52 68 98;
+  --ink: 232 236 243;
+  --sub: 190 198 210;
+  --muted: 154 166 184;
   --onaccent: 14 20 32;
-  --brand: 222 166 84;
-  --brand-soft: 52 39 20;
-  --accent: 140 165 240;
-  --accent-hover: 172 192 246;
+  --brand: 224 168 74;
+  --brand-soft: 14 22 38;
+  --accent: 143 168 255;
+  --accent-hover: 176 194 255;
   --accent-soft: 28 39 70;
-  --accent-ink: 172 192 246;
+  --accent-ink: 176 194 255;
   --ok: 92 190 146;
   --ok-soft: 20 44 35;
   --ok-ink: 132 214 176;
@@ -66,7 +66,7 @@
   --bad-soft: 54 24 24;
   --bad-ink: 246 160 150;
   --held: 150 158 172;
-  --held-soft: 34 42 56;
+  --held-soft: 30 40 58;
   --p-mohammed: 52 178 188;
   --p-khalifa: 140 134 248;
   --p-rashid: 240 124 118;
@@ -91,8 +91,8 @@ h1, h2, h3 {
 }
 
 .font-display {
-  letter-spacing: -0.005em;
-  font-weight: 400;
+  letter-spacing: -0.02em;
+  font-weight: 600;
 }
 
 @keyframes ring-link {
@@ -145,23 +145,23 @@ h1, h2, h3 {
 }
 
 /* Landing hero scene: 8s loop. Base styles are the final frame for reduced motion. */
-.hs { animation-duration: 8s; animation-iteration-count: infinite; animation-timing-function: ease-in-out; animation-fill-mode: both; }
+.hs { animation-duration: 10s; animation-iteration-count: infinite; animation-timing-function: ease-in-out; animation-fill-mode: both; }
 .hs-forms { opacity: 0; animation-name: hs-forms; }
-@keyframes hs-forms { 0% { opacity: 0; transform: translateY(-12px); } 6%, 16% { opacity: 1; transform: none; } 22%, 100% { opacity: 0; transform: scale(0.7); } }
+@keyframes hs-forms { 0%, 6% { opacity: 0; transform: translateY(-12px); } 10%, 24% { opacity: 1; transform: none; } 30%, 100% { opacity: 0; transform: scale(0.7); } }
 .hs-people { animation-name: hs-people; }
-@keyframes hs-people { 0%, 18% { opacity: 0; transform: scale(0.6); } 25%, 92% { opacity: 1; transform: none; } 100% { opacity: 0; } }
+@keyframes hs-people { 0%, 8% { opacity: 1; transform: none; } 12%, 24% { opacity: 0.6; transform: scale(0.92); } 30%, 100% { opacity: 1; transform: none; } }
 .hs-ladder { transform-origin: left; animation-name: hs-ladder; }
-@keyframes hs-ladder { 0%, 30% { opacity: 0; transform: scaleX(0); } 32% { opacity: 1; } 44%, 92% { opacity: 1; transform: scaleX(1); } 100% { opacity: 0; transform: scaleX(1); } }
+@keyframes hs-ladder { 0%, 8% { opacity: 1; transform: scaleX(1); } 12%, 34% { opacity: 0.4; transform: scaleX(0.4); } 46%, 100% { opacity: 1; transform: scaleX(1); } }
 .hs-r-on { opacity: 0; animation-name: hs-r-on; }
-@keyframes hs-r-on { 0%, 18% { opacity: 0; transform: scale(0.6); } 25%, 52% { opacity: 1; transform: none; } 60%, 100% { opacity: 0; } }
+@keyframes hs-r-on { 0%, 24% { opacity: 0; transform: scale(0.85); } 30%, 54% { opacity: 1; transform: none; } 62%, 100% { opacity: 0; } }
 .hs-r-held { animation-name: hs-r-held; }
-@keyframes hs-r-held { 0%, 52% { opacity: 0; } 60%, 92% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes hs-r-held { 0%, 8% { opacity: 1; } 12%, 24% { opacity: 0.25; } 28%, 54% { opacity: 0; } 62%, 100% { opacity: 1; } }
 .hs-link-l { animation-name: hs-link-l; }
-@keyframes hs-link-l { 0%, 60% { opacity: 0; transform: translateX(-28px); } 64% { opacity: 1; transform: translateX(-28px); } 72%, 92% { opacity: 1; transform: none; } 100% { opacity: 0; } }
+@keyframes hs-link-l { 0%, 8% { opacity: 1; transform: none; } 12%, 62% { opacity: 0.35; transform: translateX(-28px); } 66% { opacity: 1; transform: translateX(-28px); } 74%, 100% { opacity: 1; transform: none; } }
 .hs-link-r { animation-name: hs-link-r; }
-@keyframes hs-link-r { 0%, 60% { opacity: 0; transform: translateX(28px); } 64% { opacity: 1; transform: translateX(28px); } 72%, 92% { opacity: 1; transform: none; } 100% { opacity: 0; } }
+@keyframes hs-link-r { 0%, 8% { opacity: 1; transform: none; } 12%, 62% { opacity: 0.35; transform: translateX(28px); } 66% { opacity: 1; transform: translateX(28px); } 74%, 100% { opacity: 1; transform: none; } }
 .hs-live { animation-name: hs-live; }
-@keyframes hs-live { 0%, 76% { opacity: 0; transform: scale(0.8); } 82%, 94% { opacity: 1; transform: none; } 100% { opacity: 0; } }
+@keyframes hs-live { 0%, 8% { opacity: 1; transform: none; } 12%, 78% { opacity: 0.3; transform: scale(0.9); } 84%, 100% { opacity: 1; transform: none; } }
 .crawl { transform-origin: left; animation: crawl 10s linear infinite; }
 @keyframes crawl { 0% { transform: scaleX(0); } 85%, 100% { transform: scaleX(1); } }
 .crawl-fast { transform-origin: left; animation: crawl-fast 10s ease-out infinite; }
@@ -169,3 +169,21 @@ h1, h2, h3 {
 @media (prefers-reduced-motion: reduce) {
   .hs, .crawl, .crawl-fast { animation: none !important; }
 }
+
+.flash {
+  outline: 3px solid rgb(200 137 43 / 0.7);
+  outline-offset: 4px;
+  border-radius: 12px;
+}
+
+.alt > section { background: rgb(var(--canvas)); }
+.alt > section:nth-of-type(even) { background: rgb(var(--surface)); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}
+
+@keyframes phone-in { from { opacity: 0; transform: translateX(120%); } to { opacity: 1; transform: none; } }
+.phone-in { animation: phone-in .5s cubic-bezier(.2,.8,.2,1) both; }
+@media (prefers-reduced-motion: reduce) { .phone-in { animation: none; } }
+.scenario-open [aria-label="Decision bar"] { visibility: hidden; }
