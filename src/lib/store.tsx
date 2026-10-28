@@ -229,7 +229,7 @@ function reducer(s: State, a: Action): State {
   }
 }
 
-const KEY = "jointly-demo-v5";
+const KEY = "jointly-demo-v6";
 
 interface Ctx {
   state: State;

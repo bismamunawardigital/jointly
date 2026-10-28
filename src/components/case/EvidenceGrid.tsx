@@ -11,7 +11,7 @@ import { hasEvent, useStore } from "@/lib/store";
 import { Avatar, cn } from "@/components/ui";
 
 type Tone = "ok" | "warn" | "bad" | "na" | "held";
-type CellData = { tone: Tone; text: string; src?: EvidenceKey; why?: string; changed?: boolean };
+type CellData = { tone: Tone; text: string; src?: EvidenceKey; why?: string; changed?: boolean; tag?: string };
 const cols = ["Signed form", "Finacle", "EFR", "Digital Banking", "SVS mandate 2019", "SVS letter 2023", "Planned setup"];
 const na: CellData = { tone: "na", text: "Not used" };
 
@@ -57,9 +57,30 @@ function FinacleCrop({ id }: { id: string }) {
         </div>
         <figcaption className="mt-1 text-[11px] text-muted">The Finacle screen the agent reads. The CIF ID is filled in for this demo.</figcaption>
       </figure>
+      {p.id === "khalifa" && <DedupRows />}
       <p className="text-ink">
         The SVS mandate says <q>{svsName}</q> and the form says <q>{p.name}</q>. The agent matched them by Emirates ID and <Gloss term="RCIF" def={glossary.RCIF} />, so it doesn&apos;t matter how the name is written.
       </p>
+    </div>
+  );
+}
+
+function DedupRows() {
+  const rows = [
+    { rcif: "100587", where: "Linked in SVS", used: true },
+    { rcif: "087316", where: "Deira, 2014", used: false },
+  ];
+  return (
+    <div aria-label="DEDUP result: 2 records with the same Emirates ID" className="rounded-md border border-line">
+      <p className="border-b border-line px-2 py-1 text-[11px] text-muted">DEDUP, every branch · same Emirates ID</p>
+      {rows.map((r) => (
+        <div key={r.rcif} className={cn("flex items-center gap-2 px-2 py-1.5", !r.used && "text-muted")}>
+          {r.used ? <Check className="h-3.5 w-3.5 text-ok" strokeWidth={3} aria-hidden /> : <span className="h-1.5 w-1.5 rounded-full bg-line-strong" aria-hidden />}
+          <span className={cn("font-mono text-[11px]", r.used ? "text-ink" : "line-through")}>RCIF {r.rcif}</span>
+          <span className="text-[11px]">{r.where}</span>
+          <span className={cn("ml-auto text-[11px] font-medium", r.used ? "text-ok-ink" : "text-muted")}>{r.used ? "Used" : "To Data Quality"}</span>
+        </div>
+      ))}
     </div>
   );
 }
@@ -105,7 +126,7 @@ export function EvidenceGrid() {
       ),
       cells: [
         { tone: "ok", text: `EID …${p.eidLast4}`, src: `form-${p.id}` as EvidenceKey },
-        { tone: "ok", text: `RCIF ${p.rcif}`, src: `cif-${p.id}` as EvidenceKey },
+        { tone: "ok", text: `RCIF ${p.rcif}`, src: `cif-${p.id}` as EvidenceKey, tag: p.id === "khalifa" && hasEvent(state, "id-dedup") ? "+1 old" : undefined },
         expired
           ? { tone: "bad", text: "EID expired", src: "eid-rashid", why: `EID expired ${p.eidExpiry}. EFR fails, so ${p.name.split(" ")[0]} is held until he renews.` }
           : { tone: "ok", text: p.id === "rashid" ? "Renewed" : "Valid" },
@@ -212,7 +233,7 @@ export function EvidenceGrid() {
                         data-r={r}
                         data-c={c}
                         tabIndex={r === 0 && c === 0 ? 0 : -1}
-                        aria-label={`${row.name}, ${cols[c]}: ${toneWord[cell.tone]}, ${cell.text}`}
+                        aria-label={`${row.name}, ${cols[c]}: ${toneWord[cell.tone]}, ${cell.text}${cell.tag ? `, ${cell.tag} record` : ""}`}
                         onClick={(e) => { setRect(e.currentTarget.getBoundingClientRect()); act(cell, key); }}
                         aria-expanded={pinned === key}
                         onMouseEnter={() => setActive(key)}
@@ -231,10 +252,11 @@ export function EvidenceGrid() {
                       >
                         {glyph[cell.tone]}
                         <span className={/^(EID|RCIF) /.test(cell.text) ? "min-w-0 whitespace-nowrap font-mono text-[11px]" : "min-w-0"}>{cell.text}</span>
+                        {cell.tag && <span className="whitespace-nowrap rounded-full bg-panel px-1.5 text-[10px] text-muted ring-1 ring-line">{cell.tag}</span>}
                       </button>
                       {pinned === key && (
-                        <div role="dialog" aria-label={`Source for ${row.name}, ${cols[c]}`} style={rect ? { left: Math.min(rect.left + 8, window.innerWidth - (c === 1 ? 432 : 336)), ...(rect.bottom + (c === 1 || c === 2 ? 520 : 360) > window.innerHeight ? { bottom: window.innerHeight - rect.top + 4 } : { top: rect.bottom + 4 }) } : undefined}
-                          className={cn("fixed z-50 rounded-lg border border-line bg-surface p-3 text-xs text-sub shadow-lg", c === 1 ? "w-[26rem]" : "w-80")}>
+                        <div role="dialog" aria-label={`Source for ${row.name}, ${cols[c]}`} style={rect ? { left: Math.min(rect.left + 8, window.innerWidth - (c === 1 ? 432 : 336)), ...(rect.bottom + (c === 1 || c === 2 ? 560 : 360) > window.innerHeight && rect.top > window.innerHeight - rect.bottom ? { bottom: window.innerHeight - rect.top + 4, maxHeight: rect.top - 12 } : { top: rect.bottom + 4, maxHeight: window.innerHeight - rect.bottom - 12 }) } : undefined}
+                          className={cn("fixed z-50 overflow-y-auto rounded-lg border border-line bg-surface p-3 text-xs text-sub shadow-lg", c === 1 ? "w-[26rem]" : "w-80")}>
                           <div className="mb-2 flex items-center justify-between gap-2">
                             <span className="font-medium text-ink">{cell.src ? evidence[cell.src].system : cols[c]}</span>
                             <button type="button" aria-label="Close" onClick={() => setPinned(null)} className="rounded p-0.5 text-muted hover:text-ink"><X className="h-3.5 w-3.5" /></button>

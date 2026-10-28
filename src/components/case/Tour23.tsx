@@ -32,6 +32,14 @@ function Sig() {
 function Field({ v }: { v: string }) {
   return <span className="rounded-sm border border-line bg-surface px-1.5 py-1 font-mono text-[10px] text-ink">{v}</span>;
 }
+function Dedup() {
+  return (
+    <span className="flex flex-col gap-1">
+      <span className="flex items-center gap-1"><Field v="RCIF 100587" /><Check className="h-3 w-3 text-ok" strokeWidth={3} aria-hidden /></span>
+      <span className="flex items-center gap-1 opacity-60"><span className="line-through decoration-muted"><Field v="RCIF 087316" /></span><span className="text-[10px] text-muted">to Data Quality</span></span>
+    </span>
+  );
+}
 function Ids() {
   return (
     <span className="flex gap-1">
@@ -53,9 +61,10 @@ const sources: { t: string; at: number; v: React.ReactNode; flag?: "Expired" | "
   { t: "Mode of operation", at: 4, v: <Field v="JOINTLY - ANY TWO" /> },
   { t: "Memorandum of Association", at: 5, v: <Doc /> },
   { t: "SVS signing mandate", at: 7, v: <Doc /> },
-  { t: "Signatures on file", at: 8, v: <Sig /> },
-  { t: "3 Emirates ID checks", at: 9, v: <Ids />, flag: "Expired" },
-  { t: "2023 letter", at: 11, v: <Doc blur />, flag: "Unclear" },
+  { t: "DEDUP, every branch", at: 8, v: <Dedup /> },
+  { t: "Signatures on file", at: 9, v: <Sig /> },
+  { t: "3 Emirates ID checks", at: 10, v: <Ids />, flag: "Expired" },
+  { t: "2023 letter", at: 12, v: <Doc blur />, flag: "Unclear" },
 ];
 
 export function SourceCards({ read }: { read: number }) {
@@ -81,7 +90,7 @@ export function SourceCards({ read }: { read: number }) {
 export function SourceSummary() {
   return (
     <p className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-sub">
-      <span className="flex items-center gap-1.5"><Check className="h-4 w-4 text-ok" /> 7 sources checked</span>
+      <span className="flex items-center gap-1.5"><Check className="h-4 w-4 text-ok" /> 8 sources checked</span>
       <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-warn" /> Rashid&apos;s ID expired</span>
       <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-warn" /> 1 number on the 2023 letter</span>
     </p>

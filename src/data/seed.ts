@@ -86,6 +86,7 @@ export type EvidenceKey =
   | "finacle-cif"
   | "cif-mohammed"
   | "cif-khalifa"
+  | "cif-khalifa-dup"
   | "cif-rashid"
   | "finacle-mop"
   | "svs-signatories"
@@ -166,6 +167,15 @@ export const evidence: Record<EvidenceKey, Evidence> = {
     ref: "RCIF 100587",
     body: "100587 KHALIFA S ALFALASI, EID ending 7714.",
     highlight: "EID ending 7714",
+  },
+  "cif-khalifa-dup": {
+    key: "cif-khalifa-dup",
+    title: "Older customer record (DEDUP)",
+    system: "Finacle",
+    ref: "RCIF 087316",
+    body: "087316 KHALIFA SAEED FALASI, EID ending 7714. Deira branch, opened 2014. No live accounts.",
+    highlight: "EID ending 7714",
+    note: "Same Emirates ID as RCIF 100587. The SVS mandate points to 100587, so that one is used. This one goes to Data Quality to merge.",
   },
   "cif-rashid": {
     key: "cif-rashid",

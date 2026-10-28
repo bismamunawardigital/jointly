@@ -41,6 +41,12 @@ const rashidTrace: Line["trace"] = [
   { t: "No access while an ID is expired, so Rashid waits", who: "rules" },
   { t: "Texted Rashid to renew. Mohammed and Khalifa carry on", who: "agent" },
 ];
+const dedupTrace: Line["trace"] = [
+  { t: "Ran DEDUP across every branch by Emirates ID", who: "agent" },
+  { t: "Found 2 records for Khalifa: 100587 and an older 087316", who: "agent" },
+  { t: "Use the record the SVS mandate links to", who: "rules" },
+  { t: "Added 087316 to the Data Quality ticket. No merge by the agent", who: "agent" },
+];
 const letterTrace: Line["trace"] = [
   { t: "Found a 2023 letter in SVS", who: "agent" },
   { t: "Read AED 25,000, but the last digits are blurry", who: "agent" },
@@ -67,6 +73,7 @@ export function ProgressView() {
             ? { tone: "ok" as Tone, lead: "Rashid renewed", text: "his Emirates ID is valid again.", who: "agent" as const, people: ["rashid"] as PersonId[] }
             : { tone: "warn" as Tone, lead: "Rashid is on hold", text: "his Emirates ID expired 14 Aug. We asked him to renew. The others continue.", who: "agent" as const, people: ["rashid"] as PersonId[], trace: rashidTrace }]
         : []),
+      ...(has("id-dedup") ? [{ tone: "ok" as Tone, lead: "Duplicate caught", text: "Khalifa has an older record at another branch. We used the one SVS links to.", who: "agent" as const, people: ["khalifa"] as PersonId[], docs: ["cif-khalifa", "cif-khalifa-dup"] as EvidenceKey[], trace: dedupTrace }] : []),
       ...(has("id-digital") ? [{ tone: "ok" as Tone, lead: "People confirmed", text: "matched by Emirates ID, not by name. Mohammed already has a login, so we reuse it.", who: "agent" as const, people: ["mohammed", "khalifa", "rashid"] as PersonId[] }] : []),
     ],
     mandate: [

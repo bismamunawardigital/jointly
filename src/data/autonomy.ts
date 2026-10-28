@@ -23,6 +23,7 @@ export const autonomy: AutonomyLane[] = [
     items: [
       { text: "Reads the forms, Finacle, SVS and EFR", tab: "run", event: "intake-forms" },
       { text: "Matches people on EID and RCIF", tab: "evidence", event: "id-svs" },
+      { text: "Runs DEDUP across every branch", tab: "evidence", event: "id-dedup" },
       { text: "Drafts the plan, with a source on every line", tab: "plan", event: "plan-build" },
       { text: "Sets up users, roles and rules", tab: "release", event: "ex-rules" },
       { text: "Drafts the customer messages", tab: "release", event: "rel-mohammed" },

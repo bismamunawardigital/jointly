@@ -84,6 +84,13 @@ export const script: AgentEvent[] = [
     evidence: ["svs-signatories"],
   },
   {
+    id: "id-dedup", group: "run", step: "identity", time: "Mon 09:16", actor: "Identity Agent",
+    call: "finacle.dedup(EID, allBranches)", system: "Finacle", status: "ok",
+    title: "DEDUP found an older record for Khalifa at another branch",
+    detail: "RCIF 087316 at Deira has the same Emirates ID. SVS links this account to 100587, so I used that one. I don't merge records. Added 087316 to the Data Quality ticket.",
+    evidence: ["cif-khalifa", "cif-khalifa-dup"],
+  },
+  {
     id: "id-digital", group: "run", step: "identity", time: "Mon 09:17", actor: "Identity Agent",
     call: "admin.findUser", system: "Digital Banking Admin", status: "ok",
     title: "Mohammed already has a digital banking login",
