@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { RotateCcw } from "lucide-react";
 
 type Tone = "plain" | "warn" | "ok";
 type N = { lane: number; col: number; text: string; tone?: Tone };
@@ -124,29 +125,7 @@ export function DaysSwimlane({ t }: { t: T }) {
         swapped={{ lane: 1, was: st.was }}
       />
     );
-    const head = (label: string, total: string, cls: string) => (
-      <div className="mb-3 flex items-baseline justify-between">
-        <p className="text-xs font-medium uppercase tracking-wide text-muted">{label}</p>
-        <p className={`tnum font-display text-xl font-semibold ${cls}`}>{total}</p>
-      </div>
-    );
-    return (
-      <div>
-        {head(t.today, st.todayTotal, "text-warn")}
-        <div className="overflow-x-auto rounded-card border border-line">{today}</div>
-        <ol className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm text-sub">
-          {t.pains.map((p, i) => (
-            <li key={p} className="flex items-center gap-2">
-              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-warn text-[11px] font-bold text-white">{i + 1}</span>
-              {p}
-            </li>
-          ))}
-        </ol>
-        <div className="mt-12">{head(t.jointly, st.jointlyTotal, "text-ok-ink")}</div>
-        <div className="overflow-x-auto rounded-card border border-ok/40">{agentLane}</div>
-        <p className="mt-3 text-xs text-muted">{t.caption}</p>
-      </div>
-    );
+    return <AutoSwim t={t} today={today} jointly={agentLane} />;
   }
   const tab = (v: "today" | "jointly", label: string) => (
     <button type="button" aria-pressed={view === v} onClick={() => setView(v)} className={`rounded-full px-3 py-1 text-xs ${view === v ? "bg-ink text-canvas" : "text-sub hover:text-ink"}`}>
@@ -162,6 +141,69 @@ export function DaysSwimlane({ t }: { t: T }) {
         <div><p className="mb-2 text-xs font-medium text-muted">{t.jointly}</p><div className="overflow-x-auto rounded-card border border-line">{jointly}</div></div>
       </div>
       <ol className={`mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm text-sub ${view === "jointly" ? "md:invisible" : ""}`}>
+        {t.pains.map((p, i) => (
+          <li key={p} className="flex items-center gap-2">
+            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-warn text-[11px] font-bold text-white">{i + 1}</span>
+            {p}
+          </li>
+        ))}
+      </ol>
+      <p className="mt-3 text-xs text-muted">{t.caption}</p>
+    </div>
+  );
+}
+
+const HOLD = 2800;
+
+function AutoSwim({ t, today, jointly }: { t: T; today: React.ReactNode; jointly: React.ReactNode }) {
+  const st = t.stacked!;
+  const ref = useRef<HTMLDivElement>(null);
+  const timer = useRef<ReturnType<typeof setTimeout>>();
+  const [phase, setPhase] = useState<"idle" | "today" | "jointly">("idle");
+
+  const play = () => {
+    clearTimeout(timer.current);
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return setPhase("jointly");
+    setPhase("today");
+    timer.current = setTimeout(() => setPhase("jointly"), HOLD);
+  };
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) { play(); io.disconnect(); }
+    }, { threshold: 0.5 });
+    io.observe(el);
+    return () => { io.disconnect(); clearTimeout(timer.current); };
+  }, []);
+
+  const j = phase === "jointly";
+  return (
+    <div ref={ref}>
+      <div className="mb-3 flex items-end justify-between gap-4">
+        <div className="relative h-5 w-40">
+          <p className={`absolute inset-0 text-xs font-medium uppercase tracking-wide text-muted transition-opacity duration-700 ${j ? "opacity-0" : "opacity-100"}`}>{t.today}</p>
+          <p className={`absolute inset-0 text-xs font-medium uppercase tracking-wide text-ok-ink transition-opacity duration-700 ${j ? "opacity-100" : "opacity-0"}`}>{t.jointly}</p>
+        </div>
+        <div className="flex items-center gap-4">
+          <p className="tnum font-display text-xl font-semibold">
+            <span className={`transition-all duration-700 ${j ? "text-muted line-through decoration-2" : "text-warn"}`}>{st.todayTotal}</span>
+            <span className={`ms-3 text-ok-ink transition-opacity duration-700 ${j ? "opacity-100" : "opacity-0"}`}>{st.jointlyTotal}</span>
+          </p>
+          <button type="button" onClick={play} aria-label="Replay" className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-line text-sub hover:bg-panel hover:text-ink">
+            <RotateCcw aria-hidden className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
+      <div className="h-0.5 overflow-hidden rounded-full bg-line">
+        <div className="h-full bg-warn" style={{ width: phase === "idle" ? "0%" : "100%", transition: phase === "today" ? `width ${HOLD}ms linear` : "none", opacity: j ? 0 : 1 }} />
+      </div>
+      <div className={`mt-3 grid overflow-x-auto rounded-card border transition-colors duration-700 ${j ? "border-ok/40" : "border-line"}`}>
+        <div aria-hidden={j} className={`[grid-area:1/1] transition-opacity duration-700 ${j ? "opacity-0" : "opacity-100"}`}>{today}</div>
+        <div aria-hidden={!j} className={`[grid-area:1/1] transition-opacity duration-700 ${j ? "opacity-100" : "opacity-0"}`}>{jointly}</div>
+      </div>
+      <ol className={`mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm text-sub transition-opacity duration-700 ${j ? "opacity-0" : "opacity-100"}`}>
         {t.pains.map((p, i) => (
           <li key={p} className="flex items-center gap-2">
             <span className="flex h-5 w-5 items-center justify-center rounded-full bg-warn text-[11px] font-bold text-white">{i + 1}</span>
