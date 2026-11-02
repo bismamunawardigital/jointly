@@ -57,7 +57,7 @@ body {
   padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
   padding-block: 40px 96px; -webkit-font-smoothing: antialiased;
 }
-.wrap { max-width: 1120px; margin: 0 auto; display: grid; gap: 88px; }
+.wrap { max-width: 1120px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1fr); gap: 88px; }
 .note { justify-self: start; font-size: 13px; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px; }
 .eyebrow { font-size: 12.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--emerald); font-weight: 500; }
 h2, h3 { font-family: var(--display); font-weight: 400; margin: 0; letter-spacing: -.025em; text-wrap: balance; }
