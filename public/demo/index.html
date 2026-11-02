@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Jointly demo · You are the human checker</title>
@@ -1573,6 +1573,7 @@ const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 
 // Scale each 1280-wide frame to its column
 const ro = new ResizeObserver(es => es.forEach(e => {
+  if (document.documentElement.classList.contains('proto')) return;
   const st = e.target, h = +st.dataset.h, s = Math.min(1, st.clientWidth / 1280);
   st.style.setProperty('--s', s); st.style.height = (h * s) + 'px';
 }));
@@ -1814,7 +1815,11 @@ playOnView($('#rpath12'), 'grow', [300, 1000, 1700, 2400]);
 
 <style>
 /* Prototype mode: one screen at a time, fitted to the window */
-html.proto body { padding: 16px 16px 76px; min-height: 100vh; }
+html.proto body { padding: 0; min-height: 100vh; background: var(--bg); }
+html.proto .app { border: 0; border-radius: 0; box-shadow: none; }
+html.proto .pbar { transition: opacity .25s, transform .25s; }
+html.proto:not(.bar-on) .pbar { opacity: 0; transform: translate(-50%, 12px); pointer-events: none; }
+@media (hover: none) { html.proto:not(.bar-on) .pbar { opacity: 1; transform: translateX(-50%); pointer-events: auto; } }
 html.proto .wrap { display: block; max-width: none; }
 html.proto .intro-page, html.proto .closing, html.proto .fr-head, html.proto .fr { display: none; }
 html.proto .fr.cur { display: block; }
@@ -1877,9 +1882,11 @@ html.proto [data-go] { cursor: pointer; }
     if (!cur) return;
     const st = $('.stage', cur), h = +st.dataset.h;
     // Size from the page's own box, not innerWidth: on a phone innerWidth grows once anything overflows
-    const de = document.documentElement, pad = 32;
-    const w = Math.min(1280, de.clientWidth - pad, (de.clientHeight - 92) * 1280 / h);
-    st.style.width = Math.max(240, Math.min(w, de.clientWidth - pad)) + 'px';
+    const de = document.documentElement, W = de.clientWidth, H = de.clientHeight;
+    const s = Math.min(1.2, W / 1280, H / h), app = $('.app', st), sc = $('.scaler', st);
+    const aw = W / s, ah = Math.max(h, Math.min(H / s, h * 1.4));
+    sc.style.width = app.style.width = aw + 'px'; app.style.height = ah + 'px';
+    st.style.width = W + 'px'; st.style.height = ah * s + 'px'; st.style.setProperty('--s', s);
   }
   function show(id) {
     if (!ids.includes(id)) id = 'f1';
@@ -1926,6 +1933,14 @@ html.proto [data-go] { cursor: pointer; }
 @media (max-width: 700px) and (orientation: portrait) { .phone-note { display: block; } }
 </style>
 <script>
+(() => {
+  const root = document.documentElement, pb = document.querySelector('.pbar');
+  let peek = true;
+  const sync = y => root.classList.toggle('bar-on', peek || y > innerHeight - 100 || pb.contains(document.activeElement) || !document.getElementById('pmenu').hidden);
+  setTimeout(() => { peek = false; sync(0); }, 2500); sync(0);
+  addEventListener('mousemove', e => sync(e.clientY));
+  pb.addEventListener('focusin', () => sync(innerHeight)); pb.addEventListener('focusout', () => setTimeout(() => sync(0)));
+})();
 document.addEventListener('click', e => {
   if (!e.target.closest('[title="Dark mode"]')) return;
   const root = document.documentElement;
