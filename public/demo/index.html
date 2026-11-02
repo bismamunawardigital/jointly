@@ -1820,6 +1820,7 @@ html.proto .app { border: 0; border-radius: 0; box-shadow: none; }
 html.proto .pbar { transition: opacity .25s, transform .25s; }
 html.proto:not(.bar-on) .pbar { opacity: 0; transform: translate(-50%, 12px); pointer-events: none; }
 @media (hover: none) { html.proto:not(.bar-on) .pbar { opacity: 1; transform: translateX(-50%); pointer-events: auto; } }
+html.proto .pbar { visibility: hidden !important; pointer-events: none !important; }
 html.proto .wrap { display: block; max-width: none; }
 html.proto .intro-page, html.proto .closing, html.proto .fr-head, html.proto .fr { display: none; }
 html.proto .fr.cur { display: block; }
