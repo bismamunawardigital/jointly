@@ -1,10 +1,28 @@
 {
-  "headers": [
-    { "source": "/opengraph-image", "headers": [{ "key": "Content-Type", "value": "image/png" }] },
-    { "source": "/opengraph-image/", "headers": [{ "key": "Content-Type", "value": "image/png" }] },
-    { "source": "/twitter-image", "headers": [{ "key": "Content-Type", "value": "image/png" }] },
-    { "source": "/twitter-image/", "headers": [{ "key": "Content-Type", "value": "image/png" }] },
-    { "source": "/ar/opengraph-image/", "headers": [{ "key": "Content-Type", "value": "image/png" }] },
-    { "source": "/ar/twitter-image/", "headers": [{ "key": "Content-Type", "value": "image/png" }] }
+  "framework": null,
+  "buildCommand": null,
+  "installCommand": null,
+  "outputDirectory": "public",
+  "redirects": [
+    {
+      "source": "/demo/(.+)",
+      "destination": "/demo",
+      "permanent": true
+    },
+    {
+      "source": "/((?!demo/?$).+)",
+      "destination": "/",
+      "permanent": true
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/demo",
+      "destination": "/demo/index.html"
+    },
+    {
+      "source": "/demo/",
+      "destination": "/demo/index.html"
+    }
   ]
 }
