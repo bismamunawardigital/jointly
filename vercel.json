@@ -1,0 +1,28 @@
+{
+  "framework": null,
+  "buildCommand": null,
+  "installCommand": null,
+  "outputDirectory": "public",
+  "redirects": [
+    {
+      "source": "/demo/(.+)",
+      "destination": "/demo",
+      "permanent": true
+    },
+    {
+      "source": "/((?!demo/?$|_vercel/).+)",
+      "destination": "/",
+      "permanent": true
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/demo",
+      "destination": "/demo/index.html"
+    },
+    {
+      "source": "/demo/",
+      "destination": "/demo/index.html"
+    }
+  ]
+}

@@ -1,0 +1,1953 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
+<script defer src="/_vercel/insights/script.js"></script>
+<title>Jointly demo · You are the human checker</title>
+<meta name="description" content="Try Jointly as a human checker at a UAE bank. The agent sets up digital banking access for a business with three joint signatories, and you make the call.">
+<meta property="og:title" content="Jointly demo · You are the human checker">
+<meta property="og:description" content="Try Jointly as a human checker at a UAE bank. The agent sets up digital banking access for a business with three joint signatories, and you make the call.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 22 15'%3E%3Ccircle cx='7.5' cy='7.5' r='6' fill='none' stroke='%232140b8' stroke-width='2'/%3E%3Ccircle cx='14.5' cy='7.5' r='6' fill='none' stroke='%232140b8' stroke-width='2'/%3E%3C/svg%3E">
+<script>document.documentElement.classList.add('proto')</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Host+Grotesk:wght@600;700&family=Schibsted+Grotesk:wght@400;500;600;700&family=Caveat:wght@500&family=IBM+Plex+Sans+Arabic:wght@500&display=swap">
+<style>
+/* The redesigned Jointly demo, round 1. Each frame is the real app at 1280 wide, scaled to fit. Product UI first: quiet neutrals, ink blue only for the agent, clay only for the human checker, green for done, amber for anything held. */
+:root {
+  --page: #f2f4f8; --bg: #ffffff; --side: #f7f8fb; --hover: #eef1f6; --line: #e3e6ee; --line2: #edf0f5;
+  --ink: #0f1a3d; --muted: #5b6688; --faint: #8b93ad;
+  --agent: #2140b8; --agent-2: #3a5ad6; --agent-soft: #eaeefc; --agent-btn: #2140b8;
+  --human: #c4643f; --human-soft: #f9e9e2;
+  --ok: #1d7a55; --ok-soft: #e3f2ea;
+  --warn: #a5650c; --warn-soft: #fbf0d9; --warn-ink: #7a4706;
+  --tour: #0f1a3d; --tour-ink: #ffffff;
+  --shadow: 0 1px 0 #d6dcea, 0 20px 40px -26px rgba(15,26,61,.45);
+  --win: 0 1px 2px rgba(15,26,61,.06), 0 30px 60px -30px rgba(15,26,61,.35);
+  --ui: "Schibsted Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --head: "Host Grotesk", "Schibsted Grotesk", Arial, sans-serif;
+  --hand: "Caveat", "Bradley Hand", cursive;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --page: #080c18; --bg: #10172b; --side: #0d1426; --hover: #18213a; --line: #242e4a; --line2: #1b2440;
+    --ink: #e8ecf7; --muted: #a3acc6; --faint: #6f7896;
+    --agent: #8ea3f2; --agent-2: #a9bbf6; --agent-soft: #1b2552; --agent-btn: #3a5ad6;
+    --human: #e3906b; --human-soft: #3a2219; --ok: #5cc79c; --ok-soft: #12291f; --warn: #e5a94c; --warn-soft: #2f2412; --warn-ink: #f0c27a;
+    --tour: #2b3863; --tour-ink: #ffffff;
+    --shadow: 0 1px 0 #242e4a, 0 20px 40px -26px rgba(0,0,0,.8); --win: 0 30px 60px -30px rgba(0,0,0,.8);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --page: #080c18; --bg: #10172b; --side: #0d1426; --hover: #18213a; --line: #242e4a; --line2: #1b2440;
+  --ink: #e8ecf7; --muted: #a3acc6; --faint: #6f7896;
+  --agent: #8ea3f2; --agent-2: #a9bbf6; --agent-soft: #1b2552; --agent-btn: #3a5ad6;
+  --human: #e3906b; --human-soft: #3a2219; --ok: #5cc79c; --ok-soft: #12291f; --warn: #e5a94c; --warn-soft: #2f2412; --warn-ink: #f0c27a;
+  --tour: #2b3863; --tour-ink: #ffffff;
+  --shadow: 0 1px 0 #242e4a, 0 20px 40px -26px rgba(0,0,0,.8); --win: 0 30px 60px -30px rgba(0,0,0,.8);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--page); color: var(--ink); font-family: var(--ui); font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased;
+  padding: 40px max(16px, env(safe-area-inset-left, 0px)) 96px max(16px, env(safe-area-inset-right, 0px)); overflow-x: clip; }
+p { margin: 0; }
+a { color: inherit; }
+button { font: inherit; color: inherit; }
+.wrap { max-width: 1180px; margin: 0 auto; display: grid; gap: 64px; }
+
+/* Page header and frame labels (outside the app) */
+.intro-page { display: grid; gap: 12px; max-width: 760px; }
+.note { justify-self: start; font-size: 13px; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px; background: var(--bg); }
+.intro-page h1 { font-family: var(--head); font-weight: 700; font-size: clamp(28px, 3.4vw, 40px); line-height: 1.08; letter-spacing: -.025em; margin: 0; }
+.intro-page p { color: var(--muted); max-width: 62ch; }
+.flow { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.flow a { font-size: 12.5px; text-decoration: none; color: var(--muted); background: var(--bg); border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px; }
+.flow a:hover { color: var(--ink); }
+.fr { display: grid; gap: 14px; scroll-margin-top: 24px; }
+.fr-head { display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; align-items: baseline; max-width: 900px; }
+.fr-head .n { grid-row: span 2; font-family: var(--head); font-weight: 700; font-size: 15px; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: var(--ink); color: var(--bg); }
+.fr-head h2 { font-family: var(--head); font-weight: 700; font-size: 22px; letter-spacing: -.02em; margin: 0; line-height: 1.2; }
+.fr-head p { color: var(--muted); font-size: 14.5px; max-width: 78ch; }
+.stage { position: relative; width: 100%; }
+.stage > .scaler { position: absolute; left: 0; top: 0; width: 1280px; transform-origin: 0 0; transform: scale(var(--s, 0)); }
+
+/* App window */
+.app { width: 1280px; height: var(--h, 800px); display: grid; grid-template-columns: 248px minmax(0, 1fr); background: var(--bg); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; box-shadow: var(--win); font-size: 13.5px; line-height: 1.45; position: relative; }
+.app.solo { grid-template-columns: 1fr; }
+.rings { width: 22px; height: 15px; flex: none; }
+.rings circle { fill: none; stroke: currentColor; stroke-width: 2; }
+
+/* Left panel: businesses, grouped like chat history */
+.sb { background: var(--side); border-right: 1px solid var(--line2); display: grid; grid-template-rows: auto auto 1fr auto; min-height: 0; }
+.sb-top { display: flex; align-items: center; gap: 8px; padding: 16px 16px 10px; color: var(--agent); }
+.sb-top b { color: var(--ink); font-family: var(--head); font-size: 16px; letter-spacing: -.01em; }
+.sb-nav { padding: 2px 8px 8px; display: grid; gap: 1px; }
+.sb-nav a, .biz { display: flex; align-items: center; gap: 9px; padding: 6px 8px; border-radius: 7px; text-decoration: none; color: var(--ink); font-size: 13px; }
+.sb-nav a svg { width: 15px; height: 15px; color: var(--muted); }
+.sb-nav a.on, .biz.on { background: var(--hover); }
+.sb-list { overflow: hidden; padding: 0 8px; display: grid; align-content: start; gap: 12px; }
+.sb-sec { display: flex; align-items: center; gap: 7px; font-size: 12.5px; font-weight: 600; padding: 4px 8px 0; color: var(--ink); }
+.sb-sec svg { width: 15px; height: 15px; color: var(--muted); }
+.sb-sec small { margin-left: auto; font-size: 11.5px; color: var(--faint); font-weight: 500; }
+.sb-g h6 { margin: 0; font-size: 9px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--faint); padding: 0 8px 4px; }
+.biz { display: grid; grid-template-columns: 8px 1fr; gap: 1px 9px; padding: 6px 8px; }
+.biz .d { grid-row: span 2; width: 7px; height: 7px; border-radius: 50%; margin-top: 6px; background: var(--faint); }
+.biz b { font-weight: 500; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.biz small { font-size: 11.5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.biz.ready .d { background: var(--agent); }
+.biz.ready small { color: var(--agent); font-weight: 600; }
+.biz.work .d { background: var(--agent-2); animation: blink 1.6s ease-in-out infinite; }
+.biz.live .d { background: var(--ok); }
+.biz.hold .d { background: var(--warn); }
+.biz.quiet b { color: var(--muted); }
+.sb-more { font-size: 12px; color: var(--muted); padding: 2px 8px; text-decoration: none; }
+.sb-foot { border-top: 1px solid var(--line2); padding: 10px 12px; display: flex; align-items: center; gap: 8px; }
+.me { width: 28px; height: 28px; border-radius: 50%; background: var(--human-soft); color: var(--human); display: grid; place-items: center; font-weight: 700; font-size: 11.5px; flex: none; }
+.sb-foot .who { display: grid; line-height: 1.25; min-width: 0; }
+.sb-foot .who b { font-size: 12.5px; font-weight: 600; }
+.sb-foot .who small { font-size: 11px; color: var(--muted); }
+.icons { margin-left: auto; display: flex; gap: 2px; }
+.ib { width: 28px; height: 28px; border-radius: 7px; border: 0; background: transparent; display: grid; place-items: center; color: var(--muted); cursor: pointer; font-size: 12px; font-weight: 600; }
+.ib:hover { background: var(--hover); color: var(--ink); }
+.ib svg { width: 15px; height: 15px; }
+
+/* Main column */
+.main { display: grid; grid-template-rows: auto auto minmax(0, 1fr) auto; min-width: 0; min-height: 0; }
+.top { height: 56px; display: flex; align-items: center; gap: 12px; padding: 0 20px; }
+.top h3 { margin: 0; font-family: var(--head); font-weight: 700; font-size: 17px; letter-spacing: -.015em; white-space: nowrap; }
+.pair { margin-left: auto; display: flex; align-items: center; }
+.pair .ag { width: 28px; height: 28px; border-radius: 50%; background: var(--agent-soft); color: var(--agent); display: grid; place-items: center; border: 2px solid var(--bg); }
+.pair .ag svg { width: 16px; height: 11px; }
+.pair .me { border: 2px solid var(--bg); margin-left: -7px; color: var(--human); }
+.me svg { width: 58%; height: 58%; }
+.pair span { font-size: 12px; color: var(--muted); margin-left: 8px; margin-right: 6px; }
+.tabs { display: flex; gap: 20px; padding: 0 20px; border-bottom: 1px solid var(--line); }
+.tabs a { padding: 8px 0 9px; font-size: 13px; color: var(--muted); text-decoration: none; }
+.tabs a.on { color: var(--ink); font-weight: 600; box-shadow: inset 0 -2px 0 var(--ink); }
+.body { display: grid; grid-template-columns: minmax(0, 1fr) 320px; min-height: 0; }
+.body.one { grid-template-columns: minmax(0, 1fr); }
+.pane { padding: 20px 24px; min-width: 0; min-height: 0; overflow: hidden; position: relative; }
+.rp { border-left: 1px solid var(--line2); background: var(--side); padding: 18px 18px 14px; display: grid; grid-template-rows: auto auto auto minmax(0, 1fr); gap: 14px; min-height: 0; overflow: hidden; }
+.bbar { min-height: 56px; border-top: 1px solid var(--line); display: flex; align-items: center; gap: 12px; padding: 10px 20px; background: var(--bg); }
+.bbar .msg { display: grid; line-height: 1.3; }
+.bbar .msg b { font-weight: 600; font-size: 13.5px; }
+.bbar .msg small { color: var(--muted); font-size: 12px; }
+.bbar .acts { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+.btn { border: 1px solid var(--line); background: var(--bg); border-radius: 8px; padding: 7px 13px; font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; text-decoration: none; color: var(--ink); white-space: nowrap; }
+.btn:hover { background: var(--hover); }
+.btn.pri { background: var(--agent-btn); border-color: var(--agent-btn); color: #fff; }
+.btn.pri:hover { filter: brightness(1.08); }
+.btn.ghost { border-color: transparent; color: var(--muted); }
+.btn kbd { font: inherit; font-size: 11px; opacity: .7; border: 1px solid rgba(255,255,255,.35); border-radius: 4px; padding: 0 4px; }
+.lnk { border: 0; background: none; padding: 0; color: var(--agent); font-weight: 600; font-size: 13px; cursor: pointer; text-decoration: none; }
+.ldot { width: 18px; height: 18px; border-radius: 50%; display: grid; place-items: center; background: var(--agent-soft); color: var(--agent); flex: none; }
+.ldot svg { width: 12px; height: 8px; }
+
+/* Status pills and source chips */
+.pill { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; white-space: nowrap; }
+.pill i { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.pill.work { color: var(--agent); background: var(--agent-soft); }
+.pill.work i { animation: blink 1.6s ease-in-out infinite; }
+.pill.ready { color: var(--ok); background: var(--ok-soft); }
+.pill.live { color: var(--ok); background: var(--ok-soft); }
+.pill.hold { color: var(--warn-ink); background: var(--warn-soft); }
+.src { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; color: var(--muted); background: var(--hover); border-radius: 5px; padding: 1px 6px; white-space: nowrap; vertical-align: 1px; }
+.num { font-variant-numeric: tabular-nums; }
+@keyframes blink { 50% { opacity: .35; } }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes callme { 0% { box-shadow: 0 0 0 0 rgba(196,100,63,.22); } 70%, 100% { box-shadow: 0 0 0 7px rgba(196,100,63,0); } }
+
+/* The agent's plan, as a live checklist */
+.plan-h { display: grid; gap: 6px; }
+.plan-h .t { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 13.5px; }
+.plan-h .meta { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); }
+.bar-p { height: 4px; border-radius: 4px; background: var(--line); overflow: hidden; }
+.bar-p i { display: block; height: 100%; background: var(--agent-2); border-radius: 4px; width: var(--p, 40%); transition: width .6s; }
+.plan { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; }
+.plan li { display: grid; grid-template-columns: 18px 1fr; gap: 10px; padding: 6px 0; position: relative; }
+.plan li::before { content: ""; position: absolute; left: 8.5px; top: 26px; bottom: -6px; width: 1px; background: var(--line); }
+.plan li:last-child::before { display: none; }
+.plan .ic { width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid var(--line); display: grid; place-items: center; background: var(--bg); position: relative; z-index: 1; margin-top: 1px; }
+.plan .tx { display: grid; gap: 2px; font-size: 13px; color: var(--faint); }
+.plan .tx small { font-size: 11.5px; color: var(--muted); }
+.plan li.done .ic { background: var(--ok); border-color: var(--ok); }
+.plan li.done .ic::after { content: ""; width: 7px; height: 4px; border: 2px solid #fff; border-top: 0; border-right: 0; transform: translateY(-1px) rotate(-45deg); }
+.plan li.done .tx { color: var(--ink); }
+.plan li.now .ic { border-color: var(--agent-soft); }
+.plan li.now .ic::after { content: ""; position: absolute; inset: -1.5px; border-radius: 50%; border: 1.5px solid transparent; border-top-color: var(--agent-2); animation: spin 1s linear infinite; }
+.plan li.now .tx { color: var(--agent); font-weight: 600; }
+.plan li.you .ic { border-color: var(--human); background: var(--human-soft); }
+.plan li.you .tx { color: var(--human); font-weight: 600; }
+.plan li.you.call .ic { animation: callme 3s ease-out infinite; }
+.plan li.you.call .ic::after { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--human); }
+
+/* Agent log */
+.log-h { font-size: 11.5px; font-weight: 600; color: var(--faint); }
+.log { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; align-content: start; overflow: hidden; }
+.log li { display: grid; grid-template-columns: 34px 1fr; gap: 6px; font-size: 12.5px; line-height: 1.4; animation: logIn .35s ease-out; }
+.log li time { color: var(--faint); font-size: 11.5px; font-variant-numeric: tabular-nums; padding-top: 1px; }
+.log li.w span:first-of-type { color: var(--warn-ink); }
+@keyframes logIn { from { opacity: 0; transform: translateY(4px); } }
+
+/* Guided tour pointer */
+.tour { position: absolute; z-index: 30; width: 270px; background: var(--tour); color: var(--tour-ink); border-radius: 12px; padding: 12px 14px; font-size: 12.5px; line-height: 1.45; box-shadow: 0 18px 40px -16px rgba(15,26,61,.6); display: grid; gap: 8px; }
+.tour b { font-size: 13px; }
+.tour .tf { display: flex; justify-content: space-between; align-items: center; font-size: 11.5px; opacity: .85; }
+.tour .tf span:last-child { background: rgba(255,255,255,.16); border-radius: 6px; padding: 2px 9px; font-weight: 600; opacity: 1; }
+.tour::before { content: ""; position: absolute; width: 12px; height: 12px; background: var(--tour); transform: rotate(45deg); }
+.tour.l::before { left: -5px; top: 22px; }
+.tour.t::before { top: -5px; left: 30px; }
+.tour.b::before { bottom: -5px; left: 30px; }
+.tour.r::before { right: -5px; top: 22px; }
+
+/* 1. Guided tour intro */
+.welcome { display: grid; grid-template-columns: 1fr 1.05fr; height: 100%; }
+.w-left { padding: 56px 56px 40px; display: grid; align-content: space-between; }
+.w-brand { display: flex; align-items: center; gap: 9px; color: var(--agent); }
+.w-brand b { color: var(--ink); font-family: var(--head); font-size: 18px; }
+.w-brand .ib { margin-left: auto; border: 1px solid var(--line); width: auto; padding: 0 9px; }
+.w-copy { display: grid; gap: 18px; }
+.kick { font-size: 12.5px; font-weight: 600; color: var(--agent); }
+.w-copy h1 { margin: 0; font-family: var(--head); font-weight: 700; font-size: 40px; line-height: 1.06; letter-spacing: -.025em; max-width: 13ch; }
+.w-copy p { font-size: 15.5px; color: var(--muted); max-width: 46ch; line-height: 1.55; }
+.w-copy p b { color: var(--ink); font-weight: 600; }
+.case { display: flex; align-items: center; gap: 12px; border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; max-width: 440px; }
+.case .bi { width: 38px; height: 38px; border-radius: 9px; background: var(--hover); display: grid; place-items: center; font-family: var(--head); font-weight: 700; color: var(--muted); }
+.case div { display: grid; line-height: 1.35; }
+.case small { color: var(--muted); font-size: 12.5px; }
+.w-cta { display: flex; align-items: center; gap: 16px; }
+.w-cta .btn.pri { padding: 10px 18px; font-size: 14px; }
+.w-right { background: var(--side); border-left: 1px solid var(--line2); padding: 48px 44px; display: grid; align-content: center; gap: 14px; }
+.w-right h4 { margin: 0 0 2px; font-size: 13px; font-weight: 600; color: var(--muted); }
+.prev { display: grid; grid-template-columns: 26px 1fr 150px; gap: 14px; align-items: center; background: var(--bg); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+.prev .k { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: 12px; background: var(--hover); color: var(--muted); }
+.prev.you .k { background: var(--human-soft); color: var(--human); }
+.prev div b { display: block; font-size: 14px; }
+.prev div small { color: var(--muted); font-size: 12.5px; line-height: 1.4; display: block; }
+.mini { height: 86px; border-radius: 8px; border: 1px solid var(--line); background: var(--side); position: relative; overflow: hidden; }
+.mini.list i { position: absolute; left: 10px; right: 10px; height: 16px; border-radius: 4px; background: var(--bg); border: 1px solid var(--line); }
+.mini.list i::before { content: ""; position: absolute; left: 6px; top: 5px; width: 5px; height: 5px; border-radius: 50%; background: var(--ok); }
+.mini.list i.r::before { background: var(--agent); }
+.mini.apps i { position: absolute; border-radius: 4px; background: var(--bg); border: 1px solid var(--line); }
+.mini.apps i.f { left: 8px; top: 8px; width: 70px; height: 36px; border-top: 6px solid #3e5f8a; }
+.mini.apps i.s { left: 18px; top: 46px; width: 74px; height: 32px; border-top: 6px solid #2f3b45; }
+.mini.apps i.e { left: 84px; top: 22px; width: 56px; height: 40px; border-top: 6px solid #0f5132; }
+.mini.apps svg { position: absolute; left: 66px; top: 30px; width: 14px; color: var(--agent); animation: wiggle 2.4s ease-in-out infinite; }
+@keyframes wiggle { 50% { transform: translate(18px, 14px); } }
+.mini.map .line { position: absolute; left: 12px; right: 12px; top: 54px; height: 3px; background: var(--line); border-radius: 3px; }
+.mini.map .line::after { content: ""; position: absolute; left: 0; width: 42%; height: 100%; background: var(--agent-2); border-radius: 3px; }
+.mini.map .h { position: absolute; left: calc(12px + 42% * .82); top: 47px; width: 16px; height: 16px; border-radius: 50%; background: var(--bg); border: 2px solid var(--agent); }
+.mini.map .ppl { position: absolute; left: 12px; top: 14px; display: flex; gap: 5px; }
+.mini.map .ppl i { width: 20px; height: 20px; border-radius: 50%; background: var(--bg); border: 1px solid var(--line); }
+.mini.map .ok { position: absolute; right: 10px; bottom: 9px; font-size: 9.5px; font-weight: 700; color: #fff; background: var(--agent-btn); border-radius: 5px; padding: 2px 6px; }
+
+/* 2. Home */
+.home { padding: 30px 36px; display: grid; gap: 22px; align-content: start; position: relative; }
+.home h1 { margin: 0; font-family: var(--head); font-weight: 700; font-size: 28px; letter-spacing: -.025em; }
+.home .sub { color: var(--muted); font-size: 14px; margin-top: 4px; }
+.tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.tile { border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; display: grid; gap: 2px; }
+.tile b { font-family: var(--head); font-size: 26px; letter-spacing: -.03em; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.tile span { font-size: 13px; color: var(--muted); }
+.tile.a b { color: var(--agent); } .tile.g b { color: var(--ok); }
+.cards-h { display: flex; justify-content: space-between; align-items: baseline; }
+.cards-h h4 { margin: 0; font-size: 14px; }
+.cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.bc { border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; display: grid; gap: 10px; background: var(--bg); }
+.bc.hi { border-color: var(--agent-2); box-shadow: 0 0 0 3px var(--agent-soft); }
+.bc-top { display: flex; align-items: center; gap: 10px; justify-content: space-between; }
+.bc-top b { font-size: 14.5px; }
+.bc .ppl { font-size: 12.5px; color: var(--muted); }
+.bc .ag-line { display: flex; align-items: center; gap: 8px; font-size: 12.5px; }
+.bc .ag-line .ldot { width: 20px; height: 20px; }
+.bc .bar-p { height: 3px; }
+
+/* 3. The agent's screen: the real systems, recreated, with the agent's cursor */
+.desk { position: relative; height: 100%; border-radius: 12px; background: repeating-linear-gradient(0deg, transparent 0 23px, rgba(91,102,136,.06) 23px 24px), var(--side); border: 1px solid var(--line2); overflow: hidden; }
+.desk-h { position: absolute; left: 14px; top: 10px; display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); z-index: 2; }
+.desk-h .live { display: inline-flex; align-items: center; gap: 5px; color: var(--agent); font-weight: 600; }
+.desk-h .live i { width: 6px; height: 6px; border-radius: 50%; background: var(--agent-2); animation: blink 1.4s infinite; }
+.sys { position: absolute; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 2px rgba(15,26,61,.08), 0 14px 30px -14px rgba(15,26,61,.3); transition: transform .45s cubic-bezier(.2,.8,.2,1), box-shadow .45s, opacity .45s; }
+.sys.active { transform: translateY(-3px); box-shadow: 0 2px 4px rgba(15,26,61,.1), 0 22px 44px -16px rgba(15,26,61,.45); z-index: 4; }
+.sys.dim { opacity: .55; }
+.wbar { height: 24px; display: flex; align-items: center; gap: 5px; padding: 0 9px; font-size: 10px; letter-spacing: .02em; }
+.wbar i { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,.35); }
+.wbar span { margin-left: 5px; }
+.wbar em { margin-left: auto; font-style: normal; opacity: .7; }
+.fin { background: #fff; color: #000; font-family: Tahoma, Arial, sans-serif; border: 1px solid #9fb2c8; border-radius: 4px; width: 390px; }
+.f-strip { background: linear-gradient(#f4f8fc, #dfe8f3); color: #2a5aa0; font-size: 8.5px; text-align: center; padding: 2px 0; border-bottom: 1px solid #b9c9dc; }
+.f-brand { display: flex; align-items: center; justify-content: space-between; padding: 4px 8px; background: linear-gradient(#fff, #f1f1f1); }
+.f-logo { display: flex; align-items: center; gap: 3px; font-family: Arial, sans-serif; font-weight: 700; font-size: 16px; letter-spacing: -.02em; color: #1a1a1a; }
+.f-logo i { width: 9px; height: 14px; background: #d71920; transform: skewX(-14deg); }
+.f-menu { display: flex; }
+.f-menu span { font-size: 8.5px; font-weight: 700; color: #24477a; border-left: 1px solid #b9c9dc; padding: 1px 6px; }
+.f-band { display: flex; justify-content: space-between; background: linear-gradient(#5d7fa8, #3e5f8a); color: #fff; font-size: 8.5px; padding: 3px 8px; }
+.f-title { font-size: 11px; font-weight: 700; padding: 6px 8px 4px; }
+.f-grid { margin: 0 8px; border: 1px solid #9fb2c8; font-size: 8.5px; }
+.f-grid div { display: grid; grid-template-columns: 62px 1fr 110px 60px; border-top: 1px solid #d6e0ec; }
+.f-grid div:first-child { border-top: 0; background: #e8eef6; font-weight: 700; color: #24477a; }
+.f-grid span { padding: 3px 5px; white-space: nowrap; overflow: hidden; }
+.f-btns { display: flex; gap: 4px; padding: 6px 8px 8px; }
+.f-btns span { font-size: 8.5px; border: 1px solid #707070; background: linear-gradient(#fafafa, #dcdcdc); padding: 1px 7px; border-radius: 2px; }
+.svs { background: #fff; color: #1f2a33; font-family: "Segoe UI", Tahoma, Arial, sans-serif; border: 1px solid #c9d2d8; width: 400px; }
+.svs .wbar { background: #2f3b45; color: #e6ebef; }
+.s-main { padding: 9px 10px 10px; display: grid; gap: 7px; }
+.s-lab { font-size: 8px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #6b7883; }
+.s-sigs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.s-tile { border: 1px solid #e3e8ec; border-radius: 6px; padding: 5px; display: grid; gap: 3px; }
+.s-tile b { font-size: 8.5px; font-weight: 700; white-space: nowrap; }
+.s-tile small { font-size: 7.5px; color: #6b7883; }
+.scan { display: block; width: 100%; height: 26px; background: #f4f2ec; border: 1px solid #e8e4d9; border-radius: 3px; }
+.scan path, .sig path { fill: none; stroke: #1f3a7a; stroke-width: 1.3; stroke-linecap: round; }
+.rmk { display: grid; grid-template-columns: 20px 1fr; gap: 7px; align-items: center; border-left: 2px solid #dde3e8; padding: 2px 0 2px 7px; }
+.rmk .oi { width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; font-size: 7.5px; font-weight: 700; color: #fff; background: #7a8794; }
+.rmk .oi.b { background: #1b7f86; }
+.rmk small { display: block; font-size: 8px; color: #6b7883; }
+.rmk p { font-size: 10px; line-height: 1.4; }
+.form { background: #e9e9e7; color: #3a3a38; width: 250px; }
+.form .wbar { background: #d6d6d3; color: #4a4a47; }
+.form .wbar i { background: #b5b5b1; }
+.sheet { margin: 8px 11px 11px; background: #fbf8f0; color: #2b2925; padding: 10px 12px 8px; box-shadow: 0 1px 3px rgba(0,0,0,.18); transform: rotate(-.6deg); }
+.sheet .lab { font-size: 8px; text-transform: uppercase; letter-spacing: .06em; color: #7d776a; }
+.sheet .box { border-bottom: 1px solid #d9d3c4; height: 26px; margin-bottom: 7px; display: flex; align-items: flex-end; padding-bottom: 2px; }
+.hand { font-family: var(--hand); color: #1f3a7a; font-size: 19px; line-height: 1; }
+.efr { background: #f4f7f5; color: #1b2a22; width: 262px; }
+.efr .wbar { background: #0f5132; color: #e2f1e8; }
+.eid { position: relative; margin: 8px 10px 6px; height: 140px; border-radius: 9px; overflow: hidden; color: #1d2433; font-family: Arial, sans-serif;
+  background: radial-gradient(circle at 70% 40%, rgba(240,205,190,.55), transparent 55%), repeating-radial-gradient(circle at 30% 120%, rgba(120,140,170,.07) 0 2px, transparent 2px 5px), linear-gradient(120deg, #eef1f6, #e4e9f1 60%, #efe6e4);
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.06); }
+.ar { font-family: "IBM Plex Sans Arabic", "Geeza Pro", Tahoma, sans-serif; direction: rtl; unicode-bidi: isolate; }
+.eid-top { display: flex; justify-content: space-between; padding: 8px 10px 0; }
+.eid-top b { font-size: 9px; display: block; }
+.eid-top small { font-size: 7px; color: #4a5468; display: block; }
+.eid-top .ar { font-size: 8.5px; font-weight: 500; text-align: right; }
+.eid-mid { display: flex; gap: 10px; padding: 8px 10px; }
+.eid-ph { width: 46px; height: 58px; flex: none; border-radius: 5px; background: #dfe4ec; }
+.eid-f { display: grid; gap: 3px; min-width: 0; }
+.eid-f small { display: block; font-size: 6.5px; color: #5a6478; }
+.eid-f b { font-size: 9px; font-weight: 700; white-space: nowrap; }
+.eid-wm { position: absolute; right: 8px; bottom: 6px; font-size: 8.5px; font-weight: 700; letter-spacing: .2em; color: rgba(29,36,51,.28); border: 1px solid rgba(29,36,51,.22); padding: 0 5px; border-radius: 2px; }
+.efr-st { margin: 0 10px 9px; font-size: 10px; padding: 5px 8px; border-radius: 6px; background: #fff; border: 1px solid #dbe5df; color: #7b8a81; }
+.efr-st.ok { color: #0f6b46; font-weight: 600; }
+.hl { border-radius: 3px; transition: box-shadow .35s, background .35s; }
+.hl.on { background: rgba(58,90,214,.13); box-shadow: 0 0 0 2px rgba(58,90,214,.85); }
+.hl.warn { background: rgba(201,138,28,.16); box-shadow: 0 0 0 2px rgba(201,138,28,.95); }
+.cursor { position: absolute; left: 0; top: 0; z-index: 20; pointer-events: none; transition: transform .8s cubic-bezier(.45,.05,.25,1); }
+.cursor svg { width: 18px; height: 22px; display: block; filter: drop-shadow(0 2px 3px rgba(15,26,61,.3)); }
+.cursor svg path { fill: var(--agent-btn); stroke: #fff; stroke-width: 1.4; }
+.cursor span { position: absolute; left: 14px; top: 18px; background: var(--agent-btn); color: #fff; font-size: 10.5px; font-weight: 600; border-radius: 5px; padding: 2px 7px 2px 5px; white-space: nowrap; display: flex; align-items: center; gap: 4px; }
+.cursor span svg { width: 14px; height: 10px; filter: none; }
+.cursor span svg circle { fill: none; stroke: #fff; stroke-width: 2; }
+.speed { display: flex; gap: 4px; }
+.speed .btn { padding: 6px 10px; }
+.speed .btn[aria-pressed="true"] { background: var(--hover); }
+
+/* 4. What the agent checked */
+.checks { display: grid; gap: 14px; align-content: start; }
+.sec-h { display: flex; align-items: baseline; gap: 10px; }
+.sec-h h4 { margin: 0; font-size: 14px; }
+.sec-h small { color: var(--muted); font-size: 12.5px; }
+.ids { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.idc { border: 1px solid var(--line); border-radius: 10px; padding: 8px; display: grid; gap: 7px; }
+.idc .eid { margin: 0; height: 118px; }
+.idc .eid-mid { padding: 6px 9px; gap: 8px; }
+.idc .eid-ph { width: 38px; height: 48px; }
+.res { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--ok); }
+.res::before { content: "✓"; width: 16px; height: 16px; border-radius: 50%; background: var(--ok-soft); display: grid; place-items: center; font-size: 10px; }
+.res.w { color: var(--warn-ink); }
+.res.w::before { content: "!"; background: var(--warn-soft); }
+.sigs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.sigc { border: 1px solid var(--line); border-radius: 10px; padding: 10px; display: grid; gap: 7px; }
+.sigc .pair2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.sigc .pair2 div { display: grid; gap: 3px; }
+.sigc .pair2 small { font-size: 10.5px; color: var(--muted); }
+.sigc .sig { height: 30px; border-radius: 5px; background: #fbf8f0; border: 1px solid #ebe5d6; display: block; width: 100%; }
+.sigc b { font-size: 12.5px; }
+.dup { border: 1px solid var(--agent-2); border-radius: 12px; padding: 14px; display: grid; gap: 10px; background: linear-gradient(var(--agent-soft), transparent 70%); }
+.dup-h { display: flex; align-items: center; gap: 8px; }
+.dup-h b { font-size: 14px; }
+.dup-h .pill { margin-left: auto; }
+.recs { display: grid; grid-template-columns: 1fr 70px 1fr; align-items: stretch; }
+.rec { background: var(--bg); border: 1px solid var(--line); border-radius: 9px; padding: 9px 11px; display: grid; gap: 4px; font-size: 12px; }
+.rec h5 { margin: 0 0 2px; font-size: 11.5px; color: var(--muted); font-weight: 600; display: flex; justify-content: space-between; }
+.rec div { display: flex; justify-content: space-between; gap: 8px; }
+.rec div span { color: var(--muted); }
+.rec div b { font-weight: 600; font-variant-numeric: tabular-nums; }
+.rec div b.m { background: var(--agent-soft); color: var(--agent); border-radius: 4px; padding: 0 5px; }
+.links { position: relative; }
+.links svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.links path { fill: none; stroke: var(--agent-2); stroke-width: 1.5; stroke-dasharray: 3 3; }
+.dup p { font-size: 13px; }
+.docs { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--line2); padding-top: 10px; flex-wrap: wrap; }
+
+/* 5. Review */
+.ask { display: grid; grid-template-columns: 30px 1fr; gap: 12px; align-items: start; }
+.ask .ldot { width: 30px; height: 30px; }
+.ask .ldot svg { width: 17px; height: 12px; }
+.ask h2 { margin: 0; font-family: var(--head); font-weight: 700; font-size: 22px; letter-spacing: -.02em; line-height: 1.2; }
+.ask p { color: var(--muted); font-size: 13.5px; margin-top: 4px; max-width: 70ch; }
+.steps4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.steps4 > .s4 { padding: 11px 13px; display: grid; gap: 5px; align-content: start; border-left: 1px solid var(--line); position: relative; }
+.steps4 > .s4:first-child { border-left: 0; }
+.steps4 > .s4 .h { display: flex; align-items: center; gap: 7px; font-weight: 600; font-size: 13px; }
+.steps4 > .s4 .h .k { width: 18px; height: 18px; border-radius: 50%; font-size: 10.5px; display: grid; place-items: center; background: var(--ok-soft); color: var(--ok); font-weight: 700; }
+.steps4 > .s4 p { font-size: 12px; color: var(--muted); line-height: 1.4; }
+.steps4 > .s4.need { background: var(--agent-soft); box-shadow: inset 0 0 0 1.5px var(--agent-2); }
+.steps4 > .s4.need .h .k { background: var(--agent-btn); color: #fff; }
+.steps4 > .s4.wait .h { color: var(--faint); }
+.steps4 > .s4.wait .h .k { background: var(--hover); color: var(--faint); }
+.steps4 > .s4 .tag { justify-self: start; font-size: 11px; font-weight: 600; border-radius: 999px; padding: 1px 8px; }
+.steps4 > .s4.need .tag { background: var(--agent-btn); color: #fff; }
+.steps4 > .s4 .why { justify-self: start; font-size: 12px; font-weight: 600; color: var(--agent); background: var(--bg); border: 1px solid var(--agent-2); border-radius: 8px; padding: 4px 10px; text-decoration: none; transition: background .15s ease; }
+.steps4 > .s4 .why:hover { background: var(--agent-soft); }
+/* The whole rules card opens the panel, the button stays as the visible cue */
+.steps4 > .s4:has(.why) { position: relative; cursor: pointer; transition: box-shadow .15s ease; }
+.steps4 > .s4 .why::after { content: ""; position: absolute; inset: 0; }
+.steps4 > .s4:has(.why):hover { box-shadow: inset 0 0 0 1.5px var(--agent-2), 0 10px 22px -14px rgba(15,26,61,.5); }
+.steps4 > .s4:has(.why):hover .why { background: var(--agent-soft); }
+.steps4 > .s4.ok .tag { background: var(--ok-soft); color: var(--ok); }
+.steps4 > .s4.wait .tag { background: var(--hover); color: var(--faint); }
+.steps4 > .s4 .faces { display: flex; gap: 4px; flex-wrap: wrap; }
+.fc { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 600; border: 1px solid var(--line); border-radius: 999px; padding: 1px 8px 1px 2px; background: var(--bg); }
+.fc i { width: 16px; height: 16px; border-radius: 50%; display: grid; place-items: center; font-style: normal; font-size: 8.5px; font-weight: 700; color: #fff; background: #4f6a8f; }
+.fc.k i { background: #2f7f86; } .fc.r i { background: #8a6d9a; }
+.fc.held { border-style: dashed; color: var(--muted); }
+.ev { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 12.5px; }
+.ev > b { font-size: 12px; color: var(--muted); font-weight: 600; margin-right: 2px; }
+.evi { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); border-radius: 8px; padding: 4px 8px; background: var(--bg); }
+/* 12. Rashid's renewed Emirates ID, with what the agent checked on it */
+.eid12 { display: grid; grid-template-columns: 236px minmax(0, 1fr); gap: 18px; align-items: center; margin-left: 42px; }
+.eid12 .eid { margin: 0; width: 236px; height: 140px; }
+.eidk { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; align-content: center; justify-self: start; }
+.eidk li { display: flex; align-items: center; gap: 7px; font-size: 12px; }
+.eidk li::before { content: "✓"; flex: none; color: var(--ok); font-size: 11px; font-weight: 700; }
+.eidk b { font-weight: 450; color: var(--ink); }
+.eidk .src { background: none; padding: 0; font-weight: 500; font-size: 10.5px; color: var(--faint); }
+.evi::before { content: "✓"; color: var(--ok); font-weight: 700; font-size: 11px; }
+.map { border: 1px solid var(--line); border-radius: 14px; padding: 16px 20px 18px; display: grid; gap: 14px; box-shadow: var(--shadow); background: var(--bg); position: relative; }
+.map-h { display: flex; align-items: baseline; justify-content: space-between; }
+.map-h h4 { margin: 0; font-size: 14px; }
+.map-h small { color: var(--muted); font-size: 12px; }
+.people { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.pp { border: 1px solid var(--line); border-radius: 10px; padding: 9px 11px; display: grid; grid-template-columns: 32px 1fr; gap: 2px 10px; align-items: center; transition: border-color .3s, box-shadow .3s, opacity .3s; }
+.pp .av { grid-row: span 2; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; color: #fff; font-weight: 700; font-size: 12px; background: #4f6a8f; }
+.pp.k .av { background: #2f7f86; } .pp.r .av { background: #8a6d9a; }
+.pp b { font-size: 13px; }
+.pp small { font-size: 11.5px; color: var(--muted); }
+.pp.lit { border-color: var(--agent-2); box-shadow: 0 0 0 3px var(--agent-soft); }
+.pp.held { border-style: dashed; }
+.pp.held small { color: var(--warn-ink); }
+.track { position: relative; height: 84px; margin: 0 8px; user-select: none; touch-action: none; cursor: pointer; }
+.track .ln2 { position: absolute; left: 0; right: 0; top: 30px; height: 8px; border-radius: 8px; background: linear-gradient(90deg, var(--agent-soft) 0 var(--th), var(--hover) var(--th)); }
+.track .th { position: absolute; top: 14px; left: var(--th); width: 0; height: 40px; border-left: 2px solid var(--ink); }
+.track .th b { position: absolute; top: -18px; left: 0; transform: translateX(-50%); font-size: 11.5px; font-weight: 700; white-space: nowrap; background: var(--bg); padding: 0 4px; }
+.track .why { position: absolute; top: 46px; left: var(--th); transform: translateX(-50%); font-size: 11.5px; white-space: nowrap; }
+.track .ends { position: absolute; top: 46px; font-size: 11px; color: var(--faint); }
+.knob { position: absolute; top: 20px; left: var(--x); width: 28px; height: 28px; margin-left: -14px; border-radius: 50%; background: var(--bg); border: 2.5px solid var(--agent-btn); box-shadow: 0 2px 8px rgba(15,26,61,.25); cursor: grab; z-index: 2; }
+.knob::before { content: ""; position: absolute; inset: 0; margin: auto; width: 4px; height: 9px; border-left: 1.5px solid var(--agent-btn); border-right: 1.5px solid var(--agent-btn); }
+.knob.idle { animation: invite 1.8s ease-out infinite; }
+@keyframes invite { 0% { box-shadow: 0 2px 8px rgba(15,26,61,.25), 0 0 0 0 rgba(58,90,214,.45); } 70%, 100% { box-shadow: 0 2px 8px rgba(15,26,61,.25), 0 0 0 12px rgba(58,90,214,0); } }
+@media (prefers-reduced-motion: reduce) { .knob.idle { animation: none; } }
+.track.glide .knob { transition: left .6s cubic-bezier(.3,.8,.3,1); }
+.knob:active { cursor: grabbing; }
+.knob::after { content: attr(data-v); position: absolute; top: 32px; left: 50%; transform: translateX(-50%); background: var(--agent-btn); color: #fff; font-size: 11.5px; font-weight: 700; border-radius: 6px; padding: 2px 8px; white-space: nowrap; }
+.verdict { display: flex; align-items: center; gap: 10px; background: var(--side); border-radius: 10px; padding: 10px 14px; font-size: 14px; }
+.verdict b { font-weight: 600; white-space: nowrap; }
+.verdict .hint { margin-left: auto; color: var(--faint); font-size: 12px; }
+.verdict .try { margin-left: auto; border: 1px solid var(--agent-2); background: var(--bg); color: var(--agent); border-radius: 999px; padding: 3px 11px; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.verdict .try:hover { background: var(--agent-soft); }
+.answer { display: flex; align-items: center; gap: 8px; }
+
+/* 6. Why AED 25,000: the agent annotates the free-text SVS remarks */
+.scrim { position: absolute; inset: 0; background: rgba(15,26,61,.18); z-index: 10; }
+/* 9. Sending or cancelling closes the hold form */
+#scrim9, #modal9 { transition: opacity .3s ease; }
+#scrim9.gone, #modal9.gone { opacity: 0; pointer-events: none; }
+.pre9 { display: grid; gap: 16px; }
+.pre9[hidden], .sent9[hidden] { display: none; }
+.sent9 { display: grid; gap: 18px; max-width: 660px; }
+.s9-head { display: grid; grid-template-columns: 38px 1fr; gap: 12px; align-items: center; }
+.s9-head h2 { margin: 0; font-family: var(--head); font-weight: 700; font-size: 22px; letter-spacing: -.02em; line-height: 1.2; }
+.s9-head p { color: var(--muted); font-size: 12.5px; margin-top: 3px; }
+.s9-ok { width: 38px; height: 38px; border-radius: 50%; background: var(--ok); color: #fff; display: grid; place-items: center; transform: scale(.4); opacity: 0; transition: transform .45s cubic-bezier(.3,1.6,.5,1), opacity .2s ease; }
+.s9-ok svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 16; stroke-dashoffset: 16; transition: stroke-dashoffset .4s ease .35s; }
+.s9-head > div, .trk li { opacity: 0; transform: translateY(6px); transition: opacity .4s ease, transform .4s ease; }
+.s9-head > div { transition-delay: .25s; }
+.trk li { transition-delay: calc(.7s + var(--i) * .22s); }
+.sent9.go .s9-ok { transform: none; opacity: 1; animation: okring 1s ease-out .3s; }
+.sent9.go .s9-ok svg { stroke-dashoffset: 0; }
+.sent9.go .s9-head > div, .sent9.go .trk li { opacity: 1; transform: none; }
+.trk { list-style: none; margin: 0; padding: 16px 18px; border: 1px solid var(--line); border-radius: 12px; display: grid; }
+.trk li { display: grid; grid-template-columns: 18px 1fr auto; gap: 0 12px; position: relative; padding-bottom: 16px; }
+.trk li:last-child { padding-bottom: 0; }
+.trk li::before { content: ""; position: absolute; left: 8px; top: 20px; bottom: 2px; width: 2px; border-radius: 2px; background: var(--line); }
+.trk li:last-child::before { display: none; }
+.trk li.done::before { background: var(--ok); }
+.trk .dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--line); background: var(--bg); margin-top: 1px; }
+.trk li.done .dot { background: var(--ok); border-color: var(--ok); }
+.trk li.now .dot { border-color: var(--warn); background: var(--warn-soft); animation: waitdot 1.8s ease-out infinite; }
+.trk li:not(.done):not(.now) b { color: var(--muted); }
+.trk b { font-size: 13.5px; font-weight: 600; }
+.trk small { display: block; color: var(--muted); font-size: 12.5px; line-height: 1.4; margin-top: 2px; }
+.trk em { font-style: normal; font-size: 11.5px; color: var(--faint); white-space: nowrap; padding-top: 2px; }
+.trk li.now em { color: var(--warn); font-weight: 600; }
+@keyframes waitdot { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--warn) 40%, transparent); } 70%, 100% { box-shadow: 0 0 0 7px transparent; } }
+.biz.flash { animation: flash 1.6s ease-out; }
+@keyframes flash { from { background: var(--warn-soft); } }
+.drawer { position: absolute; top: 0; right: 0; bottom: 0; width: 640px; background: var(--bg); border-left: 1px solid var(--line); z-index: 11; box-shadow: -30px 0 60px -30px rgba(15,26,61,.4); display: grid; grid-template-rows: auto minmax(0, 1fr) auto; }
+/* 6. The drawer slides in over the review when the screen comes into view */
+.drawin .drawer { transform: translateX(100%); }
+.drawin .scrim { opacity: 0; }
+.drawin.s1 .drawer { transform: none; transition: transform .8s cubic-bezier(.2,.8,.2,1); }
+.drawin.s1 .scrim { opacity: 1; transition: opacity .6s ease; }
+.drawin.shut .drawer { transform: translateX(100%); transition: transform .55s cubic-bezier(.5,0,.75,0); }
+.drawin.shut .scrim { opacity: 0; transition: opacity .45s ease .1s; }
+.dr-h { padding: 18px 22px 12px; display: grid; gap: 4px; border-bottom: 1px solid var(--line2); }
+.dr-h .x { position: absolute; right: 16px; top: 14px; }
+.dr-h h3 { margin: 0; font-family: var(--head); font-size: 19px; letter-spacing: -.015em; }
+.dr-h p { color: var(--muted); font-size: 13px; }
+.dr-b { padding: 16px 22px; display: grid; gap: 14px; align-content: start; overflow: hidden; }
+.svs-big { border: 1px solid #c9d2d8; border-radius: 8px; overflow: hidden; background: #fff; color: #1f2a33; font-family: "Segoe UI", Tahoma, Arial, sans-serif; }
+.svs-big .wbar { background: #2f3b45; color: #e6ebef; height: 26px; font-size: 10.5px; }
+.svs-big .rm { display: grid; grid-template-columns: 26px 1fr; gap: 10px; padding: 10px 12px; border-top: 1px solid #edf0f2; }
+.svs-big .rm:first-of-type { border-top: 0; }
+.svs-big .oi { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font-size: 9px; font-weight: 700; color: #fff; background: #7a8794; }
+.svs-big .oi.b { background: #1b7f86; }
+.svs-big small { font-size: 10.5px; color: #6b7883; display: block; margin-bottom: 3px; }
+.svs-big p { font-size: 13px; line-height: 1.85; color: #1f2a33; }
+.mk { position: relative; background: rgba(58,90,214,.12); box-shadow: 0 0 0 1.5px rgba(58,90,214,.7); border-radius: 3px; padding: 0 2px; }
+.mk.w { background: rgba(201,138,28,.14); box-shadow: 0 0 0 1.5px rgba(201,138,28,.9); }
+.mk sup { position: absolute; top: -9px; right: -7px; width: 15px; height: 15px; border-radius: 50%; background: #2140b8; color: #fff; font: 700 9px/15px var(--ui); text-align: center; }
+.mk.w sup { background: #a5650c; }
+.notes { list-style: none; margin: 0; padding: 0; display: grid; gap: 7px; }
+.notes li { display: grid; grid-template-columns: 18px 1fr auto; gap: 10px; align-items: start; font-size: 13px; }
+.notes li > i { width: 18px; height: 18px; border-radius: 50%; background: var(--agent-btn); color: #fff; font: 700 10px/18px var(--ui); text-align: center; font-style: normal; margin-top: 1px; }
+.notes li.w > i { background: var(--warn); }
+.notes li code { font-family: var(--ui); font-size: 12px; font-weight: 600; background: var(--hover); border-radius: 4px; padding: 1px 5px; }
+.notes li small { display: block; color: var(--muted); font-size: 12px; }
+.concl { display: grid; grid-template-columns: 26px 1fr; gap: 10px; background: var(--side); border-radius: 10px; padding: 12px 14px; font-size: 13.5px; }
+.concl .ldot { width: 26px; height: 26px; }
+.dr-f { padding: 12px 22px; border-top: 1px solid var(--line); display: flex; gap: 8px; }
+
+/* 7. Workflow variations (outside the app, to compare) */
+.vars { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.var { background: var(--bg); border: 1px solid var(--line); border-radius: 14px; padding: 16px; display: grid; gap: 12px; align-content: start; font-size: 13px; box-shadow: var(--win); }
+.var-h { display: flex; align-items: center; gap: 10px; }
+.var-h .k { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font-family: var(--head); font-weight: 700; background: var(--ink); color: var(--bg); font-size: 13px; }
+.var-h b { font-size: 14.5px; }
+.var-h small { display: block; color: var(--muted); font-size: 12px; }
+.var .rec-tag { justify-self: start; font-size: 11px; font-weight: 600; color: var(--agent); background: var(--agent-soft); border-radius: 999px; padding: 1px 8px; }
+.band { border: 1px solid var(--line); border-radius: 10px; padding: 10px; display: grid; gap: 8px; }
+.band > small { font-size: 11.5px; font-weight: 600; color: var(--muted); }
+.flowA { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.nodeA { border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; display: grid; gap: 4px; background: var(--side); font-size: 12px; }
+.nodeA > span { font-weight: 600; }
+.nodeA .faces { display: flex; gap: 3px; flex-wrap: wrap; }
+.arr { color: var(--faint); font-size: 12px; }
+.bank { font-size: 11.5px; color: var(--ok); background: var(--ok-soft); border-radius: 999px; padding: 2px 8px; font-weight: 600; }
+.lanes { display: grid; grid-template-columns: 104px repeat(3, minmax(0, 1fr)); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; font-size: 12px; }
+.lanes > * { padding: 8px 8px; border-top: 1px solid var(--line2); display: flex; align-items: center; gap: 6px; }
+.lanes .hd { border-top: 0; background: var(--side); font-size: 11px; font-weight: 600; color: var(--muted); line-height: 1.25; }
+.lanes .who { font-weight: 600; }
+.lanes .who i { width: 18px; height: 18px; border-radius: 50%; display: grid; place-items: center; font-style: normal; font-size: 9px; color: #fff; background: #4f6a8f; flex: none; }
+.lanes .who.k i { background: #2f7f86; } .lanes .who.r i { background: #8a6d9a; }
+.yes { color: var(--ok); font-weight: 700; }
+.no { color: var(--faint); }
+.lim { font-weight: 600; color: var(--agent); background: var(--agent-soft); border-radius: 5px; padding: 1px 5px; font-size: 11px; }
+.lanes .rrow { opacity: .55; }
+.lanes .note-r { grid-column: 1 / -1; font-size: 11.5px; color: var(--warn-ink); background: var(--warn-soft); }
+.sent { display: grid; gap: 10px; }
+.sent .row { border: 1px solid var(--line); border-radius: 10px; padding: 10px; display: grid; gap: 8px; }
+.sent .row p { font-size: 13px; line-height: 1.45; }
+.sent .row p b { font-weight: 600; }
+.mf { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; font-size: 11.5px; color: var(--muted); }
+
+/* 8. Correct it */
+.compose { border: 1.5px solid var(--warn); border-radius: 12px; padding: 12px 14px; display: grid; gap: 8px; background: var(--bg); }
+.compose small { font-size: 12px; color: var(--muted); font-weight: 600; }
+.compose .ta { font-size: 13.5px; line-height: 1.5; min-height: 42px; }
+.compose .row2 { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.qk { font-size: 12px; border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; color: var(--muted); }
+.reply { display: grid; grid-template-columns: 26px 1fr; gap: 10px; }
+.reply .ldot { width: 26px; height: 26px; }
+.reply .bub { background: var(--side); border-radius: 12px; padding: 12px 14px; display: grid; gap: 8px; font-size: 13.5px; }
+.chg { list-style: none; margin: 0; padding: 0; display: grid; gap: 5px; font-size: 13px; }
+.chg li { display: flex; gap: 8px; align-items: baseline; }
+.chg s { color: var(--faint); }
+.chg b { background: var(--warn-soft); color: var(--warn-ink); border-radius: 4px; padding: 0 5px; font-weight: 600; }
+.track.two .th.old { border-left: 2px dashed var(--faint); }
+.track.two .th.old b { color: var(--faint); text-decoration: line-through; font-weight: 600; }
+.track.two .th.new { border-left-color: var(--warn); }
+.track.two .th.new b { color: var(--warn-ink); background: var(--warn-soft); border-radius: 4px; }
+
+.mine { display: flex; justify-content: flex-end; align-items: flex-end; gap: 10px; }
+.mine-b { max-width: 72%; background: var(--bg); border: 1px solid color-mix(in srgb, var(--human) 40%, transparent); box-shadow: 0 6px 16px -12px rgba(15,26,61,.35); color: var(--ink); border-radius: 14px 14px 4px 14px; padding: 10px 14px; display: grid; gap: 6px; font-size: 13.5px; }
+.mine-b small { font-size: 11.5px; font-weight: 600; color: var(--human); }
+.mine-b p { color: inherit; }
+/* The chat bubbles sit close, like one conversation */
+#convo8 .mine + .reply { margin-top: -8px; }
+#convo8 .reply + .map { margin-top: -4px; }
+.qk.on { justify-self: start; border-color: color-mix(in srgb, currentColor 40%, transparent); color: inherit; background: transparent; font-weight: 600; }
+/* 8 plays as a chat: your message goes out, the agent thinks, then answers */
+.dots { display: none; align-items: center; gap: 8px; color: var(--muted); font-size: 12.5px; }
+.dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--agent-2); animation: blink 1s ease-in-out infinite; }
+.dots i:nth-child(2) { animation-delay: .15s; } .dots i:nth-child(3) { animation-delay: .3s; margin-right: 2px; }
+.convo .mine { opacity: 0; transform: translate(28px, 18px) scale(.94); transform-origin: right bottom; transition: opacity .4s ease, transform .5s cubic-bezier(.2,.8,.2,1); }
+.convo .reply, .convo .map { opacity: 0; transform: translateY(10px); transition: opacity .4s ease, transform .45s cubic-bezier(.2,.8,.2,1); }
+.convo .bub > :not(.dots) { display: none; }
+.convo .chg li { opacity: 0; transform: translateX(-6px); transition: opacity .35s ease, transform .35s ease; }
+.convo .track.two .th.new { left: 25%; transition: left .9s cubic-bezier(.3,.8,.3,1) .35s; }
+.convo.s1 .mine { opacity: 1; transform: none; }
+.convo.s2 .reply { opacity: 1; transform: none; }
+.convo.s2 .dots { display: flex; }
+.convo.s3 .dots { display: none; }
+.convo.s3 .bub > :not(.dots) { display: revert; }
+.convo.s3 .bub > ul.chg { display: grid; }
+.convo.s3 .chg li { opacity: 1; transform: none; transition-delay: calc(.25s + var(--i, 0) * .3s); }
+.convo.s4 .map { opacity: 1; transform: none; }
+.convo.s4 .track.two .th.new { left: var(--th); }
+
+/* 9. Hold for compliance */
+.modal { position: absolute; z-index: 12; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 560px; background: var(--bg); border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 30px 80px -30px rgba(15,26,61,.55); display: grid; }
+.modal > div { padding: 16px 20px; display: grid; gap: 10px; }
+.modal h3 { margin: 0; font-family: var(--head); font-size: 19px; letter-spacing: -.015em; }
+.modal .lab { font-size: 12px; font-weight: 600; color: var(--muted); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chips span { font-size: 12.5px; border: 1px solid var(--line); border-radius: 999px; padding: 3px 11px; }
+.chips span.on { border-color: var(--ink); background: var(--ink); color: var(--bg); font-weight: 600; }
+.draft { border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; font-size: 13.5px; line-height: 1.55; background: var(--side); display: grid; gap: 8px; }
+.draft .by { display: flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 600; color: var(--agent); }
+.att { display: flex; gap: 6px; flex-wrap: wrap; }
+.modal .mf2 { border-top: 1px solid var(--line); display: flex; justify-content: flex-end; gap: 8px; padding: 12px 20px; }
+
+/* 10. The agent sets up access in the admin module */
+.adm { position: absolute; left: 20px; top: 40px; right: 20px; background: #fff; color: #1d2633; border: 1px solid #c7d0dc; border-radius: 8px; overflow: hidden; font-family: Arial, Helvetica, sans-serif; box-shadow: 0 14px 30px -14px rgba(15,26,61,.3); }
+.adm .wbar { background: #24324a; color: #e3e9f2; height: 26px; font-size: 10.5px; }
+.adm-nav { display: flex; gap: 0; background: #eef2f7; border-bottom: 1px solid #d3dbe6; font-size: 10.5px; }
+.adm-nav span { padding: 6px 12px; color: #3d4b62; }
+.adm-nav span.on { background: #fff; font-weight: 700; border-bottom: 2px solid #24324a; }
+.adm-b { padding: 12px 14px; display: grid; gap: 10px; }
+.adm-row1 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; font-size: 10.5px; }
+.adm-row1 label { display: grid; gap: 3px; color: #5a677d; font-weight: 700; }
+.fld { height: 24px; border: 1px solid #b8c3d3; border-radius: 3px; background: #fff; display: flex; align-items: center; padding: 0 7px; font-size: 11px; color: #1d2633; font-weight: 400; white-space: nowrap; overflow: hidden; }
+.fld.on { box-shadow: 0 0 0 2px rgba(58,90,214,.6); border-color: #3a5ad6; }
+.utab { border: 1px solid #c7d0dc; border-radius: 4px; overflow: hidden; font-size: 11px; }
+.utab .r { display: grid; grid-template-columns: 1.4fr 1.3fr .9fr 1.5fr 1.4fr; border-top: 1px solid #e3e8ef; transition: background .3s; }
+.utab .r:first-child { border-top: 0; background: #eef2f7; font-weight: 700; color: #3d4b62; font-size: 10px; }
+.utab .r > span { padding: 7px 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-height: 30px; }
+.utab .r.fill { background: rgba(58,90,214,.06); }
+.utab .r.skip span { color: #8a6a2e; }
+.tgl { display: inline-flex; align-items: center; gap: 4px; }
+.tgl i { width: 11px; height: 11px; border: 1px solid #8a97ab; border-radius: 2px; display: inline-grid; place-items: center; font-style: normal; font-size: 8px; }
+.tgl.on i { background: #2140b8; border-color: #2140b8; color: #fff; }
+.tgl.on i::before { content: "✓"; }
+.act-row { display: flex; align-items: center; gap: 10px; font-size: 11px; }
+.abtn { border: 1px solid #24324a; background: #24324a; color: #fff; border-radius: 3px; padding: 5px 10px; font-weight: 700; font-size: 10.5px; }
+.abtn.on { box-shadow: 0 0 0 2px rgba(58,90,214,.6); }
+.sent-st { color: #0f6b46; font-weight: 700; opacity: 0; transition: opacity .4s; }
+.sent-st.on { opacity: 1; }
+.readback { position: absolute; left: 20px; right: 20px; bottom: 16px; background: var(--bg); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; display: grid; gap: 8px; box-shadow: var(--shadow); }
+.readback h5 { margin: 0; font-size: 13px; display: flex; align-items: center; gap: 8px; }
+.rb { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px 14px; }
+.rb span { font-size: 11.5px; color: var(--faint); display: flex; align-items: center; gap: 5px; transition: color .3s; }
+.rb span::before { content: ""; width: 11px; height: 11px; border-radius: 50%; border: 1.5px solid var(--line); flex: none; transition: all .3s; }
+.rb span.ok { color: var(--ink); }
+.rb span.ok::before { background: var(--ok); border-color: var(--ok); box-shadow: inset 0 0 0 2px var(--bg); }
+
+/* 11. The customer, and Rashid */
+.cust { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 32px; padding: 24px 32px; height: 100%; align-items: start; }
+.phone { width: 290px; height: 560px; border-radius: 40px; background: #fff; color: #0f1a3d; position: relative; overflow: hidden; isolation: isolate; display: grid; align-content: start; gap: 10px; padding: 43px 25px 25px; box-shadow: var(--win); }
+/* The bezel sits on top of the screen, so nothing inside can ever cover it (Safari can lose rounded clipping on animated content) */
+.phone::after { content: ""; position: absolute; inset: 0; border: 9px solid #0f1a3d; border-radius: 40px; pointer-events: none; z-index: 10; }
+/* 12. A quiet confirmation when the sign-off is downloaded */
+.toast { position: absolute; right: 20px; bottom: 74px; z-index: 20; display: grid; grid-template-columns: 22px 1fr; gap: 2px 10px; align-items: center; background: var(--tour); color: var(--tour-ink); border-radius: 12px; padding: 11px 16px 11px 12px; font-size: 12.5px; line-height: 1.35; box-shadow: 0 18px 40px -16px rgba(15,26,61,.6); opacity: 0; transform: translateY(8px); transition: opacity .3s ease, transform .3s ease; pointer-events: none; }
+.toast.on { opacity: 1; transform: none; }
+.toast i { grid-row: span 2; width: 22px; height: 22px; border-radius: 50%; background: #5cc79c; color: #0f1a3d; display: grid; place-items: center; font-style: normal; font-size: 11px; font-weight: 700; }
+.toast small { opacity: .75; font-size: 11.5px; }
+.phone::before { content: ""; position: absolute; top: 18px; left: 50%; width: 70px; height: 18px; margin-left: -35px; border-radius: 12px; background: #0f1a3d; z-index: 11; }
+.ph-time { position: absolute; top: 18px; left: 31px; font-size: 11px; font-weight: 600; }
+.ph-h { display: flex; align-items: center; gap: 8px; padding-bottom: 8px; border-bottom: 1px solid #edf0f5; }
+.ph-h .bk { width: 32px; height: 32px; border-radius: 50%; background: #e3e8fb; color: #2140b8; display: grid; place-items: center; }
+.ph-h .bk svg { width: 17px; height: 12px; }
+.ph-h b { font-size: 13px; display: block; }
+.ph-h small { font-size: 11px; color: #5b6688; }
+.ph-msg { background: #f2f4f8; border-radius: 16px 16px 16px 4px; padding: 11px 12px; font-size: 12.5px; line-height: 1.45; display: grid; gap: 8px; }
+.ph-ok { display: flex; align-items: center; gap: 7px; color: #1d7a55; font-weight: 700; font-size: 13px; }
+.ph-ok i { width: 20px; height: 20px; border-radius: 50%; background: #1d7a55; color: #fff; display: grid; place-items: center; font-style: normal; font-size: 11px; }
+.ph-steps { display: grid; gap: 6px; }
+.ph-steps div { display: grid; grid-template-columns: 22px 1fr; gap: 8px; align-items: center; border: 1px solid #e3e6ee; border-radius: 10px; padding: 8px 9px; font-size: 12px; }
+.ph-steps div i { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-style: normal; font-size: 11px; font-weight: 700; background: #e3f2ea; color: #1d7a55; }
+.ph-steps div.cur { border-color: #2140b8; box-shadow: 0 0 0 3px #eaeefc; }
+.ph-steps div.cur i { background: #2140b8; color: #fff; }
+.ph-steps div.nx i { background: #eef1f6; color: #8b93ad; }
+.ph-steps small { display: block; font-size: 10.5px; color: #5b6688; }
+.arrive .ph-h { opacity: 0; transition: opacity .4s ease; }
+.arrive .ph-msg { opacity: 0; transform: translateY(16px) scale(.92); transform-origin: left bottom; transition: opacity .35s ease, transform .5s cubic-bezier(.2,.8,.2,1); }
+.arrive .ph-ok i { transform: scale(0); transition: transform .45s cubic-bezier(.3,1.8,.5,1); }
+.arrive .ph-steps div { opacity: 0; transform: translateY(8px); transition: opacity .35s ease, transform .35s ease; transition-delay: calc(var(--i, 0) * .18s); }
+.arrive.s1 .ph-h { opacity: 1; }
+.arrive.s1 .ph-msg { opacity: 1; transform: none; }
+.arrive.s2 .ph-ok i { transform: none; animation: okring 1s ease-out .2s; }
+.arrive.s3 .ph-steps div { opacity: 1; transform: none; }
+@keyframes okring { from { box-shadow: 0 0 0 0 rgba(29,122,85,.45); } to { box-shadow: 0 0 0 10px rgba(29,122,85,0); } }
+.cust-r { display: grid; gap: 16px; align-content: start; }
+.live-h { display: grid; gap: 6px; }
+.live-h h2 { margin: 0; font-family: var(--head); font-size: 24px; letter-spacing: -.02em; }
+.live-h p { color: var(--muted); font-size: 13.5px; }
+.who3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.who3 .pp small { color: var(--ok); font-weight: 600; }
+.who3 .pp.held small { color: var(--warn-ink); }
+.rashid { border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; display: grid; gap: 12px; box-shadow: var(--shadow); }
+.rashid-h { display: flex; align-items: center; gap: 10px; }
+.rashid-h .av { width: 34px; height: 34px; border-radius: 50%; background: #8a6d9a; color: #fff; display: grid; place-items: center; font-weight: 700; font-size: 12px; }
+.rashid-h b { font-size: 15px; }
+.rashid-h .pill { margin-left: auto; }
+.facts { display: grid; grid-template-columns: 150px 1fr; gap: 8px 14px; font-size: 13.5px; }
+.facts dt { color: var(--muted); font-size: 12.5px; font-weight: 600; padding-top: 1px; }
+.facts dd { margin: 0; }
+.rpath { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); position: relative; }
+.rpath::before { content: ""; position: absolute; left: 12%; right: 12%; top: 10px; height: 2px; background: var(--line); }
+.rpath div { display: grid; justify-items: center; gap: 6px; font-size: 12px; color: var(--faint); text-align: center; position: relative; }
+.rpath div i { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--line); background: var(--bg); display: grid; place-items: center; font-style: normal; font-size: 11px; }
+.rpath div.d { color: var(--ink); }
+.rpath div.d i { background: var(--ok); border-color: var(--ok); color: #fff; }
+/* 12. Rashid's path plays through: the line fills and each step ticks as it arrives */
+.rpath.grow::after { content: ""; position: absolute; left: 12%; top: 10px; height: 2px; width: 0; background: var(--ok); }
+.rpath.grow.s1::after { width: 76%; transition: width 2.1s linear; }
+.rpath.grow div { color: var(--faint); }
+.rpath.grow div i { background: var(--bg); border-color: var(--line); color: transparent; transform: scale(.7); z-index: 1; }
+.rpath.grow.s1 div:nth-child(1), .rpath.grow.s2 div:nth-child(2), .rpath.grow.s3 div:nth-child(3), .rpath.grow.s4 div:nth-child(4) { color: var(--ink); transition: color .3s ease; }
+.rpath.grow.s1 div:nth-child(1) i, .rpath.grow.s2 div:nth-child(2) i, .rpath.grow.s3 div:nth-child(3) i, .rpath.grow.s4 div:nth-child(4) i { background: var(--ok); border-color: var(--ok); color: #fff; transform: none; transition: transform .4s cubic-bezier(.3,1.6,.5,1), background .2s ease, border-color .2s ease, color .2s ease; }
+.rpath.grow.s4 div:nth-child(4) i { animation: okring 1s ease-out .2s 2; }
+
+/* 12. Full sign-off */
+.rpath.wide div small { font-size: 11px; color: var(--muted); }
+/* 12. A smaller, quieter path so the Emirates ID and signing setup lead */
+#rpath12 { margin-left: 42px; }
+#rpath12::before, #rpath12.grow::after { top: 7px; left: 7px; }
+#rpath12::before { right: auto; width: 75%; }
+#rpath12.grow.s1::after { width: 75%; }
+#rpath12 div { justify-items: start; text-align: left; }
+#rpath12 div { font-size: 11px; gap: 4px; }
+#rpath12 div i { width: 16px; height: 16px; border-width: 1.5px; font-size: 8.5px; }
+#rpath12 div small { font-size: 10px; }
+.fso { display: grid; grid-template-columns: 1fr 1.1fr; gap: 14px; margin-left: 42px; }
+.fso h4, .signoff h4 { margin: 0 0 10px; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+.org, .wsw { border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; background: var(--bg); }
+.org { box-shadow: var(--shadow); }
+.org-top { display: flex; align-items: center; gap: 10px; justify-self: center; width: max-content; margin: 0 auto; border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; background: var(--side); }
+.org-top .bi { width: 30px; height: 30px; border-radius: 8px; background: var(--bg); border: 1px solid var(--line); display: grid; place-items: center; font-family: var(--head); font-weight: 700; color: var(--muted); }
+.org-top div { display: grid; line-height: 1.3; }
+.org-top small { font-size: 11.5px; color: var(--muted); }
+.org-lines { display: block; width: 100%; height: 26px; }
+.org-lines path { fill: none; stroke: var(--line); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+.org-ppl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.op { border: 1px solid var(--line); border-radius: 10px; padding: 10px 8px; display: grid; justify-items: center; text-align: center; gap: 3px; }
+.op .av { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; color: #fff; font-weight: 700; font-size: 12px; background: #4f6a8f; margin-bottom: 2px; }
+.op.k .av { background: #2f7f86; } .op.r .av { background: #8a6d9a; }
+.op b { font-size: 13px; }
+.op small { font-size: 11px; color: var(--faint); }
+.op .rl { font-size: 11.5px; color: var(--muted); line-height: 1.35; min-height: 31px; }
+.op .pill { font-size: 11px; padding: 2px 8px; }
+.wsw { display: grid; gap: 10px; align-content: start; }
+.wsw h4 { margin-bottom: 0; }
+.bnd { border: 1px solid var(--line2); border-radius: 10px; padding: 10px 12px; display: grid; gap: 8px; background: var(--side); }
+.bnd-h { display: flex; align-items: baseline; gap: 10px; }
+.bnd-h b { font-size: 13px; }
+.bnd-h small { font-size: 12px; color: var(--muted); }
+.combos { display: flex; flex-wrap: wrap; gap: 6px; }
+.cb { display: inline-flex; align-items: center; gap: 4px; font-size: 11.5px; color: var(--muted); background: var(--bg); border: 1px solid var(--line); border-radius: 999px; padding: 2px 6px 2px 3px; }
+.cb .fc { border: 0; padding: 0 4px 0 0; background: none; }
+.cb.solo { border-color: var(--agent-2); color: var(--agent); font-weight: 600; }
+.eg { font-size: 12px; color: var(--muted); }
+.signoff { border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; }
+.signoff ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px 20px; }
+.signoff li { display: flex; align-items: center; gap: 7px; font-size: 13px; flex-wrap: wrap; }
+.signoff li::before { content: "✓"; width: 16px; height: 16px; border-radius: 50%; background: var(--ok); color: #fff; font-size: 9.5px; font-weight: 700; display: grid; place-items: center; flex: none; }
+.signoff li.you::before { background: var(--human); }
+
+/* 13. The ending */
+.end { display: grid; grid-template-columns: 1fr 1fr; height: 100%; }
+.end-l { padding: 56px 48px; display: grid; align-content: center; gap: 22px; border-right: 1px solid var(--line2); }
+.end-l .pill { justify-self: start; }
+.end-l h1 { margin: 0; font-family: var(--head); font-weight: 700; font-size: 40px; letter-spacing: -.025em; line-height: 1.05; }
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.stat { border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; display: grid; gap: 2px; }
+.stat b { font-family: var(--head); font-size: 26px; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+.stat span { font-size: 12.5px; color: var(--muted); line-height: 1.35; }
+.stat.you b { color: var(--human); }
+.end-l .small { color: var(--muted); font-size: 13.5px; }
+.tl { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; }
+.tl li { display: grid; grid-template-columns: 44px 14px 1fr; gap: 10px; align-items: start; font-size: 13.5px; padding-bottom: 12px; position: relative; }
+.tl li::before { content: ""; grid-column: 2; grid-row: 1; width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--line); background: var(--bg); margin-top: 4px; z-index: 1; }
+.tl li::after { content: ""; position: absolute; left: 59px; top: 14px; bottom: -2px; width: 2px; background: var(--line); }
+.tl li:last-child::after { display: none; }
+.tl time { grid-column: 1; grid-row: 1; color: var(--faint); font-size: 12.5px; font-variant-numeric: tabular-nums; padding-top: 1px; }
+.tl span { grid-column: 3; grid-row: 1; }
+.tl li.you::before { border-color: var(--human); background: var(--human); }
+.tl li.you span { color: var(--human); font-weight: 600; }
+.tl li.ok::before { border-color: var(--ok); background: var(--ok); }
+.end-r { background: var(--side); padding: 40px 48px; display: grid; align-content: center; gap: 16px; }
+.end-r .kick { color: var(--muted); }
+.end-r h2 { margin: 0; font-family: var(--head); font-weight: 700; font-size: 30px; letter-spacing: -.025em; line-height: 1.15; max-width: 18ch; }
+.end-r h2 em { font-style: normal; color: var(--agent); }
+.end-r p { font-size: 15px; color: var(--muted); max-width: 46ch; line-height: 1.6; }
+.berg { position: relative; width: 544px; height: 420px; border-radius: 14px; overflow: hidden; box-shadow: inset 0 0 0 1px var(--line); --water-top: #e6ecfc; --water-mid: #a9b9ee; --water-deep: #2f46ad; --ice-shade: #dfe6fa; --sky-top: #eef2fc; }
+:root[data-theme="dark"] .berg { --water-top: #1a2350; --water-mid: #121a40; --water-deep: #070b1f; --ice-shade: #1c2448; --sky-top: #10162c; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .berg { --water-top: #1a2350; --water-mid: #121a40; --water-deep: #070b1f; --ice-shade: #1c2448; --sky-top: #10162c; } }
+.berg svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.berg .ray { fill: var(--bg); opacity: .14; }
+.berg .shade { fill: #0f1a3d; opacity: .78; transition: opacity 1.2s ease; }
+.berg .tip-l { fill: var(--bg); } .berg .tip-d { fill: var(--agent-soft); }
+.berg .tip-l, .berg .tip-d { stroke: var(--agent-2); stroke-opacity: .5; stroke-width: 1.2; stroke-linejoin: round; }
+.berg .mass { opacity: 0; transition: opacity 1s ease .3s; }
+.berg .mass .body { fill: url(#bg-ice); }
+.berg .mass .lit { fill: var(--bg); opacity: .5; }
+.berg .mass .edge { fill: none; stroke: var(--agent-2); stroke-opacity: .55; stroke-width: 1.5; stroke-linejoin: round; }
+.berg .wl { fill: none; stroke: var(--agent-2); stroke-width: 2; }
+.berg .bub { fill: var(--bg); opacity: 0; }
+.berg.on .bub { animation: bub 5s ease-in infinite; }
+.berg.on .bub:nth-of-type(2) { animation-delay: 1.6s; } .berg.on .bub:nth-of-type(3) { animation-delay: 3s; }
+@keyframes bub { 0% { opacity: 0; transform: translateY(0); } 20% { opacity: .7; } 100% { opacity: 0; transform: translateY(-110px); } }
+.b-tip { position: absolute; left: 14px; top: 30px; width: 200px; text-align: right; display: grid; line-height: 1.3; }
+.b-tip b { font-size: 13.5px; color: var(--ink); }
+.b-tip span { font-size: 12px; color: var(--muted); }
+.berg .sink { stroke: var(--agent-2); stroke-width: 1.2; stroke-dasharray: 3 4; opacity: 0; transition: opacity .6s ease .8s; }
+/* Inside the iceberg: three layers feed the agent */
+.in { opacity: 0; transition: opacity .6s ease var(--d, .8s); }
+.berg.on .in { opacity: 1; }
+.iw { position: absolute; inset: 0; width: 100%; height: 100%; }
+.iw path { fill: none; stroke: var(--agent-2); stroke-width: 1.3; stroke-opacity: .4; }
+.it { position: absolute; left: 0; right: 0; top: 110px; text-align: center; font-size: 15px; color: var(--muted); --d: .8s; }
+.it b { font-family: var(--head); font-size: 22px; letter-spacing: -.02em; color: var(--agent); margin-left: 2px; }
+.d3 .feed { stroke-dasharray: 3 4; stroke-opacity: .7; }
+.t3 { position: absolute; top: 146px; width: 130px; text-align: center; transform: translateX(-50%); display: grid; justify-items: center; gap: 6px; }
+.t3 i { width: 40px; height: 40px; border-radius: 50%; background: var(--bg); color: var(--agent); display: grid; place-items: center; box-shadow: 0 0 0 1px rgba(58,90,214,.3), 0 8px 18px -12px rgba(15,26,61,.6); }
+.t3 svg { width: 19px; height: 19px; }
+.t3 span { font-size: 13.5px; font-weight: 700; color: var(--ink); line-height: 1.2; margin-top: 1px; }
+.t3 small { font-size: 11px; color: var(--muted); line-height: 1.35; margin-top: -4px; text-wrap: balance; }
+.a3 { position: absolute; left: 0; right: 0; top: 288px; display: grid; justify-items: center; gap: 6px; }
+.a3 b { display: inline-flex; align-items: center; gap: 6px; background: var(--agent-btn); color: #fff; border-radius: 999px; padding: 4px 13px 4px 10px; font-size: 13px; box-shadow: 0 0 0 3px rgba(58,90,214,.15); }
+.a3 svg { width: 15px; height: 15px; }
+.a3 span { max-width: 300px; font-size: 11.5px; color: var(--muted); text-align: center; line-height: 1.4; text-wrap: balance; }
+.berg .t3 svg, .berg .a3 svg { position: static; inset: auto; }
+.b-lov { position: absolute; right: 14px; top: 70px; font-size: 10.5px; font-style: italic; color: var(--agent-2); opacity: 0; transition: opacity .6s ease .7s; }
+.berg.on .b-lov { opacity: .85; }
+.berg.on .shade { opacity: 0; }
+.berg.on .mass { opacity: 1; }
+.berg.on .sink { opacity: .7; }
+.b-hit { position: absolute; left: 50%; top: 58%; transform: translate(-50%, -50%); display: inline-flex; align-items: center; gap: 9px; border: 0; border-radius: 999px; padding: 9px 16px 9px 12px; background: var(--bg); color: var(--ink); font-size: 13.5px; font-weight: 600; cursor: pointer; box-shadow: 0 10px 30px -10px rgba(0,0,0,.5); transition: opacity .4s, transform .4s; }
+.b-hit i { width: 12px; height: 12px; border-radius: 50%; background: var(--agent-2); animation: hit 1.8s ease-out infinite; }
+@keyframes hit { 0% { box-shadow: 0 0 0 0 rgba(58,90,214,.55); } 100% { box-shadow: 0 0 0 12px rgba(58,90,214,0); } }
+.b-hit:hover { transform: translate(-50%, -50%) scale(1.04); }
+.berg.on .b-hit { opacity: 0; pointer-events: none; transform: translate(-50%, -30%); }
+.b-line { font-size: 14.5px; line-height: 1.5 !important; max-width: 52ch !important; color: var(--ink) !important; font-weight: 500; }
+.sig2 { display: flex; align-items: center; gap: 12px; }
+.sig2 .ph { width: 44px; height: 44px; border-radius: 50%; background: var(--human-soft); color: var(--human); display: grid; place-items: center; font-weight: 700; }
+.sig2 b { display: block; font-size: 14px; }
+.sig2 small { color: var(--muted); font-size: 12.5px; }
+.end-cta { display: flex; gap: 10px; align-items: center; }
+.end-cta .btn { padding: 10px 16px; font-size: 14px; }
+
+.closing { display: grid; gap: 8px; border-top: 1px solid var(--line); padding-top: 28px; max-width: 760px; }
+.closing h2 { margin: 0; font-family: var(--head); font-size: 20px; letter-spacing: -.015em; }
+.closing ul { margin: 0; padding-left: 18px; color: var(--muted); display: grid; gap: 4px; font-size: 14.5px; }
+
+@media (max-width: 900px) { .vars { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+
+<p class="phone-note">Jointly is a desktop workbench. It reads best on a laptop, or with your phone turned sideways.</p>
+<div class="wrap">
+  <header class="intro-page">
+    <span class="note">Round 1 · built from your 15 comments on the live demo · comment on anything</span>
+    <h1>The demo, redesigned as an agentic workbench</h1>
+    <p>Each frame is the real app at desktop size, in journey order. The agent's screen and the admin module play on their own, and you can drag the amount on the signing map. One decision for the human checker instead of four.</p>
+    <nav class="flow" aria-label="Frames">
+      <a href="#f1">1 Intro</a><a href="#f2">2 Home</a><a href="#f3">3 Agent at work</a><a href="#f4">4 What it checked</a><a href="#f5">5 Review</a><a href="#f6">6 Why AED 25,000</a><a href="#f7">7 Who can do what</a><a href="#f8">8 Correct it</a><a href="#f9">9 Hold</a><a href="#f10">10 Set up access</a><a href="#f11">11 Customer and Rashid</a><a href="#f12">12 Full sign-off</a><a href="#f13">13 Ending</a>
+    </nav>
+  </header>
+
+  <!-- 1 -->
+  <section class="fr" id="f1">
+    <div class="fr-head"><span class="n">1</span><h2>Guided tour intro</h2><p>No modal and no blur. A full welcome that tells you who you are, what Jointly is, your case today, and what you'll see when you go in.</p></div>
+    <div class="stage" data-h="720"><div class="scaler"><div class="app solo" style="--h:720px">
+      <div class="welcome">
+        <div class="w-left">
+          <div class="w-brand"><a class="home" href="../" title="Back to the case study"><svg class="rings" viewBox="0 0 22 15"><circle cx="7.5" cy="7.5" r="6"/><circle cx="14.5" cy="7.5" r="6"/></svg><b>Jointly</b></a></div>
+          <div class="w-copy">
+            <span class="kick">Guided tour · about 3 minutes</span>
+            <h1>You're a human checker at a UAE bank.</h1>
+            <p>You work on the <b>customer fulfilment operations team</b>. Your job is to give <b>joint signatory business clients</b> digital banking access. Jointly is your workbench: an agent does the reading, checking and setting up, and you make the calls that need a person.</p>
+            <div class="case"><span class="bi">C</span><div><b>Your case today: Creekside General Trading LLC</b><small>A trading business with 3 joint signatories</small></div></div>
+          </div>
+          <div class="w-cta"><a class="btn pri" href="#f2">Start the tour</a><a class="lnk" href="#f5">Skip to the review</a></div>
+        </div>
+        <div class="w-right">
+          <h4>What you'll see when you go in</h4>
+          <div class="prev"><span class="k">1</span><div><b>Business clients</b><small>Every joint signatory client the agent is working on, and which ones are ready for you.</small></div><div class="mini list"><i style="top:10px"></i><i class="r" style="top:32px"></i><i style="top:54px"></i></div></div>
+          <div class="prev"><span class="k">2</span><div><b>The agent at work</b><small>Watch it read Finacle, SVS and each Emirates ID, and see where every fact came from.</small></div><div class="mini apps"><i class="f"></i><i class="s"></i><i class="e"></i><svg viewBox="0 0 18 22"><path d="M2 2 L2 18 L6.5 13.5 L9.5 20 L12 19 L9 12.5 L15 12.5 Z" fill="currentColor"/></svg></div></div>
+          <div class="prev you"><span class="k">3</span><div><b>Your decision</b><small>The agent shows you the signing rules it built and why. You approve, correct or hold.</small></div><div class="mini map"><span class="ppl"><i></i><i></i><i></i></span><span class="line"></span><span class="h"></span><span class="ok">Approve</span></div></div>
+        </div>
+      </div>
+    </div></div></div>
+  </section>
+
+  <!-- 2 -->
+  <section class="fr" id="f2">
+    <div class="fr-head"><span class="n">2</span><h2>Home: business clients</h2><p>Where the flow starts. A calm overview with no targets or countdowns, and the left panel works like chat history but lists business clients. Creekside is still with the agent, so the tour invites you to open it and watch.</p></div>
+    <div class="stage" data-h="760"><div class="scaler"><div class="app" style="--h:760px">
+      <div class="sb-slot" data-active="home" data-creek="work"></div>
+      <div class="main" style="grid-template-rows: minmax(0,1fr)">
+        <div class="home">
+          <div><h1>Good morning</h1><p class="sub">The agent worked on 7 joint signatory business clients since yesterday. Here's where each one is.</p></div>
+          <div class="tiles">
+            <div class="tile a"><b>1</b><span>Ready for your approval</span></div>
+            <div class="tile"><b>2</b><span>Agent working</span></div>
+            <div class="tile g"><b>4</b><span>Digital banking access live today</span></div>
+          </div>
+          <div class="cards-h"><h4>Business clients</h4><a class="lnk" href="#f2">Show all 7</a></div>
+          <div class="cards">
+            <div class="bc hi" id="creek-card">
+              <div class="bc-top"><b>Creekside General Trading LLC</b><span class="pill work"><i></i>Agent working</span></div>
+              <div class="ppl">3 joint signatories: Mohammed, Khalifa, Rashid</div>
+              <div class="ag-line"><span class="ldot"><svg viewBox="0 0 22 15"><circle cx="7.5" cy="7.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="14.5" cy="7.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/></svg></span>Reading the SVS remarks · step 3 of 7</div>
+              <div class="bar-p" style="--p:38%"><i></i></div>
+            </div>
+            <div class="bc">
+              <div class="bc-top"><b>Palm Grove Auto Parts</b><span class="pill ready">Ready for your approval</span></div>
+              <div class="ppl">2 joint signatories: Aisha, Omar</div>
+              <div class="ag-line"><span class="ldot"><svg viewBox="0 0 22 15"><circle cx="7.5" cy="7.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="14.5" cy="7.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/></svg></span>Built the signing rules. One limit to confirm.</div>
+              <div class="bar-p" style="--p:62%"><i></i></div>
+            </div>
+            <div class="bc">
+              <div class="bc-top"><b>Al Noor Marine Supplies</b><span class="pill work"><i></i>Agent working</span></div>
+              <div class="ppl">4 joint signatories: Hessa, Yousef, Sami, Laila</div>
+              <div class="ag-line"><span class="ldot"><svg viewBox="0 0 22 15"><circle cx="7.5" cy="7.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="14.5" cy="7.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/></svg></span>Checking Emirates IDs · step 4 of 7</div>
+              <div class="bar-p" style="--p:50%"><i></i></div>
+            </div>
+            <div class="bc">
+              <div class="bc-top"><b>Harbour Point Logistics</b><span class="pill live"><i></i>Live · 3 of 3</span></div>
+              <div class="ppl">3 joint signatories: Fatima, Ahmed, Noura</div>
+              <div class="ag-line"><span class="ldot"><svg viewBox="0 0 22 15"><circle cx="7.5" cy="7.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="14.5" cy="7.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/></svg></span>Set up in 1h 41m. You approved it at 09:12.</div>
+              <div class="bar-p" style="--p:100%"><i style="background:var(--ok)"></i></div>
+            </div>
+          </div>
+          <div class="tour t" style="left: 60px; top: 378px;"><b>Start here.</b><span>The agent is setting up digital banking access for Creekside's joint signatory business partners right now.</span><span class="tf"><span>1 of 6</span><span>Open Creekside</span></span></div>
+        </div>
+      </div>
+    </div></div></div>
+  </section>
+
+  <!-- 3 -->
+  <section class="fr" id="f3">
+    <div class="fr-head"><span class="n">3</span><h2>The agent at work</h2><p>You're looking over the agent's shoulder. Its cursor moves through the bank's real systems (recreated from the landing page hero), the plan on the right ticks off, and the log says what it did and where the data came from. Pause, 2x, or skip to your review.</p></div>
+    <div class="stage" data-h="800"><div class="scaler"><div class="app" style="--h:800px">
+      <div class="sb-slot" data-active="creek" data-creek="work"></div>
+      <div class="main">
+        <div class="top"><h3>Creekside General Trading LLC</h3><span class="pill work"><i></i>Agent working</span><div class="pair"><span class="ag"><svg viewBox="0 0 22 15"><circle cx="7.5" cy="7.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="14.5" cy="7.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/></svg></span><span class="me" role="img" aria-label="You"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><circle cx="8" cy="5.4" r="2.8"/><path d="M2.6 13.8c.6-2.7 2.8-4.2 5.4-4.2s4.8 1.5 5.4 4.2z"/></svg></span><span>You and the agent</span></div><button class="ib" title="Case details">⋯</button></div>
+        <nav class="tabs"><a class="on" href="#f3">Review</a><a href="#f3">History</a></nav>
+        <div class="body">
+          <div class="pane" style="padding:16px">
+            <div class="desk" id="desk">
+              <div class="desk-h"><span class="live"><i></i>Agent's screen</span><span>· live</span></div>
+              <div class="sys fin" id="s-fin" style="left:16px; top:40px">
+                <div class="f-strip">Universal Banking Solution</div>
+                <div class="f-brand"><span class="f-logo"><i></i>Finacle</span><span class="f-menu"><span>Menu</span><span>Show Memo Pad</span></span></div>
+                <div class="f-band"><b>CIF Retail Inquiry</b><span>A/c. 0191-2290-01</span></div>
+                <div class="f-title">Related parties · Creekside General Trading LLC</div>
+                <div class="f-grid">
+                  <div><span>CIF ID</span><span>Customer Name</span><span>Relationship</span><span>Mode</span></div>
+                  <div><span>100234</span><span id="h-fin1" class="hl">MOHAMMED A AL MANSOORI</span><span>PARTNER</span><span>JOINTLY</span></div>
+                  <div><span>087331</span><span id="h-fin2" class="hl">KHALIFA S ALFALASI</span><span>PARTNER</span><span>JOINTLY</span></div>
+                  <div><span>100912</span><span id="h-fin3" class="hl">RASHID H ALKETBI</span><span>PARTNER</span><span>JOINTLY</span></div>
+                </div>
+                <div class="f-btns"><span>Go</span><span>Clear</span></div>
+              </div>
+              <div class="sys form" id="s-form" style="left:426px; top:52px">
+                <div class="wbar"><i></i><i></i><i></i><span>Signed application · page 2 of 6</span></div>
+                <div class="sheet">
+                  <div class="lab">Full name of signatory 2</div>
+                  <div class="box"><span class="hand hl" id="h-form">Khalifa Saeed Al Falasi</span></div>
+                  <div class="lab">Signature</div>
+                  <div class="box"><svg class="sig" width="110" height="24" viewBox="0 0 120 26"><path d="M4 18 C 12 2, 18 4, 16 16 S 26 24, 32 12 C 36 6, 40 18, 46 15 C 52 12, 56 6, 62 14 C 68 22, 76 8, 84 12 C 92 16, 100 18, 116 8"/></svg></div>
+                </div>
+              </div>
+              <div class="sys svs" id="s-svs" style="left:30px; top:262px">
+                <div class="wbar"><i></i><i></i><i></i><span>SVS · Signature Verification</span><em>A/c. 0191-2290-01</em></div>
+                <div class="s-main">
+                  <div class="s-lab">Signatories · names typed by hand</div>
+                  <div class="s-sigs">
+                    <div class="s-tile"><svg class="scan" viewBox="0 0 110 30" preserveAspectRatio="none"><path d="M8 20 C 16 4, 24 6, 22 18 S 32 25, 40 13 C 45 6, 50 22, 58 18 C 66 14, 72 22, 100 9"/></svg><b>MOHD A. MANSORI</b><small>Typed by staff</small></div>
+                    <div class="s-tile"><svg class="scan" viewBox="0 0 110 30" preserveAspectRatio="none"><path d="M6 18 C 14 3, 22 6, 20 18 C 18 25, 30 22, 36 12 C 40 5, 46 21, 54 17 C 62 13, 66 7, 74 15 C 80 21, 90 16, 102 10"/></svg><b><span class="hl" id="h-svs">KHALEFA S. ALFALASY</span></b><small>Typed by staff</small></div>
+                    <div class="s-tile"><svg class="scan" viewBox="0 0 110 30" preserveAspectRatio="none"><path d="M8 22 C 12 10, 18 4, 24 10 C 30 16, 27 23, 36 18 C 46 13, 50 7, 60 12 C 70 17, 78 21, 102 13"/></svg><b>RASHEED H. ALKETBI</b><small>Typed by staff</small></div>
+                  </div>
+                  <div class="s-lab">Operating instructions · free text</div>
+                  <div class="rmk"><span class="oi">AK</span><div><small>Dec 2019 · Operations</small><p>AUTH SIGN: MOHD / KHALEFA / RASHEED (PRTNRS) AS PER MOA. <span class="hl" id="h-r1">ANY TWO JNTLY. KHALEFA SINGLY UPTO AED 50,000/-</span> PER TXN, ABOVE 50K ANY TWO.</p></div></div>
+                  <div class="rmk"><span class="oi b">RM</span><div><small>Apr 2023 · Branch</small><p>AMNDMT 18/04/23. <span class="hl" id="h-r2">Sole lmt of Khalifa revised to 25K per txn</span> w.e.f. 01/05/23 per brd res 03/23 (orig sighted). All other instr. unchanged.</p></div></div>
+                </div>
+              </div>
+              <div class="sys efr" id="s-efr" style="left:444px; top:300px">
+                <div class="wbar"><i></i><i></i><i></i><span>EFR · Emirates ID check</span><em>3 IDs</em></div>
+                <div class="eid">
+                  <div class="eid-top"><div><b>UNITED ARAB EMIRATES</b><small>Identity Card</small></div><div class="ar">دولة الإمارات العربية المتحدة<small>بطاقة هوية</small></div></div>
+                  <div class="eid-mid">
+                    <svg class="eid-ph" viewBox="0 0 50 62"><circle cx="25" cy="24" r="10" fill="#b9c2cf"/><path d="M6 62 C 8 44, 16 38, 25 38 C 34 38, 42 44, 44 62 Z" fill="#b9c2cf"/></svg>
+                    <div class="eid-f">
+                      <div><small>ID Number</small><b>784-1981-•••••••-1</b></div>
+                      <div><small>Name</small><b class="hl" id="h-efr">KHALIFA SAEED ALFALASI</b></div>
+                      <div><small>Expiry Date</small><b>14/03/2027</b></div>
+                    </div>
+                  </div>
+                  
+                </div>
+                <div class="efr-st" id="efr-st">Not checked yet</div>
+              </div>
+              <div class="cursor" id="cur"><svg viewBox="0 0 18 22"><path d="M2 2 L2 18 L6.5 13.5 L9.5 20 L12 19 L9 12.5 L15 12.5 Z"/></svg><span><svg viewBox="0 0 22 15"><circle cx="7.5" cy="7.5" r="6"/><circle cx="14.5" cy="7.5" r="6"/></svg>Agent</span></div>
+            </div>
+          </div>
+          <aside class="rp">
+            <div class="plan-h"><div class="t">Setting up digital banking access</div><div class="meta"><span id="p-count">2 of 7 done</span><span class="num">6 min</span></div><div class="bar-p" id="p-bar" style="--p:28%"><i></i></div></div>
+            <ol class="plan" id="plan3">
+              <li class="done"><span class="ic"></span><span class="tx">Read the request and 3 signed forms<small><span class="src">Forms</span></small></span></li>
+              <li class="done"><span class="ic"></span><span class="tx">Find the signatories<small><span class="src">Finacle</span> 3 partners, CIF 100234, 087331, 100912</small></span></li>
+              <li class="now"><span class="ic"></span><span class="tx">Read the signing rules<small><span class="src">SVS</span> free-text remarks</small></span></li>
+              <li><span class="ic"></span><span class="tx">Check Emirates IDs and signatures</span></li>
+              <li class="you"><span class="ic"></span><span class="tx">Your approval</span></li>
+              <li><span class="ic"></span><span class="tx">Set up digital banking access</span></li>
+              <li><span class="ic"></span><span class="tx">Send each signatory their login</span></li>
+            </ol>
+            <div class="log-h">Agent log</div>
+            <ul class="log" id="log3"></ul>
+          </aside>
+        </div>
+        <div class="bbar">
+          <span class="ldot"><svg viewBox="0 0 22 15"><circle cx="7.5" cy="7.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="14.5" cy="7.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/></svg></span>
+          <div class="msg"><b id="doing3">Reading the signing rules in SVS</b><small>Nothing needed from you yet.</small></div>
+          <div class="acts"><div class="speed"><button class="btn" id="pause3">Pause</button><button class="btn" id="fast3" aria-pressed="false">2x</button></div><a class="btn pri proto-next" href="#f4" hidden>See what it checked <kbd>Enter</kbd></a></div>
+        </div>
+      </div>
+    </div></div></div>
+  </section>
+
+  <!-- 4 -->
+  <section class="fr" id="f4">
+    <div class="fr-head"><span class="n">4</span><h2>What the agent checked</h2><p>When the reading is done, the checks appear as finished evidence instead of placeholder tiles: real-looking Emirates IDs, each signature next to its SVS specimen, and the existing CIF check as its own "the agent thought of this" card. Supporting documents shrink to one quiet row.</p></div>
+    <div class="stage" data-h="860"><div class="scaler"><div class="app" style="--h:860px">
+      <div class="sb-slot" data-active="creek" data-creek="ready"></div>
+      <div class="main">
+        <div class="top"><h3>Creekside General Trading LLC</h3><span class="pill ready">Ready for your approval</span><div class="pair"><span class="ag"><svg viewBox="0 0 22 15"><circle cx="7.5" cy="7.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="14.5" cy="7.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/></svg></span><span class="me" role="img" aria-label="You"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><circle cx="8" cy="5.4" r="2.8"/><path d="M2.6 13.8c.6-2.7 2.8-4.2 5.4-4.2s4.8 1.5 5.4 4.2z"/></svg></span><span>You and the agent</span></div><button class="ib">⋯</button></div>
+        <nav class="tabs"><a class="on" href="#f4">Review</a><a href="#f4">History</a></nav>
+        <div class="body">
+          <div class="pane checks">
+            <div class="sec-h"><h4>Emirates IDs</h4><small>Checked with EFR</small></div>
+            <div class="ids">
+              <div class="idc"><div class="eid"><div class="eid-top"><div><b>UNITED ARAB EMIRATES</b><small>Identity Card</small></div></div><div class="eid-mid"><svg class="eid-ph" viewBox="0 0 50 62"><circle cx="25" cy="24" r="10" fill="#b9c2cf"/><path d="M6 62 C 8 44, 16 38, 25 38 C 34 38, 42 44, 44 62 Z" fill="#b9c2cf"/></svg><div class="eid-f"><div><small>Name</small><b>MOHAMMED A AL MANSOORI</b></div><div><small>ID Number</small><b>784-1979-•••••••-3</b></div><div><small>Expiry</small><b>02/02/2028</b></div></div></div></div><span class="res">Valid · matches Finacle</span></div>
+              <div class="idc"><div class="eid"><div class="eid-top"><div><b>UNITED ARAB EMIRATES</b><small>Identity Card</small></div></div><div class="eid-mid"><svg class="eid-ph" viewBox="0 0 50 62"><circle cx="25" cy="24" r="10" fill="#b9c2cf"/><path d="M6 62 C 8 44, 16 38, 25 38 C 34 38, 42 44, 44 62 Z" fill="#b9c2cf"/></svg><div class="eid-f"><div><small>Name</small><b>KHALIFA SAEED ALFALASI</b></div><div><small>ID Number</small><b>784-1981-•••••••-1</b></div><div><small>Expiry</small><b>14/03/2027</b></div></div></div></div><span class="res">Valid · 4 spellings matched by ID</span></div>
+              <div class="idc"><div class="eid"><div class="eid-top"><div><b>UNITED ARAB EMIRATES</b><small>Identity Card</small></div></div><div class="eid-mid"><svg class="eid-ph" viewBox="0 0 50 62"><circle cx="25" cy="24" r="10" fill="#b9c2cf"/><path d="M6 62 C 8 44, 16 38, 25 38 C 34 38, 42 44, 44 62 Z" fill="#b9c2cf"/></svg><div class="eid-f"><div><small>Name</small><b>RASHID HAMAD ALKETBI</b></div><div><small>ID Number</small><b>784-1985-•••••••-6</b></div><div><small>Expiry</small><b style="color:#a5650c">14/08/2026</b></div></div></div></div><span class="res w">Expired 14 Aug · asked him to renew</span></div>
+            </div>
+            <div class="sec-h"><h4>Signatures</h4><small>Each signed form compared with the specimen held in SVS</small></div>
+            <div class="sigs">
+              <div class="sigc"><b>Mohammed</b><div class="pair2"><div><small>Signed form</small><svg class="sig" viewBox="0 0 110 30" preserveAspectRatio="none"><path d="M8 20 C 16 4, 24 6, 22 18 S 32 25, 40 13 C 45 6, 50 22, 58 18 C 66 14, 72 22, 100 9"/></svg></div><div><small>SVS specimen</small><svg class="sig" viewBox="0 0 110 30" preserveAspectRatio="none"><path d="M9 21 C 17 5, 25 7, 23 18 S 33 24, 41 14 C 46 7, 51 21, 59 18 C 67 15, 73 21, 99 10"/></svg></div></div><span class="res">Match</span></div>
+              <div class="sigc"><b>Khalifa</b><div class="pair2"><div><small>Signed form</small><svg class="sig" viewBox="0 0 110 30" preserveAspectRatio="none"><path d="M6 18 C 14 3, 22 6, 20 18 C 18 25, 30 22, 36 12 C 40 5, 46 21, 54 17 C 62 13, 66 7, 74 15 C 80 21, 90 16, 102 10"/></svg></div><div><small>SVS specimen</small><svg class="sig" viewBox="0 0 110 30" preserveAspectRatio="none"><path d="M7 19 C 15 4, 23 7, 21 18 C 19 24, 31 21, 37 12 C 41 6, 47 20, 55 17 C 63 14, 67 8, 75 15 C 81 20, 91 16, 101 11"/></svg></div></div><span class="res">Match</span></div>
+              <div class="sigc"><b>Rashid</b><div class="pair2"><div><small>Signed form</small><svg class="sig" viewBox="0 0 110 30" preserveAspectRatio="none"><path d="M8 22 C 12 10, 18 4, 24 10 C 30 16, 27 23, 36 18 C 46 13, 50 7, 60 12 C 70 17, 78 21, 102 13"/></svg></div><div><small>SVS specimen</small><svg class="sig" viewBox="0 0 110 30" preserveAspectRatio="none"><path d="M9 21 C 13 11, 19 5, 25 11 C 31 16, 28 22, 37 18 C 47 13, 51 8, 61 12 C 71 17, 79 20, 101 13"/></svg></div></div><span class="res">Match</span></div>
+            </div>
+            <div class="dup">
+              <div class="dup-h"><span class="ldot"><svg viewBox="0 0 22 15"><circle cx="7.5" cy="7.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="14.5" cy="7.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/></svg></span><b>I checked if Khalifa already had a CIF before creating a new one</b><span class="pill live"><i></i>Existing CIF found</span></div>
+              <div class="recs">
+                <div class="rec"><h5>Request <span>Signed form and Emirates ID</span></h5><div><span>Name</span><b class="m">Khalifa Saeed Al Falasi</b></div><div><span>Emirates ID</span><b class="m">784-1981-•••••••-1</b></div><div><span>Date of birth</span><b class="m">09/05/1981</b></div><div><span>CIF</span><b>Not created yet</b></div></div>
+                <div class="links"><svg viewBox="0 0 70 120" preserveAspectRatio="none"><path d="M0 50 C 35 50, 35 50, 70 50"/><path d="M0 72 C 35 72, 35 72, 70 72"/><path d="M0 94 C 35 94, 35 94, 70 94"/></svg></div>
+                <div class="rec"><h5>Existing CIF <span>Deira branch · 2016</span></h5><div><span>Name</span><b class="m">Khalefa S. Alfalasy</b></div><div><span>Emirates ID</span><b class="m">784-1981-•••••••-1</b></div><div><span>Date of birth</span><b class="m">09/05/1981</b></div><div><span>CIF</span><b>087331</b></div></div>
+              </div>
+              <p><b>Same person.</b> I found his existing CIF, so I'm using it instead of creating a new one. He won't end up with two customer records or two logins.</p>
+            </div>
+            <div class="docs">Documents read <span class="src">Trade licence</span><span class="src">Memorandum of Association</span><span class="src">Board resolution 03/23</span><span class="src">Access request form</span></div>
+          </div>
+          <aside class="rp">
+            <div class="plan-h"><div class="t">Setting up digital banking access</div><div class="meta"><span>4 of 7 done</span><span class="num">18 min</span></div><div class="bar-p" style="--p:57%"><i></i></div></div>
+            <ol class="plan">
+              <li class="done"><span class="ic"></span><span class="tx">Read the request and 3 signed forms<small><span class="src">Forms</span></small></span></li>
+              <li class="done"><span class="ic"></span><span class="tx">Find the signatories<small><span class="src">Finacle</span> 3 partners</small></span></li>
+              <li class="done"><span class="ic"></span><span class="tx">Read the signing rules<small><span class="src">SVS</span> 2 remarks, 2019 and 2023</small></span></li>
+              <li class="done"><span class="ic"></span><span class="tx">Check Emirates IDs and signatures<small><span class="src">EFR</span><span class="src">SVS</span> Rashid's ID expired</small></span></li>
+              <li class="you call"><span class="ic"></span><span class="tx">Your approval<small>The signing rules I built, and one limit to confirm</small></span></li>
+              <li><span class="ic"></span><span class="tx">Set up digital banking access</span></li>
+              <li><span class="ic"></span><span class="tx">Send each signatory their login</span></li>
+            </ol>
+          </aside>
+        </div>
+        <div class="bbar">
+          <span class="ldot"><svg viewBox="0 0 22 15"><circle cx="7.5" cy="7.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="14.5" cy="7.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/></svg></span>
+          <div class="msg"><b>The setup is ready for your approval</b><small>13 sources read. One limit needs a person to confirm.</small></div>
+          <div class="acts"><a class="btn pri" href="#f5">Review the setup <kbd>Enter</kbd></a></div>
+        </div>
+      </div>
+    </div></div></div>
+  </section>
+
+  <!-- 5 -->
+  <section class="fr" id="f5">
+    <div class="fr-head"><span class="n">5</span><h2>Review: here's what I built, does it look right?</h2><p>The agent shows its reasoning in order (users, roles, rules, workflow) with where each came from, then the signing map you can play with. Drag the amount to see who can approve. Three ways to answer: approve, correct it, or hold for compliance.</p></div>
+    <div class="stage" data-h="860"><div class="scaler"><div class="app" style="--h:860px">
+      <div class="sb-slot" data-active="creek" data-creek="ready"></div>
+      <div class="main">
+        <div class="top"><h3>Creekside General Trading LLC</h3><span class="pill ready">Ready for your approval</span><div class="pair"><span class="ag"><svg viewBox="0 0 22 15"><circle cx="7.5" cy="7.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="14.5" cy="7.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/></svg></span><span class="me" role="img" aria-label="You"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><circle cx="8" cy="5.4" r="2.8"/><path d="M2.6 13.8c.6-2.7 2.8-4.2 5.4-4.2s4.8 1.5 5.4 4.2z"/></svg></span><span>You and the agent</span></div><button class="ib">⋯</button></div>
+        <nav class="tabs"><a class="on" href="#f5">Review</a><a href="#f5">History</a></nav>
+        <div class="body one">
+          <div class="pane" style="display:grid; gap:16px; align-content:start; padding:22px 28px">
+            <div class="ask"><span class="ldot"><svg viewBox="0 0 22 15"><circle cx="7.5" cy="7.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="14.5" cy="7.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/></svg></span><div><h2>Here's how I set up Creekside's signing rules. Does this look right?</h2><p>I read 13 sources and everything matched except one thing: the limit Khalifa can approve alone. Two SVS remarks disagree, so I used the newer one and I'd like you to confirm it.</p></div></div>
+            <div class="steps4">
+              <div class="s4 ok"><div class="h"><span class="k">✓</span>Users</div><div class="faces"><span class="fc"><i>MA</i>Mohammed</span><span class="fc k"><i>KF</i>Khalifa</span><span class="fc r held"><i>RS</i>Rashid</span></div><p><span class="src">Finacle</span> <span class="src">Signed forms</span></p></div>
+              <div class="s4 ok"><div class="h"><span class="k">✓</span>Roles</div><p>All three can start and approve payments. Rashid joins once his Emirates ID is renewed.</p><p><span class="src">Access request form</span></p></div>
+              <div class="s4 need"><div class="h"><span class="k">3</span>Signing rules</div><p>Khalifa alone up to AED 25,000. Above that, any two together.</p><a class="why" href="#f6">Why AED 25,000? <span aria-hidden="true">→</span></a><span class="tag">Needs you</span></div>
+              <div class="s4 wait"><div class="h"><span class="k">4</span>Workflow</div><p>Built from the rules. Ready to set up once you confirm.</p><span class="tag">Waits for you</span></div>
+            </div>
+            <div class="ev"><b>Where I got this</b><span class="evi">3 signatories <span class="src">Finacle</span></span><span class="evi">Names and IDs <span class="src">Emirates ID</span></span><span class="evi">"Any two jointly" <span class="src">SVS 2019</span></span><span class="evi">Khalifa's limit <span class="src">SVS 2023</span><span class="src">Board res. 03/23</span></span><span class="evi">Existing CIF used <span class="src">Finacle, every branch</span></span></div>
+            <div class="map" id="map5">
+              <div class="map-h"><h4>Signing map</h4><small>Drag the payment to test the rules</small></div>
+              <div class="people">
+                <div class="pp" data-p="m"><span class="av">MA</span><b>Mohammed Al Mansoori</b><small>Approves with one other</small></div>
+                <div class="pp k" data-p="k"><span class="av">KF</span><b>Khalifa Saeed Al Falasi</b><small>Alone up to AED 25,000</small></div>
+                <div class="pp r held" data-p="r"><span class="av">RS</span><b>Rashid Hamad Al Ketbi</b><small>Access after EID renewal and EFR check</small></div>
+              </div>
+              <div class="track" id="track5" style="--th:25%; --x:18%">
+                <div class="ln2"></div>
+                <div class="th"><b>AED 25,000</b></div>
+                <span class="ends" style="left:0">AED 0</span><span class="ends" style="right:0">AED 100,000</span>
+                <div class="knob idle" id="knob5" role="slider" tabindex="0" aria-label="Test payment amount" data-v="AED 18,000"></div>
+              </div>
+              <div class="verdict" id="verdict5"><b>AED 18,000:</b><span>Khalifa can approve this alone.</span><button class="try" type="button" data-v="40000">Try AED 40,000 →</button></div>
+            </div>
+          </div>
+        </div>
+        <div class="bbar">
+          <span class="me" role="img" aria-label="You" style="width:26px;height:26px"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><circle cx="8" cy="5.4" r="2.8"/><path d="M2.6 13.8c.6-2.7 2.8-4.2 5.4-4.2s4.8 1.5 5.4 4.2z"/></svg></span>
+          <div class="msg"><b>Your decision</b><small>Approve and the agent sets up digital banking access for Mohammed and Khalifa now, and Rashid once his Emirates ID is renewed.</small></div>
+          <div class="acts answer"><a class="btn ghost" href="#f9">Hold for compliance</a><a class="btn" href="#f8">Correct it</a><a class="btn pri" href="#f10">Approve AED 25,000 <kbd>Enter</kbd></a></div>
+        </div>
+      </div>
+    </div></div></div>
+  </section>
+
+  <!-- 6 -->
+  <section class="fr" id="f6">
+    <div class="fr-head"><span class="n">6</span><h2>Why AED 25,000? The agent reads SVS</h2><p>SVS is free text, typed by different people, with no template and names spelt differently each time. The agent annotates the remarks in place, links every name to the right person, and only opens a document to confirm.</p></div>
+    <div class="stage" data-h="860"><div class="scaler"><div class="app" id="app6" style="--h:860px">
+      <div class="sb-slot" data-active="creek" data-creek="ready"></div>
+      <div class="main">
+        <div class="top"><h3>Creekside General Trading LLC</h3><span class="pill ready">Ready for your approval</span><div class="pair"><span class="ag"><svg viewBox="0 0 22 15"><circle cx="7.5" cy="7.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="14.5" cy="7.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/></svg></span><span class="me" role="img" aria-label="You"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><circle cx="8" cy="5.4" r="2.8"/><path d="M2.6 13.8c.6-2.7 2.8-4.2 5.4-4.2s4.8 1.5 5.4 4.2z"/></svg></span><span>You and the agent</span></div><button class="ib">⋯</button></div>
+        <nav class="tabs"><a class="on" href="#f6">Review</a><a href="#f6">History</a></nav>
+        <div class="body one"><div class="pane" style="padding:22px 28px; display:grid; gap:16px; align-content:start; opacity:.9">
+          <div class="ask"><span class="ldot"><svg viewBox="0 0 22 15"><circle cx="7.5" cy="7.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="14.5" cy="7.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/></svg></span><div><h2>Here's how I set up Creekside's signing rules. Does this look right?</h2><p>I read 13 sources and everything matched except one thing.</p></div></div>
+            <div class="steps4">
+              <div class="s4 ok"><div class="h"><span class="k">✓</span>Users</div><div class="faces"><span class="fc"><i>MA</i>Mohammed</span><span class="fc k"><i>KF</i>Khalifa</span><span class="fc r held"><i>RS</i>Rashid</span></div><p><span class="src">Finacle</span> <span class="src">Signed forms</span></p></div>
+              <div class="s4 ok"><div class="h"><span class="k">✓</span>Roles</div><p>All three can start and approve payments. Rashid joins once his Emirates ID is renewed.</p><p><span class="src">Access request form</span></p></div>
+              <div class="s4 need"><div class="h"><span class="k">3</span>Signing rules</div><p>Khalifa alone up to AED 25,000. Above that, any two together.</p><a class="why" href="#f6">Why AED 25,000? <span aria-hidden="true">→</span></a><span class="tag">Needs you</span></div>
+              <div class="s4 wait"><div class="h"><span class="k">4</span>Workflow</div><p>Built from the rules. Ready to set up once you confirm.</p><span class="tag">Waits for you</span></div>
+            </div>
+            <div class="ev"><b>Where I got this</b><span class="evi">3 signatories <span class="src">Finacle</span></span><span class="evi">Names and IDs <span class="src">Emirates ID</span></span><span class="evi">"Any two jointly" <span class="src">SVS 2019</span></span><span class="evi">Khalifa's limit <span class="src">SVS 2023</span><span class="src">Board res. 03/23</span></span><span class="evi">Existing CIF used <span class="src">Finacle, every branch</span></span></div>
+            <div class="map">
+              <div class="map-h"><h4>Signing map</h4><small>Drag the payment to test the rules</small></div>
+              <div class="people">
+                <div class="pp" data-p="m"><span class="av">MA</span><b>Mohammed Al Mansoori</b><small>Approves with one other</small></div>
+                <div class="pp k" data-p="k"><span class="av">KF</span><b>Khalifa Saeed Al Falasi</b><small>Alone up to AED 25,000</small></div>
+                <div class="pp r held" data-p="r"><span class="av">RS</span><b>Rashid Hamad Al Ketbi</b><small>Access after EID renewal and EFR check</small></div>
+              </div>
+              <div class="track" style="--th:25%; --x:18%">
+                <div class="ln2"></div>
+                <div class="th"><b>AED 25,000</b></div>
+                <span class="ends" style="left:0">AED 0</span><span class="ends" style="right:0">AED 100,000</span>
+                <div class="knob idle" role="slider" tabindex="-1" aria-label="Test payment amount" data-v="AED 18,000"></div>
+              </div>
+              <div class="verdict"><b>AED 18,000:</b><span>Khalifa can approve this alone.</span><button tabindex="-1" class="try" type="button" data-v="40000">Try AED 40,000 →</button></div>
+            </div>
+        </div></div>
+        <div class="bbar">
+          <span class="me" role="img" aria-label="You" style="width:26px;height:26px"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><circle cx="8" cy="5.4" r="2.8"/><path d="M2.6 13.8c.6-2.7 2.8-4.2 5.4-4.2s4.8 1.5 5.4 4.2z"/></svg></span>
+          <div class="msg"><b>Your decision</b><small>Approve and the agent sets up digital banking access for Mohammed and Khalifa now, and Rashid once his Emirates ID is renewed.</small></div>
+          <div class="acts answer"><a class="btn ghost" tabindex="-1">Hold for compliance</a><a class="btn" tabindex="-1">Correct it</a><a class="btn pri" tabindex="-1">Approve AED 25,000 <kbd>Enter</kbd></a></div>
+        </div>
+      </div>
+      <div class="scrim"></div>
+      <div class="drawer">
+        <div class="dr-h"><button class="ib x">✕</button><h3>Why AED 25,000?</h3><p>Here's how I read the signing rules in SVS. The remarks are typed by hand, so I linked each part to what it means.</p></div>
+        <div class="dr-b">
+          <div class="svs-big">
+            <div class="wbar"><i></i><i></i><i></i><span>SVS · Operating instructions · A/c. 0191-2290-01</span></div>
+            <div class="rm"><span class="oi">AK</span><div><small>Dec 2019 · Operations · typed by staff</small><p>A/C TO BE OPRTD AS PER MOA DTD 12/11/2019. AUTH SIGNATORIES: MR <span class="mk">MOHD<sup>1</sup></span> A. MANSORI (PRTNR), MR <span class="mk">KHALEFA<sup>2</sup></span> S. ALFALASY (MNG PRTNR), MR <span class="mk">RASHEED<sup>3</sup></span> H. ALKETBI (PRTNR). <span class="mk">ANY TWO JNTLY<sup>4</sup></span> FOR ALL TXNS INCL CHQS, TRFS &amp; A/C CLOSURE. MR KHALEFA <span class="mk w">SINGLY UPTO AED 50,000/-<sup>5</sup></span> PER TXN, ABOVE 50K ANY TWO JNTLY. SIGN SPECIMENS VERIFIED VS PP COPIES.</p></div></div>
+            <div class="rm"><span class="oi b">RM</span><div><small>Apr 2023 · Branch · typed by staff</small><p>AMNDMT 18/04/2023 ON CUST REQ VIA RM. <span class="mk w">Sole lmt of Khalifa revised to 25K<sup>6</sup></span> per txn w.e.f. 01/05/2023 per <span class="mk">brd res 03/23<sup>7</sup></span>, orig sighted at br. All other instr. remain unchanged.</p></div></div>
+          </div>
+          <ol class="notes">
+            <li><i>1</i><span><code>MOHD</code> is Mohammed Al Mansoori<small>CIF 100234 · matched by Emirates ID number</small></span><span class="src">Finacle</span></li>
+            <li><i>2</i><span><code>KHALEFA</code> is Khalifa Saeed Al Falasi<small>Spelt differently from his Emirates ID. Matched by ID number.</small></span><span class="src">Emirates ID</span></li>
+            <li><i>3</i><span><code>RASHEED</code> is Rashid Hamad Al Ketbi<small>Spelt differently from his Emirates ID. Matched by ID number.</small></span><span class="src">Emirates ID</span></li>
+            <li><i>4</i><span><code>ANY TWO JNTLY</code> means any two of the three approve together</span><span class="src">SVS 2019</span></li>
+            <li class="w"><i>5</i><span><code>SINGLY UPTO 50,000</code> means Khalifa could approve alone up to AED 50,000<small>The 2019 limit</small></span><span class="src">SVS 2019</span></li>
+            <li class="w"><i>6</i><span><code>revised to 25K</code> lowers Khalifa's limit to AED 25,000<small>Newer, from April 2023</small></span><span class="src">SVS 2023</span></li>
+            <li><i>7</i><span><code>brd res 03/23</code> is the board resolution I opened to confirm the change<small>Signed by all 3 partners, March 2023</small></span><span class="src">Board res. 03/23</span></li>
+          </ol>
+          <div class="concl"><span class="ldot"><svg viewBox="0 0 22 15"><circle cx="7.5" cy="7.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="14.5" cy="7.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/></svg></span><span>I used the newer remark, AED 25,000, because the 2023 board resolution backs it. The 2019 remark was never removed from SVS, which is why I'm asking you rather than deciding alone.</span></div>
+        </div>
+        <div class="dr-f"><a class="btn pri" href="#f10">Approve AED 25,000</a><a class="btn" href="#f8">Correct it</a></div>
+      </div>
+    </div></div></div>
+  </section>
+
+  <!-- 7 -->
+  <section class="fr" id="f7">
+    <div class="fr-head"><span class="n">7</span><h2>Who can do what: three ways to show the workflow</h2><p>The same rules drawn three ways, so you can see which reads best. They'd sit under the signing map once you confirm. My pick is B.</p></div>
+    <div class="vars">
+      <div class="var">
+        <div class="var-h"><span class="k">A</span><div><b>Name chips</b><small>Today's diagram, with names and roles instead of initials</small></div></div>
+        <div class="band"><small>Up to AED 25,000</small>
+          <div class="flowA"><div class="nodeA"><span>Starts it</span><div class="faces"><span class="fc"><i>MA</i>Mohammed</span><span class="fc k"><i>KF</i>Khalifa</span></div></div><span class="arr">→</span><div class="nodeA"><span>Approves</span><div class="faces"><span class="fc k"><i>KF</i>Khalifa alone</span></div><small style="color:var(--muted)">or any two together</small></div><span class="arr">→</span><span class="bank">Bank pays</span></div>
+        </div>
+        <div class="band"><small>Above AED 25,000</small>
+          <div class="flowA"><div class="nodeA"><span>Starts it</span><div class="faces"><span class="fc"><i>MA</i>Mohammed</span><span class="fc k"><i>KF</i>Khalifa</span></div></div><span class="arr">→</span><div class="nodeA"><span>Two approve</span><div class="faces"><span class="fc"><i>MA</i>Mohammed</span><span class="fc k"><i>KF</i>Khalifa</span></div></div><span class="arr">→</span><span class="bank">Bank pays</span></div>
+        </div>
+        <span class="fc r held" style="justify-self:start"><i>RS</i>Rashid joins after his Emirates ID renewal</span>
+      </div>
+      <div class="var">
+        <div class="var-h"><span class="k">B</span><div><b>One row per person</b><small>Read across a row to see what that person can do</small></div></div>
+        <span class="rec-tag">My pick</span>
+        <div class="lanes">
+          <span class="hd"></span><span class="hd">Start a payment</span><span class="hd">Approve alone</span><span class="hd">Approve with one other</span>
+          <span class="who"><i>MA</i>Mohammed</span><span class="yes">✓</span><span class="no">No</span><span class="yes">✓</span>
+          <span class="who k"><i>KF</i>Khalifa</span><span class="yes">✓</span><span><span class="lim">Up to AED 25,000</span></span><span class="yes">✓</span>
+          <span class="who r rrow"><i>RS</i>Rashid</span><span class="yes rrow">✓</span><span class="no rrow">No</span><span class="yes rrow">✓</span>
+          <span class="note-r">Rashid's row turns on when his renewed Emirates ID is checked.</span>
+        </div>
+      </div>
+      <div class="var">
+        <div class="var-h"><span class="k">C</span><div><b>Plain sentences</b><small>The agent explaining the rules, with a small flow under each</small></div></div>
+        <div class="sent">
+          <div class="row"><p><b>Up to AED 25,000:</b> anyone can start a payment, and Khalifa can approve it alone. Any two can also approve together.</p><div class="mf"><span class="fc"><i>MA</i>Starts</span>→<span class="fc k"><i>KF</i>Approves</span>→<span class="bank">Bank pays</span></div></div>
+          <div class="row"><p><b>Above AED 25,000:</b> anyone can start a payment, and any two approve together.</p><div class="mf"><span class="fc k"><i>KF</i>Starts</span>→<span class="fc"><i>MA</i>Approves</span>+<span class="fc k"><i>KF</i>Approves</span>→<span class="bank">Bank pays</span></div></div>
+          <div class="row" style="border-style:dashed"><p style="color:var(--muted)">Rashid will be able to do the same as Mohammed once his Emirates ID is renewed.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section class="fr" id="f8">
+    <div class="fr-head"><span class="n">8</span><h2>Correct it: the agent redoes the work</h2><p>If the checker thinks the agent is wrong, they say why in their own words or pick a quick option. The agent rebuilds the rules and shows exactly what changed, then the checker approves the corrected version. This answers "what if the agent is wrong?"</p></div>
+    <div class="stage" data-h="820"><div class="scaler"><div class="app" style="--h:820px">
+      <div class="sb-slot" data-active="creek" data-creek="ready"></div>
+      <div class="main">
+        <div class="top"><h3>Creekside General Trading LLC</h3><span class="pill ready">Ready for your approval</span><div class="pair"><span class="ag"><svg viewBox="0 0 22 15"><circle cx="7.5" cy="7.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="14.5" cy="7.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/></svg></span><span class="me" role="img" aria-label="You"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><circle cx="8" cy="5.4" r="2.8"/><path d="M2.6 13.8c.6-2.7 2.8-4.2 5.4-4.2s4.8 1.5 5.4 4.2z"/></svg></span><span>You and the agent</span></div><button class="ib">⋯</button></div>
+        <nav class="tabs"><a class="on" href="#f8">Review</a><a href="#f8">History</a></nav>
+        <div class="body one">
+          <div class="pane" id="convo8" style="display:grid; gap:14px; align-content:start; padding:22px 28px">
+            <div class="mine">
+              <div class="mine-b"><small>You · your correction · 10:39</small><span class="qk on">The limit is wrong</span><p>The board resolution was withdrawn in June 2023. Khalifa's limit should stay at AED 50,000, see the 2019 remark.</p></div>
+              <span class="me" role="img" aria-label="You"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><circle cx="8" cy="5.4" r="2.8"/><path d="M2.6 13.8c.6-2.7 2.8-4.2 5.4-4.2s4.8 1.5 5.4 4.2z"/></svg></span>
+            </div>
+            <div class="reply"><span class="ldot"><svg viewBox="0 0 22 15"><circle cx="7.5" cy="7.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="14.5" cy="7.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/></svg></span>
+              <div class="bub"><span class="dots"><i></i><i></i><i></i>Rebuilding the signing rules</span><span>Thanks. I rebuilt the signing rules with Khalifa's limit at AED 50,000. Here's what changed:</span>
+                <ul class="chg"><li style="--i:0">Khalifa approves alone up to <s>AED 25,000</s> <b>AED 50,000</b></li><li style="--i:1">Payments between AED 25,000 and 50,000 <s>need any two</s> <b>Khalifa can approve alone</b></li><li style="--i:2">Your reason is saved in History with the case.</li></ul>
+              </div>
+            </div>
+            <div class="map">
+              <div class="map-h"><h4>Signing map · corrected</h4><small>Old limit shown faintly</small></div>
+              <div class="people">
+                <div class="pp"><span class="av">MA</span><b>Mohammed Al Mansoori</b><small>Approves with one other</small></div>
+                <div class="pp k lit"><span class="av">KF</span><b>Khalifa Saeed Al Falasi</b><small style="color:var(--warn-ink); font-weight:600">Alone up to AED 50,000</small></div>
+                <div class="pp r held"><span class="av">RS</span><b>Rashid Hamad Al Ketbi</b><small>Access after EID renewal and EFR check</small></div>
+              </div>
+              <div class="track two" style="--th:50%">
+                <div class="ln2"></div>
+                <div class="th old" style="left:25%"><b>AED 25,000</b></div>
+                <div class="th new"><b>AED 50,000</b></div>
+                <span class="ends" style="left:0">AED 0</span><span class="ends" style="right:0">AED 100,000</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bbar">
+          <span class="me" role="img" aria-label="You" style="width:26px;height:26px"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><circle cx="8" cy="5.4" r="2.8"/><path d="M2.6 13.8c.6-2.7 2.8-4.2 5.4-4.2s4.8 1.5 5.4 4.2z"/></svg></span>
+          <div class="msg"><b>Approve the corrected setup?</b><small>The agent will set up access with your limit, and record your reason.</small></div>
+          <div class="acts"><span class="btn ghost">Undo my correction</span><a class="btn pri" href="#f10">Approve AED 50,000</a></div>
+        </div>
+      </div>
+    </div></div></div>
+  </section>
+
+  <!-- 9 -->
+  <section class="fr" id="f9">
+    <div class="fr-head"><span class="n">9</span><h2>Hold for compliance</h2><p>The checker isn't sure and wants a second opinion. They pick a reason, the agent drafts the handover note with the evidence attached, and the case moves to "With compliance" in the left panel so nothing gets lost. Once it's sent, the case shows what happens next while compliance reviews it.</p></div>
+    <div class="stage" data-h="720"><div class="scaler"><div class="app" style="--h:720px">
+      <div class="sb-slot" data-active="creek" data-creek="ready"></div>
+      <div class="main">
+        <div class="top"><h3>Creekside General Trading LLC</h3><span class="pill ready" id="pill9">Ready for your approval</span><div class="pair"><span class="ag"><svg viewBox="0 0 22 15"><circle cx="7.5" cy="7.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="14.5" cy="7.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/></svg></span><span class="me" role="img" aria-label="You"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><circle cx="8" cy="5.4" r="2.8"/><path d="M2.6 13.8c.6-2.7 2.8-4.2 5.4-4.2s4.8 1.5 5.4 4.2z"/></svg></span><span>You and the agent</span></div><button class="ib">⋯</button></div>
+        <nav class="tabs"><a class="on" href="#f9">Review</a><a href="#f9">History</a></nav>
+        <div class="body one"><div class="pane" style="padding:22px 28px; display:grid; gap:16px; align-content:start">
+          <div class="pre9" id="pre9"><div class="ask"><span class="ldot"><svg viewBox="0 0 22 15"><circle cx="7.5" cy="7.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="14.5" cy="7.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/></svg></span><div><h2>Here's how I set up Creekside's signing rules. Does this look right?</h2></div></div>
+          <div class="steps4"><div class="s4 ok"><div class="h"><span class="k">✓</span>Users</div></div><div class="s4 ok"><div class="h"><span class="k">✓</span>Roles</div></div><div class="s4 need"><div class="h"><span class="k">3</span>Signing rules</div></div><div class="s4 wait"><div class="h"><span class="k">4</span>Workflow</div></div></div></div>
+          <div class="sent9" id="sent9" hidden>
+            <div class="s9-head"><span class="s9-ok"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7"/></svg></span><div><h2>Sent to compliance</h2><p>Case CMP-0417 · Your handover note and 4 documents went with it</p></div></div>
+            <ol class="trk" aria-label="What happens next">
+              <li class="done" style="--i:0"><span class="dot"></span><div><b>Sent with your handover note</b><small>SVS 2019, SVS 2023, board resolution 03/23 and the signing map are attached.</small></div><em>Just now</em></li>
+              <li class="now" style="--i:1"><span class="dot"></span><div><b>Compliance reviews the two limits</b><small>They check which SVS remark is current against the board resolution.</small></div><em>Usually 1 to 2 working days</em></li>
+              <li style="--i:2"><span class="dot"></span><div><b>They confirm the limit or ask the business for more</b><small>If Creekside needs to send a document, the agent drafts the request for you to check and send.</small></div></li>
+              <li style="--i:3"><span class="dot"></span><div><b>It comes back to you to approve</b><small>Creekside returns to "Ready for your approval" with compliance's answer attached. Nothing is set up until you approve.</small></div></li>
+            </ol>
+          </div>
+        </div></div>
+        <div class="bbar" id="bbar9"><div class="msg"><b>Your decision</b></div></div>
+      </div>
+      <div class="scrim" id="scrim9"></div>
+      <div class="modal" id="modal9">
+        <div><h3>Hold for compliance</h3><span class="lab">Why are you holding it?</span><div class="chips"><span class="on">The two limits disagree</span><span>I need another document</span><span>Something looks unusual</span><span>Other</span></div></div>
+        <div style="padding-top:0"><span class="lab">Handover note</span>
+          <div class="draft"><span class="by"><svg class="rings" viewBox="0 0 22 15" style="width:16px"><circle cx="7.5" cy="7.5" r="6"/><circle cx="14.5" cy="7.5" r="6"/></svg>Drafted by the agent · you can edit it</span>Creekside General Trading LLC has two SVS remarks with different solo limits for Khalifa: AED 50,000 (2019) and AED 25,000 (2023). Board resolution 03/23 supports AED 25,000. Please confirm the limit before digital banking access is set up.<div class="att"><span class="src">SVS 2019</span><span class="src">SVS 2023</span><span class="src">Board res. 03/23</span><span class="src">Signing map</span></div></div>
+        </div>
+        <div class="mf2"><button class="btn ghost" type="button" id="cancel9">Cancel</button><button class="btn pri" type="button" id="send9">Send to compliance</button></div>
+      </div>
+    </div></div></div>
+  </section>
+
+  <!-- 10 -->
+  <section class="fr" id="f10">
+    <div class="fr-head"><span class="n">10</span><h2>The agent sets up access</h2><p>After you approve, you watch it happen in the digital banking admin module: the company profile, a user ID per signatory, their roles, the approval rule, and activation links sent by SMS (passwords are never typed or shown). Rashid is skipped while he's on hold. Then the agent reads everything back against your approved plan.</p></div>
+    <div class="stage" data-h="800"><div class="scaler"><div class="app" style="--h:800px">
+      <div class="sb-slot" data-active="creek" data-creek="setup"></div>
+      <div class="main">
+        <div class="top"><h3>Creekside General Trading LLC</h3><span class="pill work"><i></i>Setting up access</span><div class="pair"><span class="ag"><svg viewBox="0 0 22 15"><circle cx="7.5" cy="7.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="14.5" cy="7.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/></svg></span><span class="me" role="img" aria-label="You"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><circle cx="8" cy="5.4" r="2.8"/><path d="M2.6 13.8c.6-2.7 2.8-4.2 5.4-4.2s4.8 1.5 5.4 4.2z"/></svg></span><span>You and the agent</span></div><button class="ib">⋯</button></div>
+        <nav class="tabs"><a class="on" href="#f10">Review</a><a href="#f10">History</a></nav>
+        <div class="body">
+          <div class="pane" style="padding:16px">
+            <div class="desk" id="desk10">
+              <div class="desk-h"><span class="live"><i></i>Agent's screen</span><span>· live</span></div>
+              <div class="adm">
+                <div class="wbar"><i></i><i></i><i></i><span>Corporate Digital Banking · Admin module</span><em>OPSAGENT1</em></div>
+                <div class="adm-nav"><span>Companies</span><span class="on">Users and roles</span><span>Approval rules</span><span>Activation</span></div>
+                <div class="adm-b">
+                  <div class="adm-row1">
+                    <label>Company<span class="fld" id="a-co"></span></label>
+                    <label>Account<span class="fld" id="a-ac"></span></label>
+                    <label>Mandate<span class="fld" id="a-md"></span></label>
+                  </div>
+                  <div class="utab">
+                    <div class="r"><span>Name</span><span>User ID</span><span>CIF</span><span>Roles</span><span>Status</span></div>
+                    <div class="r" id="u1"><span></span><span></span><span></span><span></span><span></span></div>
+                    <div class="r" id="u2"><span></span><span></span><span></span><span></span><span></span></div>
+                    <div class="r" id="u3"><span></span><span></span><span></span><span></span><span></span></div>
+                  </div>
+                  <div class="adm-row1" style="grid-template-columns: 2fr 1fr">
+                    <label>Approval rule<span class="fld" id="a-rule"></span></label>
+                    <label>Currency<span class="fld" id="a-cur"></span></label>
+                  </div>
+                  <div class="act-row"><span class="abtn" id="a-send">Send activation links</span><span class="sent-st" id="a-sent">✓ Sent by SMS to each signatory's own mobile · never visible to staff</span></div>
+                </div>
+              </div>
+              <div class="readback" id="rb10">
+                <h5><span class="ldot"><svg viewBox="0 0 22 15"><circle cx="7.5" cy="7.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="14.5" cy="7.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/></svg></span>Read-back: what I entered, compared with your approved plan</h5>
+                <div class="rb"><span>Company and account</span><span>Mohammed's user and roles</span><span>Khalifa's user and roles</span><span>Approval rule AED 25,000</span><span>Rashid held, not created</span><span>Activation links sent</span></div>
+              </div>
+              <div class="cursor" id="cur10"><svg viewBox="0 0 18 22"><path d="M2 2 L2 18 L6.5 13.5 L9.5 20 L12 19 L9 12.5 L15 12.5 Z"/></svg><span><svg viewBox="0 0 22 15"><circle cx="7.5" cy="7.5" r="6"/><circle cx="14.5" cy="7.5" r="6"/></svg>Agent</span></div>
+            </div>
+          </div>
+          <aside class="rp">
+            <div class="plan-h"><div class="t">Setting up digital banking access</div><div class="meta"><span>5 of 7 done</span><span class="num">1h 31m</span></div><div class="bar-p" style="--p:72%"><i></i></div></div>
+            <ol class="plan">
+              <li class="done"><span class="ic"></span><span class="tx">Read the request and 3 signed forms</span></li>
+              <li class="done"><span class="ic"></span><span class="tx">Find the signatories</span></li>
+              <li class="done"><span class="ic"></span><span class="tx">Read the signing rules</span></li>
+              <li class="done"><span class="ic"></span><span class="tx">Check Emirates IDs and signatures</span></li>
+              <li class="done"><span class="ic" style="background:var(--human);border-color:var(--human)"></span><span class="tx">Your approval<small>You approved AED 25,000 at 10:41</small></span></li>
+              <li class="now"><span class="ic"></span><span class="tx">Set up digital banking access<small><span class="src">Admin module</span></small></span></li>
+              <li><span class="ic"></span><span class="tx">Send each signatory their login</span></li>
+            </ol>
+            <div class="log-h">Agent log</div>
+            <ul class="log" id="log10"></ul>
+          </aside>
+        </div>
+        <div class="bbar">
+          <span class="ldot"><svg viewBox="0 0 22 15"><circle cx="7.5" cy="7.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="14.5" cy="7.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/></svg></span>
+          <div class="msg"><b id="doing10">Setting up digital banking access</b><small>Nothing needed from you.</small></div>
+          <div class="acts"><div class="speed"><button class="btn" id="pause10">Pause</button><button class="btn" id="fast10" aria-pressed="false">2x</button></div><a class="btn pri proto-next" href="#f11" hidden>See who's live <kbd>Enter</kbd></a></div>
+        </div>
+      </div>
+    </div></div></div>
+  </section>
+
+  <!-- 11 -->
+  <section class="fr" id="f11">
+    <div class="fr-head"><span class="n">11</span><h2>The customer, and why Rashid doesn't hold anyone back</h2><p>Both sides of the moment: Khalifa's phone, and the checker's view. Rashid's card says why he's on hold, what the agent did, what it means for Creekside and what happens next. "Skip ahead 2 days" becomes the main button at the bottom.</p></div>
+    <div class="stage" data-h="780"><div class="scaler"><div class="app" style="--h:780px">
+      <div class="sb-slot" data-active="creek" data-creek="live2"></div>
+      <div class="main">
+        <div class="top"><h3>Creekside General Trading LLC</h3><span class="pill live"><i></i>Live · 2 of 3</span><div class="pair"><span class="ag"><svg viewBox="0 0 22 15"><circle cx="7.5" cy="7.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="14.5" cy="7.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/></svg></span><span class="me" role="img" aria-label="You"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><circle cx="8" cy="5.4" r="2.8"/><path d="M2.6 13.8c.6-2.7 2.8-4.2 5.4-4.2s4.8 1.5 5.4 4.2z"/></svg></span><span>You and the agent</span></div><button class="ib">⋯</button></div>
+        <nav class="tabs"><a class="on" href="#f11">Review</a><a href="#f11">History</a></nav>
+        <div class="cust">
+          <div class="phone" id="phone11">
+            <span class="ph-time">10:54</span>
+            <div class="ph-h"><span class="bk"><svg viewBox="0 0 22 15"><circle cx="7.5" cy="7.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="14.5" cy="7.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/></svg></span><div><b>Your bank</b><small>Text message · now</small></div></div>
+            <div class="ph-msg"><span class="ph-ok"><i>✓</i>Digital banking access is ready</span><span>Hi Khalifa, Creekside General Trading LLC can now bank online. You can approve payments alone up to AED 25,000.</span></div>
+            <div class="ph-steps">
+              <div style="--i:0"><i>✓</i><span>Get the app<small>Installed</small></span></div>
+              <div class="cur" style="--i:1"><i>2</i><span>Open your secure link<small>Valid for 24 hours</small></span></div>
+              <div class="nx" style="--i:2"><i>3</i><span>Set your password<small>Only you will ever see it</small></span></div>
+            </div>
+          </div>
+          <div class="cust-r">
+            <div class="live-h"><h2>Mohammed and Khalifa can bank online now</h2><p>Khalifa received his link at 10:54. The agent ticked "Send each signatory their login" for both of them.</p></div>
+            <div class="who3">
+              <div class="pp"><span class="av">MA</span><b>Mohammed</b><small>✓ Live · first login 10:54</small></div>
+              <div class="pp k"><span class="av">KF</span><b>Khalifa</b><small>✓ Live · link opened</small></div>
+              <div class="pp r held"><span class="av">RS</span><b>Rashid</b><small>On hold · ID expired</small></div>
+            </div>
+            <div class="rashid">
+              <div class="rashid-h"><span class="av">RS</span><b>Rashid Hamad Al Ketbi</b><span class="pill hold">On hold</span></div>
+              <dl class="facts">
+                <dt>Why he's on hold</dt><dd>His Emirates ID expired on 14 Aug.</dd>
+                <dt>What the agent did</dt><dd>Sent him a secure link to upload his renewed Emirates ID.</dd>
+                <dt>What it means for Creekside</dt><dd>Nothing is blocked. Mohammed and Khalifa are live, and above AED 25,000 they approve together.</dd>
+                <dt>What happens next</dt><dd>When Rashid uploads his Emirates ID, the agent checks it and sets up his access. No new form, and nobody starts over.</dd>
+              </dl>
+              <div class="rpath"><div class="d"><i>✓</i>Link sent</div><div><i>2</i>EID uploaded</div><div><i>3</i>Agent checks</div><div><i>4</i>Digital banking live</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="bbar">
+          <span class="ldot"><svg viewBox="0 0 22 15"><circle cx="7.5" cy="7.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="14.5" cy="7.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/></svg></span>
+          <div class="msg"><b>2 of 3 signatories are live</b><small>With a digital form, all three would wait for Rashid.</small></div>
+          <div class="acts"><a class="btn ghost" href="#f2">Back to business clients</a><a class="btn pri" href="#f12">Show what happens when Rashid renews →</a></div>
+        </div>
+      </div>
+    </div></div></div>
+  </section>
+
+  <!-- 12 -->
+  <section class="fr" id="f12">
+    <div class="fr-head"><span class="n">12</span><h2>Rashid renews: the full sign-off</h2><p>Two days later Rashid uploads his renewed Emirates ID. The agent checks it, sets up his access, then shows the whole signing setup: the org chart, who signs on what amount, and a sign-off they can download for the audit file. The checker closes the case.</p></div>
+    <div class="stage" data-h="880"><div class="scaler"><div class="app" style="--h:880px">
+      <div class="sb-slot" data-active="creek" data-creek="live3"></div>
+      <div class="main">
+        <div class="top"><h3>Creekside General Trading LLC</h3><span class="pill live"><i></i>Live · 3 of 3</span><div class="pair"><span class="ag"><svg viewBox="0 0 22 15"><circle cx="7.5" cy="7.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="14.5" cy="7.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/></svg></span><span class="me" role="img" aria-label="You"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><circle cx="8" cy="5.4" r="2.8"/><path d="M2.6 13.8c.6-2.7 2.8-4.2 5.4-4.2s4.8 1.5 5.4 4.2z"/></svg></span><span>You and the agent</span></div><button class="ib">⋯</button></div>
+        <nav class="tabs"><a class="on" href="#f12">Review</a><a href="#f12">History</a></nav>
+        <div class="body one">
+          <div class="pane" style="display:grid; gap:16px; align-content:start; padding:22px 28px">
+            <div class="ask"><span class="ldot"><svg viewBox="0 0 22 15"><circle cx="7.5" cy="7.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="14.5" cy="7.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/></svg></span><div><h2>Rashid renewed his Emirates ID. Creekside is fully set up.</h2><p>I checked his new Emirates ID with EFR, matched it to "RASHEED" in SVS, and set up his access with the same rules you approved. Here's the full signing setup for your sign-off.</p></div></div>
+            <div class="rpath wide" id="rpath12"><div class="d"><i>✓</i>Link sent<small>Tue 10:47</small></div><div class="d"><i>✓</i>EID uploaded<small>Thu 09:12</small></div><div class="d"><i>✓</i>Agent checked it<small>Thu 09:14 · EFR</small></div><div class="d"><i>✓</i>Digital banking live<small>Thu 09:20</small></div></div>
+            <div class="eid12">
+              <div class="eid" role="img" aria-label="Rashid's renewed Emirates ID"><div class="eid-top"><div><b>UNITED ARAB EMIRATES</b><small>Identity Card</small></div><div class="ar">دولة الإمارات العربية المتحدة<small>بطاقة هوية</small></div></div><div class="eid-mid"><svg class="eid-ph" viewBox="0 0 50 62"><circle cx="25" cy="24" r="10" fill="#b9c2cf"/><path d="M6 62 C 8 44, 16 38, 25 38 C 34 38, 42 44, 44 62 Z" fill="#b9c2cf"/></svg><div class="eid-f"><div><small>Name</small><b>RASHID HAMAD ALKETBI</b></div><div><small>ID Number</small><b>784-1985-•••••••-6</b></div><div><small>Expiry</small><b>29/10/2031</b></div></div></div></div>
+              <ul class="eidk">
+                <li><b>Verified with EFR</b><span class="src">EFR</span></li>
+                <li><b>Name matches SVS</b><span class="src">SVS 2019</span></li>
+                <li><b>Valid until Oct 2031</b><span class="src">Emirates ID</span></li>
+                <li><b>Same CIF 100912</b><span class="src">Finacle</span></li>
+              </ul>
+            </div>
+            <div class="fso">
+              <div class="org">
+                <h4>Creekside's signatories</h4>
+                <div class="org-top"><span class="bi">C</span><div><b>Creekside General Trading LLC</b><small>A/c. 0191-2290-01 · Mixed mandate</small></div></div>
+                <svg class="org-lines" viewBox="0 0 300 30" preserveAspectRatio="none"><path d="M150 0 V14 M50 14 H250 M50 14 V30 M150 14 V30 M250 14 V30"/></svg>
+                <div class="org-ppl">
+                  <div class="op"><span class="av">MA</span><b>Mohammed</b><small>Partner</small><span class="rl">Starts and approves</span><span class="pill live"><i></i>Live</span></div>
+                  <div class="op k"><span class="av">KF</span><b>Khalifa</b><small>Partner</small><span class="rl">Approves alone up to AED 25,000</span><span class="pill live"><i></i>Live</span></div>
+                  <div class="op r"><span class="av">RS</span><b>Rashid</b><small>Partner</small><span class="rl">Starts and approves</span><span class="pill live"><i></i>Live today</span></div>
+                </div>
+              </div>
+              <div class="wsw">
+                <h4>Who signs when</h4>
+                <div class="bnd"><div class="bnd-h"><b>Up to AED 25,000</b><small>Khalifa alone, or any two together</small></div>
+                  <div class="combos"><span class="cb solo"><span class="fc k"><i>KF</i>Khalifa</span>alone</span><span class="cb"><span class="fc"><i>MA</i>Mohammed</span>+<span class="fc k"><i>KF</i>Khalifa</span></span><span class="cb"><span class="fc"><i>MA</i>Mohammed</span>+<span class="fc r"><i>RS</i>Rashid</span></span><span class="cb"><span class="fc k"><i>KF</i>Khalifa</span>+<span class="fc r"><i>RS</i>Rashid</span></span></div>
+                  <p class="eg">For example, a AED 12,000 supplier payment: Khalifa can approve it on his own.</p></div>
+                <div class="bnd"><div class="bnd-h"><b>Above AED 25,000</b><small>Any two together</small></div>
+                  <div class="combos"><span class="cb"><span class="fc"><i>MA</i>Mohammed</span>+<span class="fc k"><i>KF</i>Khalifa</span></span><span class="cb"><span class="fc"><i>MA</i>Mohammed</span>+<span class="fc r"><i>RS</i>Rashid</span></span><span class="cb"><span class="fc k"><i>KF</i>Khalifa</span>+<span class="fc r"><i>RS</i>Rashid</span></span></div>
+                  <p class="eg">For example, the AED 80,000 warehouse rent: Mohammed and Rashid approve it together.</p></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bbar">
+          <span class="ldot"><svg viewBox="0 0 22 15"><circle cx="7.5" cy="7.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="14.5" cy="7.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/></svg></span>
+          <div class="msg"><b>Everything matches the mandate</b><small>Close the case and it moves to History with every source attached.</small></div>
+          <div class="toast" id="toast12" role="status"><i>✓</i><b>Creekside sign-off.pdf downloaded</b><small>Signing rules, every source and your approval, ready for the audit file</small></div>
+          <div class="acts"><a class="btn" href="#f12" id="dl12">Download sign-off</a><a class="btn pri" href="#f13">Close the case</a></div>
+        </div>
+      </div>
+    </div></div></div>
+  </section>
+
+  <!-- 13 -->
+  <section class="fr" id="f13">
+    <div class="fr-head"><span class="n">13</span><h2>The ending, and your touchpoint</h2><p>The result in one glance, then the turn to you: why this agent works, in your words, with a quiet link to sunsetbisma.com. The vague "try disagreeing with the agent" line is gone, because correcting it now lives on the review screen.</p></div>
+    <div class="stage" data-h="800"><div class="scaler"><div class="app solo" style="--h:800px">
+      <div class="end">
+        <div class="end-l">
+          <span class="pill live"><i></i>Live · 3 of 3</span>
+          <h1>Creekside is live.</h1>
+          <div class="stats">
+            <div class="stat"><b>3 of 3</b><span>signatories can bank online</span></div>
+            <div class="stat"><b>1h 54m</b><span>from the signed form to the first login</span></div>
+            <div class="stat you"><b>1</b><span>decision made by you, the human checker</span></div>
+          </div>
+          <ol class="tl">
+            <li><time>09:00</time><span>The signed form arrived</span></li>
+            <li><time>09:18</time><span>The agent read Finacle, SVS and 3 Emirates IDs</span></li>
+            <li class="you"><time>10:41</time><span>You approved the signing rules</span></li>
+            <li><time>10:53</time><span>Access was set up and read back</span></li>
+            <li class="ok"><time>10:54</time><span>First login. Mohammed and Khalifa went live</span></li>
+            <li class="ok"><time>Thu</time><span>Rashid renewed his Emirates ID and went live, with no new form</span></li>
+          </ol>
+        </div>
+        <div class="end-r">
+          <span class="kick">Why this agent works</span>
+          <h2>What you saw is the tip. <em>Service design is the rest.</em></h2>
+          <div class="berg" id="berg" role="img" aria-label="An iceberg. Above the line of visibility, the tip is the user's journey you saw. Below it, what I saw with service design: the hand-offs from maker to checker, the systems behind digital banking access, and the limits that slow them down. Mapping people and systems showed me where an agent could truly make a difference.">
+            <svg viewBox="0 0 560 420" preserveAspectRatio="none" aria-hidden="true">
+              <defs>
+                <linearGradient id="bg-water" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color: var(--water-top)"/><stop offset=".55" style="stop-color: var(--water-mid)"/><stop offset="1" style="stop-color: var(--water-deep)"/></linearGradient>
+                <linearGradient id="bg-ice" x1="0" y1="0" x2=".35" y2="1"><stop offset="0" style="stop-color: var(--bg)"/><stop offset="1" style="stop-color: var(--ice-shade)"/></linearGradient>
+                <linearGradient id="bg-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color: var(--sky-top)"/><stop offset="1" style="stop-color: var(--bg)"/></linearGradient>
+              </defs>
+              <rect x="0" y="0" width="560" height="91" fill="url(#bg-sky)"/>
+              <rect x="0" y="90" width="560" height="330" fill="url(#bg-water)"/>
+              <polygon class="ray" points="60,90 104,90 40,420 0,420"/>
+              <polygon class="ray" points="450,90 480,90 556,420 506,420"/>
+              <g class="mass">
+                <polygon class="body" points="226,90 334,90 404,104 470,140 512,214 504,300 460,362 378,402 264,408 174,384 104,328 66,236 92,148 156,106"/>
+                <polygon class="lit" points="226,90 278,90 228,200 190,330 174,384 104,328 66,236 92,148 156,106"/>
+                <polygon class="edge" points="226,90 334,90 404,104 470,140 512,214 504,300 460,362 378,402 264,408 174,384 104,328 66,236 92,148 156,106"/>
+              </g>
+              <circle class="bub" cx="36" cy="380" r="3"/><circle class="bub" cx="532" cy="360" r="2.5"/><circle class="bub" cx="30" cy="300" r="2"/>
+              <rect class="shade" x="0" y="91" width="560" height="329"/>
+              <polygon class="tip-l" points="226,90 254,44 272,22 280,90"/>
+              <polygon class="tip-d" points="272,22 292,46 310,68 334,90 280,90"/>
+              <path class="wl" d="M0 90 Q 20 85 40 90 T 80 90 T 120 90 T 160 90 T 200 90 T 240 90 T 280 90 T 320 90 T 360 90 T 400 90 T 440 90 T 480 90 T 520 90 T 560 90"/>
+              <path class="sink" d="M280 30 V100"/>
+            </svg>
+            <div class="b-tip"><b>What you saw</b><span>The user's journey</span></div>
+            <span class="b-lov">line of visibility</span>
+            <div class="it in">What I saw with <b>Service design</b></div><svg class="iw d3 in" style="--d:1.1s" viewBox="0 0 544 420" aria-hidden="true"><path d="M142 166 Q155 161 168 166 T194 166 T220 166 T246 166 T272 166 T298 166 T324 166 T350 166 T376 166 T402 166"/><path class="feed" d="M142 250 C142 272 272 264 272 284"/><path class="feed" d="M272 250 C272 272 272 264 272 284"/><path class="feed" d="M402 250 C402 272 272 264 272 284"/></svg><div class="t3 in" style="left:142px;--d:1.1s"><i><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h11l-3-3M16 13H5l3 3"/></svg></i><span>Hand-offs</span><small>from maker to checker</small></div><div class="t3 in" style="left:272px;--d:1.3s"><i><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="10" cy="5" rx="6" ry="2.4"/><path d="M4 5v10c0 1.3 2.7 2.4 6 2.4s6-1.1 6-2.4V5M4 10c0 1.3 2.7 2.4 6 2.4s6-1.1 6-2.4"/></svg></i><span>Systems</span><small>behind digital banking access</small></div><div class="t3 in" style="left:402px;--d:1.5s"><i><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8M6 17h8M7 3c0 4 6 4.5 6 7s-6 3-6 7M13 3c0 4-6 4.5-6 7s6 3 6 7"/></svg></i><span>Legacy</span><small>the limits that slow them down</small></div><div class="a3 in" style="--d:2s"><b><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 2.5l1.7 4.8 4.8 1.7-4.8 1.7L10 15.5l-1.7-4.8L3.5 9l4.8-1.7z"/></svg>Agent</b><span>Mapping people and systems showed me where an agent could truly make a difference.</span></div>
+            <button class="b-hit" id="berg-hit" type="button"><i></i>See what's underneath</button>
+          </div>
+          <p class="b-line">Then I designed these screens around it, to cut the time from days to under two hours.</p>
+          <div class="sig2"><span class="ph">BM</span><div><b>Bisma Munawar</b><small>AI Product Designer with service design skills under her belt · <a href="https://sunsetbisma.com" target="_blank" rel="noopener">sunsetbisma.com</a></small></div></div>
+          <div class="end-cta"><a class="btn" href="#f1"><svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 8a5 5 0 1 0 1.5-3.5M3 2.5V5h2.5"/></svg>Replay the demo</a><a class="btn ghost" href="../">Back to the case study</a></div>
+        </div>
+      </div>
+    </div></div></div>
+  </section>
+
+  <footer class="closing">
+    <h2>Not redrawn in this round</h2>
+    <ul>
+      <li>History keeps its current structure and gets restyled to match, with corrections and compliance holds recorded in it.</li>
+      <li>Arabic and dark mode stay, now as two small icons in the left panel next to Start over.</li>
+      <li>Every name, number and ID is synthetic.</li>
+    </ul>
+  </footer>
+</div>
+
+<template id="sb-tpl">
+  <aside class="sb">
+    <div class="sb-top"><svg class="rings" viewBox="0 0 22 15"><circle cx="7.5" cy="7.5" r="6"/><circle cx="14.5" cy="7.5" r="6"/></svg><b>Jointly</b></div>
+    <nav class="sb-nav">
+      <a href="#f2" data-k="home"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2.5 7 8 2.5 13.5 7v6.5h-11z"/></svg>Home</a>
+      <a href="#f2"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="4.5"/><path d="m10.5 10.5 3 3"/></svg>Search clients</a>
+    </nav>
+    <div class="sb-list">
+      <div class="sb-sec"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2.5 13.5V4l5-2v11.5M7.5 6h6v7.5M1.5 13.5h13M4.5 6v.01M4.5 8.5v.01M4.5 11v.01M10 8.5h1M10 11h1"/></svg>Business clients<small>7</small></div>
+      <div class="sb-g" data-g="ready"><h6>Ready for your approval</h6></div>
+      <div class="sb-g" data-g="hold" hidden><h6>With compliance</h6></div>
+      <div class="sb-g" data-g="work"><h6>Agent working</h6></div>
+      <div class="sb-g" data-g="today"><h6>Went live today</h6></div>
+      <div class="sb-g" data-g="yest"><h6>Went live yesterday</h6><a class="biz live quiet"><span class="d"></span><b>Desert Bloom Interiors</b><small>Live · 2 of 2</small></a><a class="biz live quiet"><span class="d"></span><b>Blue Dhow Travel</b><small>Live · 3 of 3</small></a><a class="sb-more" href="#f2">Show all</a></div>
+    </div>
+    <div class="sb-foot"><span class="me" role="img" aria-label="You"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><circle cx="8" cy="5.4" r="2.8"/><path d="M2.6 13.8c.6-2.7 2.8-4.2 5.4-4.2s4.8 1.5 5.4 4.2z"/></svg></span><span class="who"><b>Human checker</b><small>Operations</small></span>
+      <span class="icons"><button class="ib" title="Start over"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8a5 5 0 1 0 1.5-3.5M3 2.5V5h2.5"/></svg></button><button class="ib" title="Dark mode"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13 9.5A5.5 5.5 0 0 1 6.5 3a5.5 5.5 0 1 0 6.5 6.5z"/></svg></button></span>
+    </div>
+  </aside>
+</template>
+
+<script>
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+// Scale each 1280-wide frame to its column
+const ro = new ResizeObserver(es => es.forEach(e => {
+  if (document.documentElement.classList.contains('proto')) return;
+  const st = e.target, h = +st.dataset.h, s = Math.min(1, st.clientWidth / 1280);
+  st.style.setProperty('--s', s); st.style.height = (h * s) + 'px';
+}));
+$$('.stage').forEach(s => ro.observe(s));
+
+// Left panel: one template, with Creekside in the state each frame needs
+const creekRow = {
+  work: ['work', 'Agent working · reading SVS'],
+  ready: ['ready', 'Ready for your approval'],
+  hold: ['hold', 'Held · sent to compliance'],
+  setup: ['work', 'Setting up access'],
+  live2: ['live', 'Live · 2 of 3'],
+  live3: ['live', 'Live · 3 of 3'],
+};
+const others = {
+  ready: [['ready', 'Palm Grove Auto Parts', 'Ready for your approval']],
+  work: [['work', 'Al Noor Marine Supplies', 'Checking Emirates IDs']],
+  today: [['live', 'Harbour Point Logistics', 'Live · 3 of 3'], ['live', 'Qasr Textiles', 'Live · 4 of 4']],
+};
+const creekHref = { work: '#f3', ready: '#f5', hold: '#f9', setup: '#f10', live2: '#f11', live3: '#f12' };
+const row = (cls, name, sub, on, href) => `<a class="biz ${cls}${on ? ' on' : ''}"${href ? ` href="${href}"` : ''}><span class="d"></span><b>${name}</b><small>${sub}</small></a>`;
+$$('.sb-slot').forEach(slot => {
+  const sb = $('#sb-tpl').content.firstElementChild.cloneNode(true);
+  const st = slot.dataset.creek, active = slot.dataset.active;
+  if (active === 'home') $('[data-k="home"]', sb).classList.add('on');
+  ['ready', 'work', 'today'].forEach(g => others[g].forEach(o => $(`[data-g="${g}"]`, sb).insertAdjacentHTML('beforeend', row(...o))));
+  const [cls, sub] = creekRow[st];
+  const group = st === 'hold' ? 'hold' : st.startsWith('live') ? 'today' : cls === 'ready' ? 'ready' : 'work';
+  if (group === 'hold') $('[data-g="hold"]', sb).hidden = false;
+  $(`[data-g="${group}"] h6`, sb).insertAdjacentHTML('afterend', row(cls, 'Creekside General Trading', sub, active === 'creek', creekHref[st]));
+  slot.replaceWith(sb);
+});
+
+// A small timeline runner per animated frame: plays while visible, loops, can pause or run at 2x
+function runner(root, script, pauseBtn, fastBtn) {
+  let rate = 1, paused = false, visible = false, gen = 0;
+  const wait = (ms, g) => new Promise(res => {
+    let left = ms; const tick = () => {
+      if (g !== gen) return;
+      if (!visible || paused) return setTimeout(tick, 120);
+      left -= 50 * rate; left <= 0 ? res() : setTimeout(tick, 50);
+    }; tick();
+  });
+  async function loop() { const g = ++gen, w = ms => wait(ms, g); await script(w); if (g === gen) root.dispatchEvent(new Event('run-done')); }
+  root.restart = () => { if (matchMedia('(prefers-reduced-motion: reduce)').matches) return root.dispatchEvent(new Event('run-done')); loop(); };
+  new IntersectionObserver(es => es.forEach(e => { visible = e.isIntersecting; })).observe(root);
+  pauseBtn.addEventListener('click', () => { paused = !paused; pauseBtn.textContent = paused ? 'Play' : 'Pause'; });
+  fastBtn.addEventListener('click', () => { rate = rate === 1 ? 2 : 1; fastBtn.setAttribute('aria-pressed', rate === 2); });
+}
+function moveTo(cur, target, desk) {
+  const s = parseFloat(getComputedStyle(desk.closest('.stage')).getPropertyValue('--s')) || 1;
+  const d = desk.getBoundingClientRect(), t = target.getBoundingClientRect();
+  const x = (t.left - d.left) / s + Math.min(40, (t.width / s) * .6), y = (t.top - d.top) / s + (t.height / s) * .55;
+  cur.style.transform = `translate(${x}px, ${y}px)`;
+}
+function logLine(ul, time, text, src, warn) {
+  ul.insertAdjacentHTML('beforeend', `<li class="${warn ? 'w' : ''}"><time>${time}</time><span><span>${text}</span> ${src ? `<span class="src">${src}</span>` : ''}</span></li>`);
+  while (ul.children.length > 6) ul.firstElementChild.remove();
+}
+
+// 3. The agent at work
+(() => {
+  const desk = $('#desk'), cur = $('#cur'), log = $('#log3'), doing = $('#doing3');
+  const sys = id => $('#' + id), focus = id => $$('#desk .sys').forEach(s => { s.classList.toggle('active', s.id === id); s.classList.toggle('dim', !!id && s.id !== id); });
+  const steps = $$('#plan3 li');
+  const setStep = (i, n) => { steps.forEach((li, k) => { if (k === 4) return; li.className = k < i ? 'done' : k === i ? 'now' : ''; }); $('#p-count').textContent = `${i} of 7 done`; $('#p-bar').style.setProperty('--p', (i / 7 * 100) + '%'); };
+  runner(desk, async w => {
+    $$('#desk .hl').forEach(h => h.classList.remove('on', 'warn')); $('#efr-st').className = 'efr-st'; $('#efr-st').textContent = 'Not checked yet';
+    log.innerHTML = ''; setStep(2); focus(null); cur.style.transform = 'translate(300px, 230px)';
+    logLine(log, '09:00', 'Read the access request and 3 signed forms', 'Forms');
+    await w(700);
+    doing.textContent = 'Finding the signatories in Finacle'; focus('s-fin');
+    for (const id of ['h-fin1', 'h-fin2', 'h-fin3']) { moveTo(cur, $('#' + id), desk); await w(650); $('#' + id).classList.add('on'); }
+    logLine(log, '09:02', 'Found 3 partners, CIF 100234, 087331, 100912', 'Finacle'); await w(700);
+    setStep(2); doing.textContent = 'Reading the signing rules in SVS. They are typed by hand.'; focus('s-svs');
+    moveTo(cur, $('#h-svs'), desk); await w(800); $('#h-svs').classList.add('warn');
+    logLine(log, '09:03', 'SVS spells Khalifa as "KHALEFA". Checking it against his Emirates ID.', 'SVS', true); await w(900);
+    moveTo(cur, $('#h-r1'), desk); await w(800); $('#h-r1').classList.add('on');
+    logLine(log, '09:04', '2019 remark: any two jointly, Khalifa alone up to 50K', 'SVS'); await w(900);
+    moveTo(cur, $('#h-r2'), desk); await w(800); $('#h-r2').classList.add('warn');
+    logLine(log, '09:05', '2023 remark lowers Khalifa’s limit to 25K. I’ll ask the checker.', 'SVS', true); await w(900);
+    setStep(3); doing.textContent = 'Checking Emirates IDs with EFR'; focus('s-efr');
+    moveTo(cur, $('#h-efr'), desk); await w(800); $('#h-efr').classList.add('on'); $('#h-svs').classList.replace('warn', 'on');
+    $('#efr-st').className = 'efr-st ok'; $('#efr-st').textContent = '✓ Valid until 14/03/2027 · same person as KHALEFA';
+    logLine(log, '09:07', 'Matched "KHALEFA" to Khalifa by Emirates ID number', 'Emirates ID'); await w(900);
+    moveTo(cur, $('#h-form'), desk); focus('s-form'); await w(800); $('#h-form').classList.add('on');
+    logLine(log, '09:08', 'Signature on the form matches the SVS specimen', 'SVS'); await w(1200);
+    focus(null); doing.textContent = 'Checking the other two IDs';
+  }, $('#pause3'), $('#fast3'));
+})();
+
+// 5. Signing map: drag a test payment
+(() => {
+  const track = $('#track5'), knob = $('#knob5'), verdict = $('#verdict5'), pp = $$('#map5 .pp');
+  const MAX = 100000, TH = 25000;
+  const fmt = v => 'AED ' + v.toLocaleString('en-US');
+  function set(v) {
+    v = Math.round(Math.max(1000, Math.min(MAX, v)) / 1000) * 1000;
+    track.style.setProperty('--x', (v / MAX * 100) + '%'); knob.dataset.v = fmt(v); knob.setAttribute('aria-valuenow', v);
+    const alone = v <= TH;
+    pp.forEach(p => p.classList.toggle('lit', alone ? p.dataset.p === 'k' : true));
+    verdict.innerHTML = `<b>${fmt(v)}:</b><span>${alone ? 'Khalifa can approve this alone.' : 'Any two of the three approve together. Rashid joins once his renewed Emirates ID passes EFR.'}</span><button class="try" type="button" data-v="${alone ? 40000 : 18000}">${alone ? 'Try AED 40,000 →' : '← Try AED 18,000'}</button>`;
+  }
+  const fromX = x => { const r = track.getBoundingClientRect(); set((x - r.left) / r.width * MAX); };
+  knob.addEventListener('pointerdown', e => { knob.setPointerCapture(e.pointerId); const mv = ev => fromX(ev.clientX); knob.addEventListener('pointermove', mv); knob.addEventListener('pointerup', () => knob.removeEventListener('pointermove', mv), { once: true }); });
+  track.addEventListener('click', e => { if (e.target.closest('a')) return; fromX(e.clientX); });
+  knob.addEventListener('keydown', e => { const v = +knob.getAttribute('aria-valuenow'); if (e.key === 'ArrowRight') set(v + 1000); if (e.key === 'ArrowLeft') set(v - 1000); });
+  // Stop inviting once someone has played with it
+  ['pointerdown', 'keydown'].forEach(t => knob.addEventListener(t, () => knob.classList.remove('idle')));
+  track.addEventListener('click', () => knob.classList.remove('idle'));
+  verdict.addEventListener('click', e => { const b = e.target.closest('.try'); if (!b) return; knob.classList.remove('idle'); track.classList.add('glide'); set(+b.dataset.v); setTimeout(() => track.classList.remove('glide'), 650); });
+  set(18000);
+})();
+
+// Small scenes that play each time they come into view: base class first, then s1, s2... on a timeline
+const playOnView = (el, base, steps) => {
+  if (!el || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  let timers = [], shown = false;
+  const play = () => {
+    timers.forEach(clearTimeout);
+    steps.forEach((_, i) => el.classList.remove('s' + (i + 1))); el.classList.add(base);
+    void el.offsetWidth;
+    timers = steps.map((t, i) => setTimeout(() => el.classList.add('s' + (i + 1)), t));
+  };
+  new IntersectionObserver(es => es.forEach(e => {
+    if (e.intersectionRatio >= .45 && !shown) { shown = true; play(); }
+    if (!e.isIntersecting && e.intersectionRatio === 0) shown = false;
+  }), { threshold: [0, .45] }).observe(el);
+};
+
+// 9. Hold for compliance: send moves Creekside to "With compliance", cancel leaves it with you
+(() => {
+  const f = $('#f9'), send = $('#send9');
+  if (!send) return;
+  const scrim = $('#scrim9'), modal = $('#modal9'), pill = $('#pill9'), bar = $('#bbar9'), pre = $('#pre9'), sent = $('#sent9');
+  const creek = $$('.biz', f).find(a => a.textContent.includes('Creekside'));
+  const readyG = $('[data-g="ready"]', f), holdG = $('[data-g="hold"]', f);
+  const ldot = '<span class="ldot"><svg viewBox="0 0 22 15"><circle cx="7.5" cy="7.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="14.5" cy="7.5" r="6" fill="none" stroke="currentColor" stroke-width="2"/></svg></span>';
+  const form = show => [scrim, modal].forEach(el => el.classList.toggle('gone', !show));
+  const place = (g, cls, sub) => { $('h6', g).after(creek); creek.className = 'biz ' + cls + ' on'; $('small', creek).textContent = sub; };
+  send.addEventListener('click', () => {
+    form(false);
+    pre.hidden = true; sent.hidden = false; void sent.offsetWidth; sent.classList.add('go');
+    holdG.hidden = false; place(holdG, 'hold', 'Held · sent to compliance');
+    void creek.offsetWidth; creek.classList.add('flash');
+    pill.className = 'pill hold'; pill.innerHTML = '<i></i>With compliance';
+    bar.innerHTML = ldot + '<div class="msg"><b>Waiting on compliance</b><small>The agent will tell you as soon as they reply.</small></div><div class="acts"><button class="btn ghost" type="button" data-again>Show the hold form again</button><a class="btn" href="#f5">Back to the review</a></div>';
+  });
+  $('#cancel9').addEventListener('click', () => {
+    form(false);
+    bar.innerHTML = '<div class="msg"><b>Nothing was sent</b><small>Creekside is still waiting for your decision.</small></div><div class="acts"><button class="btn" type="button" data-again>Hold for compliance</button></div>';
+  });
+  const reset = () => {
+    pre.hidden = false; sent.hidden = true; sent.classList.remove('go');
+    holdG.hidden = true; place(readyG, 'ready', 'Ready for your approval');
+    pill.className = 'pill ready'; pill.textContent = 'Ready for your approval';
+    bar.innerHTML = '<div class="msg"><b>Your decision</b></div>';
+    form(true);
+  };
+  bar.addEventListener('click', e => { if (e.target.closest('[data-again]')) reset(); });
+  f.addEventListener('reset', reset);
+})();
+
+// 12. Download sign-off: confirm with a toast instead of leaving the click silent
+(() => {
+  const dl = $('#dl12'), toast = $('#toast12');
+  if (!dl || !toast) return;
+  let t;
+  dl.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); toast.classList.add('on'); clearTimeout(t); t = setTimeout(() => toast.classList.remove('on'), 3800); });
+})();
+
+// 8. Correction as a chat: your message goes out, the agent thinks, then answers
+playOnView($('#convo8'), 'convo', [150, 900, 2600, 3700]);
+
+// 11. Khalifa's phone: the text arrives, the tick pops, then the steps
+playOnView($('#phone11'), 'arrive', [200, 800, 1200, 2000]);
+
+// 6. Why AED 25,000: the drawer slides in from the right
+playOnView($('#app6'), 'drawin', [350]);
+// Any answer in the drawer (approve, correct, back, close) slides it out first, then moves on
+$('#app6').addEventListener('click', e => {
+  const a = e.target.closest('.dr-f a, .dr-h .x'), app = e.currentTarget;
+  if (!a || !app.classList.contains('drawin')) return;
+  e.preventDefault(); e.stopPropagation();
+  const to = a.getAttribute('href') || '#' + (a.dataset.go || 'f5');
+  app.classList.add('shut');
+  setTimeout(() => { location.hash = to; setTimeout(() => app.classList.remove('shut'), 100); }, 560);
+}, true);
+
+// 12. Rashid's path: link sent, ID uploaded, agent checked it, live
+playOnView($('#rpath12'), 'grow', [300, 1000, 1700, 2400]);
+
+// 10. The agent sets up access in the admin module
+(() => {
+  const desk = $('#desk10'), cur = $('#cur10'), log = $('#log10'), doing = $('#doing10');
+  const type = async (el, text, w) => { el.classList.add('on'); el.textContent = ''; for (let i = 0; i <= text.length; i += 3) { el.textContent = text.slice(0, i); await w(30); } el.textContent = text; el.classList.remove('on'); };
+  const users = [
+    ['u1', ['Mohammed Al Mansoori', 'mmansoori', '100234', 'roles', 'Created']],
+    ['u2', ['Khalifa Saeed Al Falasi', 'kfalasi', '087331', 'roles', 'Created']],
+  ];
+  const roles = '<span class="tgl on"><i></i>Initiate &amp; Authorize</span>';
+  runner(desk, async w => {
+    ['a-co', 'a-ac', 'a-md', 'a-rule', 'a-cur'].forEach(id => $('#' + id).textContent = '');
+    ['u1', 'u2', 'u3'].forEach(id => { const r = $('#' + id); r.className = 'r'; $$('span', r).forEach(s => s.innerHTML = ''); });
+    $('#a-sent').classList.remove('on'); $('#a-send').classList.remove('on'); $$('#rb10 .rb span').forEach(s => s.classList.remove('ok')); log.innerHTML = '';
+    doing.textContent = 'Creating the company profile';
+    moveTo(cur, $('#a-co'), desk); await w(700); await type($('#a-co'), 'Creekside General Trading LLC', w);
+    await type($('#a-ac'), '0191-2290-01', w); await type($('#a-md'), 'Mixed · any two jointly', w);
+    logLine(log, '10:42', 'Created the company profile', 'Admin module'); await w(400);
+    for (const [id, vals] of users) {
+      const r = $('#' + id), sp = $$('span', r); doing.textContent = `Adding ${vals[0].split(' ')[0]} as a user`;
+      moveTo(cur, sp[0], desk); await w(600); r.classList.add('fill');
+      for (let i = 0; i < 3; i++) await type(sp[i], vals[i], w);
+      moveTo(cur, sp[3], desk); await w(500); sp[3].innerHTML = roles; await w(300); sp[4].textContent = 'Created';
+      logLine(log, id === 'u1' ? '10:44' : '10:46', `Created ${vals[1]} with initiate and authorize roles`, 'Admin module'); await w(400);
+    }
+    const r3 = $('#u3'), s3 = $$('span', r3); r3.classList.add('skip');
+    s3[0].textContent = 'Rashid Hamad Al Ketbi'; s3[1].textContent = 'Not created'; s3[2].textContent = '100912'; s3[3].textContent = 'Held'; s3[4].textContent = 'On hold · ID expired';
+    logLine(log, '10:47', 'Skipped Rashid while his Emirates ID is expired', 'EFR', true); await w(600);
+    doing.textContent = 'Entering the approval rule'; moveTo(cur, $('#a-rule'), desk); await w(600);
+    await type($('#a-rule'), 'Khalifa alone up to AED 25,000 · above that, any two', w); await type($('#a-cur'), 'AED', w);
+    logLine(log, '10:49', 'Entered the approval rule you approved', 'Admin module'); await w(400);
+    doing.textContent = 'Sending activation links'; moveTo(cur, $('#a-send'), desk); await w(700); $('#a-send').classList.add('on'); await w(400); $('#a-sent').classList.add('on');
+    logLine(log, '10:52', 'Sent activation links by SMS. No password is ever shown.', 'SMS'); await w(600);
+    doing.textContent = 'Reading back what I entered'; moveTo(cur, $('#rb10 h5'), desk);
+    for (const s of $$('#rb10 .rb span')) { await w(380); s.classList.add('ok'); }
+    logLine(log, '10:53', 'Read-back matches your approved plan, 6 of 6', 'Admin module');
+    doing.textContent = 'Done. Everything matches your approved plan.';
+  }, $('#pause10'), $('#fast10'));
+})();
+// 13. The iceberg: click the hint to reveal what's underneath
+(() => {
+  const berg = $('#berg'), hit = $('#berg-hit');
+  if (!berg) return;
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) berg.classList.add('on');
+  hit.addEventListener('click', () => berg.classList.add('on'));
+})();
+</script>
+
+<style>
+/* Prototype mode: one screen at a time, fitted to the window */
+html.proto body { padding: 0; min-height: 100vh; background: var(--bg); }
+html.proto .app { border: 0; border-radius: 0; box-shadow: none; }
+html.proto .pbar { transition: opacity .25s, transform .25s; }
+html.proto:not(.bar-on) .pbar { opacity: 0; transform: translate(-50%, 12px); pointer-events: none; }
+@media (hover: none) { html.proto:not(.bar-on) .pbar { opacity: 1; transform: translateX(-50%); pointer-events: auto; } }
+html.proto .pbar { visibility: hidden !important; pointer-events: none !important; }
+html.proto .wrap { display: block; max-width: none; }
+html.proto .intro-page, html.proto .closing, html.proto .fr-head, html.proto .fr { display: none; }
+html.proto .fr.cur { display: block; }
+html.proto .stage { margin: 0 auto; }
+.proto-next[hidden] { display: none !important; }
+html.proto [data-go] { cursor: pointer; }
+.pbar { position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%); z-index: 50; display: flex; align-items: center; gap: 2px; padding: 4px; border-radius: 999px; background: var(--ink); color: var(--bg); font-size: 13px; box-shadow: 0 12px 30px -12px rgba(15,26,61,.55); }
+.pbar button { border: 0; background: none; color: inherit; cursor: pointer; border-radius: 999px; padding: 6px 11px; font-weight: 600; }
+.pbar button:hover { background: rgba(127,140,180,.22); }
+.pbar .lbl { padding: 0 8px; min-width: 210px; text-align: center; white-space: nowrap; }
+.pbar .lbl small { opacity: .65; margin-right: 6px; font-variant-numeric: tabular-nums; }
+.pbar .sep { width: 1px; height: 18px; background: currentColor; opacity: .25; margin: 0 4px; }
+.pmenu { position: absolute; bottom: calc(100% + 8px); right: 0; background: var(--bg); color: var(--ink); border: 1px solid var(--line); border-radius: 12px; padding: 6px; min-width: 240px; box-shadow: 0 18px 40px -16px rgba(15,26,61,.45); display: grid; }
+.pmenu[hidden] { display: none; }
+.pmenu a { text-decoration: none; padding: 7px 10px; border-radius: 8px; display: flex; gap: 10px; }
+.pmenu a:hover { background: var(--hover); }
+.pmenu a.on { background: var(--agent-soft); color: var(--agent); font-weight: 600; }
+.pmenu a small { color: var(--faint); width: 18px; font-variant-numeric: tabular-nums; }
+.pmenu a.on small { color: inherit; }
+.pmenu .alt { padding-left: 38px; }
+/* Click on nothing: show what's clickable, like a Figma prototype */
+@keyframes hot { from { outline-color: rgba(58,90,214,.7); } to { outline-color: rgba(58,90,214,0); } }
+.hot .fr.cur a[href], .hot .fr.cur button, .hot .fr.cur [data-go], .hot .fr.cur .knob { outline: 2px solid rgba(58,90,214,0); outline-offset: 2px; animation: hot .9s ease-out; }
+</style>
+<div class="pbar" role="navigation" aria-label="Prototype">
+  <button id="pb-prev" aria-label="Previous screen">‹</button>
+  <span class="lbl" id="pb-lbl"></span>
+  <button id="pb-next" aria-label="Next screen">›</button>
+  <span class="sep"></span>
+  <button id="pb-menu" aria-expanded="false">Screens</button>
+  <div class="pmenu" id="pmenu" hidden></div>
+</div>
+<script>
+(() => {
+  const screens = [
+    ['f1', 'Welcome'], ['f2', 'Business clients'], ['f3', 'The agent at work'], ['f4', 'What it checked'],
+    ['f5', 'Your review'], ['f6', 'Why AED 25,000?', 1], ['f8', 'Correct it', 1], ['f9', 'Hold for compliance', 1],
+    ['f10', 'Setting up access'], ['f11', 'Live · 2 of 3'], ['f12', 'Rashid renews, full sign-off'], ['f13', 'The end'],
+  ];
+  const ids = screens.map(s => s[0]);
+  const bar = $('#pb-lbl'), menu = $('#pmenu'), menuBtn = $('#pb-menu');
+  menu.innerHTML = screens.map(([id, name, alt], i) => `<a href="#${id}" class="${alt ? 'alt' : ''}"><small>${i + 1}</small>${name}</a>`).join('');
+
+  // Things that aren't links in the review file but are clickable here
+  const go = (sel, to) => $$(sel).forEach(el => el.dataset.go = to);
+  go('#creek-card, #f2 .tour', 'f3');
+  go('#f6 .dr-h .x', 'f5');
+  go('[title="Start over"]', 'f1');
+  // Sending to compliance is handled by the demo itself; cancel goes back to the review here
+  const f9 = $('#f9');
+  $('#cancel9').dataset.go = 'f5';
+  $$('#f8 .acts .btn.ghost').forEach(b => b.dataset.go = 'f5');
+  document.addEventListener('click', e => { const g = e.target.closest('[data-go]'); if (g) location.hash = g.dataset.go; });
+
+  // Animated screens reveal their next step when they finish
+  [['#desk', '#f3'], ['#desk10', '#f10']].forEach(([d, f]) => $(d).addEventListener('run-done', () => $(f + ' .proto-next').hidden = false));
+
+  let cur = null;
+  function fit() {
+    if (!cur) return;
+    const st = $('.stage', cur), h = +st.dataset.h;
+    // Size from the page's own box, not innerWidth: on a phone innerWidth grows once anything overflows
+    const de = document.documentElement, W = de.clientWidth, H = de.clientHeight;
+    const s = Math.min(1.2, W / 1280, H / h), app = $('.app', st), sc = $('.scaler', st);
+    const aw = W / s, ah = Math.max(h, Math.min(H / s, h * 1.4));
+    sc.style.width = app.style.width = aw + 'px'; app.style.height = ah + 'px';
+    st.style.width = W + 'px'; st.style.height = ah * s + 'px'; st.style.setProperty('--s', s);
+  }
+  function show(id) {
+    if (!ids.includes(id)) id = 'f1';
+    cur = $('#' + id);
+    $$('.fr').forEach(f => f.classList.toggle('cur', f === cur));
+    fit(); scrollTo(0, 0);
+    if (id === 'f3') { $('#f3 .proto-next').hidden = true; $('#desk').restart(); }
+    if (id === 'f10') { $('#f10 .proto-next').hidden = true; $('#desk10').restart(); }
+    if (id === 'f9') f9.dispatchEvent(new Event('reset'));
+    if (id === 'f13') $('#berg').classList.remove('on');
+    const i = ids.indexOf(id);
+    bar.innerHTML = `<small>${i + 1} of ${ids.length}</small>${screens[i][1]}`;
+    $$('a', menu).forEach(a => a.classList.toggle('on', a.getAttribute('href') === '#' + id));
+    $('#pb-prev').disabled = i === 0; $('#pb-next').disabled = i === ids.length - 1;
+    document.title = screens[i][1] + ' · Jointly demo';
+  }
+  const step = d => { const i = ids.indexOf(cur.id) + d; if (i >= 0 && i < ids.length) location.hash = ids[i]; };
+  $('#pb-prev').addEventListener('click', () => step(-1));
+  $('#pb-next').addEventListener('click', () => step(1));
+  const openMenu = o => { menu.hidden = !o; menuBtn.setAttribute('aria-expanded', o); };
+  menuBtn.addEventListener('click', e => { e.stopPropagation(); openMenu(menu.hidden); });
+  menu.addEventListener('click', () => openMenu(false));
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.pmenu, #pb-menu')) openMenu(false);
+    if (e.target.closest('.stage') && !e.target.closest('a[href], button, [data-go], .knob, .track, .chips span')) {
+      document.body.classList.remove('hot'); void document.body.offsetWidth; document.body.classList.add('hot');
+    }
+  });
+  document.addEventListener('keydown', e => {
+    if (e.target.closest('input, textarea, [contenteditable], .knob')) return;
+    if (e.key === 'ArrowRight') step(1);
+    if (e.key === 'ArrowLeft') step(-1);
+    if (e.key === 'Escape') openMenu(false);
+    if (e.key === 'Enter') { const b = $$('.btn.pri[href]', cur).find(b => !b.hidden); if (b) { e.preventDefault(); b.click(); } }
+  });
+  addEventListener('hashchange', () => show(location.hash.slice(1)));
+  addEventListener('resize', fit);
+  show(location.hash.slice(1));
+})();
+</script>
+<style>
+.w-brand .home { display: inline-flex; align-items: center; gap: inherit; color: inherit; text-decoration: none; }
+.phone-note { display: none; margin: 0 auto 12px; max-width: 420px; font-size: 13px; line-height: 1.45; color: var(--muted); text-align: center; }
+@media (max-width: 700px) and (orientation: portrait) { .phone-note { display: block; } }
+</style>
+<script>
+(() => {
+  const root = document.documentElement, pb = document.querySelector('.pbar');
+  let peek = true;
+  const sync = y => root.classList.toggle('bar-on', peek || y > innerHeight - 100 || pb.contains(document.activeElement) || !document.getElementById('pmenu').hidden);
+  setTimeout(() => { peek = false; sync(0); }, 2500); sync(0);
+  addEventListener('mousemove', e => sync(e.clientY));
+  pb.addEventListener('focusin', () => sync(innerHeight)); pb.addEventListener('focusout', () => setTimeout(() => sync(0)));
+})();
+document.addEventListener('click', e => {
+  if (!e.target.closest('[title="Dark mode"]')) return;
+  const root = document.documentElement;
+  const dark = root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  root.dataset.theme = dark ? 'light' : 'dark';
+});
+</script>

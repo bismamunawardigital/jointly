@@ -5,10 +5,10 @@ colors:
   ink: "#16171A"
   sub: "#4A4C52"
   muted: "#6E6F73"
-  line: "#E7E4DE"
-  panel: "#F4F2EE"
+  line: "#E3E7ED"
+  panel: "#EEF1F5"
   surface: "#FFFFFF"
-  canvas: "#FBFAF7"
+  canvas: "#F6F7F9"
   accent: "#2449B4"
   accent-soft: "#EEF3FC"
   accent-ink: "#1C3A93"
@@ -77,7 +77,7 @@ The product story is always visible in the UI: the agent proposes, rules verify,
 
 All colours are CSS variables in `src/app/globals.css`, with a dark set under `[data-theme="dark"]`. Light is the default. Live reference: `/demo/styleguide`.
 
-- **Ink** `#0F1B2D`, **canvas** `#FAF7F2` (dark `#0E1420`), **surface** `#FFFFFF` (dark `#151D2B`), **border** `#E9E3D8` (dark `#243044`).
+- **Ink** `#0F1B2D`, **canvas** `#F6F7F9` (dark `#0B1220`), **surface** `#FFFFFF` (dark `#151D2B`), **border** `#E3E7ED` (dark `#243044`).
 - **Saffron** `#C8892B` is the brand accent. Only for the logo, the landing hero and the active step.
 - **Ink blue** `#1F3A8A` is the primary action and focus.
 - **Status only**: verified `#2F7D5B`, needs you `#B7791F`, blocked `#B42318`, held `#6B7280`. Never decorative.
@@ -86,7 +86,7 @@ All colours are CSS variables in `src/app/globals.css`, with a dark set under `[
 
 ## Typography
 
-IBM Plex Sans for UI, IBM Plex Sans Arabic for Arabic, Fraunces for display (its 1 and l stay distinct, which matters for "v1" and amounts). Scale 12 / 14 / 16 / 20 / 28 / 40 / 56 / 72. Product display is 28px, landing display 40 to 72px. Body 14 to 15px, never below 12px. Mono only inside Technical details. Tabular numbers for amounts and times. Sentence case everywhere.
+IBM Plex Sans for UI, IBM Plex Sans Arabic for Arabic, Instrument Sans 500/600 for display (its 1 and l stay distinct, which matters for "v1" and amounts). No serif in the product. Scale 12 / 14 / 16 / 20 / 28 / 40 / 56 / 72. Product display is 28px, landing display 40 to 72px. Body 14 to 15px, never below 12px. Mono only inside Technical details. Tabular numbers for amounts and times. Sentence case everywhere.
 
 Every product screen starts with a small eyebrow (the case name) and one display sentence that says the situation, like "2 of 3 signatories can go live today."
 
